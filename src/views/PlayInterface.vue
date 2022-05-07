@@ -1,5 +1,5 @@
 <template>
-  <div class="compA">
+  <div class="play-interface">
     <Track :Track="tempTrack" :Global="global"/>
   </div>
 </template>
@@ -22,7 +22,7 @@ export default {
         startTiming: 9163,
         endTiming: 10228,
         positionX: 0.1,
-        width: 0.03,
+        width: 0.1,
         R: 160,
         G: 160,
         B: 160,
@@ -4092,4 +4092,10 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.play-interface{
+  height:100%;
+  width:100%;
+  background:blue
+}
+</style>
