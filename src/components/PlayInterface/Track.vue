@@ -9,12 +9,25 @@
     }"
   >
     <div
+      class="black-line"
+      :style="{
+        width: '2px',
+        position: 'absolute',
+        left: 0.5 * width + 1 + 'px',
+        top: '0px',
+        height: height + 'px',
+        background: 'rgba(0,0,0,0.3)',
+      }"
+    ></div>
+    <div
       class="track-body"
       @click="isActive = !isActive"
       :style="{
         height: height + 'px',
         width: '100%',
         margin: 'auto 0',
+        borderTop: '0px',
+        borderBottom: '0px',
         borderRight: '2px solid rgba(255,255,255,0.5)',
         borderLeft: '2px solid rgba(255,255,255,0.5)',
         top: 0,
@@ -46,37 +59,32 @@
             : 'rgba(' + Track.R + ',' + Track.G + ',' + Track.B + ',0.8)',
         ],
       }"
-    ></div>
+    >
+      <Note :note="Track.notes[0]" :left="0.5 * width" />
+    </div>
     <div
       class="black-point"
       :style="{
-        width: lengthForBlackPoint+'px',
+        width: lengthForBlackPoint + 'px',
         position: 'absolute',
         left: 0.5 * width - offsetDiagonal + 'px',
-        top: height - offsetDiagonal - 2 + 'px',
+        top: height - offsetDiagonal + 'px',
         margin: 'auto 0',
-        height: lengthForBlackPoint+'px',
+        height: lengthForBlackPoint + 'px',
         background: 'rgb(0,0,0)',
         transform: 'rotateZ(45deg)',
-      }"
-    ></div>
-    <div
-      class="black-point"
-      :style="{
-        width: '2px',
-        position: 'absolute',
-        left: 0.5 * width+1  + 'px',
-        top: '0px',
-        height: height+'px',
-        background: 'rgba(0,0,0,0.3)',
       }"
     ></div>
   </div>
 </template>
 
 <script>
+import Note from "./Note";
 export default {
   props: ["Track", "Global"],
+  components: {
+    Note,
+  },
   data() {
     return {
       myTrack: this.Track,
@@ -103,7 +111,10 @@ export default {
       );
     },
     offsetDiagonal() {
-      return Math.sqrt(this.lengthForBlackPoint * this.lengthForBlackPoint * 2)-this.lengthForBlackPoint;
+      return (
+        Math.sqrt(this.lengthForBlackPoint * this.lengthForBlackPoint * 2) -
+        this.lengthForBlackPoint
+      );
     },
   },
 };

@@ -26,7 +26,32 @@ export default {
         R: 160,
         G: 160,
         B: 160,
-        notes: [],
+        notes: [
+          {
+              basedTrack: 3,
+              positionX: 0.0,
+              positionY: 0.0,
+              noteType: 0,
+              key: "k",
+              timing: 12319,
+              endTiming: 0,
+              length: 0.0,
+              lastTime: 0,
+              currentTime: 0,
+            },
+            {
+              basedTrack: 3,
+              positionX: 0.0,
+              positionY: 0.0,
+              noteType: 1,
+              key: "k",
+              timing: 13200,
+              endTiming: 13381,
+              length: 0.13163636363636363,
+              lastTime: 0,
+              currentTime: 0,
+            },
+        ],
         moveOperations: [
           {
             trackId: 5,
