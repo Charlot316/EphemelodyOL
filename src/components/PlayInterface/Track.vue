@@ -85,23 +85,40 @@
           :Global="Global"
         />
       </div>
-       <div v-for="MoveOperation in Track.moveOperations" :key="MoveOperation">
+      <div v-for="MoveOperation in Track.moveOperations" :key="MoveOperation">
         <MoveOperation
           :Operation="MoveOperation"
           v-if="
             Global.currentTime > MoveOperation.startTime &&
-              Global.currentTime < MoveOperation.endTime 
+              Global.currentTime < MoveOperation.endTime + refreshTime
           "
           :Global="Global"
           :Track="Track"
         />
       </div>
-       <div v-for="WidthOperation in Track.changeWidthOperations" :key="WidthOperation">
+      <div
+        v-for="WidthOperation in Track.changeWidthOperations"
+        :key="WidthOperation"
+      >
         <WidthOperation
           :Operation="WidthOperation"
           v-if="
             Global.currentTime > WidthOperation.startTime &&
-              Global.currentTime < WidthOperation.endTime 
+              Global.currentTime < WidthOperation.endTime + refreshTime
+          "
+          :Global="Global"
+          :Track="Track"
+        />
+      </div>
+      <div
+        v-for="ColorOperation in Track.changeColorOperations"
+        :key="ColorOperation"
+      >
+        <ColorOperation
+          :Operation="ColorOperation"
+          v-if="
+            Global.currentTime > ColorOperation.startTime &&
+              Global.currentTime < ColorOperation.endTime + refreshTime
           "
           :Global="Global"
           :Track="Track"
@@ -115,18 +132,21 @@
 import Note from "./Note";
 import MoveOperation from "./MoveOperation";
 import WidthOperation from "./WidthOperation";
+import ColorOperation from "./ColorOperation";
 export default {
   props: ["Track", "Global"],
   components: {
     Note,
     MoveOperation,
     WidthOperation,
+    ColorOperation,
   },
   data() {
     return {
       myTrack: this.Track,
       isActive: false,
       lengthForBlackPoint: 15,
+      refreshTime: 1000 / this.$store.state.refreshRate,
     };
   },
   watch: {
@@ -134,7 +154,8 @@ export default {
       this.myTrack.width = this.Track.width;
     },
   },
-  created() {},
+  created() {
+  },
   computed: {
     height() {
       return this.Global.screenHeight * this.Global.finalY;
