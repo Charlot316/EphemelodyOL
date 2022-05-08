@@ -4027,7 +4027,7 @@ export default {
       this.nowDateTime = Date.now();
       setTimeout(() => {
         this.run();
-      }, 1000 / 60);
+      }, 1000 / this.$store.state.refreshRate);
     },
     initiate() {
       this.getChart();
