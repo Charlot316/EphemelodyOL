@@ -2,8 +2,8 @@
   <div class="play-interface">
     <div class="play-interface-container" v-for="Track in chart" :key="Track">
       <Track :Track="Track" :Global="global"  v-if="
-            global.currentTime > Track.startTiming - global.remainingTime &&
-              global.currentTime < Track.endTiming + global.lostTime
+            global.currentTime > Track.startTiming &&
+              global.currentTime < Track.endTiming
           "/>
     </div>
   </div>

@@ -96,6 +96,17 @@
           :Track="Track"
         />
       </div>
+       <div v-for="WidthOperation in Track.changeWidthOperations" :key="WidthOperation">
+        <WidthOperation
+          :Operation="WidthOperation"
+          v-if="
+            Global.currentTime > WidthOperation.startTime &&
+              Global.currentTime < WidthOperation.endTime 
+          "
+          :Global="Global"
+          :Track="Track"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -103,11 +114,13 @@
 <script>
 import Note from "./Note";
 import MoveOperation from "./MoveOperation";
+import WidthOperation from "./WidthOperation";
 export default {
   props: ["Track", "Global"],
   components: {
     Note,
     MoveOperation,
+    WidthOperation,
   },
   data() {
     return {
