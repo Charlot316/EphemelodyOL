@@ -60,7 +60,7 @@
         ],
       }"
     >
-      <Note :Note="Track.notes[0]" :left="0.5 * width" />
+      <Note :Note="Track.notes[0]" :left="0.5 * width" :Global="Global"/>
     </div>
     <div
       class="black-point"

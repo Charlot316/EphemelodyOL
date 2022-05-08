@@ -73,7 +73,7 @@ export default {
   },
   computed: {
     top() {
-      return 50;
+      return this.Note.positionY * this.Global.screenHeight;
     },
     offsetDiagonal() {
       if (this.Note.noteType == 0) {
