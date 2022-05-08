@@ -33,7 +33,6 @@ export default {
     },
   },
   created() {
-    console.log(this.Operation)
     this.myOperation.startR = this.Track.R;
     this.myOperation.startG = this.Track.G;
     this.myOperation.startB = this.Track.B;

@@ -4059,6 +4059,6 @@ export default {
 .play-interface {
   height: 100%;
   width: 100%;
-  background: blue;
+  background: black;
 }
 </style>
