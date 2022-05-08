@@ -90,7 +90,7 @@
           :Operation="MoveOperation"
           v-if="
             Global.currentTime > MoveOperation.startTime &&
-              Global.currentTime < MoveOperation.endTime + refreshTime
+              Global.currentTime < MoveOperation.endTime + 2*refreshTime
           "
           :Global="Global"
           :Track="Track"
@@ -104,7 +104,7 @@
           :Operation="WidthOperation"
           v-if="
             Global.currentTime > WidthOperation.startTime &&
-              Global.currentTime < WidthOperation.endTime + refreshTime
+              Global.currentTime < WidthOperation.endTime + 2*refreshTime
           "
           :Global="Global"
           :Track="Track"
@@ -118,7 +118,7 @@
           :Operation="ColorOperation"
           v-if="
             Global.currentTime > ColorOperation.startTime &&
-              Global.currentTime < ColorOperation.endTime + refreshTime
+              Global.currentTime < ColorOperation.endTime + 2*refreshTime
           "
           :Global="Global"
           :Track="Track"
