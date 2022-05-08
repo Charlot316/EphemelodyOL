@@ -9,13 +9,14 @@ export default createStore({
         username: "未登录",
         user_id: "",
         role: 2,
+        refrashRate: 120,
     },
     mutations: {
         login(state, username) {
             state.islogin = true
             state.username = username
         },
-        changeName(state,username){
+        changeName(state, username) {
             state.username = username
         },
         storeId(state, userid) {
@@ -25,7 +26,7 @@ export default createStore({
             state.islogin = false
             state.username = "未登录"
             state.user_id = ""
-            state.tagsList=[]
+            state.tagsList = []
         },
         setRole(state, role) {
             state.role = role

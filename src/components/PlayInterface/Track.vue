@@ -41,8 +41,8 @@
         margin: 'auto 0',
         borderTop: '0px',
         borderBottom: '0px',
-        borderRight: '2px solid rgba(255,255,255,0.5)',
-        borderLeft: '2px solid rgba(255,255,255,0.5)',
+        borderRight: '2px solid rgba(255,255,255,1)',
+        borderLeft: '2px solid rgba(255,255,255,1)',
         top: 0,
         background: [
           isActive
@@ -85,16 +85,29 @@
           :Global="Global"
         />
       </div>
+       <div v-for="MoveOperation in Track.moveOperations" :key="MoveOperation">
+        <MoveOperation
+          :Operation="MoveOperation"
+          v-if="
+            Global.currentTime > MoveOperation.startTime &&
+              Global.currentTime < MoveOperation.endTime 
+          "
+          :Global="Global"
+          :Track="Track"
+        />
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import Note from "./Note";
+import MoveOperation from "./MoveOperation";
 export default {
   props: ["Track", "Global"],
   components: {
     Note,
+    MoveOperation,
   },
   data() {
     return {
