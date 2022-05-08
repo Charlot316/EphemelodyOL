@@ -69,7 +69,6 @@ export default {
     "Global.screenWidth"() {},
   },
   created() {
-    console.log(this.Note);
   },
   computed: {
     top() {

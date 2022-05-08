@@ -67,7 +67,7 @@
       :style="{
         width: lengthForBlackPoint + 'px',
         position: 'absolute',
-        left: 0.5 * width - offsetDiagonal + 'px',
+        left: 0.5 * width - offsetDiagonal +0.2+ 'px',
         top: height - offsetDiagonal + 'px',
         margin: 'auto 0',
         height: lengthForBlackPoint + 'px',
