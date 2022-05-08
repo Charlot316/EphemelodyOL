@@ -13,10 +13,23 @@
       :style="{
         width: '2px',
         position: 'absolute',
-        left: 0.5 * width + 1 + 'px',
+        left: 0.5 * width+ 'px',
         top: '0px',
         height: height + 'px',
         background: 'rgba(0,0,0,0.3)',
+      }"
+    ></div>
+    <div
+      class="black-point"
+      :style="{
+        width: lengthForBlackPoint + 'px',
+        position: 'absolute',
+        left: 0.5 * width - offsetDiagonal - 1.2 + 'px',
+        top: height - offsetDiagonal + 'px',
+        margin: 'auto 0',
+        height: lengthForBlackPoint + 'px',
+        background: 'rgb(0,0,0)',
+        transform: 'rotateZ(45deg)',
       }"
     ></div>
     <div
@@ -24,7 +37,7 @@
       @click="isActive = !isActive"
       :style="{
         height: height + 'px',
-        width: '100%',
+        width: width - 4 + 'px',
         margin: 'auto 0',
         borderTop: '0px',
         borderBottom: '0px',
@@ -60,21 +73,11 @@
         ],
       }"
     >
-      <Note :Note="Track.notes[0]" :left="0.5 * width" :Global="Global"/>
+      {{ Track.left }}
+      <div v-for="Note in Track.notes" :key="Note">
+        <Note :Note="Note" :left="0.5 * width" :Global="Global" />
+      </div>
     </div>
-    <div
-      class="black-point"
-      :style="{
-        width: lengthForBlackPoint + 'px',
-        position: 'absolute',
-        left: 0.5 * width - offsetDiagonal +0.2+ 'px',
-        top: height - offsetDiagonal + 'px',
-        margin: 'auto 0',
-        height: lengthForBlackPoint + 'px',
-        background: 'rgb(0,0,0)',
-        transform: 'rotateZ(45deg)',
-      }"
-    ></div>
   </div>
 </template>
 
@@ -96,6 +99,9 @@ export default {
     "Global.screenWidth"() {
       this.myTrack.width = this.Track.width;
     },
+  },
+  created() {
+    console.log(this.Track);
   },
   computed: {
     height() {
