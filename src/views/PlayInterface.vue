@@ -1,13 +1,15 @@
 <template>
   <div class="play-interface">
     <div class="play-interface-container" v-for="Track in chart" :key="Track">
-      <Track :Track="Track" :Global="global" />
+      <Track :Track="Track" :Global="global"  v-if="
+            global.currentTime > Track.startTiming - global.remainingTime &&
+              global.currentTime < Track.endTiming + global.lostTime
+          "/>
     </div>
   </div>
 </template>
 
 <script>
-import TWEEN from "@tweenjs/tween.js";
 import Track from "@/components/PlayInterface/Track";
 
 export default {
@@ -17,97 +19,43 @@ export default {
   data() {
     return {
       num: 0,
-      tempTrack: {
-        id: 5,
-        type: 0,
-        key: "a",
-        startTiming: 9163,
-        endTiming: 10228,
-        positionX: 0.1,
-        width: 0.1,
-        R: 160,
-        G: 160,
-        B: 160,
-        notes: [
-          {
-            basedTrack: 3,
-            positionX: 0.0,
-            positionY: 0.0,
-            noteType: 1,
-            key: "k",
-            timing: 12319,
-            endTiming: 0,
-            length: 0.0,
-            lastTime: 0,
-            currentTime: 0,
-          },
-          {
-            basedTrack: 3,
-            positionX: 0.0,
-            positionY: 0.0,
-            noteType: 1,
-            key: "k",
-            timing: 13200,
-            endTiming: 13381,
-            length: 0.13163636363636363,
-            lastTime: 0,
-            currentTime: 0,
-          },
-        ],
-        moveOperations: [
-          {
-            trackId: 5,
-            type: 1,
-            startTime: 9163,
-            endTime: 9514,
-            endX: 0.9,
-            endWidth: 0.0,
-            endR: 160,
-            endG: 160,
-            endB: 160,
-            background: "",
-          },
-          {
-            trackId: 5,
-            type: 1,
-            startTime: 9514,
-            endTime: 9879,
-            endX: 0.85,
-            endWidth: 0.0,
-            endR: 160,
-            endG: 160,
-            endB: 160,
-            background: "",
-          },
-          {
-            trackId: 5,
-            type: 1,
-            startTime: 9879,
-            endTime: 10053,
-            endX: 0.8,
-            endWidth: 0.0,
-            endR: 160,
-            endG: 160,
-            endB: 160,
-            background: "",
-          },
-          {
-            trackId: 5,
-            type: 1,
-            startTime: 10053,
-            endTime: 10228,
-            endX: 0.9,
-            endWidth: 0.0,
-            endR: 160,
-            endG: 160,
-            endB: 160,
-            background: "",
-          },
-        ],
-        changeWidthOperations: [],
-        changeColorOperations: [],
+      chart: [],
+      global: {
+        screenWidth: 0,
+        screenHeight: 0,
+        remainingTime: 1000,
+        finalY: 0.8,
+        currentTime: 0,
+        lostTime:150,
       },
-      chart: [
+      startDateTime: 0,
+      nowDateTime: 0,
+    };
+  },
+  created() {
+    this.global.screenWidth = document.documentElement.clientWidth;
+    this.global.screenHeight = document.documentElement.clientHeight;
+  },
+  mounted() {
+    const that = this;
+    window.onresize = () => {
+      return (() => {
+        window.screenWidth = document.documentElement.clientWidth; //实时宽度
+        window.screenHeight = document.documentElement.clientHeight; //实时高度
+        that.global.screenWidth = window.screenWidth;
+        that.global.screenHeight = window.screenHeight;
+      })();
+    };
+    this.initiate();
+  },
+  watch: {
+    nowDateTime() {
+      this.global.currentTime = this.nowDateTime - this.startDateTime;
+    },
+  },
+  methods: {
+    getChart() {
+      this.chart = [
         {
           id: 0,
           type: 1,
@@ -4073,48 +4021,36 @@ export default {
             },
           ],
         },
-      ],
-      global: {
-        screenWidth: 0,
-        screenHeight: 0,
-        remainingTime: 0,
-        finalY: 0.8,
-        currentTime: 0,
-      },
-    };
-  },
-  created() {
-    this.global.screenWidth = document.documentElement.clientWidth;
-    this.global.screenHeight = document.documentElement.clientHeight;
-  },
-  mounted() {
-    const that = this;
-    window.onresize = () => {
-      return (() => {
-        window.screenWidth = document.documentElement.clientWidth; //实时宽度
-        window.screenHeight = document.documentElement.clientHeight; //实时高度
-        that.global.screenWidth = window.screenWidth;
-        that.global.screenHeight = window.screenHeight;
-      })();
-    };
-  },
-  methods: {
-    //缓动函数，一切属性的动画都在这里实现
-    myTween(newValue, oldValue, startTime, endTime, type, id, key) {
-      let vm = this;
-      const animate = function() {
-        if (TWEEN.update()) {
-          requestAnimationFrame(animate);
-        }
-      };
-      new TWEEN.Tween({ tweeningValue: oldValue })
-        .to({ tweeningValue: newValue }, endTime - startTime)
-        .onUpdate((object) => {
-          vm.chart["Track"][id][key] = object.tweeningValue.toFixed(0);
-        })
-        .start();
-      animate();
+      ];
     },
+    run() {
+      this.nowDateTime = Date.now();
+      setTimeout(() => {
+        this.run();
+      }, 1000 / 60);
+    },
+    initiate() {
+      this.getChart();
+      this.startDateTime = Date.now();
+      this.run();
+    },
+    //   //缓动函数，一切属性的动画都在这里实现
+    //   myTween(newValue, oldValue, startTime, endTime, type, id, key) {
+    //     let vm = this;
+    //     const animate = function() {
+    //       if (TWEEN.update()) {
+    //         requestAnimationFrame(animate);
+    //       }
+    //     };
+    //     new TWEEN.Tween({ tweeningValue: oldValue })
+    //       .to({ tweeningValue: newValue }, endTime - startTime)
+    //       .onUpdate((object) => {
+    //         vm.chart["Track"][id][key] = object.tweeningValue.toFixed(0);
+    //       })
+    //       .start();
+    //     animate();
+    //   },
+    // },
   },
 };
 </script>

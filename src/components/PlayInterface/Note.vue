@@ -29,7 +29,7 @@
     <div
       class="point"
       :style="{
-        width: [
+        width: [     
           Note.noteType == 0
             ? lengthForPinkPoint + 'px'
             : lengthForWhitePoint - 2 + 'px',
@@ -66,10 +66,15 @@ export default {
     };
   },
   watch: {
-    "Global.screenWidth"() {},
+    "Global.currentTime"() {
+      this.myNote.positionY =
+        (this.Global.finalY / this.Global.remainingTime) *
+          this.Global.currentTime -
+        (this.Global.finalY / this.Global.remainingTime) *
+          (this.Note.timing - this.Global.remainingTime);
+    },
   },
-  created() {
-  },
+  created() {},
   computed: {
     top() {
       return this.Note.positionY * this.Global.screenHeight;

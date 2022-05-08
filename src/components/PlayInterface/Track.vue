@@ -13,7 +13,7 @@
       :style="{
         width: '2px',
         position: 'absolute',
-        left: 0.5 * width+ 'px',
+        left: 0.5 * width + 'px',
         top: '0px',
         height: height + 'px',
         background: 'rgba(0,0,0,0.3)',
@@ -75,7 +75,15 @@
     >
       {{ Track.left }}
       <div v-for="Note in Track.notes" :key="Note">
-        <Note :Note="Note" :left="0.5 * width" :Global="Global" />
+        <Note
+          :Note="Note"
+          v-if="
+            Global.currentTime > Note.timing - Global.remainingTime &&
+              Global.currentTime < Note.timing + Global.lostTime
+          "
+          :left="0.5 * width"
+          :Global="Global"
+        />
       </div>
     </div>
   </div>
@@ -100,9 +108,7 @@ export default {
       this.myTrack.width = this.Track.width;
     },
   },
-  created() {
-    console.log(this.Track);
-  },
+  created() {},
   computed: {
     height() {
       return this.Global.screenHeight * this.Global.finalY;
