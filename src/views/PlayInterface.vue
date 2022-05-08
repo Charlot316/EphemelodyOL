@@ -31,7 +31,7 @@ export default {
               basedTrack: 3,
               positionX: 0.0,
               positionY: 0.0,
-              noteType: 0,
+              noteType: 1,
               key: "k",
               timing: 12319,
               endTiming: 0,

@@ -3,35 +3,54 @@
     class="note-slice"
     :style="{
       position: 'absolute',
-      height: lengthForPinkPoint + 'px',
-      width: lengthForPinkPoint + 'px',
-      left: left - offsetDiagonal - 2 + 'px',
-      top: top - offsetDiagonal - 2 + 'px',
+      height: [
+        Note.noteType == 0
+          ? lengthForBlackPoint + 'px'
+          : lengthForWhitePoint + 'px',
+      ],
+      width: [
+        Note.noteType == 0
+          ? lengthForBlackPoint + 'px'
+          : lengthForWhitePoint + 'px',
+      ],
+      left: [
+        Note.noteType == 0
+          ? left - offsetDiagonal - 2 + 'px'
+          : left - offsetDiagonal + 'px',
+      ],
+      top: [
+        Note.noteType == 0
+          ? top - offsetDiagonal - 2 + 'px'
+          : top - offsetDiagonal + 'px',
+      ],
       transform: 'rotateZ(45deg)',
     }"
   >
     <div
-      class="pink-point"
+      class="point"
       :style="{
-        width: '100%',
+        width: [
+          Note.noteType == 0
+            ? lengthForPinkPoint + 'px'
+            : lengthForWhitePoint - 2 + 'px',
+        ],
         margin: 'auto 0',
-        height: '100%',
-        background: 'rgb(22, 22, 14)',
+        height: [
+          Note.noteType == 0
+            ? lengthForPinkPoint + 'px'
+            : lengthForWhitePoint - 2 + 'px',
+        ],
+        background: [
+          Note.noteType == 0 ? 'rgb(203, 105, 121)' : 'rgb(250, 250, 250)',
+        ],
+        border: [
+          Note.noteType == 0
+            ? 0.5 * (lengthForBlackPoint - lengthForPinkPoint) +
+              'px solid rgb(22, 22, 14)'
+            : '1px solid rgb(22, 22, 14)',
+        ],
       }"
-    >
-      <div
-        class="black-point"
-        :style="{
-          width: lengthForBlackPoint + 'px',
-          position: 'absolute',
-          left: 0.5 * (lengthForPinkPoint - lengthForBlackPoint) + 'px',
-          top: 0.5 * (lengthForPinkPoint - lengthForBlackPoint) + 'px',
-          margin: 'auto 0',
-          height: lengthForBlackPoint + 'px',
-          background: 'rgb(203, 105, 121)',
-        }"
-      ></div>
-    </div>
+    ></div>
   </div>
 </template>
 
@@ -41,25 +60,33 @@ export default {
   data() {
     return {
       myNote: this.Note,
-      lengthForBlackPoint: 30,
-      lengthForPinkPoint: 45,
+      lengthForPinkPoint: 30,
+      lengthForBlackPoint: 45,
+      lengthForWhitePoint: 20,
     };
   },
   watch: {
     "Global.screenWidth"() {},
   },
   created() {
-    console.log(this.left);
+    console.log(this.Note);
   },
   computed: {
     top() {
       return 50;
     },
     offsetDiagonal() {
-      return (
-        Math.sqrt(this.lengthForPinkPoint * this.lengthForPinkPoint * 2) -
-        this.lengthForPinkPoint
-      );
+      if (this.Note.noteType == 0) {
+        return (
+          Math.sqrt(this.lengthForBlackPoint * this.lengthForBlackPoint * 2) -
+          this.lengthForBlackPoint
+        );
+      } else {
+        return (
+          Math.sqrt(this.lengthForWhitePoint * this.lengthForWhitePoint * 2) -
+          this.lengthForWhitePoint
+        );
+      }
     },
   },
 };
