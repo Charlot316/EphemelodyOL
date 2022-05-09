@@ -1,5 +1,5 @@
 <template>
-  <div class="play-interface">
+  <div class="play-interface" @click="startDateTime=Date.now()">
     <div class="play-interface-container" v-for="Track in chart" :key="Track">
       <Track :Track="Track" :Global="global"  v-if="
             global.currentTime > Track.startTiming &&
