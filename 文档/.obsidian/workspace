@@ -1,0 +1,94 @@
+{
+  "main": {
+    "id": "435e68b15a74ed7f",
+    "type": "split",
+    "children": [
+      {
+        "id": "76228811131bcf5a",
+        "type": "leaf",
+        "state": {
+          "type": "markdown",
+          "state": {
+            "file": "数据库结构.md",
+            "mode": "source",
+            "source": false
+          }
+        }
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "1803c00d135a5c68",
+    "type": "split",
+    "children": [
+      {
+        "id": "f90cd554271fc18a",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "92620583954d12b1",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {}
+            }
+          },
+          {
+            "id": "edb62b9f7f0bb834",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "1a7801d5f5d31389",
+    "type": "split",
+    "children": [
+      {
+        "id": "f356df9ad2d2867e",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "46398103c37f46a6",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "数据库结构.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "active": "76228811131bcf5a",
+  "lastOpenFiles": [
+    "数据库结构.md"
+  ]
+}
