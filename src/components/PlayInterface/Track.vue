@@ -151,14 +151,14 @@ export default {
   },
   methods: {
     initiate() {
-      this.myTrack.tempPositionX = this.Track.positionX;
-      this.myTrack.tempWidth = this.Track.width;
-      this.myTrack.tempR = this.Track.R;
-      this.myTrack.tempG = this.Track.G;
-      this.myTrack.tempB = this.Track.B;
       this.generateWidthPath();
       this.generatePositionXPath();
       this.generateRGBPath();
+      this.myTrack.tempPositionX = this.getPositionX();
+      this.myTrack.tempWidth = this.getWidth();
+      this.myTrack.tempR = this.getRGB()[0];
+      this.myTrack.tempG = this.getRGB()[1];
+      this.myTrack.tempB = this.getRGB()[2];
     },
     generateWidthPath() {
       let length = this.myTrack.changeWidthOperations.length;
@@ -384,7 +384,6 @@ export default {
           this.positionXPath
         );
         currentX = this.positionXPath[this.positionXIndex];
-
       }
       if (currentX.type == 0) {
         return currentX.positionX;
