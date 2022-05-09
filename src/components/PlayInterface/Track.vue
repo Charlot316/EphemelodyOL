@@ -132,11 +132,11 @@ export default {
       return this.Global.screenHeight * this.Global.finalY;
     },
     width() {
-      return this.Track.tempWidth * this.Global.screenWidth;
+      return 2*this.Track.tempWidth * this.Global.screenWidth;
     },
     left() {
       return (
-        (this.Track.tempPositionX - 0.5 * this.Track.tempWidth) *
+        (this.Track.tempPositionX - this.Track.tempWidth) *
         this.Global.screenWidth
       );
     },
