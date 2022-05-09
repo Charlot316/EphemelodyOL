@@ -48,32 +48,31 @@
           isActive
             ? [
                 'linear-gradient(0deg, rgba(255,255,255,0.8) 0, rgba(' +
-                  Track.R +
+                  Track.tempR +
                   ',' +
-                  Track.G +
+                  Track.tempG +
                   ',' +
-                  Track.B +
+                  Track.tempB +
                   ',0.8) 100%)',
                 '-moz-linear-gradient(0deg, rgba(255,255,255,0.8) 0, rgba(' +
-                  Track.R +
+                  Track.tempR +
                   ',' +
-                  Track.G +
+                  Track.tempG +
                   ',' +
-                  Track.B +
+                  Track.tempB +
                   ',0.8) 100%)',
                 '-webkit-linear-gradient(90deg, rgba(255,255,255,0.8) 0, rgba(' +
-                  Track.R +
+                  Track.tempR +
                   ',' +
-                  Track.G +
+                  Track.tempG +
                   ',' +
-                  Track.B +
+                  Track.tempB +
                   ',0.8) 100%)',
               ]
-            : 'rgba(' + Track.R + ',' + Track.G + ',' + Track.B + ',0.8)',
+            : 'rgba(' + Track.tempR + ',' + Track.tempG + ',' + Track.tempB + ',0.8)',
         ],
       }"
     >
-      {{ Track.left }}
       <div v-for="Note in Track.notes" :key="Note">
         <Note
           :Note="Note"
@@ -85,6 +84,7 @@
           :Global="Global"
         />
       </div>
+
       <div v-for="MoveOperation in Track.moveOperations" :key="MoveOperation">
         <MoveOperation
           :Operation="MoveOperation"
@@ -147,25 +147,35 @@ export default {
       isActive: false,
       lengthForBlackPoint: 15,
       refreshTime: 1000 / this.$store.state.refreshRate,
+      widthPath:[],
+      positionXPath:[],
+      RPath:[],
+      GPath:[],
+      BPath:[],
     };
   },
   watch: {
     "Global.screenWidth"() {
-      this.myTrack.width = this.Track.width;
+      
     },
   },
   created() {
+    this.myTrack.tempR=this.Track.R;
+    this.myTrack.tempG=this.Track.G;
+    this.myTrack.tempB=this.Track.B;
+    this.myTrack.tempWidth=this.Track.width;
+    this.myTrack.tempPositionX=this.Track.positionX;
   },
   computed: {
     height() {
       return this.Global.screenHeight * this.Global.finalY;
     },
     width() {
-      return this.Track.width * this.Global.screenWidth;
+      return this.Track.tempWidth * this.Global.screenWidth;
     },
     left() {
       return (
-        (this.Track.positionX - 0.5 * this.Track.width) *
+        (this.Track.tempPositionX - 0.5 * this.Track.tempWidth) *
         this.Global.screenWidth
       );
     },
