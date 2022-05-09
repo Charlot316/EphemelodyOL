@@ -117,11 +117,13 @@ export default {
   },
   watch: {
     "Global.currentTime"() {
-      this.myTrack.tempPositionX = this.getPositionX();
-      this.myTrack.tempWidth = this.getWidth();
-      this.myTrack.tempR = this.getRGB()[0];
-      this.myTrack.tempG = this.getRGB()[1];
-      this.myTrack.tempB = this.getRGB()[2];
+      if (this.Global.currentTime > 0) {
+        this.myTrack.tempPositionX = this.getPositionX();
+        this.myTrack.tempWidth = this.getWidth();
+        this.myTrack.tempR = this.getRGB()[0];
+        this.myTrack.tempG = this.getRGB()[1];
+        this.myTrack.tempB = this.getRGB()[2];
+      }
     },
   },
   created() {
@@ -132,7 +134,7 @@ export default {
       return this.Global.screenHeight * this.Global.finalY;
     },
     width() {
-      return 2*this.Track.tempWidth * this.Global.screenWidth;
+      return 2 * this.Track.tempWidth * this.Global.screenWidth;
     },
     left() {
       return (
@@ -173,7 +175,7 @@ export default {
       this.widthPath.push({
         type: 0,
         width: this.myTrack.width,
-        startTime: start,
+        startTime: 0,
         endTime: end,
       });
       for (let i = 0; i < length; i++) {
@@ -230,7 +232,7 @@ export default {
       this.positionXPath.push({
         type: 0,
         positionX: this.myTrack.positionX,
-        startTime: start,
+        startTime: 0,
         endTime: end,
       });
       for (let i = 0; i < length; i++) {
@@ -289,7 +291,7 @@ export default {
         R: this.myTrack.R,
         G: this.myTrack.G,
         B: this.myTrack.B,
-        startTime: start,
+        startTime: 0,
         endTime: end,
       });
       for (let i = 0; i < length; i++) {
@@ -382,6 +384,7 @@ export default {
           this.positionXPath
         );
         currentX = this.positionXPath[this.positionXIndex];
+
       }
       if (currentX.type == 0) {
         return currentX.positionX;

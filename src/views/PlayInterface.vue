@@ -1,5 +1,6 @@
 <template>
-  <div class="play-interface" @click="log">
+  <div class="play-interface">
+    <el-slider v-model="global.currentTime" :min="0" :max="50000"></el-slider>
     <div class="play-interface-container" v-for="Track in chart" :key="Track">
       <Track
         :Track="Track"
@@ -53,9 +54,9 @@ export default {
     this.initiate();
   },
   watch: {
-    nowDateTime() {
-      this.global.currentTime = this.nowDateTime - this.startDateTime;
-    },
+    // nowDateTime() {
+    //   this.global.currentTime = this.nowDateTime - this.startDateTime;
+    // },
   },
   methods: {
     getChart() {

@@ -75,7 +75,11 @@ export default {
     },
   },
   created() {
-    this.myNote.positionY=0;
+    this.myNote.positionY =
+        (this.Global.finalY / this.Global.remainingTime) *
+          this.Global.currentTime -
+        (this.Global.finalY / this.Global.remainingTime) *
+          (this.Note.timing - this.Global.remainingTime);
   },
   computed: {
     top() {
