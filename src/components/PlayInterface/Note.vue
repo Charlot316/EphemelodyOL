@@ -74,7 +74,9 @@ export default {
           (this.Note.timing - this.Global.remainingTime);
     },
   },
-  created() {},
+  created() {
+    this.myNote.positionY=0;
+  },
   computed: {
     top() {
       return this.Note.positionY * this.Global.screenHeight;

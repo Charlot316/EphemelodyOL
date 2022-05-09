@@ -19,7 +19,7 @@ export default {
           this.Global.currentTime >= this.Operation.startTime &&
           this.Global.currentTime <= this.Operation.endTime
         ) {
-          this.myTrack.positionX =
+          this.myTrack.tempPositionX =
             this.k * this.Global.currentTime +
             this.Operation.endX -
             this.k * this.Operation.endTime;
@@ -28,7 +28,6 @@ export default {
     },
   },
   created() {
-    this.myOperation.startX = this.Track.positionX;
     if (this.Operation.startTime != this.Operation.endTime) {
       this.k =
         (this.Operation.endX - this.Operation.startX) /
@@ -36,7 +35,7 @@ export default {
     }
   },
   unmounted() {
-    this.myTrack.positionX = this.Operation.endX;
+    this.myTrack.tempPositionX = this.Operation.endX;
   },
 };
 </script>

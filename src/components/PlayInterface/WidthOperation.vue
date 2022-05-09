@@ -19,7 +19,7 @@ export default {
           this.Global.currentTime >= this.Operation.startTime &&
           this.Global.currentTime <= this.Operation.endTime
         ) {
-          this.myTrack.width =
+          this.myTrack.tempWidth =
             this.k * this.Global.currentTime +
             this.Operation.endWidth -
             this.k * this.Operation.endTime;
@@ -28,7 +28,6 @@ export default {
     },
   },
   created() {
-    this.myOperation.startWidth = this.Track.width;
     if (this.Operation.startTime != this.Operation.endTime) {
       this.k =
         (this.Operation.endWidth - this.Operation.startWidth) /
@@ -36,7 +35,7 @@ export default {
     }
   },
   unmounted() {
-    this.myTrack.width = this.Operation.endWidth;
+    this.myTrack.tempWidth = this.Operation.endWidth;
   },
 };
 </script>
