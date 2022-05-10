@@ -15,8 +15,8 @@
       ],
       left: [
         Note.noteType == 0
-          ? left - offsetDiagonal - 2 + 'px'
-          : left - offsetDiagonal + 'px',
+          ? left - offsetDiagonal - 4.5 + 'px'
+          : left - offsetDiagonal -2.5+ 'px',
       ],
       top: [
         Note.noteType == 0

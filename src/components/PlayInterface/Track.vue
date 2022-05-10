@@ -83,7 +83,7 @@ export default {
       positionXIndex: 0,
       RGBIndex: 0,
       opacity: 0.35,
-      animationTime: 100,
+      animationTime: 50,
       height: 0,
       top: 0,
     };
