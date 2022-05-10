@@ -1,6 +1,13 @@
 <template>
   <div class="play-interface">
-    <video id="audioSong" controls="" autoplay="" :src="chart.songUrl" type="audio/mpeg" ></video>
+    <audio
+      id="audioSong"
+      preload="auto"
+      controls
+      autoplay
+      :src="chart.songUrl"
+      style="display:none"
+    />
     <img
       :src="backgroundUrl"
       style="position:absolute;left:0;top:0;width:100%;height:100%;object-fit:fill;"
@@ -27,6 +34,19 @@
         "
       />
     </div>
+    <el-dialog
+      v-model="dialogVisible"
+      title="开始"
+      width="30%"
+      :show-close="false"
+    >
+      <span>加载完毕，点按以开始</span>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button type="primary" @click="startMusic">确认</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -56,6 +76,8 @@ export default {
       imageIndex: 0,
       startDateTime: 0,
       nowDateTime: 0,
+      dialogVisible: false,
+      audio: null,
     };
   },
   created() {
@@ -75,9 +97,13 @@ export default {
     this.initiate();
   },
   watch: {
-    nowDateTime() {
-      this.global.currentTime = this.nowDateTime - this.startDateTime;
+    'global.currentTime'() {
       this.backgroundUrl = this.getImage();
+      console.log(
+        this.audio.currentTime * 1000,
+        this.global.currentTime,
+        this.global.currentTime - this.audio.currentTime * 1000
+      );
     },
   },
   methods: {
@@ -4273,12 +4299,12 @@ export default {
       });
     },
     run() {
-      this.nowDateTime = Date.now();
-      
-      setTimeout(() => {
-        this.run();
-      }, 1000 / this.$store.state.refreshRate);
-      
+      this.global.currentTime =this.audio.currentTime * 1000
+      if (this.global.currentTime < this.chart.songLength) {
+        setTimeout(() => {
+          this.run();
+        }, 1000 / this.$store.state.refreshRate);
+      }
     },
     log(message) {
       console.log(message);
@@ -4286,10 +4312,16 @@ export default {
     initiate() {
       this.getChart();
       this.sortTrack();
-      this.startDateTime = Date.now();
       this.generateImagePath();
       this.backgroundUrl = this.getImage();
-      this.run()
+      this.dialogVisible = true;
+    },
+    startMusic() {
+      this.dialogVisible = false;
+      this.audio = document.getElementById("audioSong");
+      this.audio.play();
+      this.startDateTime = Date.now();
+      this.run();
     },
     generateImagePath() {
       this.imagePath = [];
@@ -4372,10 +4404,10 @@ export default {
       return mid;
     },
     changeTime() {
+      //this.global.currentTime=Math.floor(this.global.currentTime/1000)*1000;
       this.startDateTime = this.nowDateTime - this.global.currentTime;
-      var audio = document.getElementById("audioSong");
-      audio.currentTime = this.global.currentTime;
-      audio.play();
+      this.audio.play();
+      this.audio.currentTime = this.global.currentTime / 1000;
     },
   },
 };
