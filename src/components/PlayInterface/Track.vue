@@ -7,6 +7,7 @@
       width: width + 'px',
       left: left + 'px',
     }"
+    @click="log()"
   >
     <div
       class="black-line"
@@ -14,9 +15,9 @@
         width: '2px',
         position: 'absolute',
         left: 0.5 * width + 'px',
-        top: '0px',
+        top: top + 'px',
         height: height + 'px',
-        background: 'rgba(0,0,0,0.3)',
+        background: 'rgba(0,0,0,0.2)',
       }"
     ></div>
     <div
@@ -24,11 +25,11 @@
       :style="{
         width: lengthForBlackPoint + 'px',
         position: 'absolute',
-        left: 0.5 * width - offsetDiagonal - 1.2 + 'px',
-        top: height - offsetDiagonal + 'px',
+        left: 0.5 * width - offsetDiagonal - 0.5 + 'px',
+        top: finalHeight - offsetDiagonal + 'px',
         margin: 'auto 0',
         height: lengthForBlackPoint + 'px',
-        background: 'rgb(0,0,0)',
+        background: 'rgb(22, 22, 14)',
         transform: 'rotateZ(45deg)',
       }"
     ></div>
@@ -38,17 +39,13 @@
       :style="{
         height: height + 'px',
         width: width - 4 + 'px',
-        margin: 'auto 0',
+        position: 'absolute',
         borderTop: '0px',
         borderBottom: '0px',
         borderRight: '2px solid rgba(244,244,244,1)',
         borderLeft: '2px solid rgba(244,244,244,1)',
-        top: 0,
-        background: [
-          isActive
-            ? activeStyle
-            : inactiveStyle
-        ],
+        top: top + 'px',
+        background: [isActive ? activeStyle : inactiveStyle],
       }"
     >
       <div v-for="Note in Track.notes" :key="Note">
@@ -86,6 +83,9 @@ export default {
       positionXIndex: 0,
       RGBIndex: 0,
       opacity: 0.35,
+      animationTime: 100,
+      height: 0,
+      top: 0,
     };
   },
   watch: {
@@ -96,6 +96,7 @@ export default {
         this.myTrack.tempR = this.getRGB()[0];
         this.myTrack.tempG = this.getRGB()[1];
         this.myTrack.tempB = this.getRGB()[2];
+        this.setHeightAndTop();
       }
     },
   },
@@ -103,7 +104,7 @@ export default {
     this.initiate();
   },
   computed: {
-    height() {
+    finalHeight() {
       return this.Global.screenHeight * this.Global.finalY;
     },
     width() {
@@ -128,7 +129,7 @@ export default {
         ")"
       );
     },
-    TrackColorWithoutA(){
+    TrackColorWithoutA() {
       return (
         "rgba(" +
         this.Track.tempR +
@@ -138,19 +139,55 @@ export default {
         this.Track.tempB
       );
     },
-    activeStyle(){
+    activeStyle() {
       return [
-        '-webkit-linear-gradient(-90deg, '+this.TrackColor+' 0, '+ this.TrackColorWithoutA+',0.05) 28%, '+this.TrackColorWithoutA+',0.1) 50%, rgba(255,255,255,0.1) 70%, rgba(255,255,255,0.2) 100%)',
-        ' -moz-linear-gradient(180deg, '+this.TrackColor+' 0, '+ this.TrackColorWithoutA+',0.05) 28%, '+this.TrackColorWithoutA+',0.1) 50%, rgba(255,255,255,0.1) 70%, rgba(255,255,255,0.2) 100%)',
-        'linear-gradient(180deg, '+this.TrackColor+' 0, '+ this.TrackColorWithoutA+',0.05) 28%, '+this.TrackColorWithoutA+',0.1) 50%, rgba(255,255,255,0.1) 70%, rgba(255,255,255,0.2) 100%)'
-      ]
+        "-webkit-linear-gradient(-90deg, " +
+          this.TrackColor +
+          " 0, " +
+          this.TrackColorWithoutA +
+          ",0.05) 28%, " +
+          this.TrackColorWithoutA +
+          ",0.1) 50%, rgba(255,255,255,0.1) 70%, rgba(255,255,255,0.2) 100%)",
+        " -moz-linear-gradient(180deg, " +
+          this.TrackColor +
+          " 0, " +
+          this.TrackColorWithoutA +
+          ",0.05) 28%, " +
+          this.TrackColorWithoutA +
+          ",0.1) 50%, rgba(255,255,255,0.1) 70%, rgba(255,255,255,0.2) 100%)",
+        "linear-gradient(180deg, " +
+          this.TrackColor +
+          " 0, " +
+          this.TrackColorWithoutA +
+          ",0.05) 28%, " +
+          this.TrackColorWithoutA +
+          ",0.1) 50%, rgba(255,255,255,0.1) 70%, rgba(255,255,255,0.2) 100%)",
+      ];
     },
-    inactiveStyle(){
-      return  [
-        '-webkit-linear-gradient(-90deg, '+this.TrackColor+' 0, '+ this.TrackColorWithoutA+',0.1) 28%, '+this.TrackColorWithoutA+',0.2) 64%, rgba(255,255,255,0.2) 99%, rgba(255,255,255,0.1) 100%)',
-        ' -moz-linear-gradient(180deg, '+this.TrackColor+' 0, '+ this.TrackColorWithoutA+',0.1) 28%, '+this.TrackColorWithoutA+',0.2) 64%, rgba(255,255,255,0.2) 99%, rgba(255,255,255,0.1) 100%)',
-        'linear-gradient(180deg, '+this.TrackColor+' 0, '+ this.TrackColorWithoutA+',0.1) 28%, '+this.TrackColorWithoutA+',0.2) 64%, rgba(255,255,255,0.2) 99%, rgba(255,255,255,0.1) 100%)'
-      ]
+    inactiveStyle() {
+      return [
+        "-webkit-linear-gradient(-90deg, " +
+          this.TrackColor +
+          " 0, " +
+          this.TrackColorWithoutA +
+          ",0.1) 28%, " +
+          this.TrackColorWithoutA +
+          ",0.2) 64%, rgba(255,255,255,0.2) 99%, rgba(255,255,255,0.1) 100%)",
+        " -moz-linear-gradient(180deg, " +
+          this.TrackColor +
+          " 0, " +
+          this.TrackColorWithoutA +
+          ",0.1) 28%, " +
+          this.TrackColorWithoutA +
+          ",0.2) 64%, rgba(255,255,255,0.2) 99%, rgba(255,255,255,0.1) 100%)",
+        "linear-gradient(180deg, " +
+          this.TrackColor +
+          " 0, " +
+          this.TrackColorWithoutA +
+          ",0.1) 28%, " +
+          this.TrackColorWithoutA +
+          ",0.2) 64%, rgba(255,255,255,0.2) 99%, rgba(255,255,255,0.1) 100%)",
+      ];
     },
     offsetDiagonal() {
       return (
@@ -161,6 +198,7 @@ export default {
   },
   methods: {
     initiate() {
+      this.setHeightAndTop();
       this.generateWidthPath();
       this.generatePositionXPath();
       this.generateRGBPath();
@@ -177,19 +215,35 @@ export default {
       let start = this.Track.startTiming;
       let end = start;
       if (length == 0) {
-        end = this.Track.endTiming;
+        end = this.Track.endTiming - this.animationTime;
       } else {
         this.myTrack.changeWidthOperations.sort(function(a, b) {
           return a.startTime - b.startTime;
         });
         end = this.myTrack.changeWidthOperations[0].startTime;
       }
+
+      this.widthPath.push({
+        type: 0,
+        width: 0,
+        startTime: 0,
+        endTime: start,
+      });
+      let tempK1 = this.myTrack.width / this.animationTime;
+      this.widthPath.push({
+        type: 1,
+        k: tempK1,
+        b: -tempK1 * this.myTrack.startTiming,
+        startTime: start,
+        endTime: start + this.animationTime,
+      });
       this.widthPath.push({
         type: 0,
         width: this.myTrack.width,
-        startTime: 0,
+        startTime: start + this.animationTime,
         endTime: end,
       });
+
       for (let i = 0; i < length; i++) {
         let operation = this.myTrack.changeWidthOperations[i];
         start = operation.startTime;
@@ -218,15 +272,31 @@ export default {
             });
           }
         } else {
-          if (end < this.Track.endTiming) {
-            this.widthPath.push({
-              type: 0,
-              width: operation.endWidth,
-              startTime: end,
-              endTime: this.Track.endTiming,
-            });
-          }
+          this.widthPath.push({
+            type: 0,
+            width: operation.endWidth,
+            startTime: end,
+            endTime: this.Track.endTiming - this.animationTime,
+          });
+          let tempK2 = -operation.endWidth / this.animationTime;
+          this.widthPath.push({
+            type: 1,
+            k: tempK2,
+            b: -tempK2 * this.myTrack.endTiming,
+            startTime: this.Track.endTiming - this.animationTime,
+            endTime: this.Track.endTiming,
+          });
         }
+      }
+      if (length == 0) {
+        let tempK3 = -this.myTrack.width / this.animationTime;
+        this.widthPath.push({
+          type: 1,
+          k: tempK3,
+          b: -tempK3 * this.myTrack.endTiming,
+          startTime: this.Track.endTiming - this.animationTime,
+          endTime: this.Track.endTiming,
+        });
       }
     },
     generatePositionXPath() {
@@ -453,16 +523,32 @@ export default {
         ];
       }
     },
-    returnResult(path, currentTime) {
-      let index = this.binaryGetCurrentIndex(currentTime, path);
-      if (path[index].type == 0) {
-        return path[index].value;
+    setHeightAndTop() {
+      let k = this.Global.finalY / this.animationTime;
+      if (
+        this.Global.currentTime <
+        this.myTrack.startTiming + this.animationTime
+      ) {
+        this.top =
+          this.finalHeight -
+          (k * this.Global.currentTime - k * this.myTrack.startTiming) *
+            this.Global.screenHeight;
+      } else if (
+        this.Global.currentTime >
+        this.myTrack.endTiming - this.animationTime
+      ) {
+        this.top =
+          this.finalHeight -
+          (-k * this.Global.currentTime + k * this.myTrack.endTiming) *
+            this.Global.screenHeight;
       } else {
-        let k = path[index].k;
-        let b = path[index].b;
-        return k * currentTime + b;
+        this.top = 0;
       }
+      this.height = this.finalHeight - this.top;
     },
+    log(){
+      console.log(this.myTrack.tempWidth)
+    }
   },
 };
 </script>

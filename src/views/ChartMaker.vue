@@ -63,9 +63,9 @@ export default {
     this.initiate();
   },
   watch: {
-    // nowDateTime() {
-    //   this.global.currentTime = this.nowDateTime - this.startDateTime;
-    // },
+    nowDateTime() {
+      this.global.currentTime = this.nowDateTime - this.startDateTime;
+    },
   },
   methods: {
     getChart() {
