@@ -4289,7 +4289,7 @@ export default {
       });
     },
     run() {
-      this.global.currentTime =this.audio.currentTime * 1000
+      this.global.currentTime = Math.floor(this.audio.currentTime * 1000);
       this.backgroundUrl = this.getImage();
       if (this.global.currentTime < this.chart.songLength) {
         setTimeout(() => {
@@ -4395,10 +4395,10 @@ export default {
       return mid;
     },
     changeTime() {
-      //this.global.currentTime=Math.floor(this.global.currentTime/1000)*1000;
-      this.startDateTime = this.nowDateTime - this.global.currentTime;
       this.audio.play();
       this.audio.currentTime = this.global.currentTime / 1000;
+
+      this.run();
     },
   },
 };
