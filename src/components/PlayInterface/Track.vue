@@ -161,6 +161,8 @@ export default {
       this.myTrack.tempB = this.getRGB()[2];
     },
     generateWidthPath() {
+      this.widthPath = [];
+      this.widthIndex = 0;
       let length = this.myTrack.changeWidthOperations.length;
       let start = this.Track.startTiming;
       let end = start;
@@ -218,6 +220,8 @@ export default {
       }
     },
     generatePositionXPath() {
+      this.positionXPath = [];
+      this.positionXIndex = 0;
       let length = this.myTrack.moveOperations.length;
       let start = this.Track.startTiming;
       let end = start;
@@ -275,6 +279,8 @@ export default {
       }
     },
     generateRGBPath() {
+      this.RGBPath = [];
+      this.RGBIndex = 0;
       let length = this.myTrack.changeColorOperations.length;
       let start = this.Track.startTiming;
       let end = start;
