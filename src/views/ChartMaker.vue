@@ -1,11 +1,25 @@
 <template>
   <div class="play-interface">
+    <audio
+      id="audioSong"
+      preload="auto"
+      controls
+      autoplay
+      :src="chart.songUrl"
+      style="display:none"
+    />
+    <img
+      :src="backgroundUrl"
+      style="position:absolute;left:0;top:0;width:100%;height:100%;object-fit:fill;"
+    />
+
     <el-slider
       v-model="global.currentTime"
       :min="0"
-      :max="50000"
-      @change="startDateTime = nowDateTime - global.currentTime"
+      :max="chart.songLength"
+      @change="changeTime"
     ></el-slider>
+
     <div
       class="play-interface-container"
       v-for="Track in chart.tracks"
@@ -20,6 +34,19 @@
         "
       />
     </div>
+    <el-dialog
+      v-model="dialogVisible"
+      title="开始"
+      width="30%"
+      :show-close="false"
+    >
+      <span>加载完毕，点按以开始</span>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button type="primary" @click="startMusic">确认</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -33,7 +60,9 @@ export default {
   data() {
     return {
       num: 0,
-      chart: {},
+      chart: {
+        songLength: 0,
+      },
       global: {
         screenWidth: 0,
         screenHeight: 0,
@@ -42,8 +71,13 @@ export default {
         currentTime: 0,
         lostTime: 150,
       },
+      backgroundUrl: "",
+      imagePath: [],
+      imageIndex: 0,
       startDateTime: 0,
       nowDateTime: 0,
+      dialogVisible: false,
+      audio: null,
     };
   },
   created() {
@@ -62,11 +96,6 @@ export default {
     };
     this.initiate();
   },
-  watch: {
-    nowDateTime() {
-      this.global.currentTime = this.nowDateTime - this.startDateTime;
-    },
-  },
   methods: {
     getChart() {
       this.chart.tracks = [
@@ -83,244 +112,104 @@ export default {
           B: 180,
           notes: [
             {
-              basedTrack: 0,
-              positionX: 0,
-              positionY: 0.9248000000000003,
               noteType: 0,
               key: "d",
               timing: 3530,
-              endTiming: 0,
-              length: 0,
-              lastTime: 0,
-              currentTime: 0,
             },
             {
-              basedTrack: 0,
-              positionX: 0,
-              positionY: 0.9256000000000002,
               noteType: 0,
               key: "d",
               timing: 4221,
-              endTiming: 0,
-              length: 0,
-              lastTime: 0,
-              currentTime: 0,
             },
             {
-              basedTrack: 0,
-              positionX: 0,
-              positionY: 0.9248000000000003,
               noteType: 0,
               key: "d",
               timing: 4949,
-              endTiming: 0,
-              length: 0,
-              lastTime: 0,
-              currentTime: 0,
             },
             {
-              basedTrack: 0,
-              positionX: 0,
-              positionY: 0.9216000000000002,
               noteType: 0,
               key: "d",
               timing: 5650,
-              endTiming: 0,
-              length: 0,
-              lastTime: 0,
-              currentTime: 0,
             },
             {
-              basedTrack: 0,
-              positionX: 0,
-              positionY: 0.9215999999999998,
               noteType: 0,
               key: "d",
               timing: 6361,
-              endTiming: 0,
-              length: 0,
-              lastTime: 0,
-              currentTime: 0,
             },
             {
-              basedTrack: 0,
-              positionX: 0,
-              positionY: 0.9215999999999998,
               noteType: 0,
               key: "d",
               timing: 7062,
-              endTiming: 0,
-              length: 0,
-              lastTime: 0,
-              currentTime: 0,
             },
             {
-              basedTrack: 0,
-              positionX: 0,
-              positionY: 0.9208000000000007,
               noteType: 0,
               key: "d",
               timing: 7755,
-              endTiming: 0,
-              length: 0,
-              lastTime: 0,
-              currentTime: 0,
             },
             {
-              basedTrack: 0,
-              positionX: 0,
-              positionY: 0.9208000000000007,
               noteType: 0,
               key: "d",
               timing: 8460,
-              endTiming: 0,
-              length: 0,
-              lastTime: 0,
-              currentTime: 0,
             },
             {
-              basedTrack: 0,
-              positionX: 0,
-              positionY: 0.9215999999999998,
               noteType: 0,
               key: "d",
               timing: 9163,
-              endTiming: 0,
-              length: 0,
-              lastTime: 0,
-              currentTime: 0,
             },
             {
-              basedTrack: 0,
-              positionX: 0,
-              positionY: 0.9207999999999998,
               noteType: 0,
               key: "d",
               timing: 10228,
-              endTiming: 0,
-              length: 0,
-              lastTime: 0,
-              currentTime: 0,
             },
             {
-              basedTrack: 0,
-              positionX: 0,
-              positionY: 0.9255999999999993,
               noteType: 0,
               key: "d",
               timing: 10568,
-              endTiming: 0,
-              length: 0,
-              lastTime: 0,
-              currentTime: 0,
             },
             {
-              basedTrack: 0,
-              positionX: 0,
-              positionY: 0.9256000000000011,
               noteType: 0,
               key: "d",
               timing: 11969,
-              endTiming: 0,
-              length: 0,
-              lastTime: 0,
-              currentTime: 0,
             },
             {
-              basedTrack: 0,
-              positionX: 0,
-              positionY: 0.9207999999999998,
               noteType: 0,
               key: "d",
               timing: 12144,
-              endTiming: 0,
-              length: 0,
-              lastTime: 0,
-              currentTime: 0,
             },
             {
-              basedTrack: 0,
-              positionX: 0,
-              positionY: 0.9239999999999995,
               noteType: 0,
               key: "d",
               timing: 12319,
-              endTiming: 0,
-              length: 0,
-              lastTime: 0,
-              currentTime: 0,
             },
             {
-              basedTrack: 0,
-              positionX: 0,
-              positionY: 0.9248000000000012,
               noteType: 1,
               key: "d",
               timing: 13200,
-              endTiming: 13381,
-              length: 0.13163636363636363,
-              lastTime: 0,
-              currentTime: 0,
             },
             {
-              basedTrack: 0,
-              positionX: 0,
-              positionY: 0.9247999999999994,
               noteType: 0,
               key: "d",
               timing: 13728,
-              endTiming: 0,
-              length: 0,
-              lastTime: 0,
-              currentTime: 0,
             },
             {
-              basedTrack: 0,
-              positionX: 0,
-              positionY: 0.9239999999999995,
               noteType: 0,
               key: "d",
               timing: 14081,
-              endTiming: 0,
-              length: 0,
-              lastTime: 0,
-              currentTime: 0,
             },
             {
-              basedTrack: 0,
-              positionX: 0,
-              positionY: 0.9255999999999993,
               noteType: 0,
               key: "d",
               timing: 14254,
-              endTiming: 0,
-              length: 0,
-              lastTime: 0,
-              currentTime: 0,
             },
             {
-              basedTrack: 0,
-              positionX: 0,
-              positionY: 0.9199999999999999,
               noteType: 0,
               key: "d",
               timing: 14428,
-              endTiming: 0,
-              length: 0,
-              lastTime: 0,
-              currentTime: 0,
             },
             {
-              basedTrack: 0,
-              positionX: 0,
-              positionY: 0.9215999999999998,
               noteType: 0,
               key: "d",
               timing: 14618,
-              endTiming: 0,
-              length: 0,
-              lastTime: 0,
-              currentTime: 0,
             },
           ],
           moveOperations: [
@@ -4323,6 +4212,76 @@ export default {
           tempPositionX: 0.5,
         },
       ];
+      this.chart.songLength = 42500;
+      this.chart.defaultBackground =
+        "http://pic.mcatk.com/charlot-pictures/0.jpg";
+      this.chart.changeBackgroundOperations = [
+        {
+          startTime: 17576,
+          background: "http://pic.mcatk.com/charlot-pictures/black.jpg",
+        },
+        {
+          startTime: 17931,
+          background: "http://pic.mcatk.com/charlot-pictures/0.jpg",
+        },
+        {
+          startTime: 23569,
+          background: "http://pic.mcatk.com/charlot-pictures/1.jpg",
+        },
+        {
+          startTime: 23904,
+          background: "http://pic.mcatk.com/charlot-pictures/2.jpg",
+        },
+        {
+          startTime: 24432,
+          background: "http://pic.mcatk.com/charlot-pictures/3.jpg",
+        },
+        {
+          startTime: 24782,
+          background: "http://pic.mcatk.com/charlot-pictures/4.jpg",
+        },
+        {
+          startTime: 25134,
+          background: "http://pic.mcatk.com/charlot-pictures/5.jpg",
+        },
+        {
+          startTime: 25328,
+          background: "http://pic.mcatk.com/charlot-pictures/6.jpg",
+        },
+        {
+          startTime: 25685,
+          background: "http://pic.mcatk.com/charlot-pictures/7.jpg",
+        },
+        {
+          startTime: 26005,
+          background: "http://pic.mcatk.com/charlot-pictures/0.jpg",
+        },
+        {
+          startTime: 28806,
+          background: "http://pic.mcatk.com/charlot-pictures/black.jpg",
+        },
+        {
+          startTime: 29164,
+          background: "http://pic.mcatk.com/charlot-pictures/0.jpg",
+        },
+        {
+          startTime: 34606,
+          background: "http://pic.mcatk.com/charlot-pictures/8.jpg",
+        },
+        {
+          startTime: 35112,
+          background: "http://pic.mcatk.com/charlot-pictures/9.jpg",
+        },
+        {
+          startTime: 35613,
+          background: "http://pic.mcatk.com/charlot-pictures/10.jpg",
+        },
+        {
+          startTime: 36012,
+          background: "http://pic.mcatk.com/charlot-pictures/0.jpg",
+        },
+      ];
+      this.chart.songUrl = "http://10.251.0.251:8000/media/1.mp3";
     },
     sortTrack() {
       this.chart.tracks.sort(function(a, b) {
@@ -4330,10 +4289,13 @@ export default {
       });
     },
     run() {
-      this.nowDateTime = Date.now();
-      setTimeout(() => {
-        this.run();
-      }, 1000 / this.$store.state.refreshRate);
+      this.global.currentTime =this.audio.currentTime * 1000
+      this.backgroundUrl = this.getImage();
+      if (this.global.currentTime < this.chart.songLength) {
+        setTimeout(() => {
+          this.run();
+        }, 1000 / this.$store.state.refreshRate);
+      }
     },
     log(message) {
       console.log(message);
@@ -4341,26 +4303,103 @@ export default {
     initiate() {
       this.getChart();
       this.sortTrack();
+      this.generateImagePath();
+      this.backgroundUrl = this.getImage();
+      this.dialogVisible = true;
+    },
+    startMusic() {
+      this.dialogVisible = false;
+      this.audio = document.getElementById("audioSong");
+      this.audio.play();
       this.startDateTime = Date.now();
       this.run();
     },
-    //   //缓动函数，一切属性的动画都在这里实现
-    //   myTween(newValue, oldValue, startTime, endTime, type, id, key) {
-    //     let vm = this;
-    //     const animate = function() {
-    //       if (TWEEN.update()) {
-    //         requestAnimationFrame(animate);
-    //       }
-    //     };
-    //     new TWEEN.Tween({ tweeningValue: oldValue })
-    //       .to({ tweeningValue: newValue }, endTime - startTime)
-    //       .onUpdate((object) => {
-    //         vm.chart["Track"][id][key] = object.tweeningValue.toFixed(0);
-    //       })
-    //       .start();
-    //     animate();
-    //   },
-    // },
+    generateImagePath() {
+      this.imagePath = [];
+      this.imageIndex = 0;
+      let length = this.chart.changeBackgroundOperations.length;
+      let start = 0;
+      let end = start;
+      let defaultBackground = this.chart.defaultBackground;
+      if (length == 0) {
+        end = this.chart.songLength;
+      } else {
+        this.chart.changeBackgroundOperations.sort(function(a, b) {
+          return a.startTime - b.startTime;
+        });
+        end = this.chart.changeBackgroundOperations[0].startTime;
+      }
+      this.imagePath.push({
+        url: defaultBackground,
+        startTime: 0,
+        endTime: end,
+      });
+      for (let i = 0; i < length; i++) {
+        let operation = this.chart.changeBackgroundOperations[i];
+        start = operation.startTime;
+        if (i != length - 1) {
+          let nextOperation = this.chart.changeBackgroundOperations[i + 1];
+          this.imagePath.push({
+            url: operation.background,
+            startTime: start,
+            endTime: nextOperation.startTime,
+          });
+        } else {
+          this.imagePath.push({
+            url: defaultBackground,
+            startTime: start,
+            endTime: this.chart.songLength,
+          });
+        }
+      }
+    },
+    getImage() {
+      var currentTime = this.global.currentTime;
+      var currentImage = this.imagePath[this.imageIndex];
+      if (
+        !(
+          currentTime <= currentImage.endTime &&
+          currentTime >= currentImage.startTime
+        )
+      ) {
+        this.imageIndex = this.binaryGetCurrentIndex(
+          currentTime,
+          this.imagePath
+        );
+        currentImage = this.imagePath[this.imageIndex];
+      }
+      return currentImage.url;
+    },
+    binaryGetCurrentIndex(currentTime, path) {
+      let right = path.length - 1;
+      if (right == 0) {
+        return 0;
+      }
+      let left = 0;
+      let mid = Math.floor((right + left) / 2);
+      while (right > left) {
+        if (
+          path[mid].startTime <= currentTime &&
+          path[mid].endTime >= currentTime
+        ) {
+          return mid;
+        }
+        if (path[mid].startTime > currentTime) {
+          right = mid - 1;
+        }
+        if (path[mid].endTime < currentTime) {
+          left = mid + 1;
+        }
+        mid = Math.floor((right + left) / 2);
+      }
+      return mid;
+    },
+    changeTime() {
+      //this.global.currentTime=Math.floor(this.global.currentTime/1000)*1000;
+      this.startDateTime = this.nowDateTime - this.global.currentTime;
+      this.audio.play();
+      this.audio.currentTime = this.global.currentTime / 1000;
+    },
   },
 };
 </script>

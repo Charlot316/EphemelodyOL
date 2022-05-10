@@ -96,16 +96,6 @@ export default {
     };
     this.initiate();
   },
-  watch: {
-    'global.currentTime'() {
-      this.backgroundUrl = this.getImage();
-      console.log(
-        this.audio.currentTime * 1000,
-        this.global.currentTime,
-        this.global.currentTime - this.audio.currentTime * 1000
-      );
-    },
-  },
   methods: {
     getChart() {
       this.chart.tracks = [
@@ -4300,6 +4290,7 @@ export default {
     },
     run() {
       this.global.currentTime =this.audio.currentTime * 1000
+      this.backgroundUrl = this.getImage();
       if (this.global.currentTime < this.chart.songLength) {
         setTimeout(() => {
           this.run();
