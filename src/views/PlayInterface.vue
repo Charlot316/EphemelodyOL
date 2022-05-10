@@ -1,22 +1,11 @@
 <template>
   <div class="play-interface">
-    <audio :src="chart.songUrl" ref="audioSong" />
-    <div
-      class="background"
-      :style="{
-        position: 'absolute',
-        left: 0,
-        top: 0,
-        width: global.screenWidth,
-        height: global.screenHeight,
-      }"
-    >
-      <img
-        :src="backgroundUrl"
-        style="width:100%;height:100%;"
-        object-fit="fill"
-      />
-    </div>
+    <video id="audioSong" controls="" autoplay="" :src="chart.songUrl" type="audio/mpeg" ></video>
+    <img
+      :src="backgroundUrl"
+      style="position:absolute;left:0;top:0;width:100%;height:100%;object-fit:fill;"
+    />
+
     <el-slider
       v-model="global.currentTime"
       :min="0"
@@ -4285,9 +4274,11 @@ export default {
     },
     run() {
       this.nowDateTime = Date.now();
+      
       setTimeout(() => {
         this.run();
       }, 1000 / this.$store.state.refreshRate);
+      
     },
     log(message) {
       console.log(message);
@@ -4298,7 +4289,7 @@ export default {
       this.startDateTime = Date.now();
       this.generateImagePath();
       this.backgroundUrl = this.getImage();
-      this.run();
+      this.run()
     },
     generateImagePath() {
       this.imagePath = [];
@@ -4382,12 +4373,9 @@ export default {
     },
     changeTime() {
       this.startDateTime = this.nowDateTime - this.global.currentTime;
-      var audio = this.$refs.audioSong;
-      audio.play();
+      var audio = document.getElementById("audioSong");
       audio.currentTime = this.global.currentTime;
-      
-      
-       console.log(audio.currentTime)
+      audio.play();
     },
   },
 };

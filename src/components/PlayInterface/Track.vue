@@ -7,7 +7,6 @@
       width: width + 'px',
       left: left + 'px',
     }"
-    @click="log()"
   >
     <div
       class="black-line"
@@ -82,7 +81,7 @@ export default {
       widthIndex: 0,
       positionXIndex: 0,
       RGBIndex: 0,
-      opacity: 0.35,
+      opacity: 0.6,
       animationTime: 50,
       height: 0,
       top: 0,
@@ -147,21 +146,21 @@ export default {
           this.TrackColorWithoutA +
           ",0.05) 28%, " +
           this.TrackColorWithoutA +
-          ",0.1) 50%, rgba(255,255,255,0.1) 70%, rgba(255,255,255,0.2) 100%)",
+          ",0.1) 50%, rgba(255,255,255,0.6) 70%, rgba(255,255,255,0.3) 100%)",
         " -moz-linear-gradient(180deg, " +
           this.TrackColor +
           " 0, " +
           this.TrackColorWithoutA +
           ",0.05) 28%, " +
           this.TrackColorWithoutA +
-          ",0.1) 50%, rgba(255,255,255,0.1) 70%, rgba(255,255,255,0.2) 100%)",
+          ",0.1) 50%, rgba(255,255,255,0.6) 70%, rgba(255,255,255,0.3) 100%)",
         "linear-gradient(180deg, " +
           this.TrackColor +
           " 0, " +
           this.TrackColorWithoutA +
           ",0.05) 28%, " +
           this.TrackColorWithoutA +
-          ",0.1) 50%, rgba(255,255,255,0.1) 70%, rgba(255,255,255,0.2) 100%)",
+          ",0.1) 50%, rgba(255,255,255,0.6) 70%, rgba(255,255,255,0.3) 100%)",
       ];
     },
     inactiveStyle() {
@@ -170,23 +169,23 @@ export default {
           this.TrackColor +
           " 0, " +
           this.TrackColorWithoutA +
-          ",0.1) 28%, " +
+          ",0.2) 28%, " +
           this.TrackColorWithoutA +
-          ",0.2) 64%, rgba(255,255,255,0.2) 99%, rgba(255,255,255,0.1) 100%)",
+          ",0.4) 64%, rgba(255,255,255,0.2) 99%, rgba(255,255,255,0.1) 100%)",
         " -moz-linear-gradient(180deg, " +
           this.TrackColor +
           " 0, " +
           this.TrackColorWithoutA +
-          ",0.1) 28%, " +
+          ",0.2) 28%, " +
           this.TrackColorWithoutA +
-          ",0.2) 64%, rgba(255,255,255,0.2) 99%, rgba(255,255,255,0.1) 100%)",
+          ",0.4) 64%, rgba(255,255,255,0.2) 99%, rgba(255,255,255,0.1) 100%)",
         "linear-gradient(180deg, " +
           this.TrackColor +
           " 0, " +
           this.TrackColorWithoutA +
-          ",0.1) 28%, " +
+          ",0.2) 28%, " +
           this.TrackColorWithoutA +
-          ",0.2) 64%, rgba(255,255,255,0.2) 99%, rgba(255,255,255,0.1) 100%)",
+          ",0.4) 64%, rgba(255,255,255,0.2) 99%, rgba(255,255,255,0.1) 100%)",
       ];
     },
     offsetDiagonal() {
