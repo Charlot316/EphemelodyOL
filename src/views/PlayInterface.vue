@@ -1,7 +1,11 @@
 <template>
   <div class="play-interface">
     <el-slider v-model="global.currentTime" :min="0" :max="50000"></el-slider>
-    <div class="play-interface-container" v-for="Track in chart" :key="Track">
+    <div
+      class="play-interface-container"
+      v-for="Track in chart.tracks"
+      :key="Track"
+    >
       <Track
         :Track="Track"
         :Global="global"
@@ -24,7 +28,7 @@ export default {
   data() {
     return {
       num: 0,
-      chart: [],
+      chart: {},
       global: {
         screenWidth: 0,
         screenHeight: 0,
@@ -60,7 +64,7 @@ export default {
   },
   methods: {
     getChart() {
-      this.chart = [
+      this.chart.tracks = [
         {
           id: 0,
           type: 1,
@@ -4312,8 +4316,13 @@ export default {
           tempB: 0,
           tempWidth: 0.1,
           tempPositionX: 0.5,
-        }
+        },
       ];
+    },
+    sortTrack() {
+      this.chart.tracks.sort(function(a, b) {
+        return b.startTiming - a.startTiming;
+      });
     },
     run() {
       this.nowDateTime = Date.now();
@@ -4326,6 +4335,7 @@ export default {
     },
     initiate() {
       this.getChart();
+      this.sortTrack();
       this.startDateTime = Date.now();
       this.run();
     },
@@ -4354,6 +4364,6 @@ export default {
 .play-interface {
   height: 100%;
   width: 100%;
-  background: black;
+  background: white;
 }
 </style>

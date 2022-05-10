@@ -1,6 +1,6 @@
 <template>
   <div
-    class="track-slice"
+    class="select"
     :style="{
       position: 'absolute',
       height: '100%',
@@ -41,41 +41,13 @@
         margin: 'auto 0',
         borderTop: '0px',
         borderBottom: '0px',
-        borderRight: '2px solid rgba(255,255,255,1)',
-        borderLeft: '2px solid rgba(255,255,255,1)',
+        borderRight: '2px solid rgba(244,244,244,1)',
+        borderLeft: '2px solid rgba(244,244,244,1)',
         top: 0,
         background: [
           isActive
-            ? [
-                'linear-gradient(0deg, rgba(255,255,255,0.8) 0, rgba(' +
-                  Track.tempR +
-                  ',' +
-                  Track.tempG +
-                  ',' +
-                  Track.tempB +
-                  ',0.8) 100%)',
-                '-moz-linear-gradient(0deg, rgba(255,255,255,0.8) 0, rgba(' +
-                  Track.tempR +
-                  ',' +
-                  Track.tempG +
-                  ',' +
-                  Track.tempB +
-                  ',0.8) 100%)',
-                '-webkit-linear-gradient(90deg, rgba(255,255,255,0.8) 0, rgba(' +
-                  Track.tempR +
-                  ',' +
-                  Track.tempG +
-                  ',' +
-                  Track.tempB +
-                  ',0.8) 100%)',
-              ]
-            : 'rgba(' +
-              Track.tempR +
-              ',' +
-              Track.tempG +
-              ',' +
-              Track.tempB +
-              ',0.8)',
+            ? activeStyle
+            : inactiveStyle
         ],
       }"
     >
@@ -113,6 +85,7 @@ export default {
       widthIndex: 0,
       positionXIndex: 0,
       RGBIndex: 0,
+      opacity: 0.35,
     };
   },
   watch: {
@@ -141,6 +114,43 @@ export default {
         (this.Track.tempPositionX - this.Track.tempWidth) *
         this.Global.screenWidth
       );
+    },
+    TrackColor() {
+      return (
+        "rgba(" +
+        this.Track.tempR +
+        "," +
+        this.Track.tempG +
+        "," +
+        this.Track.tempB +
+        "," +
+        this.opacity +
+        ")"
+      );
+    },
+    TrackColorWithoutA(){
+      return (
+        "rgba(" +
+        this.Track.tempR +
+        "," +
+        this.Track.tempG +
+        "," +
+        this.Track.tempB
+      );
+    },
+    activeStyle(){
+      return [
+        '-webkit-linear-gradient(-90deg, '+this.TrackColor+' 0, '+ this.TrackColorWithoutA+',0.05) 28%, '+this.TrackColorWithoutA+',0.1) 50%, rgba(255,255,255,0.1) 70%, rgba(255,255,255,0.2) 100%)',
+        ' -moz-linear-gradient(180deg, '+this.TrackColor+' 0, '+ this.TrackColorWithoutA+',0.05) 28%, '+this.TrackColorWithoutA+',0.1) 50%, rgba(255,255,255,0.1) 70%, rgba(255,255,255,0.2) 100%)',
+        'linear-gradient(180deg, '+this.TrackColor+' 0, '+ this.TrackColorWithoutA+',0.05) 28%, '+this.TrackColorWithoutA+',0.1) 50%, rgba(255,255,255,0.1) 70%, rgba(255,255,255,0.2) 100%)'
+      ]
+    },
+    inactiveStyle(){
+      return  [
+        '-webkit-linear-gradient(-90deg, '+this.TrackColor+' 0, '+ this.TrackColorWithoutA+',0.1) 28%, '+this.TrackColorWithoutA+',0.2) 64%, rgba(255,255,255,0.2) 99%, rgba(255,255,255,0.1) 100%)',
+        ' -moz-linear-gradient(180deg, '+this.TrackColor+' 0, '+ this.TrackColorWithoutA+',0.1) 28%, '+this.TrackColorWithoutA+',0.2) 64%, rgba(255,255,255,0.2) 99%, rgba(255,255,255,0.1) 100%)',
+        'linear-gradient(180deg, '+this.TrackColor+' 0, '+ this.TrackColorWithoutA+',0.1) 28%, '+this.TrackColorWithoutA+',0.2) 64%, rgba(255,255,255,0.2) 99%, rgba(255,255,255,0.1) 100%)'
+      ]
     },
     offsetDiagonal() {
       return (
@@ -457,4 +467,14 @@ export default {
 };
 </script>
 
-<style scope></style>
+<style scope>
+.select {
+  -webkit-user-select: none;
+
+  -moz-user-select: none;
+
+  -ms-user-select: none;
+
+  user-select: none;
+}
+</style>
