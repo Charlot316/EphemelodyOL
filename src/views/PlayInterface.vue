@@ -1,5 +1,5 @@
 <template>
-  <div class="play-interface">
+  <div class="play-interface" id="play-interface-container">
     <audio
       id="audioSong"
       preload="auto"
@@ -8,15 +8,19 @@
       :src="chart.songUrl"
       style="display:none"
     />
-    <img
-      :src="backgroundUrl"
-      style="position:absolute;left:0;top:0;width:100%;height:100%;object-fit:fill;"
-    />
+    <div v-for="image in imagePath" :key="image">
+      <img
+        :src="image.url"
+        v-show="global.currentTime>=image.startTime && global.currentTime<=image.endTime"
+        style="position:absolute;left:0;top:0;width:100%;height:100%;object-fit:fill;"
+      />
+    </div>
 
     <el-slider
       v-model="global.currentTime"
       :min="0"
       :max="chart.songLength"
+      :step="30"
       @change="changeTime"
     ></el-slider>
 
@@ -78,20 +82,27 @@ export default {
       nowDateTime: 0,
       dialogVisible: false,
       audio: null,
+      isRunning: false,
     };
   },
-  created() {
-    this.global.screenWidth = document.documentElement.clientWidth;
-    this.global.screenHeight = document.documentElement.clientHeight;
-  },
+  created() {},
   mounted() {
     const that = this;
+
+    this.global.screenWidth = document.getElementById(
+      "play-interface-container"
+    ).offsetWidth;
+    this.global.screenHeight = document.getElementById(
+      "play-interface-container"
+    ).offsetHeight;
     window.onresize = () => {
       return (() => {
-        window.screenWidth = document.documentElement.clientWidth; //实时宽度
-        window.screenHeight = document.documentElement.clientHeight; //实时高度
-        that.global.screenWidth = window.screenWidth;
-        that.global.screenHeight = window.screenHeight;
+        that.global.screenWidth = document.getElementById(
+          "play-interface-container"
+        ).offsetWidth;
+        that.global.screenHeight = document.getElementById(
+          "play-interface-container"
+        ).offsetHeight;
       })();
     };
     this.initiate();
@@ -4290,11 +4301,13 @@ export default {
     },
     run() {
       this.global.currentTime = Math.floor(this.audio.currentTime * 1000);
-      this.backgroundUrl = this.getImage();
+      this.isRunning = true;
       if (this.global.currentTime < this.chart.songLength) {
         setTimeout(() => {
           this.run();
         }, 1000 / this.$store.state.refreshRate);
+      } else {
+        this.isRunning = false;
       }
     },
     log(message) {
@@ -4304,7 +4317,6 @@ export default {
       this.getChart();
       this.sortTrack();
       this.generateImagePath();
-      this.backgroundUrl = this.getImage();
       this.dialogVisible = true;
     },
     startMusic() {
@@ -4316,7 +4328,6 @@ export default {
     },
     generateImagePath() {
       this.imagePath = [];
-      this.imageIndex = 0;
       let length = this.chart.changeBackgroundOperations.length;
       let start = 0;
       let end = start;
@@ -4353,52 +4364,12 @@ export default {
         }
       }
     },
-    getImage() {
-      var currentTime = this.global.currentTime;
-      var currentImage = this.imagePath[this.imageIndex];
-      if (
-        !(
-          currentTime <= currentImage.endTime &&
-          currentTime >= currentImage.startTime
-        )
-      ) {
-        this.imageIndex = this.binaryGetCurrentIndex(
-          currentTime,
-          this.imagePath
-        );
-        currentImage = this.imagePath[this.imageIndex];
-      }
-      return currentImage.url;
-    },
-    binaryGetCurrentIndex(currentTime, path) {
-      let right = path.length - 1;
-      if (right == 0) {
-        return 0;
-      }
-      let left = 0;
-      let mid = Math.floor((right + left) / 2);
-      while (right > left) {
-        if (
-          path[mid].startTime <= currentTime &&
-          path[mid].endTime >= currentTime
-        ) {
-          return mid;
-        }
-        if (path[mid].startTime > currentTime) {
-          right = mid - 1;
-        }
-        if (path[mid].endTime < currentTime) {
-          left = mid + 1;
-        }
-        mid = Math.floor((right + left) / 2);
-      }
-      return mid;
-    },
     changeTime() {
       this.audio.play();
       this.audio.currentTime = this.global.currentTime / 1000;
-
-      this.run();
+      if (!this.isRunning) {
+        this.run();
+      }
     },
   },
 };
