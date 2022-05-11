@@ -97,7 +97,7 @@ export default {
         finalY: 0.8,
         currentTime: 0,
         lostTime: 150,
-        isEdit:false,
+        isEdit: false,
       },
       imagePath: [],
       dialogVisible: false,
@@ -161,6 +161,14 @@ export default {
         that.global.screenHeight = that.playInterface.offsetHeight;
       })();
     };
+
+    document.onkeydown = function(e) {
+      console.log(e);
+    };
+    document.onkeyup = function(e) {
+      console.log(e);
+    }
+    
     this.initiate();
   },
 
