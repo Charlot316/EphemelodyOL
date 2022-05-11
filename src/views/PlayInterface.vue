@@ -1,5 +1,5 @@
 <template>
-  <div class="play-interface" id="play-interface-container">
+  <div class="play-interface select" id="play-interface-container">
     <div v-show="loadingStatus.canRun" class="play-interface">
       <audio
         id="audioSong"
@@ -21,22 +21,6 @@
           style="position:absolute;left:0;top:0;width:100%;height:100%;object-fit:fill;"
         />
       </div>
-      <div
-        :style="{
-          position: 'absolute',
-          left: '0px',
-          top: '0px',
-          width: global.screenWidth + 'px',
-        }"
-      >
-        <el-slider
-          v-model="global.currentTime"
-          :min="0"
-          :max="chart.songLength"
-          :step="30"
-          @change="changeTime"
-        ></el-slider>
-      </div>
 
       <div
         :style="{
@@ -52,7 +36,7 @@
           :style="{
             height: '100%',
             position: 'absolute',
-            left:(global.screenWidth-whiteLineLength)/2+'px',
+            left: (global.screenWidth - whiteLineLength) / 2 + 'px',
             width: whiteLineLength + 'px',
             background: 'rgba(255,255,255,1)',
           }"
@@ -79,6 +63,8 @@
         title="开始"
         width="30%"
         :show-close="false"
+        :close-on-press-escape="false"
+        :close-on-click-modal="false"
       >
         <span>加载完毕，点按以开始</span>
         <template #footer>
@@ -128,24 +114,30 @@ export default {
   },
   computed: {
     whiteLineLength() {
-      const time=200;
-      const waitLoad=1000;
-      if(this.global.currentTime >time+waitLoad&&this.global.currentTime<this.chart.songLength-time) {
+      const time = 200;
+      const waitLoad = 1000;
+      if (
+        this.global.currentTime > time + waitLoad &&
+        this.global.currentTime < this.chart.songLength - time
+      ) {
         return this.global.screenWidth;
-      }
-      else{
-        if(this.global.currentTime<time+waitLoad){
-          if(this.global.currentTime<waitLoad)
-          {
+      } else {
+        if (this.global.currentTime < time + waitLoad) {
+          if (this.global.currentTime < waitLoad) {
             return 0;
-          }
-          else return (this.global.currentTime-waitLoad)*this.global.screenWidth/time;
-        }
-        else{
-          return (this.chart.songLength-this.global.currentTime)*this.global.screenWidth/time;
+          } else
+            return (
+              ((this.global.currentTime - waitLoad) * this.global.screenWidth) /
+              time
+            );
+        } else {
+          return (
+            ((this.chart.songLength - this.global.currentTime) *
+              this.global.screenWidth) /
+            time
+          );
         }
       }
-      
     },
   },
   created() {
@@ -4459,7 +4451,7 @@ export default {
           this.imagePath.push({
             url: defaultBackground,
             startTime: start,
-            endTime: this.chart.songLength,
+            endTime: this.chart.songLength + 1000,
           });
         }
       }
@@ -4494,5 +4486,14 @@ export default {
   height: 100%;
   width: 100%;
   background: white;
+}
+.select {
+  -webkit-user-select: none;
+
+  -moz-user-select: none;
+
+  -ms-user-select: none;
+
+  user-select: none;
 }
 </style>
