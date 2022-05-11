@@ -18,7 +18,7 @@
               global.currentTime <= image.endTime
           "
           @load="imageLoaded"
-          style="position:absolute;left:0;top:0;width:100%;height:100%;object-fit:fill;"
+          style="position:absolute;left:0;top:0;width:100%;height:100%;object-fit:fill;user-drag:none;"
         />
       </div>
 
@@ -97,6 +97,7 @@ export default {
         finalY: 0.8,
         currentTime: 0,
         lostTime: 150,
+        isEdit:false,
       },
       imagePath: [],
       dialogVisible: false,
@@ -4375,6 +4376,7 @@ export default {
           this.run();
         }, 1000 / this.$store.state.refreshRate);
       } else {
+        this.global.currentTime = this.chart.songLength;
         this.isRunning = false;
       }
     },

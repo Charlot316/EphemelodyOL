@@ -19,6 +19,43 @@
         background: 'rgba(0,0,0,0.2)',
       }"
     ></div>
+    <div class="key">
+      <div
+        v-if="Track.type == 1"
+        class="key-background"
+        :style="{
+          width: lengthForKey + 'px',
+          position: 'absolute',
+          left: 0.5 * width - (Math.sqrt(2) - 1) * lengthForKey - 6 + 'px',
+          top:
+            (finalHeight * 9) / 8 -
+            (Math.sqrt(2) - 1) * lengthForKey +
+            'px',
+          margin: 'auto 0',
+          border: '1px solid rgba(244,244,244,1)',
+          height: lengthForKey + 'px',
+          background: 'rgba(247,199,9,0.5)',
+          transform: 'rotateZ(45deg)',
+        }"
+      ></div>
+      <div
+        v-if="Track.type == 1"
+        :style="{
+          width: lengthForKey + 'px',
+          position: 'absolute',
+          left: 0.5 * width - 0.5 * lengthForKey + 'px',
+          top: (finalHeight * 9) / 8 - (Math.sqrt(2) - 1) * lengthForKey + 'px',
+          margin: 'auto 0',
+          height: lengthForKey + 'px',
+          textAlign: 'center',
+          textShadow: '1px 1px 0 rgba(0,0,0,0.25)',
+          fontSize: lengthForKey * 0.7 + 'px',
+          color: 'rgba(255,255,255,0.8)',
+        }"
+      >
+        {{ Track.key.toUpperCase() + " " }}
+      </div>
+    </div>
     <div
       class="black-point"
       :style="{
@@ -103,6 +140,13 @@ export default {
     this.initiate();
   },
   computed: {
+    lengthForKey() {
+      if (this.Global.screenHeight * 0.1 > 50) {
+        return 50;
+      } else {
+        return this.Global.screenHeight * 0.1;
+      }
+    },
     finalHeight() {
       return this.Global.screenHeight * this.Global.finalY;
     },
@@ -545,9 +589,9 @@ export default {
       }
       this.height = this.finalHeight - this.top;
     },
-    log(){
-      console.log(this.myTrack.tempWidth)
-    }
+    log() {
+      console.log(this.myTrack.tempWidth);
+    },
   },
 };
 </script>

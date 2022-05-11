@@ -4375,6 +4375,7 @@ export default {
           this.run();
         }, 1000 / this.$store.state.refreshRate);
       } else {
+        this.global.currentTime = this.chart.songLength;
         this.isRunning = false;
       }
     },
