@@ -1,56 +1,63 @@
 <template>
   <div class="play-interface" id="play-interface-container">
-    <audio
-      id="audioSong"
-      preload="auto"
-      controls
-      autoplay
-      :src="chart.songUrl"
-      style="display:none"
-    />
-    <div v-for="image in imagePath" :key="image">
-      <img
-        :src="image.url"
-        v-show="global.currentTime>=image.startTime && global.currentTime<=image.endTime"
-        style="position:absolute;left:0;top:0;width:100%;height:100%;object-fit:fill;"
+    <div v-show="loadingStatus.canRun" class="play-interface">
+      <audio
+        id="audioSong"
+        preload="auto"
+        controls
+        autoplay
+        :src="chart.songUrl"
+        style="display:none"
+        @canplaythrough="audioLoaded"
       />
-    </div>
+      <div v-for="image in imagePath" :key="image">
+        <img
+          :src="image.url"
+          v-show="
+            global.currentTime >= image.startTime &&
+              global.currentTime <= image.endTime
+          "
+          @load="imageLoaded"
+          style="position:absolute;left:0;top:0;width:100%;height:100%;object-fit:fill;"
+        />
+      </div>
 
-    <el-slider
-      v-model="global.currentTime"
-      :min="0"
-      :max="chart.songLength"
-      :step="30"
-      @change="changeTime"
-    ></el-slider>
+      <el-slider
+        v-model="global.currentTime"
+        :min="0"
+        :max="chart.songLength"
+        :step="30"
+        @change="changeTime"
+      ></el-slider>
 
-    <div
-      class="play-interface-container"
-      v-for="Track in chart.tracks"
-      :key="Track"
-    >
-      <Track
-        :Track="Track"
-        :Global="global"
-        v-if="
-          global.currentTime > Track.startTiming &&
-            global.currentTime < Track.endTiming
-        "
-      />
+      <div
+        class="play-interface-track-container"
+        v-for="Track in chart.tracks"
+        :key="Track"
+      >
+        <Track
+          :Track="Track"
+          :Global="global"
+          v-if="
+            global.currentTime > Track.startTiming &&
+              global.currentTime < Track.endTiming
+          "
+        />
+      </div>
+      <el-dialog
+        v-model="dialogVisible"
+        title="开始"
+        width="30%"
+        :show-close="false"
+      >
+        <span>加载完毕，点按以开始</span>
+        <template #footer>
+          <span class="dialog-footer">
+            <el-button type="primary" @click="startMusic">确认</el-button>
+          </span>
+        </template>
+      </el-dialog>
     </div>
-    <el-dialog
-      v-model="dialogVisible"
-      title="开始"
-      width="30%"
-      :show-close="false"
-    >
-      <span>加载完毕，点按以开始</span>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button type="primary" @click="startMusic">确认</el-button>
-        </span>
-      </template>
-    </el-dialog>
   </div>
 </template>
 
@@ -75,39 +82,45 @@ export default {
         currentTime: 0,
         lostTime: 150,
       },
-      backgroundUrl: "",
       imagePath: [],
-      imageIndex: 0,
-      startDateTime: 0,
-      nowDateTime: 0,
       dialogVisible: false,
       audio: null,
+      playInterface: null,
       isRunning: false,
+      loadingStatus: {
+        chart: false,
+        audio: false,
+        image: false,
+        imageCurrentCount: 0,
+        canRun: false,
+      },
     };
   },
-  created() {},
+  created() {
+    this.loadingStatus = {
+      chart: false,
+      audio: false,
+      image: false,
+      canRun: false,
+      imageCurrentCount: 0,
+    };
+  },
   mounted() {
     const that = this;
-
-    this.global.screenWidth = document.getElementById(
-      "play-interface-container"
-    ).offsetWidth;
-    this.global.screenHeight = document.getElementById(
-      "play-interface-container"
-    ).offsetHeight;
+    this.playInterface = document.getElementById("play-interface-container");
+    this.global.screenWidth = this.playInterface.offsetWidth;
+    this.global.screenHeight = this.playInterface.offsetHeight;
     window.onresize = () => {
       return (() => {
-        that.global.screenWidth = document.getElementById(
-          "play-interface-container"
-        ).offsetWidth;
-        that.global.screenHeight = document.getElementById(
-          "play-interface-container"
-        ).offsetHeight;
+        that.global.screenWidth = that.playInterface.offsetWidth;
+        that.global.screenHeight = that.playInterface.offsetHeight;
       })();
     };
     this.initiate();
   },
+
   methods: {
+    //获取谱面信息
     getChart() {
       this.chart.tracks = [
         {
@@ -4294,11 +4307,15 @@ export default {
       ];
       this.chart.songUrl = "http://10.251.0.251:8000/media/1.mp3";
     },
+
+    //给轨道排序
     sortTrack() {
       this.chart.tracks.sort(function(a, b) {
         return b.startTiming - a.startTiming;
       });
     },
+
+    //运行
     run() {
       this.global.currentTime = Math.floor(this.audio.currentTime * 1000);
       this.isRunning = true;
@@ -4310,22 +4327,46 @@ export default {
         this.isRunning = false;
       }
     },
+
+    //audio加载完毕
+    audioLoaded() {
+      this.audio = document.getElementById("audioSong");
+      this.loadingStatus.audio = true;
+      console.log("audio loaded");
+      this.checkIfLoaded();
+    },
+
+    //图片加载完毕
+    imageLoaded() {
+      this.loadingStatus.imageCurrentCount++;
+      if (this.loadingStatus.imageCurrentCount == this.imagePath.length) {
+        this.loadingStatus.image = true;
+        console.log("image loaded");
+        this.checkIfLoaded();
+      }
+    },
+
+    //打印控制台信息
     log(message) {
       console.log(message);
     },
+
+    //加载
     initiate() {
       this.getChart();
+      this.loadingStatus.chart = true;
       this.sortTrack();
       this.generateImagePath();
-      this.dialogVisible = true;
     },
+
+    //开始播放音乐
     startMusic() {
       this.dialogVisible = false;
-      this.audio = document.getElementById("audioSong");
       this.audio.play();
-      this.startDateTime = Date.now();
       this.run();
     },
+
+    //生成图片路径
     generateImagePath() {
       this.imagePath = [];
       let length = this.chart.changeBackgroundOperations.length;
@@ -4364,11 +4405,25 @@ export default {
         }
       }
     },
+
+    //变换slide的时间
     changeTime() {
       this.audio.play();
       this.audio.currentTime = this.global.currentTime / 1000;
       if (!this.isRunning) {
         this.run();
+      }
+    },
+
+    //当所有都加载完毕的时候开始运行
+    checkIfLoaded() {
+      if (
+        this.loadingStatus.chart &&
+        this.loadingStatus.audio &&
+        this.loadingStatus.image
+      ) {
+        this.loadingStatus.canRun = true;
+        this.dialogVisible = true;
       }
     },
   },
