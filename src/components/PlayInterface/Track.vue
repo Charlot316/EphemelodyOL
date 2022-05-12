@@ -21,18 +21,20 @@
     ></div>
     <div class="key">
       <div
-        v-if="Track.type == 1"
         class="key-background"
         :style="{
           width: lengthForKey + 'px',
           position: 'absolute',
-          left: 0.5 * width - (Math.sqrt(2) - 1) * lengthForKey - 6 + 'px',
+          left: 0.5 * width - (Math.sqrt(2) - 1) * lengthForKey - 5.5 + 'px',
           top: (finalHeight * 9) / 8 - (Math.sqrt(2) - 1) * lengthForKey + 'px',
           margin: 'auto 0',
           border: '1px solid rgba(244,244,244,1)',
           height: lengthForKey + 'px',
-          background: 'rgba(247,199,9,0)',
+          background: [
+            Track.type == 1 ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0)',
+          ],
           transform: 'rotateZ(45deg)',
+          boxShadow: boxShadow,
         }"
       ></div>
       <div
@@ -92,7 +94,6 @@
         height: lengthForBlackPoint + 'px',
         background: 'rgb(22, 22, 14)',
         transform: 'rotateZ(45deg)',
-        boxShadow: boxShadow,
       }"
     ></div>
   </div>
@@ -140,9 +141,9 @@ export default {
       if (!this.Global.isEdit) {
         this.judge();
         if (this.boxShadowSize >= 1) {
-          this.boxShadowSize += 3;
+          this.boxShadowSize += 1;
         }
-        if (this.boxShadowSize > 75) {
+        if (this.boxShadowSize > 20) {
           this.boxShadowSize = 0;
         }
       }
@@ -155,7 +156,7 @@ export default {
     boxShadow() {
       return (
         "0px 0px " +
-        0 +
+        0.5 * this.boxShadowSize +
         "px " +
         this.boxShadowSize +
         "px " +
@@ -371,12 +372,11 @@ export default {
     //主进程+1
     addCount(param) {
       if (param.key == "pureCount") {
-        this.boxShadowColor = "rgba(234,161,86,0.2)";
+        this.boxShadowColor = "rgba(234,161,86,0.4)";
       } else if (param.key == "farCount") {
-        this.boxShadowColor = "rgba(135,206,250,0.5)";
-      }
-      else if (param.key == "lostCount") {
-        this.boxShadowColor = "rgba(0,0,0,0.2)";
+        this.boxShadowColor = "rgba(135,206,250,0.4)";
+      } else if (param.key == "lostCount") {
+        this.boxShadowColor = "rgba(0,0,0,0.3)";
       }
       this.boxShadowSize = 1;
       this.$emit("addCount", param);
