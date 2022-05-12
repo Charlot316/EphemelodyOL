@@ -263,69 +263,79 @@ export default {
         let currentKey = this.Track.notes[this.currentNote].key.toUpperCase();
         let currentJudge = this.Global.keyPressTime[currentKey];
         let currentTime = this.Global.currentTime;
-        if (this.Track.notes[this.currentNote].type == 1) {
-          if (
-            currentTime >
-            this.Track.notes[this.currentNote].timing - this.Global.lostTime
-          ) {
-            if (
-              currentTime >
-              this.Track.notes[this.currentNote].timing + this.Global.lostTime
-            ) {
-              this.addCount("lost");
+        let timing = this.Track.notes[this.currentNote].timing;
+        let pureTime = this.Global.pureTime;
+        let farTime = this.Global.farTime;
+        let lostTime = this.Global.lostTime;
+        if (this.Track.notes[this.currentNote].noteType == 1) {
+          if (currentTime > timing - lostTime) {
+            if (currentTime > timing + lostTime) {
+              this.addCount({
+                key: "lost",
+                message: "因超时没有按到而判定为Lost",
+                judgeTime: currentTime,
+                timing: timing,
+              });
               this.addNoteCount();
             } else if (this.Global.keyIsHold[currentKey]) {
-              this.addCount("pure");
-              this.addCount("combo");
+              this.addCount({
+                key: "pure",
+                message: "pure",
+                judgeTime: currentTime,
+                timing: timing,
+              });
               this.myTrack.notes[this.currentNote].judged = true;
               this.addNoteCount();
             }
           }
         } else {
-          if (
-            currentTime >
-            this.Track.notes[this.currentNote].timing - this.Global.lostTime
-          ) {
-            if (
-              currentTime >
-              this.Track.notes[this.currentNote].timing + this.Global.lostTime
-            ) {
-              this.addLost("因没有按到lost");
+          if (currentTime > timing - lostTime) {
+            if (currentTime > timing + lostTime) {
+              this.addCount({
+                key: "lost",
+                message: "因超时没有按到而判定为Lost",
+                judgeTime: currentTime,
+                timing: timing,
+              });
               this.addNoteCount();
             } else if (
-              currentJudge >
-                this.Track.notes[this.currentNote].timing -
-                  this.Global.pureTime &&
-              currentJudge <
-                this.Track.notes[this.currentNote].timing + this.Global.pureTime
+              currentJudge > timing - pureTime &&
+              currentJudge < timing + pureTime
             ) {
-              this.addCount("pure");
-              this.addCount("combo");
+              this.addCount({
+                key: "pure",
+                message: "pure",
+                judgeTime: currentJudge,
+                timing: timing,
+              });
               this.myTrack.notes[this.currentNote].judged = true;
-              this.myGlobal.keyPressTime[currentKey]=0;
+              this.myGlobal.keyPressTime[currentKey] = 0;
               this.addNoteCount();
             } else if (
-              currentJudge >
-                this.Track.notes[this.currentNote].timing -
-                  this.Global.farTime &&
-              currentJudge <
-                this.Track.notes[this.currentNote].timing + this.Global.farTime
+              currentJudge > timing - farTime &&
+              currentJudge < timing + farTime
             ) {
-              this.addCount("far");
-              this.addCount("combo");
+              this.addCount({
+                key: "far",
+                message: currentJudge < timing?"因为过早按下而判定为far(early)":"因为过晚按下而判定为far(late)",
+                judgeTime: currentJudge,
+                timing: timing,
+              });
               this.myTrack.notes[this.currentNote].judged = true;
-              this.myGlobal.keyPressTime[currentKey]=0;
+              this.myGlobal.keyPressTime[currentKey] = 0;
               this.addNoteCount();
             } else if (
-              currentJudge >
-                this.Track.notes[this.currentNote].timing -
-                  this.Global.lostTime &&
-              currentJudge <
-                this.Track.notes[this.currentNote].timing + this.Global.lostTime
+              currentJudge > timing - lostTime &&
+              currentJudge < timing + lostTime
             ) {
-              this.addLost("因过早过晚点击lost");
+              this.addCount({
+                key: "lost",
+                message: currentJudge < timing?"因为过早按下而判定为lost(early)":"因为过晚按下而判定为lost(late)",
+                judgeTime: currentJudge,
+                timing: timing,
+              });
               this.myTrack.notes[this.currentNote].judged = true;
-              this.myGlobal.keyPressTime[currentKey]=0;
+              this.myGlobal.keyPressTime[currentKey] = 0;
               this.addNoteCount();
             }
           }
@@ -334,11 +344,7 @@ export default {
     },
     //主进程+1
     addCount(param) {
-      this.$emit("addCount", {key:param});
-    },
-    //主进程+1
-    addLost(param) {
-      this.$emit("addCount", {key:'lost',message:param});
+      this.$emit("addCount", param);
     },
     //判定note+1
     addNoteCount() {

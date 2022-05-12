@@ -4510,10 +4510,13 @@ export default {
     //父组件提供的方法
     addCount(param) {
       this.global[param.key] += 1;
+      console.log(param.message+", 点击时机:"+param.judgeTime+", 音符时机:"+param.timing);
       if(param.key=="lost"){
-        console.log(param.message);
         this.global.combo=0
         this.global.maxCombo = Math.max(this.global.maxCombo,this.global.combo); 
+      }
+      else{
+        this.global.combo++;
       }
     },
 
