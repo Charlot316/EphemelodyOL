@@ -77,6 +77,22 @@
         }"
       >
         <div
+          class="score-counter"
+          style="text-align:center;
+          position:absolute;
+          left:0px;
+          width: 50px;
+          margin: 0 auto;
+          text-shadow: 1px 1px 0 rgba(0,0,0,0.25);
+          font-size:30px;
+          color:rgb(255,255,255);
+          cursor: pointer;"
+          @click="pause"
+        >
+          ||
+        </div>
+        <div
+          class="score-counter"
           style="text-align:center;
           position:absolute;
           right:0px;
@@ -88,7 +104,7 @@
         >
           {{ score }}
         </div>
-        <div v-if="global.combo > 1">
+        <div class="combo-counter" v-if="global.combo > 1">
           <div
             style="text-align:center;
           width: 200px;
@@ -138,17 +154,41 @@
       <el-dialog
         v-model="dialogVisible"
         title="开始"
-        width="30%"
+        top="30vh"
+        :center="true"
         :show-close="false"
         :close-on-press-escape="false"
         :close-on-click-modal="false"
       >
-        <span>加载完毕，点按以开始</span>
+        <div style="text-align: center;">加载完毕，点按以开始</div>
         <template #footer>
           <span class="dialog-footer">
-            <el-button type="primary" @click="startMusic">确认</el-button>
+            <el-button @click="startMusic">确认</el-button>
           </span>
         </template>
+      </el-dialog>
+      <el-dialog
+        v-model="pauseVisible"
+        title="暂停"
+        top="30vh"
+        :center="true"
+        :show-close="false"
+        :close-on-press-escape="false"
+        :close-on-click-modal="false"
+      >
+        <div style="text-align: center;">
+          <el-button icon="el-icon-caret-left" circle></el-button>
+          <el-button
+            icon="el-icon-refresh-left"
+            circle
+            @click="reStart"
+          ></el-button>
+          <el-button
+            icon="el-icon-caret-right"
+            circle
+            @click="continuePlay"
+          ></el-button>
+        </div>
       </el-dialog>
     </div>
   </div>
@@ -184,10 +224,11 @@ export default {
         lostCount: 0,
         combo: 0,
         maxCombo: 0,
-        score:0,
+        score: 0,
       },
       imagePath: [],
       dialogVisible: false,
+      pauseVisible: false,
       audio: null,
       playInterface: null,
       isRunning: false,
@@ -228,7 +269,8 @@ export default {
       }
     },
     score() {
-      if (this.global.score) return this.global.score.toString().padStart(8, "0");
+      if (this.global.score)
+        return this.global.score.toString().padStart(8, "0");
       else return "00000000";
     },
   },
@@ -265,7 +307,7 @@ export default {
       lostCount: 0,
       combo: 0,
       maxCombo: 0,
-      score:0,
+      score: 0,
     };
   },
   mounted() {
@@ -284,6 +326,12 @@ export default {
       if (!e.repeat) {
         that.global.keyPressTime[e.key.toUpperCase()] = that.global.currentTime;
         that.global.keyIsHold[e.key.toUpperCase()] = true;
+      }
+      if (e.key == "Escape") {
+        that.pause();
+      }
+      if (e.key == "Enter") {
+        that.continuePlay();
       }
     };
     document.onkeyup = function(e) {
@@ -4635,6 +4683,40 @@ export default {
       ) {
         this.loadingStatus.canRun = true;
         this.dialogVisible = true;
+      }
+    },
+    //暂停
+    pause() {
+      this.audio.pause();
+      this.pauseVisible = true;
+    },
+    //继续
+    continuePlay() {
+      this.pauseVisible = false;
+      this.audio.play();
+    },
+    //重新开始
+    reStart() {
+      this.pauseVisible = false;
+      this.global.keyPressTime = [];
+      this.global.keyIsHold = [];
+      this.global.pureCount = 0;
+      this.global.farCount = 0;
+      this.global.lostCount = 0;
+      this.global.combo = 0;
+      this.global.maxCombo = 0;
+      this.global.score = 0;
+      for (var i = 0; i < this.chart.tracks.length; i++) {
+        var track = this.chart.tracks[i];
+        for (var j = 0; j < track.notes.length; j++) {
+          track.notes[j].judged = false;
+        }
+      }
+      this.audio.currentTime = 0;
+      this.audio.play();
+      if (!this.isRunning) {
+        this.global.currentTime=0;
+        this.run();
       }
     },
   },
