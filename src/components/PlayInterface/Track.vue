@@ -260,7 +260,11 @@ export default {
     },
     judge() {
       if (this.Track.notes.length > 0 && !this.judgeFinished) {
-        let currentKey = this.Track.notes[this.currentNote].key.toUpperCase();
+        let currentKey = "";
+        if (this.Track.type == 1) {
+          currentKey = this.Track.key.toUpperCase();
+        } else
+          currentKey = this.Track.notes[this.currentNote].key.toUpperCase();
         let currentJudge = this.Global.keyPressTime[currentKey];
         let currentTime = this.Global.currentTime;
         let timing = this.Track.notes[this.currentNote].timing;
@@ -271,7 +275,7 @@ export default {
           if (currentTime > timing - lostTime) {
             if (currentTime > timing + lostTime) {
               this.addCount({
-                key: "lost",
+                key: "lostCount",
                 message: "因超时没有按到而判定为Lost",
                 judgeTime: currentTime,
                 timing: timing,
@@ -279,7 +283,7 @@ export default {
               this.addNoteCount();
             } else if (this.Global.keyIsHold[currentKey]) {
               this.addCount({
-                key: "pure",
+                key: "pureCount",
                 message: "pure",
                 judgeTime: currentTime,
                 timing: timing,
@@ -292,7 +296,7 @@ export default {
           if (currentTime > timing - lostTime) {
             if (currentTime > timing + lostTime) {
               this.addCount({
-                key: "lost",
+                key: "lostCount",
                 message: "因超时没有按到而判定为Lost",
                 judgeTime: currentTime,
                 timing: timing,
@@ -303,7 +307,7 @@ export default {
               currentJudge < timing + pureTime
             ) {
               this.addCount({
-                key: "pure",
+                key: "pureCount",
                 message: "pure",
                 judgeTime: currentJudge,
                 timing: timing,
@@ -316,8 +320,11 @@ export default {
               currentJudge < timing + farTime
             ) {
               this.addCount({
-                key: "far",
-                message: currentJudge < timing?"因为过早按下而判定为far(early)":"因为过晚按下而判定为far(late)",
+                key: "farCount",
+                message:
+                  currentJudge < timing
+                    ? "因为过早按下而判定为far(early)"
+                    : "因为过晚按下而判定为far(late)",
                 judgeTime: currentJudge,
                 timing: timing,
               });
@@ -330,7 +337,10 @@ export default {
             ) {
               this.addCount({
                 key: "lost",
-                message: currentJudge < timing?"因为过早按下而判定为lost(early)":"因为过晚按下而判定为lost(late)",
+                message:
+                  currentJudge < timing
+                    ? "因为过早按下而判定为lost(early)"
+                    : "因为过晚按下而判定为lost(late)",
                 judgeTime: currentJudge,
                 timing: timing,
               });

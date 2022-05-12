@@ -1,6 +1,7 @@
 <template>
   <div class="play-interface select" id="play-interface-container">
     <div v-show="loadingStatus.canRun" class="play-interface">
+      <!-- 音频 -->
       <audio
         id="audioSong"
         preload="auto"
@@ -10,6 +11,7 @@
         style="display:none"
         @canplaythrough="audioLoaded"
       />
+      <!-- 背景 -->
       <div v-for="image in imagePath" :key="image">
         <img
           :src="image.url"
@@ -21,7 +23,7 @@
           style="position:absolute;left:0;top:0;width:100%;height:100%;object-fit:fill;user-drag:none;"
         />
       </div>
-
+      <!-- 判定线 -->
       <div
         :style="{
           height: '2px',
@@ -43,6 +45,7 @@
         ></div>
       </div>
 
+      <!-- 轨道 -->
       <div
         class="play-interface-track-container"
         v-for="Track in chart.tracks"
@@ -58,7 +61,43 @@
           "
         />
       </div>
+      <!-- 记分板 -->
+      <div
+        :style="{
+          height: '200px',
+          position: 'absolute',
+          left: '0px',
+          top: '0px',
+          width: global.screenWidth + 'px',
 
+          background: [
+            '-webkit-linear-gradient(90deg, rgba(0,0,0,0) 0, rgba(0,0,0,1) 100%)',
+            '-moz-linear-gradient(0deg, rgba(0,0,0,0) 0, rgba(0,0,0,1) 100%)',
+            'linear-gradient(0deg, rgba(0,0,0,0) 0, rgba(0,0,0,1) 100%)',
+          ],
+        }"
+      >
+        <div
+          style="text-align:center;
+          width: 200px;
+          margin: 0 auto;
+          text-shadow: 1px 1px 0 rgba(0,0,0,0.25);
+          font-size:70px;
+          color:rgb(255,255,255)"
+        >
+          {{ global.combo }}
+        </div>
+        <div
+          style="text-align:center;
+          width: 200px;
+          margin: 0 auto;
+          text-shadow: 1px 1px 0 rgba(0,0,0,0.25);
+          font-size:20px;
+          color:rgb(255,255,255)"
+        >
+          COMBO
+        </div>
+      </div>
       <el-dialog
         v-model="dialogVisible"
         title="开始"
@@ -149,6 +188,15 @@ export default {
           );
         }
       }
+    },
+    score() {
+      let singleScore = 10000000 / this.chart.notesCount;
+      this.global.score = Math.floor(
+        this.global.pureCount * singleScore +
+          this.global.farCount * 0.5 * singleScore
+      );
+      if (this.global.score > 10000000) this.global.score = 10000000;
+      return this.global.score;
     },
   },
   created() {
@@ -4140,7 +4188,7 @@ export default {
                 positionX: 0,
                 positionY: 0.9247999999999976,
                 noteType: 0,
-                key: "d",
+                key: "k",
                 timing: 34080,
                 endTiming: 0,
                 length: 0,
@@ -4510,12 +4558,20 @@ export default {
     //父组件提供的方法
     addCount(param) {
       this.global[param.key] += 1;
-      console.log(param.message+", 点击时机:"+param.judgeTime+", 音符时机:"+param.timing);
-      if(param.key=="lost"){
-        this.global.combo=0
-        this.global.maxCombo = Math.max(this.global.maxCombo,this.global.combo); 
-      }
-      else{
+      console.log(
+        param.message +
+          ", 点击时机:" +
+          param.judgeTime +
+          ", 音符时机:" +
+          param.timing
+      );
+      if (param.key == "lostCount") {
+        this.global.combo = 0;
+        this.global.maxCombo = Math.max(
+          this.global.maxCombo,
+          this.global.combo
+        );
+      } else {
         this.global.combo++;
       }
     },

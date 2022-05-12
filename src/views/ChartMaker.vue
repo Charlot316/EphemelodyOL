@@ -4100,7 +4100,7 @@ export default {
                 positionX: 0,
                 positionY: 0.9247999999999976,
                 noteType: 0,
-                key: "d",
+                key: "k",
                 timing: 34080,
                 endTiming: 0,
                 length: 0,
