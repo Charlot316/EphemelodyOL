@@ -1,5 +1,26 @@
 <template>
   <div class="play-interface select" id="play-interface-container">
+    <div v-if="!loadingStatus.canRun" class="show-info">
+      <img
+        :src="chart.defaultBackground"
+        class="loading-background"
+        style="position:absolute;left:0;top:0;width:100%;height:100%;object-fit:fill;user-drag:none;"
+      />
+      <div
+        class="info-container"
+        style="position:absolute;left:0;top:0;width:100%;height:100%;object-fit:fill;user-drag:none;"
+      >
+        <div
+          class="songcover-container"
+          style="width:200px;height:200px;border:20px solid rgb(255,255,255);"
+        >
+          <img
+            :src="chart.songCover"
+            style="width:100%;height:100%;object-fit:fill;user-drag:none;"
+          />
+        </div>
+      </div>
+    </div>
     <div v-show="loadingStatus.canRun" class="play-interface">
       <!-- 音频 -->
       <audio
@@ -203,42 +224,17 @@ export default {
   },
   data() {
     return {
-      num: 0,
       chart: {
         songLength: 0,
       },
-      global: {
-        screenWidth: 0,
-        screenHeight: 0,
-        remainingTime: 1000,
-        finalY: 0.8,
-        currentTime: 0,
-        lostTime: 150,
-        pureTime: 50,
-        farTime: 100,
-        isEdit: false,
-        keyPressTime: [],
-        keyIsHold: [],
-        pureCount: 0,
-        farCount: 0,
-        lostCount: 0,
-        combo: 0,
-        maxCombo: 0,
-        score: 0,
-      },
+      global: {},
+
       imagePath: [],
       dialogVisible: false,
       pauseVisible: false,
       audio: null,
       playInterface: null,
       isRunning: false,
-      loadingStatus: {
-        chart: false,
-        audio: false,
-        image: false,
-        imageCurrentCount: 0,
-        canRun: false,
-      },
     };
   },
   computed: {
@@ -296,9 +292,9 @@ export default {
       remainingTime: 1000,
       finalY: 0.8,
       currentTime: 0,
-      lostTime: 200,
-      pureTime: 75,
-      farTime: 150,
+      lostTime: 150,
+      pureTime: 50,
+      farTime: 100,
       isEdit: false,
       keyPressTime: [],
       keyIsHold: [],
@@ -328,7 +324,9 @@ export default {
         that.global.keyIsHold[e.key.toUpperCase()] = true;
       }
       if (e.key == "Escape") {
-        that.pause();
+        if (that.global.currentTime < that.chart.songLength) {
+          that.pause();
+        }
       }
       if (e.key == "Enter") {
         that.continuePlay();
@@ -4715,7 +4713,7 @@ export default {
       this.audio.currentTime = 0;
       this.audio.play();
       if (!this.isRunning) {
-        this.global.currentTime=0;
+        this.global.currentTime = 0;
         this.run();
       }
     },
@@ -4737,5 +4735,22 @@ export default {
   -ms-user-select: none;
 
   user-select: none;
+}
+
+@keyframes backgroung-image {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.loading-background {
+  animation-name: backgroung-image;
+  animation-duration: 10s;
+  animation-iteration-count: infinite;
 }
 </style>
