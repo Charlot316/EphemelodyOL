@@ -76,6 +76,18 @@
           ],
         }"
       >
+        <div
+          style="text-align:center;
+          position:absolute;
+          right:0px;
+          width: 200px;
+          margin: 0 auto;
+          text-shadow: 1px 1px 0 rgba(0,0,0,0.25);
+          font-size:40px;
+          color:rgb(255,255,255)"
+        >
+          {{ score }}
+        </div>
         <div v-if="global.combo > 1">
           <div
             style="text-align:center;
@@ -172,6 +184,7 @@ export default {
         lostCount: 0,
         combo: 0,
         maxCombo: 0,
+        score:0,
       },
       imagePath: [],
       dialogVisible: false,
@@ -214,6 +227,10 @@ export default {
         }
       }
     },
+    score() {
+      if (this.global.score) return this.global.score.toString().padStart(8, "0");
+      else return "00000000";
+    },
   },
   watch: {
     "global.pureCount"() {
@@ -248,6 +265,7 @@ export default {
       lostCount: 0,
       combo: 0,
       maxCombo: 0,
+      score:0,
     };
   },
   mounted() {
@@ -4478,7 +4496,6 @@ export default {
           this.global.farCount * 0.5 * singleScore
       );
       if (this.global.score > 10000000) this.global.score = 10000000;
-      return this.global.score;
     },
     //给轨道排序
     sortTrack() {

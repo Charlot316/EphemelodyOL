@@ -375,6 +375,9 @@ export default {
       } else if (param.key == "farCount") {
         this.boxShadowColor = "rgba(135,206,250,0.5)";
       }
+      else if (param.key == "lostCount") {
+        this.boxShadowColor = "rgba(0,0,0,0.2)";
+      }
       this.boxShadowSize = 1;
       this.$emit("addCount", param);
     },
