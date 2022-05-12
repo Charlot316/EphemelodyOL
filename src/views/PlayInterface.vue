@@ -214,14 +214,13 @@ export default {
         }
       }
     },
-    score() {
-      let singleScore = 10000000 / this.chart.notesCount;
-      this.global.score = Math.floor(
-        this.global.pureCount * singleScore +
-          this.global.farCount * 0.5 * singleScore
-      );
-      if (this.global.score > 10000000) this.global.score = 10000000;
-      return this.global.score;
+  },
+  watch: {
+    "global.pureCount"() {
+      this.calculateScore();
+    },
+    "global.farCount"() {
+      this.calculateScore();
     },
   },
   created() {
@@ -4472,6 +4471,15 @@ export default {
       };
     },
 
+    calculateScore() {
+      let singleScore = 10000000 / this.chart.notesCount;
+      this.global.score = Math.floor(
+        this.global.pureCount * singleScore +
+          this.global.farCount * 0.5 * singleScore
+      );
+      if (this.global.score > 10000000) this.global.score = 10000000;
+      return this.global.score;
+    },
     //给轨道排序
     sortTrack() {
       this.chart.tracks.sort(function(a, b) {

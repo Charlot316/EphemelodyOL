@@ -53,19 +53,7 @@
         {{ Track.key.toUpperCase() + " " }}
       </div>
     </div>
-    <div
-      class="black-point"
-      :style="{
-        width: lengthForBlackPoint + 'px',
-        position: 'absolute',
-        left: 0.5 * width - offsetDiagonal - 0.5 + 'px',
-        top: finalHeight - offsetDiagonal + 'px',
-        margin: 'auto 0',
-        height: lengthForBlackPoint + 'px',
-        background: 'rgb(22, 22, 14)',
-        transform: 'rotateZ(45deg)',
-      }"
-    ></div>
+
     <div
       class="track-body"
       :style="{
@@ -93,6 +81,20 @@
         />
       </div>
     </div>
+    <div
+      class="black-point"
+      :style="{
+        width: lengthForBlackPoint + 'px',
+        position: 'absolute',
+        left: 0.5 * width - offsetDiagonal - 0.5 + 'px',
+        top: finalHeight - offsetDiagonal + 'px',
+        margin: 'auto 0',
+        height: lengthForBlackPoint + 'px',
+        background: 'rgb(22, 22, 14)',
+        transform: 'rotateZ(45deg)',
+        boxShadow: boxShadow,
+      }"
+    ></div>
   </div>
 </template>
 
@@ -115,12 +117,14 @@ export default {
       widthIndex: 0,
       positionXIndex: 0,
       RGBIndex: 0,
-      opacity: 0.6,
+      opacity: 0.8,
       animationTime: 50,
       height: 0,
       top: 0,
       currentNote: 0,
       judgeFinished: false,
+      boxShadowColor: "rgba(0,0,0,0.2)",
+      boxShadowSize: 0,
     };
   },
   watch: {
@@ -133,13 +137,31 @@ export default {
         this.myTrack.tempB = this.getRGB()[2];
         this.setHeightAndTop();
       }
-      this.judge();
+      if (!this.Global.isEdit) {
+        this.judge();
+        if (this.boxShadowSize >= 1) {
+          this.boxShadowSize += 3;
+        }
+        if (this.boxShadowSize > 75) {
+          this.boxShadowSize = 0;
+        }
+      }
     },
   },
   created() {
     this.initiate();
   },
   computed: {
+    boxShadow() {
+      return (
+        "0px 0px " +
+        0 +
+        "px " +
+        this.boxShadowSize +
+        "px " +
+        this.boxShadowColor
+      );
+    },
     isActive() {
       if (this.Track.type == 1)
         return this.Global.keyIsHold[this.Track.key.toUpperCase()];
@@ -190,51 +212,45 @@ export default {
     activeStyle() {
       return [
         "-webkit-linear-gradient(-90deg, " +
-          this.TrackColor +
+          this.TrackColorWithoutA +
+          ",0.1)" +
           " 0, " +
-          this.TrackColorWithoutA +
-          ",0.05) 28%, " +
-          this.TrackColorWithoutA +
-          ",0.1) 50%, rgba(255,255,255,0.6) 70%, rgba(255,255,255,0.3) 100%)",
+          this.TrackColor +
+          " 50%,  rgba(255,255,255,0.8) 100%)",
         " -moz-linear-gradient(180deg, " +
-          this.TrackColor +
+          this.TrackColorWithoutA +
+          ",0.1)" +
           " 0, " +
-          this.TrackColorWithoutA +
-          ",0.05) 28%, " +
-          this.TrackColorWithoutA +
-          ",0.1) 50%, rgba(255,255,255,0.6) 70%, rgba(255,255,255,0.3) 100%)",
+          this.TrackColor +
+          " 50%,  rgba(255,255,255,0.8) 100%)",
         "linear-gradient(180deg, " +
-          this.TrackColor +
+          this.TrackColorWithoutA +
+          ",0.1)" +
           " 0, " +
-          this.TrackColorWithoutA +
-          ",0.05) 28%, " +
-          this.TrackColorWithoutA +
-          ",0.1) 50%, rgba(255,255,255,0.6) 70%, rgba(255,255,255,0.3) 100%)",
+          this.TrackColor +
+          " 50%,  rgba(255,255,255,0.8) 100%)",
       ];
     },
     inactiveStyle() {
       return [
         "-webkit-linear-gradient(-90deg, " +
-          this.TrackColor +
+          this.TrackColorWithoutA +
+          ",0.1)" +
           " 0, " +
-          this.TrackColorWithoutA +
-          ",0.2) 28%, " +
-          this.TrackColorWithoutA +
-          ",0.4) 64%, rgba(255,255,255,0.2) 99%, rgba(255,255,255,0.1) 100%)",
+          this.TrackColor +
+          " 90%, rgba(255,255,255,1) 100%)",
         " -moz-linear-gradient(180deg, " +
-          this.TrackColor +
+          this.TrackColorWithoutA +
+          ",0.1)" +
           " 0, " +
-          this.TrackColorWithoutA +
-          ",0.2) 28%, " +
-          this.TrackColorWithoutA +
-          ",0.4) 64%, rgba(255,255,255,0.2) 99%, rgba(255,255,255,0.1) 100%)",
+          this.TrackColor +
+          " 90%, rgba(255,255,255,1) 100%)",
         "linear-gradient(180deg, " +
-          this.TrackColor +
+          this.TrackColorWithoutA +
+          ",0.1)" +
           " 0, " +
-          this.TrackColorWithoutA +
-          ",0.2) 28%, " +
-          this.TrackColorWithoutA +
-          ",0.4) 64%, rgba(255,255,255,0.2) 99%, rgba(255,255,255,0.1) 100%)",
+          this.TrackColor +
+          " 90%, rgba(255,255,255,1) 100%)",
       ];
     },
     offsetDiagonal() {
@@ -354,6 +370,12 @@ export default {
     },
     //主进程+1
     addCount(param) {
+      if (param.key == "pureCount") {
+        this.boxShadowColor = "rgba(234,161,86,0.2)";
+      } else if (param.key == "farCount") {
+        this.boxShadowColor = "rgba(135,206,250,0.5)";
+      }
+      this.boxShadowSize = 1;
       this.$emit("addCount", param);
     },
     //判定note+1
