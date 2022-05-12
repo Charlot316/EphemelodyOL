@@ -51,6 +51,7 @@
         <Track
           :Track="Track"
           :Global="global"
+          @addCount="addCount"
           v-if="
             global.currentTime > Track.startTiming &&
               global.currentTime < Track.endTiming
@@ -97,7 +98,16 @@ export default {
         finalY: 0.8,
         currentTime: 0,
         lostTime: 150,
+        pureTime: 50,
+        farTime: 100,
         isEdit: false,
+        keyPressTime: [],
+        keyIsHold: [],
+        pureCount: 0,
+        farCount: 0,
+        lostCount: 0,
+        combo: 0,
+        maxCombo: 0,
       },
       imagePath: [],
       dialogVisible: false,
@@ -149,6 +159,24 @@ export default {
       canRun: false,
       imageCurrentCount: 0,
     };
+    this.global = {
+      screenWidth: 0,
+      screenHeight: 0,
+      remainingTime: 1000,
+      finalY: 0.8,
+      currentTime: 0,
+      lostTime: 150,
+      pureTime: 50,
+      farTime: 100,
+      isEdit: false,
+      keyPressTime: [],
+      keyIsHold: [],
+      pureCount: 0,
+      farCount: 0,
+      lostCount: 0,
+      combo: 0,
+      maxCombo: 0,
+    };
   },
   mounted() {
     const that = this;
@@ -163,12 +191,15 @@ export default {
     };
 
     document.onkeydown = function(e) {
-      console.log(e);
+      if (!e.repeat) {
+        that.global.keyPressTime[e.key.toUpperCase()] = that.global.currentTime;
+        that.global.keyIsHold[e.key.toUpperCase()] = true;
+      }
     };
     document.onkeyup = function(e) {
-      console.log(e);
-    }
-    
+      that.global.keyIsHold[e.key.toUpperCase()] = false;
+    };
+
     this.initiate();
   },
 
@@ -4473,6 +4504,16 @@ export default {
       this.audio.play();
       if (!this.isRunning) {
         this.run();
+      }
+    },
+
+    //父组件提供的方法
+    addCount(param) {
+      console.log(param)
+      this.global[param] += 1;
+      if(param=="lost"){
+        this.global.combo=0
+        this.global.maxCombo = Math.max(this.global.maxCombo,this.global.combo); 
       }
     },
 

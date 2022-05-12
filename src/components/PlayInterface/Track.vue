@@ -27,14 +27,11 @@
           width: lengthForKey + 'px',
           position: 'absolute',
           left: 0.5 * width - (Math.sqrt(2) - 1) * lengthForKey - 6 + 'px',
-          top:
-            (finalHeight * 9) / 8 -
-            (Math.sqrt(2) - 1) * lengthForKey +
-            'px',
+          top: (finalHeight * 9) / 8 - (Math.sqrt(2) - 1) * lengthForKey + 'px',
           margin: 'auto 0',
           border: '1px solid rgba(244,244,244,1)',
           height: lengthForKey + 'px',
-          background: 'rgba(247,199,9,0.5)',
+          background: 'rgba(247,199,9,0)',
           transform: 'rotateZ(45deg)',
         }"
       ></div>
@@ -71,7 +68,6 @@
     ></div>
     <div
       class="track-body"
-      @click="isActive = !isActive"
       :style="{
         height: height + 'px',
         width: width - 4 + 'px',
@@ -89,7 +85,8 @@
           :Note="Note"
           v-if="
             Global.currentTime > Note.timing - Global.remainingTime &&
-              Global.currentTime < Note.timing + Global.lostTime
+              Global.currentTime < Note.timing + Global.lostTime &&
+              !Note.judged
           "
           :left="0.5 * width"
           :Global="Global"
@@ -109,7 +106,6 @@ export default {
   data() {
     return {
       myTrack: this.Track,
-      isActive: false,
       lengthForBlackPoint: 15,
       refreshTime: 1000 / this.$store.state.refreshRate,
       widthPath: [],
@@ -122,6 +118,8 @@ export default {
       animationTime: 50,
       height: 0,
       top: 0,
+      currentNote: 0,
+      judgeFinished: false,
     };
   },
   watch: {
@@ -134,12 +132,18 @@ export default {
         this.myTrack.tempB = this.getRGB()[2];
         this.setHeightAndTop();
       }
+      this.judge();
     },
   },
   created() {
     this.initiate();
   },
   computed: {
+    isActive() {
+      if (this.Track.type == 1)
+        return this.Global.keyIsHold[this.Track.key.toUpperCase()];
+      else return false;
+    },
     lengthForKey() {
       if (this.Global.screenHeight * 0.1 > 50) {
         return 50;
@@ -245,12 +249,89 @@ export default {
       this.generateWidthPath();
       this.generatePositionXPath();
       this.generateRGBPath();
+      this.currentNote = 0;
+      this.judgeFinished = false;
       this.myTrack.tempPositionX = this.getPositionX();
       this.myTrack.tempWidth = this.getWidth();
       this.myTrack.tempR = this.getRGB()[0];
       this.myTrack.tempG = this.getRGB()[1];
       this.myTrack.tempB = this.getRGB()[2];
     },
+    judge() {
+      if (this.Track.notes.length > 0 && !this.judgeFinished) {
+        let currentKey = this.Track.notes[this.currentNote].key.toUpperCase();
+        let currentJudge = this.Global.keyPressTime[currentKey];
+        let currentTime = this.Global.currentTime;
+        if (this.Track.notes[this.currentNote].type == 1) {
+          if (
+            currentTime >
+            this.Track.notes[this.currentNote].timing - this.Global.lostTime
+          ) {
+            if (
+              currentTime >
+              this.Track.notes[this.currentNote].timing + this.Global.lostTime
+            ) {
+              this.addCount("lost");
+              this.addNoteCount();
+            } else if (this.Global.keyIsHold[currentKey]) {
+              this.addCount("pure");
+              this.addCount("combo");
+              this.myTrack.notes[this.currentNote].judged = true;
+              this.addNoteCount();
+            }
+          }
+        } else {
+          if (
+            currentTime >
+            this.Track.notes[this.currentNote].timing - this.Global.lostTime
+          ) {
+            if (
+              currentTime >
+              this.Track.notes[this.currentNote].timing + this.Global.lostTime
+            ) {
+              this.addCount("lost");
+              this.addNoteCount();
+            } else if (
+              currentJudge >
+                this.Track.notes[this.currentNote].timing -
+                  this.Global.pureTime &&
+              currentJudge <
+                this.Track.notes[this.currentNote].timing + this.Global.pureTime
+            ) {
+              this.addCount("pure");
+              this.addCount("combo");
+              this.myTrack.notes[this.currentNote].judged = true;
+              this.addNoteCount();
+            } else if (
+              currentJudge >
+                this.Track.notes[this.currentNote].timing -
+                  this.Global.farTime &&
+              currentJudge <
+                this.Track.notes[this.currentNote].timing + this.Global.farTime
+            ) {
+              this.addCount("far");
+              this.addCount("combo");
+              this.myTrack.notes[this.currentNote].judged = true;
+              this.addNoteCount();
+            }
+          }
+        }
+      }
+    },
+    //主进程+1
+    addCount(param) {
+      this.$emit("addCount", param);
+    },
+    //判定note+1
+    addNoteCount() {
+      if (this.currentNote < this.Track.notes.length - 1) {
+        this.currentNote++;
+      } else {
+        this.judgeFinished = true;
+      }
+    },
+
+    //生成轨道宽度路径，包含出场和退场的宽度动画
     generateWidthPath() {
       this.widthPath = [];
       this.widthIndex = 0;
@@ -342,6 +423,7 @@ export default {
         });
       }
     },
+    //生成轨道位置路径
     generatePositionXPath() {
       this.positionXPath = [];
       this.positionXIndex = 0;
@@ -401,6 +483,8 @@ export default {
         }
       }
     },
+
+    //生成轨道路径
     generateRGBPath() {
       this.RGBPath = [];
       this.RGBIndex = 0;
@@ -478,6 +562,8 @@ export default {
         }
       }
     },
+
+    //获取当前index
     binaryGetCurrentIndex(currentTime, path) {
       let right = path.length - 1;
       if (right == 0) {
@@ -502,6 +588,8 @@ export default {
       }
       return mid;
     },
+
+    //获取当前位置
     getPositionX() {
       var currentTime = this.Global.currentTime;
       var currentX = this.positionXPath[this.positionXIndex];
@@ -521,6 +609,8 @@ export default {
         return currentX.k * currentTime + currentX.b;
       }
     },
+
+    //获取当前宽度
     getWidth() {
       var currentTime = this.Global.currentTime;
       var currentWidth = this.widthPath[this.widthIndex];
@@ -543,6 +633,8 @@ export default {
         return currentWidth.k * currentTime + currentWidth.b;
       }
     },
+
+    //获取当前颜色
     getRGB() {
       var currentTime = this.Global.currentTime;
       var currentRGB = this.RGBPath[this.RGBIndex];
@@ -566,6 +658,8 @@ export default {
         ];
       }
     },
+
+    //轨道出场退场的高度动画
     setHeightAndTop() {
       let k = this.Global.finalY / this.animationTime;
       if (
