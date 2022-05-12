@@ -336,7 +336,7 @@ export default {
               currentJudge < timing + lostTime
             ) {
               this.addCount({
-                key: "lost",
+                key: "lostCount",
                 message:
                   currentJudge < timing
                     ? "因为过早按下而判定为lost(early)"

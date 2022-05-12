@@ -69,7 +69,6 @@
           left: '0px',
           top: '0px',
           width: global.screenWidth + 'px',
-
           background: [
             '-webkit-linear-gradient(90deg, rgba(0,0,0,0) 0, rgba(0,0,0,1) 100%)',
             '-moz-linear-gradient(0deg, rgba(0,0,0,0) 0, rgba(0,0,0,1) 100%)',
@@ -77,25 +76,51 @@
           ],
         }"
       >
-        <div
-          style="text-align:center;
+        <div v-if="global.combo > 1">
+          <div
+            style="text-align:center;
           width: 200px;
           margin: 0 auto;
           text-shadow: 1px 1px 0 rgba(0,0,0,0.25);
           font-size:70px;
           color:rgb(255,255,255)"
-        >
-          {{ global.combo }}
-        </div>
-        <div
-          style="text-align:center;
+          >
+            {{ global.combo }}
+          </div>
+          <div
+            style="text-align:center;
           width: 200px;
           margin: 0 auto;
           text-shadow: 1px 1px 0 rgba(0,0,0,0.25);
           font-size:20px;
           color:rgb(255,255,255)"
-        >
-          COMBO
+          >
+            <span
+              :style="{
+                color: [
+                  global.combo == global.pureCount
+                    ? 'rgb(247, 199, 9)'
+                    : global.lostCount == 0
+                    ? 'rgb(135, 206, 250)'
+                    : 'rgb(255, 255, 255)',
+                ],
+              }"
+              >{{ global.lostCount == 0 ? "⬥" : "⬦" }}</span
+            >
+            COMBO
+            <span
+              :style="{
+                color: [
+                  global.combo == global.pureCount
+                    ? 'rgb(247, 199, 9)'
+                    : global.lostCount == 0
+                    ? 'rgb(135, 206, 250)'
+                    : 'rgb(255, 255, 255)',
+                ],
+              }"
+              >{{ global.lostCount == 0 ? "⬥" : "⬦" }}</span
+            >
+          </div>
         </div>
       </div>
       <el-dialog
