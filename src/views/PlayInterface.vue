@@ -165,9 +165,9 @@ export default {
       remainingTime: 1000,
       finalY: 0.8,
       currentTime: 0,
-      lostTime: 150,
-      pureTime: 50,
-      farTime: 100,
+      lostTime: 200,
+      pureTime: 75,
+      farTime: 150,
       isEdit: false,
       keyPressTime: [],
       keyIsHold: [],
@@ -4509,9 +4509,9 @@ export default {
 
     //父组件提供的方法
     addCount(param) {
-      console.log(param)
-      this.global[param] += 1;
-      if(param=="lost"){
+      this.global[param.key] += 1;
+      if(param.key=="lost"){
+        console.log(param.message);
         this.global.combo=0
         this.global.maxCombo = Math.max(this.global.maxCombo,this.global.combo); 
       }

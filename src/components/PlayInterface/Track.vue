@@ -106,6 +106,7 @@ export default {
   data() {
     return {
       myTrack: this.Track,
+      myGlobal: this.Global,
       lengthForBlackPoint: 15,
       refreshTime: 1000 / this.$store.state.refreshRate,
       widthPath: [],
@@ -289,7 +290,7 @@ export default {
               currentTime >
               this.Track.notes[this.currentNote].timing + this.Global.lostTime
             ) {
-              this.addCount("lost");
+              this.addLost("因没有按到lost");
               this.addNoteCount();
             } else if (
               currentJudge >
@@ -301,6 +302,7 @@ export default {
               this.addCount("pure");
               this.addCount("combo");
               this.myTrack.notes[this.currentNote].judged = true;
+              this.myGlobal.keyPressTime[currentKey]=0;
               this.addNoteCount();
             } else if (
               currentJudge >
@@ -312,6 +314,18 @@ export default {
               this.addCount("far");
               this.addCount("combo");
               this.myTrack.notes[this.currentNote].judged = true;
+              this.myGlobal.keyPressTime[currentKey]=0;
+              this.addNoteCount();
+            } else if (
+              currentJudge >
+                this.Track.notes[this.currentNote].timing -
+                  this.Global.lostTime &&
+              currentJudge <
+                this.Track.notes[this.currentNote].timing + this.Global.lostTime
+            ) {
+              this.addLost("因过早过晚点击lost");
+              this.myTrack.notes[this.currentNote].judged = true;
+              this.myGlobal.keyPressTime[currentKey]=0;
               this.addNoteCount();
             }
           }
@@ -320,7 +334,11 @@ export default {
     },
     //主进程+1
     addCount(param) {
-      this.$emit("addCount", param);
+      this.$emit("addCount", {key:param});
+    },
+    //主进程+1
+    addLost(param) {
+      this.$emit("addCount", {key:'lost',message:param});
     },
     //判定note+1
     addNoteCount() {
