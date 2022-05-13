@@ -252,9 +252,20 @@
       </el-dialog>
     </div>
     <div v-if="loadingStatus.finished" class="show-record">
-    <div class="loading-background-end">
-      <img :src="chart.defaultBackground" class="loading-background" />
+      <div class="loading-background-end">
+        <img :src="chart.defaultBackground" class="loading-background" />
       </div>
+      <div
+        class="loading-background-end-shader"
+        :style="{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          height: global.screenHeight + 'px',
+          width: global.screenWidth + 'px',
+        }"
+      ></div>
+
       <div class="record-container">
         <div
           class="record-container-body"
@@ -270,7 +281,7 @@
             <img class="songcover-img" :src="chart.songCover" />
           </div>
           <div class="record-content">
-            <div >
+            <div>
               <div
                 class="song-name"
                 style="min-width:400px;text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:50px;color:rgb(255,255,255);background-color:rgba(105, 245, 202, 0.5);padding:0px 10px;"
@@ -295,17 +306,16 @@
                 }}lost:{{ global.lostCount }}
               </div>
             </div>
-            
           </div>
         </div>
-        
-              <div
-                :class="'play-button'"
-                style="width:150px;height:150px;line-height:150px;position:absolute;bottom:30px;right:30px;border-radius:50%;text-align: center;"
-              >
-                继续
-              </div>
-            </div>
+
+        <div
+          :class="'play-button'"
+          style="width:150px;height:150px;line-height:150px;position:absolute;bottom:50px;right:50px;border-radius:50%;text-align: center;"
+        >
+          继续
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -575,12 +585,12 @@ export default {
           param.timing
       );
       if (param.key == "lostCount") {
+        this.global.combo = 0;
+      } else {
         this.global.maxCombo = Math.max(
           this.global.maxCombo,
           this.global.combo
         );
-        this.global.combo = 0;
-      } else {
         this.global.combo++;
       }
     },
@@ -698,7 +708,7 @@ export default {
 
 @keyframes playbutton {
   0% {
-    box-shadow: 0px 0px 0px 0px rgba(255, 120, 160, 0.8) ;
+    box-shadow: 0px 0px 0px 0px rgba(255, 120, 160, 0.8);
   }
   100% {
     box-shadow: 0px 0px 0px 40px rgba(255, 144, 164, 0.2);
@@ -799,8 +809,25 @@ export default {
 }
 
 .loading-background-end {
-  animation: loading-background-end 2s;
+  animation-name: loading-background-end;
+  animation-duration: 1s;
+  animation-iteration-count: 1;
   filter: blur(10px);
+}
+
+@keyframes loading-background-end-shader {
+  0% {
+    background-color: rgba(100, 100, 100, 0);
+  }
+  100% {
+    background-color: rgba(100, 100, 100, 0.2);
+  }
+}
+.loading-background-end-shader {
+  animation-name: loading-background-end-shader;
+  animation-duration: 1s;
+  animation-iteration-count: 1;
+  background: rgba(100, 100, 100, 0.2);
 }
 
 @keyframes info-container-upward {
