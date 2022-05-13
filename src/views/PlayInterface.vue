@@ -1,6 +1,6 @@
 <template>
   <div class="play-interface select" id="play-interface-container">
-    <div v-if="true || !loadingStatus.canRun" class="show-info">
+    <div v-if="true || !loadingStatus.RunStart" class="show-info">
       <img
         :src="chart.defaultBackground"
         class="loading-background"
@@ -8,24 +8,71 @@
       />
       <div
         class="info-container"
-        style="position:absolute;left:0;bottom:0;width:100%;height:300px;padding:40px;object-fit:fill;user-drag:none;" 
-            
-      
-          
+        style="position:absolute;left:0;bottom:0;width:100%;height:300px;padding:40px;object-fit:fill;user-drag:none;display: flex;justify-content: space-between;align-items: center;"
       >
         <div
-          class="songcover-container"
-          style="width:300px;height:300px;
-          "
+          style="display: flex;justify-content: space-between;align-items: center;"
         >
-          <img
-            :src="chart.songCover"
-            style="width:100%;height:100%;object-fit:fill;user-drag:none;border: 2px solid rgb(255,255,255)"
-          />
+          <div
+            class="songcover-container"
+            style="width:300px;height:300px;margin:0;"
+          >
+            <img
+              :src="chart.songCover"
+              style="width:100%;height:100%;object-fit:fill;user-drag:none;border: 2px solid rgb(255,255,255)"
+            />
+          </div>
+          <div class="info" style="padding:20px;">
+            <div
+              class="song-uploader"
+              style="text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:30px;color:rgb(255,255,255);"
+            >
+              {{ chart.uploader }}
+            </div>
+            <div
+              class="song-name"
+              style="text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:70px;color:rgb(255,255,255);"
+            >
+              {{ chart.songName }}
+            </div>
+            <div
+              class="song-writer"
+              style="text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:50px;color:rgb(255,255,255);"
+            >
+              {{ chart.songWriter }}
+            </div>
+          </div>
+        </div>
+        <div style="text-align: center;margin-right:50px;">
+          <div
+            :class="loadingStatus.canRun?'play-button':'play-button-disabled'"
+            style="width:150px;height:150px;line-height:150px;margin:20px auto;border-radius:50%;"
+            @click="play"
+          >
+            {{ loadingStatus.canRun ? "开始" : "加载中" }}
+          </div>
+          <div
+            class="loading-text"
+            v-if="!loadingStatus.canRun"
+            style="padding:10px;text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:20px;color:rgb(255,255,255);"
+          >
+            {{ chart.loadingText }}
+          </div>
+          <div
+            v-if="loadingStatus.canRun"
+            style="padding:10px;text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:20px;color:rgb(255,255,255);"
+          >
+            {{ chart.loadedText }}
+          </div>
+          <div
+            class="loaded-text"
+            v-if="loadingStatus.canRun"
+            style="height:2px;text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:20px;color:rgb(255,255,255);"
+          ></div>
         </div>
       </div>
     </div>
-    <div v-show="false && loadingStatus.canRun" class="play-interface">
+    <div v-show="false && loadingStatus.RunStart" class="play-interface">
       <!-- 音频 -->
       <audio
         id="audioSong"
@@ -177,22 +224,6 @@
         </div>
       </div>
       <el-dialog
-        v-model="dialogVisible"
-        title="开始"
-        top="30vh"
-        :center="true"
-        :show-close="false"
-        :close-on-press-escape="false"
-        :close-on-click-modal="false"
-      >
-        <div style="text-align: center;">加载完毕，点按以开始</div>
-        <template #footer>
-          <span class="dialog-footer">
-            <el-button @click="startMusic">确认</el-button>
-          </span>
-        </template>
-      </el-dialog>
-      <el-dialog
         v-model="pauseVisible"
         title="暂停"
         top="30vh"
@@ -232,9 +263,7 @@ export default {
         songLength: 0,
       },
       global: {},
-
       imagePath: [],
-      dialogVisible: false,
       pauseVisible: false,
       audio: null,
       playInterface: null,
@@ -287,6 +316,7 @@ export default {
       chart: false,
       audio: false,
       image: false,
+      RunStart: false,
       canRun: false,
       imageCurrentCount: 0,
     };
@@ -4534,7 +4564,9 @@ export default {
         uploader: "charlot",
         songWriter: "椎名林檎",
         songCover: "http://pic.mcatk.com/charlot-pictures/0.jpg",
-        loadingText: "加载中……",
+        loadingText: "斯琴高娃老师打羊胎素中……",
+        loadedText: "打完了，哦这是可以说的吗？",
+        songName: "熱愛発覚中",
         notesCount: 164,
       };
     },
@@ -4601,7 +4633,6 @@ export default {
 
     //开始播放音乐
     startMusic() {
-      this.dialogVisible = false;
       this.audio.play();
       this.run();
     },
@@ -4683,8 +4714,10 @@ export default {
         this.loadingStatus.audio &&
         this.loadingStatus.image
       ) {
+        setTimeout(() => {
         this.loadingStatus.canRun = true;
-        this.dialogVisible = true;
+        this.$forceUpdate();
+        },2000);
       }
     },
     //暂停
@@ -4753,12 +4786,123 @@ export default {
     transform: scale(1);
   }
 }
+
+@keyframes linearGradientMove {
+  100% {
+    background-position: 4px 0, -4px 100%, 0 -4px, 100% 4px;
+  }
+}
+
 .loading-background {
   animation-name: backgroung-image;
   animation-duration: 10s;
   animation-iteration-count: infinite;
 }
 
+.loading-text {
+  background: linear-gradient(90deg, rgb(255, 255, 255) 50%, transparent 0)
+      repeat-x,
+    linear-gradient(90deg, rgb(255, 255, 255) 50%, transparent 0) repeat-x,
+    linear-gradient(0deg, rgb(255, 255, 255) 50%, transparent 0) repeat-y,
+    linear-gradient(0deg, rgb(255, 255, 255) 50%, transparent 0) repeat-y;
+  background-size: 4px 1px, 4px 1px, 1px 4px, 1px 4px;
+  background-position: 0 0, 0 100%, 0 0, 100% 0;
+  animation: linearGradientMove 0.3s infinite linear;
+}
 
+@keyframes loadedText {
+  0% {
+    background-size: 0% 2px;
+  }
+  100% {
+    background-size: 100% 2px;
+  }
+}
+.loaded-text {
+  background-image: linear-gradient(rgb(255, 255, 255), rgb(255, 255, 255));
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  animation-duration: 1s;
+  animation-name: loadedText;
+}
 
+@keyframes playbutton {
+  0% {
+    box-shadow: 0px 0px 0px 0px rgba(54, 144, 240, 0.8);
+  }
+  100% {
+    box-shadow: 0px 0px 0px 40px rgba(169, 213, 252, 0.1);
+  }
+}
+.play-button {
+  animation-name: playbutton;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+  transform: scale(1);
+  cursor: pointer;
+  font-size: 30px;
+  color: rgb(255, 255, 255);
+  background-image: -webkit-linear-gradient(
+    -240.9453959009229deg,
+    rgba(169, 213, 252, 1) 0,
+    rgba(169, 213, 252, 1) 6%,
+    rgba(84, 163, 238, 1) 53%,
+    rgba(54, 144, 240, 1) 100%
+  );
+  background-image: -moz-linear-gradient(
+    330.9453959009229deg,
+    rgba(169, 213, 252, 1) 0,
+    rgba(169, 213, 252, 1) 6%,
+    rgba(84, 163, 238, 1) 53%,
+    rgba(54, 144, 240, 1) 100%
+  );
+  background-image: linear-gradient(
+    330.9453959009229deg,
+    rgba(169, 213, 252, 1) 0,
+    rgba(169, 213, 252, 1) 6%,
+    rgba(84, 163, 238, 1) 53%,
+    rgba(54, 144, 240, 1) 100%
+  );
+  transform: scale(1);
+  transition: 0.5s;
+}
+
+.play-button-disabled {
+  transform: scale(1);
+  cursor: wait;
+  font-size: 30px;
+  color: rgb(255, 255, 255);
+  background-image: -webkit-linear-gradient(
+    -240.9453959009229deg,
+    rgb(82, 105, 125) 0,
+    rgb(65, 82, 97) 6%,
+    rgb(27, 55, 80) 53%,
+    rgb(17, 48, 81) 100%
+  );
+  background-image: -moz-linear-gradient(
+    330.9453959009229deg,
+    rgb(82, 105, 125) 0,
+    rgb(65, 82, 97) 6%,
+    rgb(27, 55, 80) 53%,
+    rgb(17, 48, 81) 100%
+  );
+  background-image: linear-gradient(
+    330.9453959009229deg,
+    rgb(82, 105, 125) 0,
+    rgb(65, 82, 97) 6%,
+    rgb(27, 55, 80) 53%,
+    rgb(17, 48, 81) 100%
+  );
+  transform: scale(1);
+  transition: 0.5s;
+}
+.play-button:hover {
+  transform: scale(0.9);
+  transition: 0.5s;
+}
+
+.play-button:active {
+  transform: scale(0.85);
+  transition: 0.1s;
+}
 </style>
