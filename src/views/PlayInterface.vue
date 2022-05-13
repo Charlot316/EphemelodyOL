@@ -1,6 +1,6 @@
 <template>
   <div class="play-interface select" id="play-interface-container">
-    <div v-if="!loadingStatus.canRun" class="show-info">
+    <div v-if="true || !loadingStatus.canRun" class="show-info">
       <img
         :src="chart.defaultBackground"
         class="loading-background"
@@ -8,20 +8,24 @@
       />
       <div
         class="info-container"
-        style="position:absolute;left:0;top:0;width:100%;height:100%;object-fit:fill;user-drag:none;"
+        style="position:absolute;left:0;bottom:0;width:100%;height:300px;padding:40px;object-fit:fill;user-drag:none;" 
+            
+      
+          
       >
         <div
           class="songcover-container"
-          style="width:200px;height:200px;border:20px solid rgb(255,255,255);"
+          style="width:300px;height:300px;
+          "
         >
           <img
             :src="chart.songCover"
-            style="width:100%;height:100%;object-fit:fill;user-drag:none;"
+            style="width:100%;height:100%;object-fit:fill;user-drag:none;border: 2px solid rgb(255,255,255)"
           />
         </div>
       </div>
     </div>
-    <div v-show="loadingStatus.canRun" class="play-interface">
+    <div v-show="false && loadingStatus.canRun" class="play-interface">
       <!-- 音频 -->
       <audio
         id="audioSong"
@@ -4726,6 +4730,7 @@ export default {
   height: 100%;
   width: 100%;
   background: white;
+  overflow: auto;
 }
 .select {
   -webkit-user-select: none;
@@ -4753,4 +4758,7 @@ export default {
   animation-duration: 10s;
   animation-iteration-count: infinite;
 }
+
+
+
 </style>
