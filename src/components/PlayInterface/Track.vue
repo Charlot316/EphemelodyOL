@@ -118,7 +118,7 @@ export default {
       widthIndex: 0,
       positionXIndex: 0,
       RGBIndex: 0,
-      opacity: 0.8,
+      opacity: 0.4,
       animationTime: 50,
       height: 0,
       top: 0,
@@ -143,7 +143,7 @@ export default {
         if (this.boxShadowSize >= 1) {
           this.boxShadowSize += 1;
         }
-        if (this.boxShadowSize > 20) {
+        if (this.boxShadowSize > 40) {
           this.boxShadowSize = 0;
         }
       }
@@ -156,7 +156,7 @@ export default {
     boxShadow() {
       return (
         "0px 0px " +
-        0.5 * this.boxShadowSize +
+        this.boxShadowSize +
         "px " +
         this.boxShadowSize +
         "px " +
@@ -383,11 +383,11 @@ export default {
     //主进程+1
     addCount(param) {
       if (param.key == "pureCount") {
-        this.boxShadowColor = "rgba(234,161,86,0.4)";
+        this.boxShadowColor = "rgba(234,161,86,0.6)";
       } else if (param.key == "farCount") {
-        this.boxShadowColor = "rgba(135,206,250,0.4)";
+        this.boxShadowColor = "rgba(100,149,237,0.6)";
       } else if (param.key == "lostCount") {
-        this.boxShadowColor = "rgba(0,0,0,0.3)";
+        this.boxShadowColor = "rgba(0,0,0,0.5)";
       }
       this.boxShadowSize = 1;
       this.$emit("addCount", param);
