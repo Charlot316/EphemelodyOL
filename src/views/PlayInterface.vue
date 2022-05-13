@@ -69,7 +69,8 @@
       </div>
     </div>
     <div
-      v-show="loadingStatus.runStart && !loadingStatus.finished"
+      v-show="loadingStatus.runStart"
+      v-if="!loadingStatus.finished"
       class="play-interface"
     >
       <!-- 音频 -->
@@ -253,8 +254,55 @@
     <div v-if="loadingStatus.finished" class="show-record">
       <img :src="chart.defaultBackground" class="loading-background" />
       <div class="record-container">
-
-
+        <div
+          class="record-container-body"
+          :style="{
+            position: 'absolute',
+            top: 0.2 * global.screenHeight + 'px',
+            left: 0,
+            height: 0.6 * global.screenHeight + 'px',
+            width: '100%',
+          }"
+        >
+          <div class="song-cover">
+            <img class="songcover-img" :src="chart.songCover" />
+          </div>
+          <div class="record-content">
+            <div>
+              <div
+                class="song-name"
+                style="text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:50px;color:rgb(255,255,255);background-color:rgba(255, 255, 255, 0.5);"
+              >
+                {{ chart.songName }}
+              </div>
+              <div
+                style="text-align:left;text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:70px;color:rgb(255,255,255);background-color:rgba(54, 144, 240, 0.5);"
+              >
+                {{ global.score }}
+              </div>
+              <div
+                style="text-align:left;text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:20px;color:rgb(255,250,235);"
+              >
+                最大连击:{{ global.maxCombo + "\u3000" }}历史最佳成绩:1000000
+              </div>
+              <div
+                style="text-align:left;text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:20px;color:rgb(255,250,235);"
+              >
+                pure:{{ global.pureCount + "\u3000" }}far:{{
+                  global.farCount + "\u3000"
+                }}lost:{{ global.lostCount }}
+              </div>
+            </div>
+            <div>
+              <div
+                :class="'play-button'"
+                style="width:150px;height:150px;line-height:150px;float:right;border-radius:50%;text-align: center;"
+              >
+                继续
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -623,7 +671,7 @@ export default {
     linear-gradient(90deg, rgb(255, 255, 255) 50%, transparent 0) repeat-x,
     linear-gradient(0deg, rgb(255, 255, 255) 50%, transparent 0) repeat-y,
     linear-gradient(0deg, rgb(255, 255, 255) 50%, transparent 0) repeat-y;
-  background-size: 4px 1px, 4px 1px, 1px 4px, 1px 4px;
+  background-size: 0px 0px, 4px 1px, 0px 0px, 0px 0px;
   background-position: 0 0, 0 100%, 0 0, 100% 0;
   animation: linearGradientMove 0.3s infinite linear;
 }
@@ -823,5 +871,53 @@ export default {
 .play-interface-scoreboard-container-upward {
   top: -200px;
   animation: scoreboard-container-upward 0.5s ease-out;
+}
+
+.record-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.record-container-body {
+  display: flex;
+  align-items: center;
+}
+
+@keyframes song-cover-enter {
+  0% {
+    left: -300px;
+  }
+  100% {
+    left: 50px;
+  }
+}
+.song-cover {
+  width: 300px;
+  height: 300px;
+  margin: 0;
+  position: absolute;
+  left: 50px;
+  animation: song-cover-enter 0.5s ease-out;
+}
+
+@keyframes record-content-enter {
+  0% {
+    left: 70%;
+  }
+  100% {
+    left: 450px;
+  }
+}
+.record-content {
+  left: 450px;
+  position: absolute;
+  animation: record-content-enter 0.5s ease-out;
+  display: flex;
+  align-items: center;
+  width: 50%;
+  justify-content: space-between;
 }
 </style>

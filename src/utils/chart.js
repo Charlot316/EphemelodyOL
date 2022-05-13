@@ -1,3 +1,8 @@
+var record = {
+    potential: 10.0,
+    formerBestScore: 10000000,
+}
+
 var chart = {
     songId: 1,
     tracks: [{
@@ -4118,4 +4123,4 @@ var chart = {
     notesCount: 164,
 };
 
-export { chart }
+export { chart, record }
