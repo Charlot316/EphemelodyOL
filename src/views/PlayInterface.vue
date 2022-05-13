@@ -1,26 +1,13 @@
 <template>
   <div class="play-interface select" id="play-interface-container">
-    <div v-if="true || !loadingStatus.RunStart" class="show-info">
-      <img
-        :src="chart.defaultBackground"
-        class="loading-background"
-        style="position:absolute;left:0;top:0;width:100%;height:100%;object-fit:fill;user-drag:none;"
-      />
-      <div
-        class="info-container"
-        style="position:absolute;left:0;bottom:0;width:100%;height:300px;padding:40px;object-fit:fill;user-drag:none;display: flex;justify-content: space-between;align-items: center;"
-      >
+    <div v-if="!loadingStatus.RunStart" class="show-info">
+      <img :src="chart.defaultBackground" class="loading-background" />
+      <div class="info-container">
         <div
           style="display: flex;justify-content: space-between;align-items: center;"
         >
-          <div
-            class="songcover-container"
-            style="width:300px;height:300px;margin:0;"
-          >
-            <img
-              :src="chart.songCover"
-              style="width:100%;height:100%;object-fit:fill;user-drag:none;border: 2px solid rgb(255,255,255)"
-            />
+          <div class="songcover-container">
+            <img class="songcover-img" :src="chart.songCover" />
           </div>
           <div class="info" style="padding:20px;">
             <div
@@ -43,36 +30,38 @@
             </div>
           </div>
         </div>
-        <div style="text-align: center;margin-right:50px;">
+        <div class="loading-container" style="text-align: center;margin-right:50px;">
           <div
-            :class="loadingStatus.canRun?'play-button':'play-button-disabled'"
+            :class="
+              loadingStatus.canRun ? 'play-button' : 'play-button-disabled'
+            "
             style="width:150px;height:150px;line-height:150px;margin:20px auto;border-radius:50%;"
-            @click="play"
+            @click="startMusic"
           >
             {{ loadingStatus.canRun ? "开始" : "加载中" }}
           </div>
           <div
             class="loading-text"
             v-if="!loadingStatus.canRun"
-            style="padding:10px;text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:20px;color:rgb(255,255,255);"
+            style="padding:10px;min-width:400px;text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:20px;color:rgb(255,255,255);"
           >
             {{ chart.loadingText }}
           </div>
           <div
             v-if="loadingStatus.canRun"
-            style="padding:10px;text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:20px;color:rgb(255,255,255);"
+            style="padding:10px;min-width:400px;text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:20px;color:rgb(255,255,255);"
           >
             {{ chart.loadedText }}
           </div>
           <div
             class="loaded-text"
             v-if="loadingStatus.canRun"
-            style="height:2px;text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:20px;color:rgb(255,255,255);"
+            style="height:2px;min-width:400px;text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:20px;color:rgb(255,255,255);"
           ></div>
         </div>
       </div>
     </div>
-    <div v-show="false && loadingStatus.RunStart" class="play-interface">
+    <div v-show="loadingStatus.RunStart" class="play-interface">
       <!-- 音频 -->
       <audio
         id="audioSong"
@@ -253,7 +242,7 @@
 <script>
 import Track from "@/components/PlayInterface/Track";
 import "animate.css";
-import {chart} from "@/utils/chart.js";
+import { chart } from "@/utils/chart.js";
 export default {
   components: {
     Track,
@@ -442,8 +431,12 @@ export default {
 
     //开始播放音乐
     startMusic() {
-      this.audio.play();
-      this.run();
+      if (this.loadingStatus.canRun) {
+        this.loadingStatus.RunStart = true;
+        this.$forceUpdate();
+        this.audio.play();
+        this.run();
+      }
     },
 
     //生成图片路径
@@ -524,9 +517,9 @@ export default {
         this.loadingStatus.image
       ) {
         setTimeout(() => {
-        this.loadingStatus.canRun = true;
-        this.$forceUpdate();
-        },1000);
+          this.loadingStatus.canRun = true;
+          this.$forceUpdate();
+        }, 1000);
       }
     },
     //暂停
@@ -713,5 +706,43 @@ export default {
 .play-button:active {
   transform: scale(0.85);
   transition: 0.1s;
+}
+
+.loading-background {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  -webkit-user-drag: none;
+}
+
+.info-container {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 300px;
+  padding: 40px;
+  object-fit: fill;
+  -webkit-user-drag: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.songcover-container {
+  width: 300px;
+  height: 300px;
+  margin: 0;
+}
+
+.songcover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  -webkit-user-drag: none;
+  border: 2px solid rgb(255, 255, 255);
 }
 </style>

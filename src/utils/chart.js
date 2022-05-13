@@ -4113,7 +4113,7 @@ var chart = {
     songWriter: "椎名林檎",
     songCover: "http://pic.mcatk.com/charlot-pictures/0.jpg",
     loadingText: "斯琴高娃老师打羊胎素中……",
-    loadedText: "打完了，哦这是可以说的吗？",
+    loadedText: "羊胎素打完了，哦这是可以说的吗？",
     songName: "熱愛発覚中",
     notesCount: 164,
 };
