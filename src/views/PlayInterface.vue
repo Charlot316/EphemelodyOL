@@ -1,8 +1,12 @@
 <template>
   <div class="play-interface select" id="play-interface-container">
-    <div v-if="!loadingStatus.RunStart" class="show-info">
+    <div v-if="!loadingStatus.runStart" class="show-info">
       <img :src="chart.defaultBackground" class="loading-background" />
-      <div class="info-container">
+      <div
+        :class="
+          loadingStatus.runReady ? 'info-container-out' : 'info-container'
+        "
+      >
         <div
           style="display: flex;justify-content: space-between;align-items: center;"
         >
@@ -30,7 +34,10 @@
             </div>
           </div>
         </div>
-        <div class="loading-container" style="text-align: center;margin-right:50px;">
+        <div
+          class="loading-container"
+          style="text-align: center;margin-right:50px;"
+        >
           <div
             :class="
               loadingStatus.canRun ? 'play-button' : 'play-button-disabled'
@@ -61,7 +68,10 @@
         </div>
       </div>
     </div>
-    <div v-show="loadingStatus.RunStart" class="play-interface">
+    <div
+      v-show="loadingStatus.runStart && !loadingStatus.finished"
+      class="play-interface"
+    >
       <!-- 音频 -->
       <audio
         id="audioSong"
@@ -124,11 +134,11 @@
       </div>
       <!-- 记分板 -->
       <div
+        :class="loadingStatus.beforeFinished?'play-interface-scoreboard-container-upward':'play-interface-scoreboard-container-downward'"
         :style="{
           height: '200px',
           position: 'absolute',
           left: '0px',
-          top: '0px',
           width: global.screenWidth + 'px',
           background: [
             '-webkit-linear-gradient(90deg, rgba(0,0,0,0) 0, rgba(0,0,0,1) 100%)',
@@ -257,7 +267,6 @@ export default {
       pauseVisible: false,
       audio: null,
       playInterface: null,
-      isRunning: false,
     };
   },
   computed: {
@@ -306,8 +315,11 @@ export default {
       chart: false,
       audio: false,
       image: false,
-      RunStart: false,
       canRun: false,
+      runReady: false,
+      runStart: false,
+      beforeFinished: false,
+      finished: false,
       imageCurrentCount: 0,
     };
     this.global = {
@@ -348,9 +360,7 @@ export default {
         that.global.keyIsHold[e.key.toUpperCase()] = true;
       }
       if (e.key == "Escape") {
-        if (that.global.currentTime < that.chart.songLength) {
-          that.pause();
-        }
+        that.pause();
       }
       if (e.key == "Enter") {
         that.continuePlay();
@@ -387,14 +397,16 @@ export default {
     //运行
     run() {
       this.global.currentTime = Math.floor(this.audio.currentTime * 1000);
-      this.isRunning = true;
       if (this.global.currentTime < this.chart.songLength) {
         setTimeout(() => {
           this.run();
         }, 1000 / this.$store.state.refreshRate);
       } else {
         this.global.currentTime = this.chart.songLength;
-        this.isRunning = false;
+        this.loadingStatus.beforeFinished = true;
+        setTimeout(() => {
+          this.loadingStatus.finished = true;
+        }, 500);
       }
     },
 
@@ -432,10 +444,18 @@ export default {
     //开始播放音乐
     startMusic() {
       if (this.loadingStatus.canRun) {
-        this.loadingStatus.RunStart = true;
-        this.$forceUpdate();
         this.audio.play();
-        this.run();
+        this.audio.muted = true;
+
+        this.loadingStatus.runReady = true;
+        this.$forceUpdate();
+        setTimeout(() => {
+          this.loadingStatus.runStart = true;
+          this.$forceUpdate();
+          this.audio.currentTime = 0;
+          this.audio.muted = false;
+          this.run();
+        }, 500);
       }
     },
 
@@ -479,15 +499,6 @@ export default {
       }
     },
 
-    //变换slide的时间
-    changeTime() {
-      this.audio.currentTime = this.global.currentTime / 1000;
-      this.audio.play();
-      if (!this.isRunning) {
-        this.run();
-      }
-    },
-
     //父组件提供的方法
     addCount(param) {
       this.global[param.key] += 1;
@@ -524,8 +535,10 @@ export default {
     },
     //暂停
     pause() {
-      this.audio.pause();
-      this.pauseVisible = true;
+      if (this.global.currentTime < this.chart.songLength) {
+        this.audio.pause();
+        this.pauseVisible = true;
+      }
     },
     //继续
     continuePlay() {
@@ -551,10 +564,6 @@ export default {
       }
       this.audio.currentTime = 0;
       this.audio.play();
-      if (!this.isRunning) {
-        this.global.currentTime = 0;
-        this.run();
-      }
     },
   },
 };
@@ -718,10 +727,43 @@ export default {
   -webkit-user-drag: none;
 }
 
+@keyframes info-container-upward {
+  0% {
+    bottom: -400px;
+  }
+  100% {
+    bottom: 0px;
+  }
+}
+
 .info-container {
   position: absolute;
   left: 0;
   bottom: 0;
+  width: 100%;
+  height: 300px;
+  padding: 40px;
+  object-fit: fill;
+  -webkit-user-drag: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  animation: info-container-upward 0.5s ease-out;
+}
+
+@keyframes info-container-downward {
+  0% {
+    bottom: 0px;
+  }
+  100% {
+    bottom: -400px;
+  }
+}
+.info-container-out {
+  animation: info-container-downward 0.5s ease-out;
+  position: absolute;
+  left: 0;
+  bottom: -400px;
   width: 100%;
   height: 300px;
   padding: 40px;
@@ -744,5 +786,32 @@ export default {
   object-fit: fill;
   -webkit-user-drag: none;
   border: 2px solid rgb(255, 255, 255);
+}
+
+@keyframes scoreboard-container-downward {
+  0% {
+    top: -200px;
+  }
+  100% {
+    top: 0px;
+  }
+}
+
+@keyframes scoreboard-container-upward {
+  0% {
+    top: 0px;
+  }
+  100% {
+    top: -200px;
+  }
+}
+.play-interface-scoreboard-container-downward {
+  top: 0;
+  animation: scoreboard-container-downward 0.5s ease-out;
+}
+
+.play-interface-scoreboard-container-upward {
+  top: -200px;
+  animation: scoreboard-container-upward 0.5s ease-out;
 }
 </style>
