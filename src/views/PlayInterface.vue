@@ -405,6 +405,7 @@ export default {
       isEdit: false,
       keyPressTime: [],
       keyIsHold: [],
+      keyUsed:[],
       pureCount: 0,
       farCount: 0,
       lostCount: 0,
@@ -429,6 +430,7 @@ export default {
       if (!e.repeat) {
         that.global.keyPressTime[e.key.toUpperCase()] = that.global.currentTime;
         that.global.keyIsHold[e.key.toUpperCase()] = true;
+        that.global.keyUsed[e.key.toUpperCase()] = false;
       }
       if (e.key == "Escape") {
         that.pause();

@@ -164,9 +164,17 @@ export default {
       );
     },
     isActive() {
-      if (this.Track.type == 1)
-        return this.Global.keyIsHold[this.Track.key.toUpperCase()];
-      else return false;
+      if (this.Track.type == 1) {
+        var currentTime = this.Global.currentTime;
+        var keyPressTime = this.Global.keyPressTime[
+          this.Track.key.toUpperCase()
+        ];
+        var isHolding = this.Global.keyIsHold[this.Track.key.toUpperCase()];
+        return (
+          isHolding ||
+          (currentTime - keyPressTime > 0 && currentTime - keyPressTime < 175)
+        );
+      } else return false;
     },
     lengthForKey() {
       if (this.Global.screenHeight * 0.1 > 50) {
@@ -217,19 +225,19 @@ export default {
           ",0.1)" +
           " 0, " +
           this.TrackColor +
-          " 50%,  rgba(255,255,255,0.8) 100%)",
+          " 25%,  rgba(255,255,255,1) 100%)",
         " -moz-linear-gradient(180deg, " +
           this.TrackColorWithoutA +
           ",0.1)" +
           " 0, " +
           this.TrackColor +
-          " 50%,  rgba(255,255,255,0.8) 100%)",
+          " 25%,  rgba(255,255,255,1) 100%)",
         "linear-gradient(180deg, " +
           this.TrackColorWithoutA +
           ",0.1)" +
           " 0, " +
           this.TrackColor +
-          " 50%,  rgba(255,255,255,0.8) 100%)",
+          " 25%,  rgba(255,255,255,1) 100%)",
       ];
     },
     inactiveStyle() {
@@ -288,6 +296,7 @@ export default {
         let pureTime = this.Global.pureTime;
         let farTime = this.Global.farTime;
         let lostTime = this.Global.lostTime;
+        let isUsed = this.Global.keyUsed[currentKey];
         if (this.Track.notes[this.currentNote].noteType == 1) {
           if (currentTime > timing - lostTime) {
             if (currentTime > timing + lostTime) {
@@ -319,51 +328,53 @@ export default {
                 timing: timing,
               });
               this.addNoteCount();
-            } else if (
-              currentJudge > timing - pureTime &&
-              currentJudge < timing + pureTime
-            ) {
-              this.addCount({
-                key: "pureCount",
-                message: "pure",
-                judgeTime: currentJudge,
-                timing: timing,
-              });
-              this.myTrack.notes[this.currentNote].judged = true;
-              this.myGlobal.keyPressTime[currentKey] = 0;
-              this.addNoteCount();
-            } else if (
-              currentJudge > timing - farTime &&
-              currentJudge < timing + farTime
-            ) {
-              this.addCount({
-                key: "farCount",
-                message:
-                  currentJudge < timing
-                    ? "因为过早按下而判定为far(early)"
-                    : "因为过晚按下而判定为far(late)",
-                judgeTime: currentJudge,
-                timing: timing,
-              });
-              this.myTrack.notes[this.currentNote].judged = true;
-              this.myGlobal.keyPressTime[currentKey] = 0;
-              this.addNoteCount();
-            } else if (
-              currentJudge > timing - lostTime &&
-              currentJudge < timing + lostTime
-            ) {
-              this.addCount({
-                key: "lostCount",
-                message:
-                  currentJudge < timing
-                    ? "因为过早按下而判定为lost(early)"
-                    : "因为过晚按下而判定为lost(late)",
-                judgeTime: currentJudge,
-                timing: timing,
-              });
-              this.myTrack.notes[this.currentNote].judged = true;
-              this.myGlobal.keyPressTime[currentKey] = 0;
-              this.addNoteCount();
+            } else if (!isUsed) {
+              if (
+                currentJudge > timing - pureTime &&
+                currentJudge < timing + pureTime
+              ) {
+                this.addCount({
+                  key: "pureCount",
+                  message: "pure",
+                  judgeTime: currentJudge,
+                  timing: timing,
+                });
+                this.myTrack.notes[this.currentNote].judged = true;
+                this.myGlobal.keyUsed[currentKey] = true;
+                this.addNoteCount();
+              } else if (
+                currentJudge > timing - farTime &&
+                currentJudge < timing + farTime
+              ) {
+                this.addCount({
+                  key: "farCount",
+                  message:
+                    currentJudge < timing
+                      ? "因为过早按下而判定为far(early)"
+                      : "因为过晚按下而判定为far(late)",
+                  judgeTime: currentJudge,
+                  timing: timing,
+                });
+                this.myTrack.notes[this.currentNote].judged = true;
+                this.myGlobal.keyUsed[currentKey] = true;
+                this.addNoteCount();
+              } else if (
+                currentJudge > timing - lostTime &&
+                currentJudge < timing + lostTime
+              ) {
+                this.addCount({
+                  key: "lostCount",
+                  message:
+                    currentJudge < timing
+                      ? "因为过早按下而判定为lost(early)"
+                      : "因为过晚按下而判定为lost(late)",
+                  judgeTime: currentJudge,
+                  timing: timing,
+                });
+                this.myTrack.notes[this.currentNote].judged = true;
+                this.myGlobal.keyUsed[currentKey] = true;
+                this.addNoteCount();
+              }
             }
           }
         }
