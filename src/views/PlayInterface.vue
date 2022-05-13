@@ -134,7 +134,11 @@
       </div>
       <!-- 记分板 -->
       <div
-        :class="loadingStatus.beforeFinished?'play-interface-scoreboard-container-upward':'play-interface-scoreboard-container-downward'"
+        :class="
+          loadingStatus.beforeFinished
+            ? 'play-interface-scoreboard-container-upward'
+            : 'play-interface-scoreboard-container-downward'
+        "
         :style="{
           height: '200px',
           position: 'absolute',
@@ -197,7 +201,7 @@
             <span
               :style="{
                 color: [
-                  global.combo == global.pureCount
+                  global.combo == global.pureCount && global.lostCount == 0
                     ? 'rgb(247, 199, 9)'
                     : global.lostCount == 0
                     ? 'rgb(135, 206, 250)'
@@ -210,7 +214,7 @@
             <span
               :style="{
                 color: [
-                  global.combo == global.pureCount
+                  global.combo == global.pureCount && global.lostCount == 0
                     ? 'rgb(247, 199, 9)'
                     : global.lostCount == 0
                     ? 'rgb(135, 206, 250)'
@@ -404,8 +408,10 @@ export default {
       } else {
         this.global.currentTime = this.chart.songLength;
         this.loadingStatus.beforeFinished = true;
+        this.$forceUpdate();
         setTimeout(() => {
           this.loadingStatus.finished = true;
+          this.$forceUpdate();
         }, 500);
       }
     },
