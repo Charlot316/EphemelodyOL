@@ -16,19 +16,19 @@
           <div class="info" style="padding:20px;">
             <div
               class="song-uploader"
-              style="text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:30px;color:rgb(255,255,255);"
+              style="text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:30px;color:rgb(255,250,235);"
             >
               {{ chart.uploader }}
             </div>
             <div
               class="song-name"
-              style="text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:70px;color:rgb(255,255,255);"
+              style="text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:70px;color:rgb(255,255,255);background-color:rgba(54, 144, 240, 0.5);"
             >
               {{ chart.songName }}
             </div>
             <div
               class="song-writer"
-              style="text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:50px;color:rgb(255,255,255);"
+              style="text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:50px;color:rgb(255,255,255);background-color:rgba(255, 255, 255, 0.5);"
             >
               {{ chart.songWriter }}
             </div>
@@ -250,6 +250,13 @@
         </div>
       </el-dialog>
     </div>
+    <div v-if="loadingStatus.finished" class="show-record">
+      <img :src="chart.defaultBackground" class="loading-background" />
+      <div class="record-container">
+
+
+      </div>
+    </div>
   </div>
 </template>
 
@@ -412,7 +419,7 @@ export default {
         setTimeout(() => {
           this.loadingStatus.finished = true;
           this.$forceUpdate();
-        }, 500);
+        }, 2000);
       }
     },
 
@@ -610,12 +617,6 @@ export default {
   }
 }
 
-.loading-background {
-  animation-name: backgroung-image;
-  animation-duration: 10s;
-  animation-iteration-count: infinite;
-}
-
 .loading-text {
   background: linear-gradient(90deg, rgb(255, 255, 255) 50%, transparent 0)
       repeat-x,
@@ -731,6 +732,9 @@ export default {
   height: 100%;
   object-fit: fill;
   -webkit-user-drag: none;
+  animation-name: backgroung-image;
+  animation-duration: 10s;
+  animation-iteration-count: infinite;
 }
 
 @keyframes info-container-upward {
