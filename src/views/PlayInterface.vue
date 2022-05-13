@@ -22,7 +22,7 @@
             </div>
             <div
               class="song-name"
-              style="text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:70px;color:rgb(255,255,255);background-color:rgba(54, 144, 240, 0.5);"
+              style="text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:70px;color:rgb(255,255,255);background-color:rgba(105, 245, 202, 0.5);"
             >
               {{ chart.songName }}
             </div>
@@ -252,7 +252,9 @@
       </el-dialog>
     </div>
     <div v-if="loadingStatus.finished" class="show-record">
+    <div class="loading-background-end">
       <img :src="chart.defaultBackground" class="loading-background" />
+      </div>
       <div class="record-container">
         <div
           class="record-container-body"
@@ -268,42 +270,42 @@
             <img class="songcover-img" :src="chart.songCover" />
           </div>
           <div class="record-content">
-            <div>
+            <div >
               <div
                 class="song-name"
-                style="text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:50px;color:rgb(255,255,255);background-color:rgba(255, 255, 255, 0.5);"
+                style="min-width:400px;text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:50px;color:rgb(255,255,255);background-color:rgba(105, 245, 202, 0.5);padding:0px 10px;"
               >
                 {{ chart.songName }}
               </div>
               <div
-                style="text-align:left;text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:70px;color:rgb(255,255,255);background-color:rgba(54, 144, 240, 0.5);"
+                style="min-width:400px;text-align:left;text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:70px;color:rgb(255,255,255);padding:0px 10px;"
               >
                 {{ global.score }}
               </div>
               <div
-                style="text-align:left;text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:20px;color:rgb(255,250,235);"
+                style="min-width:400px;text-align:left;text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:20px;color:rgb(255,255,255);padding:0px 10px;"
               >
                 最大连击:{{ global.maxCombo + "\u3000" }}历史最佳成绩:1000000
               </div>
               <div
-                style="text-align:left;text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:20px;color:rgb(255,250,235);"
+                style="min-width:400px;text-align:left;text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:20px;color:rgb(255,255,255);padding:0px 10px;"
               >
                 pure:{{ global.pureCount + "\u3000" }}far:{{
                   global.farCount + "\u3000"
                 }}lost:{{ global.lostCount }}
               </div>
             </div>
-            <div>
+            
+          </div>
+        </div>
+        
               <div
                 :class="'play-button'"
-                style="width:150px;height:150px;line-height:150px;float:right;border-radius:50%;text-align: center;"
+                style="width:150px;height:150px;line-height:150px;position:absolute;bottom:30px;right:30px;border-radius:50%;text-align: center;"
               >
                 继续
               </div>
             </div>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </template>
@@ -463,7 +465,9 @@ export default {
       } else {
         this.global.currentTime = this.chart.songLength;
         this.loadingStatus.beforeFinished = true;
+        this.calculateScore();
         this.$forceUpdate();
+
         setTimeout(() => {
           this.loadingStatus.finished = true;
           this.$forceUpdate();
@@ -571,11 +575,11 @@ export default {
           param.timing
       );
       if (param.key == "lostCount") {
-        this.global.combo = 0;
         this.global.maxCombo = Math.max(
           this.global.maxCombo,
           this.global.combo
         );
+        this.global.combo = 0;
       } else {
         this.global.combo++;
       }
@@ -694,10 +698,10 @@ export default {
 
 @keyframes playbutton {
   0% {
-    box-shadow: 0px 0px 0px 0px rgba(54, 144, 240, 0.8);
+    box-shadow: 0px 0px 0px 0px rgba(255, 120, 160, 0.8) ;
   }
   100% {
-    box-shadow: 0px 0px 0px 40px rgba(169, 213, 252, 0.1);
+    box-shadow: 0px 0px 0px 40px rgba(255, 144, 164, 0.2);
   }
 }
 .play-button {
@@ -710,24 +714,24 @@ export default {
   color: rgb(255, 255, 255);
   background-image: -webkit-linear-gradient(
     -240.9453959009229deg,
-    rgba(169, 213, 252, 1) 0,
-    rgba(169, 213, 252, 1) 6%,
-    rgba(84, 163, 238, 1) 53%,
-    rgba(54, 144, 240, 1) 100%
+    rgb(252, 169, 234) 0,
+    rgb(227, 133, 192) 6%,
+    rgb(255, 124, 198) 53%,
+    rgb(243, 83, 113) 100%
   );
   background-image: -moz-linear-gradient(
     330.9453959009229deg,
-    rgba(169, 213, 252, 1) 0,
-    rgba(169, 213, 252, 1) 6%,
-    rgba(84, 163, 238, 1) 53%,
-    rgba(54, 144, 240, 1) 100%
+    rgb(252, 169, 234) 0,
+    rgb(227, 133, 192) 6%,
+    rgb(255, 124, 198) 53%,
+    rgb(243, 83, 113) 100%
   );
   background-image: linear-gradient(
     330.9453959009229deg,
-    rgba(169, 213, 252, 1) 0,
-    rgba(169, 213, 252, 1) 6%,
-    rgba(84, 163, 238, 1) 53%,
-    rgba(54, 144, 240, 1) 100%
+    rgb(252, 169, 234) 0,
+    rgb(227, 133, 192) 6%,
+    rgb(255, 124, 198) 53%,
+    rgb(243, 83, 113) 100%
   );
   transform: scale(1);
   transition: 0.5s;
@@ -783,6 +787,20 @@ export default {
   animation-name: backgroung-image;
   animation-duration: 10s;
   animation-iteration-count: infinite;
+}
+
+@keyframes loading-background-end {
+  0% {
+    filter: blur(0px);
+  }
+  100% {
+    filter: blur(10px);
+  }
+}
+
+.loading-background-end {
+  animation: loading-background-end 2s;
+  filter: blur(10px);
 }
 
 @keyframes info-container-upward {
@@ -888,10 +906,10 @@ export default {
 
 @keyframes song-cover-enter {
   0% {
-    left: -300px;
+    right: 100%;
   }
   100% {
-    left: 50px;
+    right: 55%;
   }
 }
 .song-cover {
@@ -899,25 +917,22 @@ export default {
   height: 300px;
   margin: 0;
   position: absolute;
-  left: 50px;
+  right: 55%;
   animation: song-cover-enter 0.5s ease-out;
 }
 
 @keyframes record-content-enter {
   0% {
-    left: 70%;
+    left: 100%;
   }
   100% {
-    left: 450px;
+    left: 55%;
   }
 }
 .record-content {
-  left: 450px;
+  left: 55%;
   position: absolute;
   animation: record-content-enter 0.5s ease-out;
   display: flex;
-  align-items: center;
-  width: 50%;
-  justify-content: space-between;
 }
 </style>
