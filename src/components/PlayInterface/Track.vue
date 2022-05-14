@@ -275,6 +275,9 @@ export default {
       this.generateWidthPath();
       this.generatePositionXPath();
       this.generateRGBPath();
+      this.myTrack.notes.sort(function(a, b) {
+        return a.timing - b.timing;
+      });
       this.currentNote = 0;
       this.judgeFinished = false;
       this.myTrack.tempPositionX = this.getPositionX();
@@ -315,6 +318,7 @@ export default {
                 timing: timing,
               });
               this.myTrack.notes[this.currentNote].judged = true;
+              this.$forceUpdate();
               this.addNoteCount();
             }
           }
@@ -340,6 +344,7 @@ export default {
                   timing: timing,
                 });
                 this.myTrack.notes[this.currentNote].judged = true;
+                this.$forceUpdate();
                 this.myGlobal.keyUsed[currentKey] = true;
                 this.addNoteCount();
               } else if (
@@ -356,6 +361,7 @@ export default {
                   timing: timing,
                 });
                 this.myTrack.notes[this.currentNote].judged = true;
+                this.$forceUpdate();
                 this.myGlobal.keyUsed[currentKey] = true;
                 this.addNoteCount();
               } else if (
@@ -372,6 +378,7 @@ export default {
                   timing: timing,
                 });
                 this.myTrack.notes[this.currentNote].judged = true;
+                this.$forceUpdate();
                 this.myGlobal.keyUsed[currentKey] = true;
                 this.addNoteCount();
               }
