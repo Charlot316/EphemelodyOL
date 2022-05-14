@@ -1,6 +1,6 @@
 <template>
   <div class="play-interface">
-    <div class="header" style="position:absolute;top:0;height:150px;width:100%">
+    <div class="header">
       <div class="header-button"></div>
       <div class="header-slide">
         <div class="header-slide-item">
@@ -14,14 +14,9 @@
           ></el-slider>
         </div>
         <div class="header-slide-button">
-          <el-button icon="" circle>{{
-            "&#32;" + "|" + "&#32;" + "&#32;" + "&#32;" + "|" + "&#32;"
-          }}</el-button>
-          <el-button
-            icon="el-icon-video-pause"
-            circle
-          ></el-button>
-          <el-button icon="el-icon-video-play" circle @click="play"></el-button>
+          <el-button icon="el-icon-refresh-left" circle @click="reStart"></el-button>
+          <el-button v-if="isRunning" icon="el-icon-video-pause" circle @click="pause"></el-button>
+          <el-button v-else icon="el-icon-video-play" circle @click="play"></el-button>
         </div>
       </div>
     </div>
@@ -299,21 +294,32 @@ export default {
 
     play() {
       this.audio.play();
+      this.resetTrack();
       this.sliding = false;
       this.isRunning = true;
+    },
+
+    reStart() {
+      this.resetTrack();
+      this.audio.currentTime = 0;
+      this.global.currentTime=0;
+      if(this.isRunning)
+      {
+        this.audio.play();
+      }
     },
 
     resetTrack() {
       for (var i = 0; i < this.chart.tracks.length; i++) {
         var track = this.chart.tracks[i];
-        var index=0;
-        for (var j = track.notes.length-1; j >=0; j--) {
+        var index = 0;
+        for (var j = track.notes.length - 1; j >= 0; j--) {
           track.notes[j].judged = false;
-          if(track.notes[j].timing>this.global.currentTime){
-            index=j;
+          if (track.notes[j].timing > this.global.currentTime) {
+            index = j;
           }
         }
-        track.currentNote=index;
+        track.currentNote = index;
       }
     },
   },
@@ -336,13 +342,23 @@ export default {
 
   user-select: none;
 }
+
+.header {
+  position: absolute;
+  top: 0;
+  height: 90px;
+  width: 100%;
+  padding: 5px 0;
+  background: white;
+}
 .header-slide {
   width: 100%;
 }
+
 #play-interface-container {
   position: absolute;
-  top: 150px;
-  height: calc(100vh - 150px);
+  top: 100px;
+  height: calc(100vh - 100px);
   width: 100%;
 }
 .header-slide-item {

@@ -146,6 +146,15 @@ export default {
         this.boxShadowSize = 0;
       }
     },
+    "Track.moveOperations"(){
+      this.generatePositionXPath();
+    },
+    "Track.changeWidthOperations"(){
+      this.generateWidthPath();
+    },
+    "Track.changeColorOperations"(){
+      this.generateRGBPath();
+    },
   },
   created() {
     this.initiate();
