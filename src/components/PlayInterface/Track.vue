@@ -276,7 +276,7 @@ export default {
       this.myTrack.notes.sort(function(a, b) {
         return a.timing - b.timing;
       });
-      this.currentNote = 0;
+      this.myTrack.currentNote = 0;
       this.judgeFinished = false;
       this.myTrack.tempPositionX = this.getPositionX();
       this.myTrack.tempWidth = this.getWidth();
@@ -290,15 +290,17 @@ export default {
         if (this.Track.type == 1) {
           currentKey = this.Track.key.toUpperCase();
         } else
-          currentKey = this.Track.notes[this.currentNote].key.toUpperCase();
+          currentKey = this.Track.notes[
+            this.myTrack.currentNote
+          ].key.toUpperCase();
         let currentJudge = this.Global.keyPressTime[currentKey];
         let currentTime = this.Global.currentTime;
-        let timing = this.Track.notes[this.currentNote].timing;
+        let timing = this.Track.notes[this.myTrack.currentNote].timing;
         let pureTime = this.Global.pureTime;
         let farTime = this.Global.farTime;
         let lostTime = this.Global.lostTime;
         let isUsed = this.Global.keyUsed[currentKey];
-        if (this.Track.notes[this.currentNote].noteType == 1) {
+        if (this.Track.notes[this.myTrack.currentNote].noteType == 1) {
           if (currentTime > timing - lostTime) {
             if (currentTime > timing + lostTime) {
               this.addCount({
@@ -315,7 +317,7 @@ export default {
                 judgeTime: currentTime,
                 timing: timing,
               });
-              this.myTrack.notes[this.currentNote].judged = true;
+              this.myTrack.notes[this.myTrack.currentNote].judged = true;
               this.$forceUpdate();
               this.addNoteCount();
             }
@@ -341,7 +343,7 @@ export default {
                   judgeTime: currentJudge,
                   timing: timing,
                 });
-                this.myTrack.notes[this.currentNote].judged = true;
+                this.myTrack.notes[this.myTrack.currentNote].judged = true;
                 this.$forceUpdate();
                 this.myGlobal.keyUsed[currentKey] = true;
                 this.addNoteCount();
@@ -358,7 +360,7 @@ export default {
                   judgeTime: currentJudge,
                   timing: timing,
                 });
-                this.myTrack.notes[this.currentNote].judged = true;
+                this.myTrack.notes[this.myTrack.currentNote].judged = true;
                 this.$forceUpdate();
                 this.myGlobal.keyUsed[currentKey] = true;
                 this.addNoteCount();
@@ -375,7 +377,7 @@ export default {
                   judgeTime: currentJudge,
                   timing: timing,
                 });
-                this.myTrack.notes[this.currentNote].judged = true;
+                this.myTrack.notes[this.myTrack.currentNote].judged = true;
                 this.$forceUpdate();
                 this.myGlobal.keyUsed[currentKey] = true;
                 this.addNoteCount();
@@ -389,18 +391,23 @@ export default {
     addCount(param) {
       if (param.key == "pureCount") {
         this.boxShadowColor = "rgba(234,161,86,0.6)";
+        this.boxShadowSize = 1;
       } else if (param.key == "farCount") {
         this.boxShadowColor = "rgba(100,149,237,0.6)";
+        this.boxShadowSize = 1;
       } else if (param.key == "lostCount") {
         this.boxShadowColor = "rgba(0,0,0,0.5)";
+        if (!this.Global.isEdit) {
+          this.boxShadowSize = 1;
+        }
       }
-      this.boxShadowSize = 1;
+
       this.$emit("addCount", param);
     },
     //判定note+1
     addNoteCount() {
-      if (this.currentNote < this.Track.notes.length - 1) {
-        this.currentNote++;
+      if (this.myTrack.currentNote < this.Track.notes.length - 1) {
+        this.myTrack.currentNote++;
       } else {
         this.judgeFinished = true;
       }

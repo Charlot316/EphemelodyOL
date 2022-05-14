@@ -20,7 +20,6 @@
           <el-button
             icon="el-icon-video-pause"
             circle
-            @click="reStart"
           ></el-button>
           <el-button icon="el-icon-video-play" circle @click="play"></el-button>
         </div>
@@ -207,6 +206,9 @@ export default {
     run() {
       if (!this.sliding) {
         this.global.currentTime = Math.floor(this.audio.currentTime * 1000);
+      }
+      if (this.global.currentTime >= this.chart.songLength) {
+        this.isRunning = false;
       }
       setTimeout(() => {
         this.run();
