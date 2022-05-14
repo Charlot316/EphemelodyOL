@@ -146,14 +146,19 @@ export default {
         this.boxShadowSize = 0;
       }
     },
-    "Track.moveOperations"(){
+    "Track.moveOperations"() {
       this.generatePositionXPath();
+      this.myTrack.tempPositionX = this.getPositionX();
     },
-    "Track.changeWidthOperations"(){
+    "Track.changeWidthOperations"() {
       this.generateWidthPath();
+      this.myTrack.tempWidth = this.getWidth();
     },
-    "Track.changeColorOperations"(){
+    "Track.changeColorOperations"() {
       this.generateRGBPath();
+      this.myTrack.tempR = this.getRGB()[0];
+      this.myTrack.tempG = this.getRGB()[1];
+      this.myTrack.tempB = this.getRGB()[2];
     },
   },
   created() {
