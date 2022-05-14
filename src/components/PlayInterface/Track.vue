@@ -138,14 +138,12 @@ export default {
         this.myTrack.tempB = this.getRGB()[2];
         this.setHeightAndTop();
       }
-      if (!this.Global.isEdit) {
-        this.judge();
-        if (this.boxShadowSize >= 1) {
-          this.boxShadowSize += 1;
-        }
-        if (this.boxShadowSize > 40) {
-          this.boxShadowSize = 0;
-        }
+      this.judge();
+      if (this.boxShadowSize >= 1) {
+        this.boxShadowSize += 1;
+      }
+      if (this.boxShadowSize > 40) {
+        this.boxShadowSize = 0;
       }
     },
   },

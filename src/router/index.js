@@ -3,15 +3,22 @@ import Home from "../views/Home.vue";
 
 const routes = [{
         path: "/",
-        redirect: "/play", //可以理解为初始界面
+        redirect: "/chart/maker",
     },
     {
         path: "/play",
         name: "Play",
         component: () =>
             import (
-                /* webpackChunkName: "login" */
                 "../views/PlayInterface.vue"
+            ),
+    },
+    {
+        path: "/chart/maker",
+        name: "chartMaker",
+        component: () =>
+            import (
+                "../views/ChartMaker.vue"
             ),
     },
     // {

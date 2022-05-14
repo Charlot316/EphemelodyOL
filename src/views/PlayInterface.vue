@@ -166,7 +166,7 @@
           cursor: pointer;"
           @click="pause"
         >
-          ||
+          {{ "|" + "&#32;" + "|" }}
         </div>
         <div
           class="score-counter"
@@ -238,7 +238,7 @@
         :close-on-click-modal="false"
       >
         <div style="text-align: center;">
-          <el-button icon="el-icon-caret-left" circle></el-button>
+          <el-button icon="el-icon-caret-left" @click="back" circle></el-button>
           <el-button
             icon="el-icon-refresh-left"
             circle
@@ -312,6 +312,7 @@
 
         <div
           :class="'play-button'"
+          @click="back"
           style="width:150px;height:150px;line-height:150px;position:absolute;bottom:50px;right:50px;border-radius:50%;text-align: center;"
         >
           继续
@@ -406,7 +407,7 @@ export default {
       isEdit: false,
       keyPressTime: [],
       keyIsHold: [],
-      keyUsed:[],
+      keyUsed: [],
       pureCount: 0,
       farCount: 0,
       lostCount: 0,
@@ -643,6 +644,8 @@ export default {
       this.audio.currentTime = 0;
       this.audio.play();
     },
+
+    back() {},
   },
 };
 </script>
