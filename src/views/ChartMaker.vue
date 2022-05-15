@@ -179,7 +179,7 @@ export default {
     this.global = {
       screenWidth: 0,
       screenHeight: 0,
-      remainingTime: 5000,
+      remainingTime: 700,
       finalY: 0.8,
       currentTime: 0,
       lostTime: 150,

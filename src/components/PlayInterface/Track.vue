@@ -1,102 +1,4 @@
 <template>
-  <!-- <div
-    class="select"
-    :style="{
-      position: 'absolute',
-      height: '100%',
-      width: width + 'px',
-      left: left + 'px',
-    }"
-  >
-    <div
-      class="black-line"
-      :style="{
-        width: '2px',
-        position: 'absolute',
-        left: 0.5 * width + 'px',
-        top: top + 'px',
-        height: height + 'px',
-        background: 'rgba(0,0,0,0.2)',
-      }"
-    ></div>
-    <div class="key">
-      <div
-        class="key-background"
-        :style="{
-          width: lengthForKey-2 + 'px',
-          position: 'absolute',
-          left: 0.5 * width - (Math.sqrt(2) - 1) * (lengthForKey) - 3.5 + 'px',
-          top: (finalHeight * 9) / 8 - (Math.sqrt(2) - 1) * lengthForKey + 'px',
-          margin: 'auto 0',
-          border: '1px solid rgba(244,244,244,1)',
-          height: lengthForKey-2 + 'px',
-          background: [
-            Track.type == 1 ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0)',
-          ],
-          transform: 'rotateZ(45deg)',
-          boxShadow: boxShadow,
-        }"
-      ></div>
-      <div
-        v-if="Track.type == 1"
-        :style="{
-          width: lengthForKey + 'px',
-          position: 'absolute',
-          left: 0.5 * width - 0.5 * lengthForKey + 'px',
-          top: (finalHeight * 9) / 8 - (Math.sqrt(2) - 1) * lengthForKey + 'px',
-          margin: 'auto 0',
-          height: lengthForKey + 'px',
-          textAlign: 'center',
-          textShadow: '1px 1px 0 rgba(0,0,0,0.25)',
-          fontSize: lengthForKey * 0.7 + 'px',
-          color: 'rgba(255,255,255,0.8)',
-        }"
-      >
-        {{ Track.key.toUpperCase() + " " }}
-      </div>
-    </div>
-
-    <div
-      class="track-body"
-      :style="{
-        height: height + 'px',
-        width: width - 4 + 'px',
-        position: 'absolute',
-        borderTop: '0px',
-        borderBottom: '0px',
-        borderRight: '2px solid rgba(244,244,244,1)',
-        borderLeft: '2px solid rgba(244,244,244,1)',
-        top: top + 'px',
-        background: [isActive ? activeStyle : inactiveStyle],
-      }"
-    >
-      <div v-for="Note in Track.notes" :key="Note">
-        <Note
-          :Note="Note"
-          v-if="
-            Global.currentTime > Note.timing - Global.remainingTime &&
-              Global.currentTime < Note.timing + Global.lostTime &&
-              !Note.judged
-          "
-          :left="0.5 * width"
-          :Global="Global"
-        />
-      </div>
-    </div>
-    <div
-      class="black-point"
-      :style="{
-        width: lengthForBlackPoint + 'px',
-        position: 'absolute',
-        left: 0.5 * width - offsetDiagonal - 0.5 + 'px',
-        top: finalHeight - offsetDiagonal + 'px',
-        margin: 'auto 0',
-        height: lengthForBlackPoint + 'px',
-        background: 'rgb(22, 22, 14)',
-        transform: 'rotateZ(45deg)',
-      }"
-    ></div>
-  </div> -->
   <div></div>
 </template>
 
@@ -123,9 +25,9 @@ export default {
       judgeFinished: false,
       boxShadowColor: "rgba(0,0,0,0.2)",
       boxShadowSize: 0,
-      blackLength: 30,
-      pinkLength: 20,
-      whiteLength: 10,
+      blackLength: 35,
+      pinkLength: 25,
+      whiteLength: 15,
     };
   },
   watch: {
@@ -156,7 +58,12 @@ export default {
       }
     },
     "Global.screenHeight"() {
+
       this.setHeightAndTop();
+      this.paintTrack();
+    },
+    "Global.screenWidth"() {
+      this.paintTrack();
     },
     "Track.moveOperations": {
       handler() {
