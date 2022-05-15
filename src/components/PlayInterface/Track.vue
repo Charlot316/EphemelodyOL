@@ -1,5 +1,5 @@
 <template>
-  <div
+  <!-- <div
     class="select"
     :style="{
       position: 'absolute',
@@ -96,16 +96,14 @@
         transform: 'rotateZ(45deg)',
       }"
     ></div>
-  </div>
+  </div> -->
+  <div></div>
 </template>
 
 <script>
-import Note from "./Note";
 export default {
   props: ["Track", "Global"],
-  components: {
-    Note,
-  },
+  components: {},
   data() {
     return {
       myTrack: this.Track,
@@ -122,10 +120,12 @@ export default {
       animationTime: 50,
       height: 0,
       top: 0,
-      currentNote: 0,
       judgeFinished: false,
       boxShadowColor: "rgba(0,0,0,0.2)",
       boxShadowSize: 0,
+      blackLength: 30,
+      pinkLength: 20,
+      whiteLength: 10,
     };
   },
   watch: {
@@ -137,6 +137,15 @@ export default {
         this.myTrack.tempG = this.getRGB()[1];
         this.myTrack.tempB = this.getRGB()[2];
         this.setHeightAndTop();
+        this.paintTrack();
+      }
+      while (
+        this.myTrack.lastNote < this.myTrack.notes.length - 1 &&
+        this.Global.currentTime >
+          this.myTrack.notes[this.myTrack.lastNote + 1].timing -
+            this.Global.remainingTime
+      ) {
+        this.myTrack.lastNote++;
       }
       this.judge();
       if (this.boxShadowSize >= 1) {
@@ -214,11 +223,17 @@ export default {
     width() {
       return 2 * this.Track.tempWidth * this.Global.screenWidth;
     },
+    halfWidth() {
+      return this.Track.tempWidth * this.Global.screenWidth;
+    },
     left() {
       return (
         (this.Track.tempPositionX - this.Track.tempWidth) *
         this.Global.screenWidth
       );
+    },
+    middle() {
+      return this.Track.tempPositionX * this.Global.screenWidth;
     },
     TrackColor() {
       return (
@@ -243,58 +258,156 @@ export default {
         this.Track.tempB
       );
     },
-    activeStyle() {
-      return [
-        "-webkit-linear-gradient(-90deg, " +
-          this.TrackColorWithoutA +
-          ",0.1)" +
-          " 0, " +
-          this.TrackColor +
-          " 25%,  rgba(255,255,255,1) 100%)",
-        " -moz-linear-gradient(180deg, " +
-          this.TrackColorWithoutA +
-          ",0.1)" +
-          " 0, " +
-          this.TrackColor +
-          " 25%,  rgba(255,255,255,1) 100%)",
-        "linear-gradient(180deg, " +
-          this.TrackColorWithoutA +
-          ",0.1)" +
-          " 0, " +
-          this.TrackColor +
-          " 25%,  rgba(255,255,255,1) 100%)",
-      ];
+    Y() {
+      return this.Global.finalY * this.Global.screenHeight;
     },
-    inactiveStyle() {
-      return [
-        "-webkit-linear-gradient(-90deg, " +
-          this.TrackColorWithoutA +
-          ",0.1)" +
-          " 0, " +
-          this.TrackColor +
-          " 90%, rgba(255,255,255,1) 100%)",
-        " -moz-linear-gradient(180deg, " +
-          this.TrackColorWithoutA +
-          ",0.1)" +
-          " 0, " +
-          this.TrackColor +
-          " 90%, rgba(255,255,255,1) 100%)",
-        "linear-gradient(180deg, " +
-          this.TrackColorWithoutA +
-          ",0.1)" +
-          " 0, " +
-          this.TrackColor +
-          " 90%, rgba(255,255,255,1) 100%)",
-      ];
-    },
-    offsetDiagonal() {
-      return (
-        Math.sqrt(this.lengthForBlackPoint * this.lengthForBlackPoint * 2) -
-        this.lengthForBlackPoint
-      );
-    },
+
+    // activeStyle() {
+    //   return [
+    //     "-webkit-linear-gradient(-90deg, " +
+    //       this.TrackColorWithoutA +
+    //       ",0.1)" +
+    //       " 0, " +
+    //       this.TrackColor +
+    //       " 25%,  rgba(255,255,255,1) 100%)",
+    //     " -moz-linear-gradient(180deg, " +
+    //       this.TrackColorWithoutA +
+    //       ",0.1)" +
+    //       " 0, " +
+    //       this.TrackColor +
+    //       " 25%,  rgba(255,255,255,1) 100%)",
+    //     "linear-gradient(180deg, " +
+    //       this.TrackColorWithoutA +
+    //       ",0.1)" +
+    //       " 0, " +
+    //       this.TrackColor +
+    //       " 25%,  rgba(255,255,255,1) 100%)",
+    //   ];
+    // },
+    // inactiveStyle() {
+    //   return [
+    //     "-webkit-linear-gradient(-90deg, " +
+    //       this.TrackColorWithoutA +
+    //       ",0.1)" +
+    //       " 0, " +
+    //       this.TrackColor +
+    //       " 90%, rgba(255,255,255,1) 100%)",
+    //     " -moz-linear-gradient(180deg, " +
+    //       this.TrackColorWithoutA +
+    //       ",0.1)" +
+    //       " 0, " +
+    //       this.TrackColor +
+    //       " 90%, rgba(255,255,255,1) 100%)",
+    //     "linear-gradient(180deg, " +
+    //       this.TrackColorWithoutA +
+    //       ",0.1)" +
+    //       " 0, " +
+    //       this.TrackColor +
+    //       " 90%, rgba(255,255,255,1) 100%)",
+    //   ];
+    // },
+    // offsetDiagonal() {
+    //   return (
+    //     Math.sqrt(this.lengthForBlackPoint * this.lengthForBlackPoint * 2) -
+    //     this.lengthForBlackPoint
+    //   );
+    // },
   },
   methods: {
+    paintTrack() {
+      var painter = this.Global.trackPainter;
+      if (this.width > 4 && this.height > 0) {
+        painter.beginPath();
+        painter.rect(this.left + 2, this.top, this.width - 4, this.height);
+        painter.fillStyle =
+          "rgba(" +
+          this.Track.tempR +
+          "," +
+          this.Track.tempG +
+          "," +
+          this.Track.tempB +
+          "," +
+          this.opacity +
+          ")";
+        painter.fill();
+        painter.beginPath();
+        painter.moveTo(this.left, this.top);
+        painter.lineTo(this.left, this.Y);
+        painter.strokeStyle = "rgba(255,255,255,0.8)";
+        painter.lineWidth = 2;
+        painter.stroke();
+        painter.beginPath();
+        painter.moveTo(this.left + this.width, this.top);
+        painter.lineTo(this.left + this.width, this.Y);
+        painter.strokeStyle = "rgba(255,255,255,0.8)";
+        painter.lineWidth = 2;
+        painter.stroke();
+        painter.beginPath();
+        painter.moveTo(this.middle, this.top);
+        painter.lineTo(this.middle, this.Y);
+        painter.strokeStyle = "rgba(0,0,0,0.3)";
+        painter.stroke();
+      }
+
+      this.paintNotes();
+    },
+    paintNotes() {
+      if (!this.judgeFinished) {
+        for (
+          var i = this.myTrack.currentNote;
+          i <= this.myTrack.lastNote;
+          i++
+        ) {
+          this.paintNote(this.myTrack.notes[i]);
+        }
+      }
+    },
+    paintNote(note) {
+      var painter = this.Global.notePainter;
+      var y =
+        ((this.Global.finalY / this.Global.remainingTime) *
+          this.Global.currentTime -
+          (this.Global.finalY / this.Global.remainingTime) *
+            (note.timing - this.Global.remainingTime)) *
+        this.Global.screenHeight;
+      if (note.noteType == 0) {
+        painter.beginPath();
+        painter.moveTo(this.middle, y - this.blackLength);
+        painter.lineTo(this.middle + this.blackLength, y);
+        painter.lineTo(this.middle, y + this.blackLength);
+        painter.lineTo(this.middle - this.blackLength, y);
+        painter.lineTo(this.middle, y - this.blackLength);
+        painter.closePath();
+        painter.fillStyle = "rgb(22, 22, 14)";
+        painter.fill();
+        painter.beginPath();
+        painter.moveTo(this.middle, y - this.pinkLength);
+        painter.lineTo(this.middle + this.pinkLength, y);
+        painter.lineTo(this.middle, y + this.pinkLength);
+        painter.lineTo(this.middle - this.pinkLength, y);
+        painter.lineTo(this.middle, y - this.pinkLength);
+        painter.closePath();
+        painter.fillStyle = "rgb(203, 105, 121)";
+        painter.fill();
+      } else if (note.noteType == 2) {
+        painter.beginPath();
+
+        painter.closePath();
+      } else if (note.noteType == 1) {
+        painter.beginPath();
+        painter.moveTo(this.middle, y - this.whiteLength);
+        painter.lineTo(this.middle + this.whiteLength, y);
+        painter.lineTo(this.middle, y + this.whiteLength);
+        painter.lineTo(this.middle - this.whiteLength, y);
+        painter.lineTo(this.middle, y - this.whiteLength);
+        painter.closePath();
+        painter.fillStyle = "rgb(255,255,255)";
+        painter.fill();
+        painter.strokeStyle = "rgb(0,0,0)";
+        painter.lineWidth = 1;
+        painter.stroke();
+      }
+    },
     initiate() {
       this.setHeightAndTop();
       this.generateWidthPath();
@@ -304,6 +417,7 @@ export default {
         return a.timing - b.timing;
       });
       this.myTrack.currentNote = 0;
+      this.myTrack.lastNote = -1;
       this.judgeFinished = false;
       this.myTrack.tempPositionX = this.getPositionX();
       this.myTrack.tempWidth = this.getWidth();
@@ -344,7 +458,6 @@ export default {
                 judgeTime: currentTime,
                 timing: timing,
               });
-              this.myTrack.notes[this.myTrack.currentNote].judged = true;
               this.$forceUpdate();
               this.addNoteCount();
             }
@@ -370,7 +483,6 @@ export default {
                   judgeTime: currentJudge,
                   timing: timing,
                 });
-                this.myTrack.notes[this.myTrack.currentNote].judged = true;
                 this.$forceUpdate();
                 this.myGlobal.keyUsed[currentKey] = true;
                 this.addNoteCount();
@@ -387,7 +499,6 @@ export default {
                   judgeTime: currentJudge,
                   timing: timing,
                 });
-                this.myTrack.notes[this.myTrack.currentNote].judged = true;
                 this.$forceUpdate();
                 this.myGlobal.keyUsed[currentKey] = true;
                 this.addNoteCount();
@@ -404,7 +515,6 @@ export default {
                   judgeTime: currentJudge,
                   timing: timing,
                 });
-                this.myTrack.notes[this.myTrack.currentNote].judged = true;
                 this.$forceUpdate();
                 this.myGlobal.keyUsed[currentKey] = true;
                 this.addNoteCount();

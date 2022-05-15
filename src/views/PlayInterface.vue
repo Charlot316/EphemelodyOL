@@ -96,6 +96,9 @@
           style="position:absolute;left:0;top:0;width:100%;height:100%;object-fit:fill;user-drag:none;"
         />
       </div>
+
+
+
       <!-- 判定线 -->
       <div
         :style="{
@@ -118,6 +121,9 @@
         ></div>
       </div>
 
+      <canvas id="track-canvas" style="position:absolute;top:0;left:0;" />
+      <canvas id="note-canvas" style="position:absolute;top:0;left:0;" />
+      
       <!-- 轨道 -->
       <div
         class="play-interface-track-container"
@@ -134,6 +140,7 @@
           "
         />
       </div>
+
       <!-- 记分板 -->
       <div
         :class="
@@ -414,17 +421,33 @@ export default {
       combo: 0,
       maxCombo: 0,
       score: 0,
+      notePainter: null,
+      trackPainter: null,
+      noteCanvas: null,
+      trackCanvas: null,
     };
   },
   mounted() {
     const that = this;
     this.playInterface = document.getElementById("play-interface-container");
+    this.global.noteCanvas = document.getElementById("note-canvas");
+    this.global.trackCanvas = document.getElementById("track-canvas");
+    this.global.notePainter = this.global.noteCanvas.getContext("2d");
+    this.global.trackPainter = this.global.trackCanvas.getContext("2d");
     this.global.screenWidth = this.playInterface.offsetWidth;
     this.global.screenHeight = this.playInterface.offsetHeight;
+    that.global.noteCanvas.height = that.playInterface.offsetHeight;
+    that.global.trackCanvas.height = that.playInterface.offsetHeight;
+    that.global.noteCanvas.width = that.playInterface.offsetWidth;
+    that.global.trackCanvas.width = that.playInterface.offsetWidth;
     window.onresize = () => {
       return (() => {
         that.global.screenWidth = that.playInterface.offsetWidth;
         that.global.screenHeight = that.playInterface.offsetHeight;
+        that.global.noteCanvas.height = that.playInterface.offsetHeight;
+        that.global.trackCanvas.height = that.playInterface.offsetHeight;
+        that.global.noteCanvas.width = that.playInterface.offsetWidth;
+        that.global.trackCanvas.width = that.playInterface.offsetWidth;
       })();
     };
 
@@ -465,12 +488,24 @@ export default {
     //给轨道排序
     sortTrack() {
       this.chart.tracks.sort(function(a, b) {
-        return b.startTiming - a.startTiming;
+        return a.startTiming - b.startTiming;
       });
     },
 
     //运行
     run() {
+      this.global.notePainter.clearRect(
+        0,
+        0,
+        this.global.noteCanvas.width,
+        this.global.noteCanvas.height
+      );
+      this.global.trackPainter.clearRect(
+        0,
+        0,
+        this.global.trackCanvas.width,
+        this.global.trackCanvas.height
+      );
       this.global.currentTime = Math.floor(this.audio.currentTime * 1000);
       if (this.global.currentTime < this.chart.songLength) {
         setTimeout(() => {
@@ -635,12 +670,12 @@ export default {
       this.global.combo = 0;
       this.global.maxCombo = 0;
       this.global.score = 0;
-      for (var i = 0; i < this.chart.tracks.length; i++) {
-        var track = this.chart.tracks[i];
-        for (var j = 0; j < track.notes.length; j++) {
-          track.notes[j].judged = false;
-        }
-      }
+      // for (var i = 0; i < this.chart.tracks.length; i++) {
+      //   var track = this.chart.tracks[i];
+      //   for (var j = 0; j < track.notes.length; j++) {
+      //     track.notes[j].judged = false;
+      //   }
+      // }
       this.audio.currentTime = 0;
       this.audio.play();
     },

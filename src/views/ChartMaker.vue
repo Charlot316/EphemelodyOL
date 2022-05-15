@@ -14,9 +14,23 @@
           ></el-slider>
         </div>
         <div class="header-slide-button">
-          <el-button icon="el-icon-refresh-left" circle @click="reStart"></el-button>
-          <el-button v-if="isRunning" icon="el-icon-video-pause" circle @click="pause"></el-button>
-          <el-button v-else icon="el-icon-video-play" circle @click="play"></el-button>
+          <el-button
+            icon="el-icon-refresh-left"
+            circle
+            @click="reStart"
+          ></el-button>
+          <el-button
+            v-if="isRunning"
+            icon="el-icon-video-pause"
+            circle
+            @click="pause"
+          ></el-button>
+          <el-button
+            v-else
+            icon="el-icon-video-play"
+            circle
+            @click="play"
+          ></el-button>
         </div>
       </div>
     </div>
@@ -63,7 +77,8 @@
             }"
           ></div>
         </div>
-
+        <canvas id="track-canvas" style="position:absolute;top:0;left:0;" />
+        <canvas id="note-canvas" style="position:absolute;top:0;left:0;" />
         <!-- 轨道 -->
         <div
           class="play-interface-track-container"
@@ -91,6 +106,26 @@ import { chart } from "@/utils/chart.js";
 export default {
   components: {
     Track,
+  },
+  watch: {
+    "global.currentTime"() {
+      if (this.global.notePainter) {
+        this.global.notePainter.clearRect(
+          0,
+          0,
+          this.global.noteCanvas.width,
+          this.global.noteCanvas.height
+        );
+      }
+      if (this.global.trackPainter) {
+        this.global.trackPainter.clearRect(
+          0,
+          0,
+          this.global.trackCanvas.width,
+          this.global.trackCanvas.height
+        );
+      }
+    },
   },
   data() {
     return {
@@ -144,7 +179,7 @@ export default {
     this.global = {
       screenWidth: 0,
       screenHeight: 0,
-      remainingTime: 1000,
+      remainingTime: 5000,
       finalY: 0.8,
       currentTime: 0,
       lostTime: 150,
@@ -160,17 +195,33 @@ export default {
       combo: 0,
       maxCombo: 0,
       score: 0,
+      notePainter: null,
+      trackPainter: null,
+      noteCanvas: null,
+      trackCanvas: null,
     };
   },
   mounted() {
     const that = this;
     this.playInterface = document.getElementById("play-interface-container");
+    this.global.noteCanvas = document.getElementById("note-canvas");
+    this.global.trackCanvas = document.getElementById("track-canvas");
+    this.global.notePainter = this.global.noteCanvas.getContext("2d");
+    this.global.trackPainter = this.global.trackCanvas.getContext("2d");
     this.global.screenWidth = this.playInterface.offsetWidth;
     this.global.screenHeight = this.playInterface.offsetHeight;
+    that.global.noteCanvas.height = that.playInterface.offsetHeight;
+    that.global.trackCanvas.height = that.playInterface.offsetHeight;
+    that.global.noteCanvas.width = that.playInterface.offsetWidth;
+    that.global.trackCanvas.width = that.playInterface.offsetWidth;
     window.onresize = () => {
       return (() => {
         that.global.screenWidth = that.playInterface.offsetWidth;
         that.global.screenHeight = that.playInterface.offsetHeight;
+        that.global.noteCanvas.height = that.playInterface.offsetHeight;
+        that.global.trackCanvas.height = that.playInterface.offsetHeight;
+        that.global.noteCanvas.width = that.playInterface.offsetWidth;
+        that.global.trackCanvas.width = that.playInterface.offsetWidth;
       })();
     };
     document.onkeydown = function(e) {
@@ -303,9 +354,8 @@ export default {
     reStart() {
       this.resetTrack();
       this.audio.currentTime = 0;
-      this.global.currentTime=0;
-      if(this.isRunning)
-      {
+      this.global.currentTime = 0;
+      if (this.isRunning) {
         this.audio.play();
       }
     },
@@ -321,6 +371,7 @@ export default {
           }
         }
         track.currentNote = index;
+        track.lastNote=-1;
       }
     },
   },
