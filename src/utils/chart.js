@@ -3,7 +3,7 @@ var record = {
     formerBestScore: 10000000,
 };
 
-var chart2 = {
+var chart = {
     songId: 1,
     tracks: [{
             id: 0,
@@ -4123,7 +4123,7 @@ var chart2 = {
     notesCount: 164,
 };
 
-var chart = {
+var chart2 = {
     songId: 1,
     tracks: [{
             id: 0,

@@ -284,6 +284,7 @@ export default {
       if (this.isRunning) {
         this.sliding = false;
         this.audio.play();
+        this.resetTrack();
       }
     },
 

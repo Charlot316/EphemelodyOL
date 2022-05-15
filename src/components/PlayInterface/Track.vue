@@ -23,13 +23,13 @@
       <div
         class="key-background"
         :style="{
-          width: lengthForKey + 'px',
+          width: lengthForKey-2 + 'px',
           position: 'absolute',
-          left: 0.5 * width - (Math.sqrt(2) - 1) * lengthForKey - 5.5 + 'px',
+          left: 0.5 * width - (Math.sqrt(2) - 1) * (lengthForKey) - 3.5 + 'px',
           top: (finalHeight * 9) / 8 - (Math.sqrt(2) - 1) * lengthForKey + 'px',
           margin: 'auto 0',
           border: '1px solid rgba(244,244,244,1)',
-          height: lengthForKey + 'px',
+          height: lengthForKey-2 + 'px',
           background: [
             Track.type == 1 ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0)',
           ],
@@ -145,6 +145,9 @@ export default {
       if (this.boxShadowSize > 40) {
         this.boxShadowSize = 0;
       }
+    },
+    "Global.screenHeight"() {
+      this.setHeightAndTop();
     },
     "Track.moveOperations": {
       handler() {
