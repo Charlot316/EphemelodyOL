@@ -10,7 +10,7 @@ export default {
     return {
       myTrack: this.Track,
       myGlobal: this.Global,
-      lengthForBlackPoint: 15,
+      lengthForBlackPoint: 10,
       refreshTime: 1000 / this.$store.state.refreshRate,
       widthPath: [],
       positionXPath: [],
@@ -92,16 +92,6 @@ export default {
     this.initiate();
   },
   computed: {
-    boxShadow() {
-      return (
-        "0px 0px " +
-        this.boxShadowSize +
-        "px " +
-        this.boxShadowSize +
-        "px " +
-        this.boxShadowColor
-      );
-    },
     isActive() {
       if (this.Track.type == 1) {
         var currentTime = this.Global.currentTime;
@@ -116,8 +106,8 @@ export default {
       } else return false;
     },
     lengthForKey() {
-      if (this.Global.screenHeight * 0.1 > 50) {
-        return 50;
+      if (this.Global.screenHeight * 0.1 > 30) {
+        return 30;
       } else {
         return this.Global.screenHeight * 0.1;
       }
@@ -140,33 +130,29 @@ export default {
     middle() {
       return this.Track.tempPositionX * this.Global.screenWidth;
     },
-    TrackColor() {
-      return (
-        "rgba(" +
-        this.Track.tempR +
-        "," +
-        this.Track.tempG +
-        "," +
-        this.Track.tempB +
-        "," +
-        this.opacity +
-        ")"
-      );
-    },
-    TrackColorWithoutA() {
-      return (
-        "rgba(" +
-        this.Track.tempR +
-        "," +
-        this.Track.tempG +
-        "," +
-        this.Track.tempB
-      );
-    },
-    Y() {
-      return this.Global.finalY * this.Global.screenHeight;
-    },
-
+    // TrackColor() {
+    //   return (
+    //     "rgba(" +
+    //     this.Track.tempR +
+    //     "," +
+    //     this.Track.tempG +
+    //     "," +
+    //     this.Track.tempB +
+    //     "," +
+    //     this.opacity +
+    //     ")"
+    //   );
+    // },
+    // TrackColorWithoutA() {
+    //   return (
+    //     "rgba(" +
+    //     this.Track.tempR +
+    //     "," +
+    //     this.Track.tempG +
+    //     "," +
+    //     this.Track.tempB
+    //   );
+    // },
     // activeStyle() {
     //   return [
     //     "-webkit-linear-gradient(-90deg, " +
@@ -217,11 +203,15 @@ export default {
     //     this.lengthForBlackPoint
     //   );
     // },
+    Y() {
+      return this.Global.finalY * this.Global.screenHeight;
+    },
   },
   methods: {
     paintTrack() {
       var painter = this.Global.trackPainter;
       if (this.width > 4 && this.height > 0) {
+        //填充长方形主体
         painter.beginPath();
         painter.rect(this.left + 2, this.top, this.width - 4, this.height);
         painter.fillStyle =
@@ -235,23 +225,70 @@ export default {
           this.opacity +
           ")";
         painter.fill();
+        if (this.isActive) {
+          painter.fillStyle = "rgba(255,255,255,0.3)";
+          painter.fill();
+        }
+        //画左线
         painter.beginPath();
         painter.moveTo(this.left, this.top);
         painter.lineTo(this.left, this.Y);
         painter.strokeStyle = "rgba(255,255,255,0.8)";
         painter.lineWidth = 2;
         painter.stroke();
+        //画右线
         painter.beginPath();
         painter.moveTo(this.left + this.width, this.top);
         painter.lineTo(this.left + this.width, this.Y);
         painter.strokeStyle = "rgba(255,255,255,0.8)";
         painter.lineWidth = 2;
         painter.stroke();
+        //画中线
         painter.beginPath();
         painter.moveTo(this.middle, this.top);
         painter.lineTo(this.middle, this.Y);
         painter.strokeStyle = "rgba(0,0,0,0.3)";
+        painter.lineWidth = 1;
         painter.stroke();
+
+        //画小黑方块
+        painter.beginPath();
+        painter.moveTo(this.middle, this.Y - this.lengthForBlackPoint);
+        painter.lineTo(this.middle + this.lengthForBlackPoint, this.Y);
+        painter.lineTo(this.middle, this.Y + this.lengthForBlackPoint);
+        painter.lineTo(this.middle - this.lengthForBlackPoint, this.Y);
+        painter.lineTo(this.middle, this.Y - this.lengthForBlackPoint);
+        painter.closePath();
+        painter.fillStyle = "rgb(22, 22, 14)";
+        painter.fill();
+
+        //画key
+        var keyY = (this.Y * 9) / 8;
+        painter.beginPath();
+        painter.moveTo(this.middle, keyY - this.lengthForKey);
+        painter.lineTo(this.middle + this.lengthForKey, keyY);
+        painter.lineTo(this.middle, keyY + this.lengthForKey);
+        painter.lineTo(this.middle - this.lengthForKey, keyY);
+        painter.lineTo(this.middle, keyY - this.lengthForKey);
+        painter.closePath();
+        painter.strokeStyle = "rgb(255,255,255)";
+        painter.lineWidth = 1;
+        painter.stroke();
+        if (this.Track.type == 1) {
+          painter.fillStyle = "rgba(255, 255, 255,0.3)";
+          painter.fill();
+          painter.beginPath();
+          painter.font = ""+this.lengthForKey + "px Arial";
+          painter.shadowColor = "rgba(0, 0, 0, 1)";
+          painter.shadowBlur = 2;
+          painter.fillStyle = "rgba(255, 255, 255,1)";
+          painter.textAlign = "center";
+          painter.textBaseline = "middle";
+          painter.fillText(this.myTrack.key.toUpperCase(), this.middle, keyY);
+          painter.shadowBlur =0
+        }
+
+        //画判定结果
       }
 
       this.paintNotes();
@@ -338,6 +375,7 @@ export default {
       }
       track.currentNote = index;
       track.lastNote = last - 1;
+      this.myTrack.judges = [];
       this.myTrack.tempPositionX = this.getPositionX();
       this.myTrack.tempWidth = this.getWidth();
       this.myTrack.tempR = this.getRGB()[0];

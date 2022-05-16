@@ -179,7 +179,7 @@ export default {
     this.global = {
       screenWidth: 0,
       screenHeight: 0,
-      remainingTime: 7000,
+      remainingTime: 700,
       finalY: 0.8,
       currentTime: 0,
       lostTime: 150,
@@ -256,9 +256,7 @@ export default {
       if (this.global.currentTime >= this.chart.songLength) {
         this.isRunning = false;
       }
-      setTimeout(() => {
-        this.run();
-      }, 1000 / this.$store.state.refreshRate);
+      requestAnimationFrame(this.run)
     },
 
     //打印控制台信息
