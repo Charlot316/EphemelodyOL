@@ -27,6 +27,7 @@ export default {
       judgeSize: 300,
       judgeAnimationTime: 250,
       colorOpacity: 0.02,
+      mirrorOpacity: 0.1,
     };
   },
   watch: {
@@ -224,6 +225,7 @@ export default {
     paintTrack() {
       var painter = this.Global.trackPainter;
       if (this.width > 4 && this.height > 0) {
+        var longerThanScreen = this.height > this.Global.screenHeight - this.Y;
         //填充长方形主体
         painter.beginPath();
         painter.rect(this.left + 2, this.top, this.width - 4, this.height);
@@ -242,6 +244,29 @@ export default {
           painter.fillStyle = "rgba(255,255,255,0.4)";
           painter.fill();
         }
+
+        painter.beginPath();
+        painter.rect(
+          this.left + 2,
+          this.Y,
+          this.width - 4,
+          longerThanScreen ? this.Global.screenHeight - this.Y : this.height
+        );
+        painter.fillStyle =
+          "rgba(" +
+          this.Track.tempR +
+          "," +
+          this.Track.tempG +
+          "," +
+          this.Track.tempB +
+          "," +
+          0.05 +
+          ")";
+        painter.fill();
+        if (this.isActive) {
+          painter.fillStyle = "rgba(255,255,255,0.2)";
+          painter.fill();
+        }
         //画左线
         painter.beginPath();
         painter.moveTo(this.left, this.top);
@@ -250,6 +275,15 @@ export default {
         painter.lineWidth = 2;
         painter.stroke();
 
+        painter.beginPath();
+        painter.moveTo(this.left, this.Y);
+        painter.lineTo(
+          this.left,
+          longerThanScreen ? this.Global.screenHeight : this.Y + this.height
+        );
+        painter.strokeStyle = "rgba(255,255,255,0.1)";
+        painter.lineWidth = 2;
+        painter.stroke();
         //画右线
         painter.beginPath();
         painter.moveTo(this.left + this.width, this.top);
@@ -258,11 +292,31 @@ export default {
         painter.lineWidth = 2;
         painter.stroke();
 
+        painter.beginPath();
+        painter.moveTo(this.left + this.width, this.Y);
+        painter.lineTo(
+          this.left + this.width,
+          longerThanScreen ? this.Global.screenHeight : this.Y + this.height
+        );
+        painter.strokeStyle = "rgba(255,255,255,0.1)";
+        painter.lineWidth = 2;
+        painter.stroke();
+
         //画中线
         painter.beginPath();
         painter.moveTo(this.middle, this.top);
         painter.lineTo(this.middle, this.Y);
         painter.strokeStyle = "rgba(0,0,0,0.3)";
+        painter.lineWidth = 1;
+        painter.stroke();
+
+        painter.beginPath();
+        painter.moveTo(this.middle, this.Y);
+        painter.lineTo(
+          this.middle,
+          longerThanScreen ? this.Global.screenHeight : this.Y + this.height
+        );
+        painter.strokeStyle = "rgba(0,0,0,0.05)";
         painter.lineWidth = 1;
         painter.stroke();
 
@@ -277,19 +331,19 @@ export default {
         painter.fillStyle = "rgb(22, 22, 14)";
         painter.fill();
 
-        //画key
-        var keyY = (this.Y * 9) / 8;
-        painter.beginPath();
-        painter.moveTo(this.middle, keyY - this.lengthForKey);
-        painter.lineTo(this.middle + this.lengthForKey, keyY);
-        painter.lineTo(this.middle, keyY + this.lengthForKey);
-        painter.lineTo(this.middle - this.lengthForKey, keyY);
-        painter.lineTo(this.middle, keyY - this.lengthForKey);
-        painter.closePath();
-        painter.strokeStyle = "rgb(255,255,255)";
-        painter.lineWidth = 1;
-        painter.stroke();
         if (this.Track.type == 1) {
+          //画key
+          var keyY = (this.Y * 9) / 8;
+          painter.beginPath();
+          painter.moveTo(this.middle, keyY - this.lengthForKey);
+          painter.lineTo(this.middle + this.lengthForKey, keyY);
+          painter.lineTo(this.middle, keyY + this.lengthForKey);
+          painter.lineTo(this.middle - this.lengthForKey, keyY);
+          painter.lineTo(this.middle, keyY - this.lengthForKey);
+          painter.closePath();
+          painter.strokeStyle = "rgb(255,255,255)";
+          painter.lineWidth = 1;
+          painter.stroke();
           if (this.isActive) {
             painter.fillStyle = "rgba(255,255,255,0.4)";
             painter.fill();
@@ -406,7 +460,35 @@ export default {
           (this.Global.finalY / this.Global.remainingTime) *
             (note.timing - this.Global.remainingTime)) *
         this.Global.screenHeight;
+      var canMirror =
+        y / this.Global.screenHeight > 0.6 &&
+        y / this.Global.screenHeight < 0.8;
       if (note.noteType == 0) {
+        if (canMirror) {
+          var tempY = 2 * this.Y - y;
+          painter.beginPath();
+          painter.moveTo(this.middle, tempY - this.blackLength);
+          painter.lineTo(this.middle + this.blackLength, tempY);
+          painter.lineTo(this.middle, tempY + this.blackLength);
+          painter.lineTo(this.middle - this.blackLength, tempY);
+          painter.lineTo(this.middle, tempY - this.blackLength);
+          painter.closePath();
+          painter.fillStyle = "rgba(22, 22, 14,0.1)";
+          painter.fill();
+          painter.beginPath();
+          painter.moveTo(this.middle, tempY - this.pinkLength);
+          painter.lineTo(this.middle + this.pinkLength, tempY);
+          painter.lineTo(this.middle, tempY + this.pinkLength);
+          painter.lineTo(this.middle - this.pinkLength, tempY);
+          painter.lineTo(this.middle, tempY - this.pinkLength);
+          painter.closePath();
+          painter.globalCompositeOperation = "destination-out";
+          painter.fillStyle = "rgba(203, 105, 121,1)";
+          painter.fill();
+          painter.globalCompositeOperation = "source-over";
+          painter.fillStyle = "rgba(203, 105, 121,0.1)";
+          painter.fill();
+        }
         painter.beginPath();
         painter.moveTo(this.middle, y - this.blackLength);
         painter.lineTo(this.middle + this.blackLength, y);
@@ -423,12 +505,11 @@ export default {
         painter.lineTo(this.middle - this.pinkLength, y);
         painter.lineTo(this.middle, y - this.pinkLength);
         painter.closePath();
+        painter.globalCompositeOperation = "destination-out";
+        painter.fill();
+        painter.globalCompositeOperation = "source-over";
         painter.fillStyle = "rgb(203, 105, 121)";
         painter.fill();
-      } else if (note.noteType == 2) {
-        painter.beginPath();
-
-        painter.closePath();
       } else if (note.noteType == 1) {
         painter.beginPath();
         painter.moveTo(this.middle, y - this.whiteLength);
@@ -442,6 +523,21 @@ export default {
         painter.strokeStyle = "rgb(0,0,0)";
         painter.lineWidth = 1;
         painter.stroke();
+        if (canMirror) {
+          tempY = 2 * this.Y - y;
+          painter.beginPath();
+          painter.moveTo(this.middle, tempY - this.whiteLength);
+          painter.lineTo(this.middle + this.whiteLength, tempY);
+          painter.lineTo(this.middle, tempY + this.whiteLength);
+          painter.lineTo(this.middle - this.whiteLength, tempY);
+          painter.lineTo(this.middle, tempY - this.whiteLength);
+          painter.closePath();
+          painter.fillStyle = "rgba(255,255,255,0.3)";
+          painter.fill();
+          painter.strokeStyle = "rgba(0,0,0,0.3)";
+          painter.lineWidth = 1;
+          painter.stroke();
+        }
       }
     },
     initiate() {

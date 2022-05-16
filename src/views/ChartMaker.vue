@@ -270,6 +270,9 @@ export default {
       if (!this.sliding) {
         this.global.currentTime = Math.floor(this.audio.currentTime * 1000);
       }
+      else{
+        this.resetTrack();
+      }
       if (this.global.currentTime >= this.chart.songLength) {
         this.isRunning = false;
       }
