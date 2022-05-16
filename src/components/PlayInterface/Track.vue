@@ -260,7 +260,7 @@ export default {
           "," +
           this.Track.tempB +
           "," +
-          0.05 +
+          0.1 +
           ")";
         painter.fill();
         if (this.isActive) {
