@@ -24,8 +24,8 @@ export default {
       blackLength: 35,
       pinkLength: 23,
       whiteLength: 15,
-      judgeSize: 200,
-      judgeAnimationTime: 200,
+      judgeSize: 300,
+      judgeAnimationTime: 250,
       colorOpacity: 0.02,
     };
   },
@@ -95,8 +95,8 @@ export default {
       "rgba(255,255,255," + this.colorOpacity + ")",
       "rgba(255,215,0," + this.colorOpacity + ")",
       "rgba(218,165,32," + this.colorOpacity + ")",
-      "rgba(255,255,255," + this.colorOpacity + ")",
       "rgba(173,255,47," + this.colorOpacity + ")",
+      "rgba(100,149,237," + this.colorOpacity + ")",
       "rgba(0,191,255," + this.colorOpacity + ")",
       "rgba(255,0,255," + this.colorOpacity + ")",
       "rgba(72,61,139," + this.colorOpacity + ")",
@@ -315,15 +315,21 @@ export default {
       for (var i = 0; i < this.myTrack.judges.length; i++) {
         var judge = this.myTrack.judges[i];
         var size = 0;
+        var width = 0;
         if (currentTime < judge.timing + this.judgeAnimationTime * 0.75) {
           size =
-            (this.judgeSize / (this.judgeAnimationTime * 0.75)) *
+            (0.9*this.judgeSize / (this.judgeAnimationTime * 0.75)) *
             (currentTime - judge.timing);
+          width = 40;
         } else if (currentTime < judge.timing + this.judgeAnimationTime) {
-          size = this.judgeSize;
-        }
-        else{
-          size=0;
+          var k=0.4*this.judgeSize / this.judgeAnimationTime
+          var b=this.judgeSize-k*(judge.timing +this.judgeAnimationTime)
+          size = k*currentTime+b
+          width= (40/ (this.judgeAnimationTime * 0.25)) *
+            (judge.timing + this.judgeAnimationTime - currentTime);
+        } else {
+          size = 0;
+          width = 0;
         }
         painter.beginPath();
         painter.moveTo(this.middle, this.Y - size);
@@ -332,8 +338,8 @@ export default {
         painter.lineTo(this.middle - size, this.Y);
         painter.lineTo(this.middle, this.Y - size);
         painter.closePath();
-        painter.strokeStyle ="rgba(255,255,255,0.005)"
-        for (temp = 2; temp < 25; temp++) {
+        painter.strokeStyle = "rgba(255,255,255," + this.colorOpacity + ")";
+        for (var temp = 2; temp < width; temp++) {
           painter.lineWidth = temp / 2;
           painter.stroke();
         }
@@ -344,17 +350,31 @@ export default {
             this.middle + size,
             this.Y + size
           );
-          for (var temp = 0; temp <= 10; temp++) {
+          for (temp = 0; temp <= 10; temp++) {
             console.log(this.colorList[temp]);
             gradient.addColorStop("" + temp / 10, this.colorList[temp]);
           }
           painter.strokeStyle = gradient;
         } else {
-          painter.strokeStyle = "rgba(100,149,237,"+this.colorOpacity+")";
+          painter.strokeStyle = "rgba(100,149,237," + this.colorOpacity + ")";
         }
-        for (temp = 2; temp < 25; temp++) {
+        for (temp = 2; temp < width; temp++) {
           painter.lineWidth = temp / 2;
           painter.stroke();
+        }
+        painter.beginPath();
+        var scale=1.5
+        painter.moveTo(this.middle, this.Y - scale*size);
+        painter.lineTo(this.middle + scale*size, this.Y);
+        painter.lineTo(this.middle, this.Y + scale*size);
+        painter.lineTo(this.middle - scale*size, this.Y);
+        painter.lineTo(this.middle, this.Y - scale*size);
+        painter.closePath();
+        painter.strokeStyle = "rgba(255,255,255," + 0.1*this.colorOpacity + ")";
+        for (temp = 2; temp < 3*width; temp++) {
+          painter.lineWidth = temp;
+          painter.stroke();
+          temp+=2;
         }
       }
     },
@@ -555,19 +575,6 @@ export default {
     },
     //主进程+1
     addCount(param) {
-      if (param.key == "pureCount") {
-        this.boxShadowColor = "rgba(234,161,86,0.6)";
-        this.boxShadowSize = 1;
-      } else if (param.key == "farCount") {
-        this.boxShadowColor = "rgba(100,149,237,0.6)";
-        this.boxShadowSize = 1;
-      } else if (param.key == "lostCount") {
-        this.boxShadowColor = "rgba(0,0,0,0.5)";
-        if (!this.Global.isEdit) {
-          this.boxShadowSize = 1;
-        }
-      }
-
       this.$emit("addCount", param);
     },
     //判定note+1
