@@ -394,6 +394,7 @@ export default {
             last = j;
           }
         }
+        track.judges=[]
         track.currentNote = index;
         track.lastNote = last - 1;
         if (track.currentNote != track.notes.length) {

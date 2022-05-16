@@ -239,7 +239,7 @@ export default {
           ")";
         painter.fill();
         if (this.isActive) {
-          painter.fillStyle = "rgba(255,255,255,0.3)";
+          painter.fillStyle = "rgba(255,255,255,0.4)";
           painter.fill();
         }
         //画左线
@@ -290,7 +290,11 @@ export default {
         painter.lineWidth = 1;
         painter.stroke();
         if (this.Track.type == 1) {
-          painter.fillStyle = "rgba(255, 255, 255,0.3)";
+          if (this.isActive) {
+            painter.fillStyle = "rgba(255,255,255,0.4)";
+            painter.fill();
+          }
+          painter.fillStyle = "rgba(255, 255, 255,0.2)";
           painter.fill();
           painter.beginPath();
           painter.font = "" + this.lengthForKey + "px Arial";
@@ -318,18 +322,22 @@ export default {
         var width = 0;
         if (currentTime < judge.timing + this.judgeAnimationTime * 0.75) {
           size =
-            (0.9*this.judgeSize / (this.judgeAnimationTime * 0.75)) *
+            ((0.9 * this.judgeSize) / (this.judgeAnimationTime * 0.75)) *
             (currentTime - judge.timing);
           width = 40;
         } else if (currentTime < judge.timing + this.judgeAnimationTime) {
-          var k=0.4*this.judgeSize / this.judgeAnimationTime
-          var b=this.judgeSize-k*(judge.timing +this.judgeAnimationTime)
-          size = k*currentTime+b
-          width= (40/ (this.judgeAnimationTime * 0.25)) *
+          var k = (0.4 * this.judgeSize) / this.judgeAnimationTime;
+          var b = this.judgeSize - k * (judge.timing + this.judgeAnimationTime);
+          size = k * currentTime + b;
+          width =
+            (40 / (this.judgeAnimationTime * 0.25)) *
             (judge.timing + this.judgeAnimationTime - currentTime);
         } else {
           size = 0;
           width = 0;
+        }
+        if (judge.type == "far") {
+          size *= 0.6;
         }
         painter.beginPath();
         painter.moveTo(this.middle, this.Y - size);
@@ -363,18 +371,19 @@ export default {
           painter.stroke();
         }
         painter.beginPath();
-        var scale=1.5
-        painter.moveTo(this.middle, this.Y - scale*size);
-        painter.lineTo(this.middle + scale*size, this.Y);
-        painter.lineTo(this.middle, this.Y + scale*size);
-        painter.lineTo(this.middle - scale*size, this.Y);
-        painter.lineTo(this.middle, this.Y - scale*size);
+        var scale = 1.5;
+        painter.moveTo(this.middle, this.Y - scale * size);
+        painter.lineTo(this.middle + scale * size, this.Y);
+        painter.lineTo(this.middle, this.Y + scale * size);
+        painter.lineTo(this.middle - scale * size, this.Y);
+        painter.lineTo(this.middle, this.Y - scale * size);
         painter.closePath();
-        painter.strokeStyle = "rgba(255,255,255," + 0.1*this.colorOpacity + ")";
-        for (temp = 2; temp < 3*width; temp++) {
+        painter.strokeStyle =
+          "rgba(255,255,255," + 0.1 * this.colorOpacity + ")";
+        for (temp = 2; temp < 3 * width; temp++) {
           painter.lineWidth = temp;
           painter.stroke();
-          temp+=2;
+          temp += 3;
         }
       }
     },
