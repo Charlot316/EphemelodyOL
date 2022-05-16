@@ -11,7 +11,6 @@ export default {
       myTrack: this.Track,
       myGlobal: this.Global,
       lengthForBlackPoint: 10,
-      refreshTime: 1000 / this.$store.state.refreshRate,
       widthPath: [],
       positionXPath: [],
       RGBPath: [],
@@ -19,14 +18,15 @@ export default {
       positionXIndex: 0,
       RGBIndex: 0,
       opacity: 0.3,
-      animationTime: 50,
+      animationTime: 100,
       height: 0,
       top: 0,
-      boxShadowColor: "rgba(0,0,0,0.2)",
-      boxShadowSize: 0,
       blackLength: 35,
       pinkLength: 23,
       whiteLength: 15,
+      judgeSize: 200,
+      judgeAnimationTime: 200,
+      colorOpacity: 0.02,
     };
   },
   watch: {
@@ -38,6 +38,12 @@ export default {
         this.myTrack.tempG = this.getRGB()[1];
         this.myTrack.tempB = this.getRGB()[2];
         this.setHeightAndTop();
+        while (
+          this.myTrack.judges.length > 0 &&
+          this.myTrack.judges[0].size > this.judgeSize
+        ) {
+          this.myTrack.judges = this.myTrack.judges.slice(1);
+        }
         this.paintTrack();
       }
       while (
@@ -49,12 +55,6 @@ export default {
         this.myTrack.lastNote++;
       }
       this.judge();
-      if (this.boxShadowSize >= 1) {
-        this.boxShadowSize += 1;
-      }
-      if (this.boxShadowSize > 40) {
-        this.boxShadowSize = 0;
-      }
     },
     "Global.screenHeight"() {
       this.setHeightAndTop();
@@ -90,6 +90,19 @@ export default {
   },
   created() {
     this.initiate();
+    this.colorList = [
+      "rgba(0,0,0," + this.colorOpacity + ")",
+      "rgba(255,255,255," + this.colorOpacity + ")",
+      "rgba(255,215,0," + this.colorOpacity + ")",
+      "rgba(218,165,32," + this.colorOpacity + ")",
+      "rgba(255,255,255," + this.colorOpacity + ")",
+      "rgba(173,255,47," + this.colorOpacity + ")",
+      "rgba(0,191,255," + this.colorOpacity + ")",
+      "rgba(255,0,255," + this.colorOpacity + ")",
+      "rgba(72,61,139," + this.colorOpacity + ")",
+      "rgba(0,0,0," + this.colorOpacity + ")",
+      "rgba(0,0,0," + this.colorOpacity + ")",
+    ];
   },
   computed: {
     isActive() {
@@ -236,6 +249,7 @@ export default {
         painter.strokeStyle = "rgba(255,255,255,0.8)";
         painter.lineWidth = 2;
         painter.stroke();
+
         //画右线
         painter.beginPath();
         painter.moveTo(this.left + this.width, this.top);
@@ -243,6 +257,7 @@ export default {
         painter.strokeStyle = "rgba(255,255,255,0.8)";
         painter.lineWidth = 2;
         painter.stroke();
+
         //画中线
         painter.beginPath();
         painter.moveTo(this.middle, this.top);
@@ -278,20 +293,70 @@ export default {
           painter.fillStyle = "rgba(255, 255, 255,0.3)";
           painter.fill();
           painter.beginPath();
-          painter.font = ""+this.lengthForKey + "px Arial";
+          painter.font = "" + this.lengthForKey + "px Arial";
           painter.shadowColor = "rgba(0, 0, 0, 1)";
           painter.shadowBlur = 2;
           painter.fillStyle = "rgba(255, 255, 255,1)";
           painter.textAlign = "center";
           painter.textBaseline = "middle";
           painter.fillText(this.myTrack.key.toUpperCase(), this.middle, keyY);
-          painter.shadowBlur =0
+          painter.shadowBlur = 0;
         }
 
         //画判定结果
+        this.paintJudges();
       }
 
       this.paintNotes();
+    },
+    paintJudges() {
+      var painter = this.Global.judgePainter;
+      var currentTime = this.Global.currentTime;
+      for (var i = 0; i < this.myTrack.judges.length; i++) {
+        var judge = this.myTrack.judges[i];
+        var size = 0;
+        if (currentTime < judge.timing + this.judgeAnimationTime * 0.75) {
+          size =
+            (this.judgeSize / (this.judgeAnimationTime * 0.75)) *
+            (currentTime - judge.timing);
+        } else if (currentTime < judge.timing + this.judgeAnimationTime) {
+          size = this.judgeSize;
+        }
+        else{
+          size=0;
+        }
+        painter.beginPath();
+        painter.moveTo(this.middle, this.Y - size);
+        painter.lineTo(this.middle + size, this.Y);
+        painter.lineTo(this.middle, this.Y + size);
+        painter.lineTo(this.middle - size, this.Y);
+        painter.lineTo(this.middle, this.Y - size);
+        painter.closePath();
+        painter.strokeStyle ="rgba(255,255,255,0.005)"
+        for (temp = 2; temp < 25; temp++) {
+          painter.lineWidth = temp / 2;
+          painter.stroke();
+        }
+        if (judge.type == "pure") {
+          var gradient = painter.createLinearGradient(
+            this.middle - size,
+            this.Y - size,
+            this.middle + size,
+            this.Y + size
+          );
+          for (var temp = 0; temp <= 10; temp++) {
+            console.log(this.colorList[temp]);
+            gradient.addColorStop("" + temp / 10, this.colorList[temp]);
+          }
+          painter.strokeStyle = gradient;
+        } else {
+          painter.strokeStyle = "rgba(100,149,237,"+this.colorOpacity+")";
+        }
+        for (temp = 2; temp < 25; temp++) {
+          painter.lineWidth = temp / 2;
+          painter.stroke();
+        }
+      }
     },
     paintNotes() {
       if (!this.myTrack.judgeFinished) {
@@ -416,6 +481,7 @@ export default {
                 judgeTime: currentTime,
                 timing: timing,
               });
+              this.myTrack.judges.push({ type: "pure", timing: currentTime });
               this.$forceUpdate();
               this.addNoteCount();
             }
@@ -441,6 +507,10 @@ export default {
                   judgeTime: currentJudge,
                   timing: timing,
                 });
+                this.myTrack.judges.push({
+                  type: "pure",
+                  timing: currentJudge,
+                });
                 this.$forceUpdate();
                 this.myGlobal.keyUsed[currentKey] = true;
                 this.addNoteCount();
@@ -457,6 +527,7 @@ export default {
                   judgeTime: currentJudge,
                   timing: timing,
                 });
+                this.myTrack.judges.push({ type: "far", timing: currentJudge });
                 this.$forceUpdate();
                 this.myGlobal.keyUsed[currentKey] = true;
                 this.addNoteCount();

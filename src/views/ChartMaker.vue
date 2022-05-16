@@ -79,6 +79,7 @@
         </div>
         <canvas id="track-canvas" style="position:absolute;top:0;left:0;" />
         <canvas id="note-canvas" style="position:absolute;top:0;left:0;" />
+        <canvas id="judge-canvas" style="position:absolute;top:0;left:0;" />
         <!-- 轨道 -->
         <div
           class="play-interface-track-container"
@@ -123,6 +124,14 @@ export default {
           0,
           this.global.trackCanvas.width,
           this.global.trackCanvas.height
+        );
+      }
+      if (this.global.judgePainter) {
+        this.global.judgePainter.clearRect(
+          0,
+          0,
+          this.global.judgeCanvas.width,
+          this.global.judgeCanvas.height
         );
       }
     },
@@ -197,8 +206,10 @@ export default {
       score: 0,
       notePainter: null,
       trackPainter: null,
+      judgePainter: null,
       noteCanvas: null,
       trackCanvas: null,
+      judgeCanvas: null,
     };
   },
   mounted() {
@@ -206,22 +217,28 @@ export default {
     this.playInterface = document.getElementById("play-interface-container");
     this.global.noteCanvas = document.getElementById("note-canvas");
     this.global.trackCanvas = document.getElementById("track-canvas");
+    this.global.judgeCanvas = document.getElementById("judge-canvas");
     this.global.notePainter = this.global.noteCanvas.getContext("2d");
     this.global.trackPainter = this.global.trackCanvas.getContext("2d");
+    this.global.judgePainter = this.global.judgeCanvas.getContext("2d");
     this.global.screenWidth = this.playInterface.offsetWidth;
     this.global.screenHeight = this.playInterface.offsetHeight;
     that.global.noteCanvas.height = that.playInterface.offsetHeight;
     that.global.trackCanvas.height = that.playInterface.offsetHeight;
+    that.global.judgeCanvas.height = that.playInterface.offsetHeight;
     that.global.noteCanvas.width = that.playInterface.offsetWidth;
     that.global.trackCanvas.width = that.playInterface.offsetWidth;
+    that.global.judgeCanvas.width = that.playInterface.offsetWidth;
     window.onresize = () => {
       return (() => {
         that.global.screenWidth = that.playInterface.offsetWidth;
         that.global.screenHeight = that.playInterface.offsetHeight;
         that.global.noteCanvas.height = that.playInterface.offsetHeight;
         that.global.trackCanvas.height = that.playInterface.offsetHeight;
+        that.global.judgeCanvas.height = that.playInterface.offsetHeight;
         that.global.noteCanvas.width = that.playInterface.offsetWidth;
         that.global.trackCanvas.width = that.playInterface.offsetWidth;
+        that.global.judgeCanvas.width = that.playInterface.offsetWidth;
       })();
     };
     document.onkeydown = function(e) {
@@ -256,7 +273,7 @@ export default {
       if (this.global.currentTime >= this.chart.songLength) {
         this.isRunning = false;
       }
-      requestAnimationFrame(this.run)
+      requestAnimationFrame(this.run);
     },
 
     //打印控制台信息
@@ -320,7 +337,6 @@ export default {
       this.global.currentTime = this.global.currentTime + 1;
       this.global.currentTime = this.global.currentTime - 1;
       this.audio.currentTime = this.global.currentTime / 1000;
-      
     },
 
     SlideMouseDown() {
@@ -379,7 +395,7 @@ export default {
           }
         }
         track.currentNote = index;
-        track.lastNote = last-1;
+        track.lastNote = last - 1;
         if (track.currentNote != track.notes.length) {
           track.judgeFinished = false;
         } else {
