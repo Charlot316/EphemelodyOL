@@ -22,11 +22,10 @@ export default {
       animationTime: 50,
       height: 0,
       top: 0,
-      judgeFinished: false,
       boxShadowColor: "rgba(0,0,0,0.2)",
       boxShadowSize: 0,
       blackLength: 35,
-      pinkLength: 25,
+      pinkLength: 23,
       whiteLength: 15,
     };
   },
@@ -58,7 +57,6 @@ export default {
       }
     },
     "Global.screenHeight"() {
-
       this.setHeightAndTop();
       this.paintTrack();
     },
@@ -259,11 +257,11 @@ export default {
       this.paintNotes();
     },
     paintNotes() {
-      if (!this.judgeFinished) {
+      if (!this.myTrack.judgeFinished) {
         for (
-          var i = this.myTrack.currentNote;
-          i <= this.myTrack.lastNote;
-          i++
+          var i = this.myTrack.lastNote;
+          i >= this.myTrack.currentNote;
+          i--
         ) {
           this.paintNote(this.myTrack.notes[i]);
         }
@@ -323,17 +321,32 @@ export default {
       this.myTrack.notes.sort(function(a, b) {
         return a.timing - b.timing;
       });
-      this.myTrack.currentNote = 0;
-      this.myTrack.lastNote = -1;
-      this.judgeFinished = false;
+      var track = this.myTrack;
+      var index = 0;
+      var last = track.notes.length;
+      for (var j = track.notes.length - 1; j >= 0; j--) {
+        track.notes[j].judged = false;
+        if (track.notes[j].timing > this.Global.currentTime) {
+          index = j;
+        }
+        if (
+          this.Global.currentTime <
+          track.notes[j].timing - this.Global.remainingTime
+        ) {
+          last = j;
+        }
+      }
+      track.currentNote = index;
+      track.lastNote = last - 1;
       this.myTrack.tempPositionX = this.getPositionX();
       this.myTrack.tempWidth = this.getWidth();
       this.myTrack.tempR = this.getRGB()[0];
       this.myTrack.tempG = this.getRGB()[1];
       this.myTrack.tempB = this.getRGB()[2];
+      this.paintTrack();
     },
     judge() {
-      if (this.Track.notes.length > 0 && !this.judgeFinished) {
+      if (this.Track.notes.length > 0 && !this.myTrack.judgeFinished) {
         let currentKey = "";
         if (this.Track.type == 1) {
           currentKey = this.Track.key.toUpperCase();
@@ -453,7 +466,7 @@ export default {
       if (this.myTrack.currentNote < this.Track.notes.length - 1) {
         this.myTrack.currentNote++;
       } else {
-        this.judgeFinished = true;
+        this.myTrack.judgeFinished = true;
       }
     },
 
@@ -808,9 +821,6 @@ export default {
         this.top = 0;
       }
       this.height = this.finalHeight - this.top;
-    },
-    log() {
-      console.log(this.myTrack.tempWidth);
     },
   },
 };

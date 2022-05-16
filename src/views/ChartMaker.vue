@@ -179,7 +179,7 @@ export default {
     this.global = {
       screenWidth: 0,
       screenHeight: 0,
-      remainingTime: 700,
+      remainingTime: 7000,
       finalY: 0.8,
       currentTime: 0,
       lostTime: 150,
@@ -318,8 +318,11 @@ export default {
 
     //变换slide的时间
     changeTime() {
-      this.audio.currentTime = this.global.currentTime / 1000;
       this.resetTrack();
+      this.global.currentTime = this.global.currentTime + 1;
+      this.global.currentTime = this.global.currentTime - 1;
+      this.audio.currentTime = this.global.currentTime / 1000;
+      
     },
 
     SlideMouseDown() {
@@ -364,14 +367,26 @@ export default {
       for (var i = 0; i < this.chart.tracks.length; i++) {
         var track = this.chart.tracks[i];
         var index = 0;
+        var last = track.notes.length;
         for (var j = track.notes.length - 1; j >= 0; j--) {
           track.notes[j].judged = false;
           if (track.notes[j].timing > this.global.currentTime) {
             index = j;
           }
+          if (
+            this.global.currentTime <
+            track.notes[j].timing - this.global.remainingTime
+          ) {
+            last = j;
+          }
         }
         track.currentNote = index;
-        track.lastNote=-1;
+        track.lastNote = last-1;
+        if (track.currentNote != track.notes.length) {
+          track.judgeFinished = false;
+        } else {
+          track.judgeFinished = true;
+        }
       }
     },
   },
