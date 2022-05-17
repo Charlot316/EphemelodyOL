@@ -1,7 +1,27 @@
 <template>
   <div class="play-interface">
     <div class="header">
-      <div class="header-button"></div>
+      <div class="header-button">
+        <div>
+          <el-button icon="el-icon-refresh-left" size="small" @click="reStart"
+            >重播</el-button
+          >
+          <el-button
+            v-if="isRunning"
+            size="small"
+            icon="el-icon-video-pause"
+            @click="pause"
+            >暂停</el-button
+          >
+          <el-button v-else icon="el-icon-video-play" size="small" @click="play"
+            >播放</el-button
+          >
+        </div>
+        <div>
+          <el-button size="small">保存</el-button>
+          <el-button size="small">保存并返回</el-button>
+        </div>
+      </div>
       <div class="header-slide">
         <div class="header-slide-item">
           <el-slider
@@ -12,25 +32,6 @@
             @mousedown="SlideMouseDown"
             @mouseup="SlideMouseUp"
           ></el-slider>
-        </div>
-        <div class="header-slide-button">
-          <el-button
-            icon="el-icon-refresh-left"
-            circle
-            @click="reStart"
-          ></el-button>
-          <el-button
-            v-if="isRunning"
-            icon="el-icon-video-pause"
-            circle
-            @click="pause"
-          ></el-button>
-          <el-button
-            v-else
-            icon="el-icon-video-play"
-            circle
-            @click="play"
-          ></el-button>
         </div>
       </div>
     </div>
@@ -246,11 +247,10 @@ export default {
         that.global.keyPressTime[e.key.toUpperCase()] = that.global.currentTime;
         that.global.keyIsHold[e.key.toUpperCase()] = true;
         that.global.keyUsed[e.key.toUpperCase()] = false;
-        if(e.key==" "){
-          if(that.isRunning){
+        if (e.key == " ") {
+          if (that.isRunning) {
             that.pause();
-          }
-          else{
+          } else {
             that.play();
           }
         }
@@ -275,11 +275,11 @@ export default {
     },
     //运行
     run() {
-      // console.log(1000/( Math.floor(this.audio.currentTime * 1000)- this.global.currentTime))
+      // var refresh=1000/( Math.floor(this.audio.currentTime * 1000)- this.global.currentTime)
+      // if(refresh<50) console.log(refresh)
       if (!this.sliding) {
         this.global.currentTime = Math.floor(this.audio.currentTime * 1000);
-      }
-      else{
+      } else {
         this.resetTrack();
       }
       if (this.global.currentTime >= this.chart.songLength) {
@@ -389,6 +389,9 @@ export default {
     },
 
     resetTrack() {
+      this.global.keyPressTime = [];
+      this.global.keyIsHold = [];
+      this.global.keyUsed = [];
       for (var i = 0; i < this.chart.tracks.length; i++) {
         var track = this.chart.tracks[i];
         var index = 0;
@@ -405,7 +408,7 @@ export default {
             last = j;
           }
         }
-        track.judges=[]
+        track.judges = [];
         track.currentNote = index;
         track.lastNote = last - 1;
         if (track.currentNote != track.notes.length) {
@@ -444,6 +447,12 @@ export default {
   padding: 5px 0;
   background: white;
 }
+.header-button {
+  padding: 5px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 .header-slide {
   width: 100%;
 }
@@ -455,14 +464,8 @@ export default {
   width: 100%;
 }
 .header-slide-item {
-  width: 76%;
+  width: 96%;
   padding: 0px 2%;
   float: left;
-}
-.header-slide-button {
-  width: 18%;
-  padding: 0px 1%;
-  float: left;
-  text-align: center;
 }
 </style>

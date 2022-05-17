@@ -21,6 +21,7 @@ export default {
         "rgba(0,0,0," + colorOpacity + ")",
         "rgba(0,0,0," + colorOpacity + ")",
       ],
+      flakes:[],
     };
   },
   props: ["Y", "middle", "Global", "judge"],
@@ -28,6 +29,11 @@ export default {
     "Global.currentTime"() {
       this.judgePainter(this.judge);
     },
+  },
+  created(){
+
+      for(var i=0;i<4;i++)
+       this.flakes.push({})
   },
   methods: {
     judgePainter(judge) {
