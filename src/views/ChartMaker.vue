@@ -246,6 +246,14 @@ export default {
         that.global.keyPressTime[e.key.toUpperCase()] = that.global.currentTime;
         that.global.keyIsHold[e.key.toUpperCase()] = true;
         that.global.keyUsed[e.key.toUpperCase()] = false;
+        if(e.key==" "){
+          if(that.isRunning){
+            that.pause();
+          }
+          else{
+            that.play();
+          }
+        }
       }
     };
     document.onkeyup = function(e) {
@@ -267,6 +275,7 @@ export default {
     },
     //运行
     run() {
+      // console.log(1000/( Math.floor(this.audio.currentTime * 1000)- this.global.currentTime))
       if (!this.sliding) {
         this.global.currentTime = Math.floor(this.audio.currentTime * 1000);
       }
@@ -366,7 +375,6 @@ export default {
 
     play() {
       this.audio.play();
-      this.resetTrack();
       this.sliding = false;
       this.isRunning = true;
     },

@@ -636,7 +636,7 @@ export default {
           ", 音符时机:" +
           param.timing
       );
-      if (param.key == "lostCount") {
+      if (param.type == "lost") {
         this.global.combo = 0;
       } else {
         this.global.maxCombo = Math.max(

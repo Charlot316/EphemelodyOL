@@ -1,11 +1,18 @@
 <template>
-  <div></div>
+  <div>
+    <div v-for="judge in myTrack.judges" :key="judge">
+      <judge-painter :middle="middle" :Y="Y" :Global="Global"  :judge="judge"/>
+    </div>
+  </div>
 </template>
 
 <script>
+import JudgePainter from './JudgePainter'
 export default {
   props: ["Track", "Global"],
-  components: {},
+  components: {
+    JudgePainter
+  },
   data() {
     return {
       myTrack: this.Track,
@@ -24,9 +31,6 @@ export default {
       blackLength: 35,
       pinkLength: 23,
       whiteLength: 15,
-      judgeSize: 300,
-      judgeAnimationTime: 300,
-      colorOpacity: 0.02,
       mirrorOpacity: 0.1,
     };
   },
@@ -41,7 +45,7 @@ export default {
         this.setHeightAndTop();
         while (
           this.myTrack.judges.length > 0 &&
-          this.myTrack.judges[0].size > this.judgeSize
+          this.myTrack.judges[0].timing+this.judgeAnimationTime < this.Global.currentTime
         ) {
           this.myTrack.judges = this.myTrack.judges.slice(1);
         }
@@ -91,19 +95,6 @@ export default {
   },
   created() {
     this.initiate();
-    this.colorList = [
-      "rgba(0,0,0," + this.colorOpacity + ")",
-      "rgba(255,255,255," + this.colorOpacity + ")",
-      "rgba(255,215,0," + this.colorOpacity + ")",
-      "rgba(218,165,32," + this.colorOpacity + ")",
-      "rgba(173,255,47," + this.colorOpacity + ")",
-      "rgba(100,149,237," + this.colorOpacity + ")",
-      "rgba(0,191,255," + this.colorOpacity + ")",
-      "rgba(255,0,255," + this.colorOpacity + ")",
-      "rgba(72,61,139," + this.colorOpacity + ")",
-      "rgba(0,0,0," + this.colorOpacity + ")",
-      "rgba(0,0,0," + this.colorOpacity + ")",
-    ];
   },
   computed: {
     isActive() {
@@ -144,79 +135,6 @@ export default {
     middle() {
       return this.Track.tempPositionX * this.Global.screenWidth;
     },
-    // TrackColor() {
-    //   return (
-    //     "rgba(" +
-    //     this.Track.tempR +
-    //     "," +
-    //     this.Track.tempG +
-    //     "," +
-    //     this.Track.tempB +
-    //     "," +
-    //     this.opacity +
-    //     ")"
-    //   );
-    // },
-    // TrackColorWithoutA() {
-    //   return (
-    //     "rgba(" +
-    //     this.Track.tempR +
-    //     "," +
-    //     this.Track.tempG +
-    //     "," +
-    //     this.Track.tempB
-    //   );
-    // },
-    // activeStyle() {
-    //   return [
-    //     "-webkit-linear-gradient(-90deg, " +
-    //       this.TrackColorWithoutA +
-    //       ",0.1)" +
-    //       " 0, " +
-    //       this.TrackColor +
-    //       " 25%,  rgba(255,255,255,1) 100%)",
-    //     " -moz-linear-gradient(180deg, " +
-    //       this.TrackColorWithoutA +
-    //       ",0.1)" +
-    //       " 0, " +
-    //       this.TrackColor +
-    //       " 25%,  rgba(255,255,255,1) 100%)",
-    //     "linear-gradient(180deg, " +
-    //       this.TrackColorWithoutA +
-    //       ",0.1)" +
-    //       " 0, " +
-    //       this.TrackColor +
-    //       " 25%,  rgba(255,255,255,1) 100%)",
-    //   ];
-    // },
-    // inactiveStyle() {
-    //   return [
-    //     "-webkit-linear-gradient(-90deg, " +
-    //       this.TrackColorWithoutA +
-    //       ",0.1)" +
-    //       " 0, " +
-    //       this.TrackColor +
-    //       " 90%, rgba(255,255,255,1) 100%)",
-    //     " -moz-linear-gradient(180deg, " +
-    //       this.TrackColorWithoutA +
-    //       ",0.1)" +
-    //       " 0, " +
-    //       this.TrackColor +
-    //       " 90%, rgba(255,255,255,1) 100%)",
-    //     "linear-gradient(180deg, " +
-    //       this.TrackColorWithoutA +
-    //       ",0.1)" +
-    //       " 0, " +
-    //       this.TrackColor +
-    //       " 90%, rgba(255,255,255,1) 100%)",
-    //   ];
-    // },
-    // offsetDiagonal() {
-    //   return (
-    //     Math.sqrt(this.lengthForBlackPoint * this.lengthForBlackPoint * 2) -
-    //     this.lengthForBlackPoint
-    //   );
-    // },
     Y() {
       return this.Global.finalY * this.Global.screenHeight;
     },
@@ -224,7 +142,6 @@ export default {
   methods: {
     async paintTrack() {
       //画判定结果
-      await this.paintJudges();
       await this.paintNotes();
       var painter = this.Global.trackPainter;
       if (this.width > 4 && this.height > 0) {
@@ -363,84 +280,10 @@ export default {
           painter.fillText(this.myTrack.key.toUpperCase(), this.middle, keyY);
           painter.shadowBlur = 0;
         }
+      }
+    },
 
-        
-      }
-      
-    },
-    paintJudges() {
-      var painter = this.Global.judgePainter;
-      var currentTime = this.Global.currentTime;
-      for (var i = 0; i < this.myTrack.judges.length; i++) {
-        var judge = this.myTrack.judges[i];
-        var size = 0;
-        var width = 0;
-        if (currentTime < judge.timing + this.judgeAnimationTime * 0.75) {
-          size =
-            ((0.9 * this.judgeSize) / (this.judgeAnimationTime * 0.75)) *
-            (currentTime - judge.timing);
-          width = 40;
-        } else if (currentTime < judge.timing + this.judgeAnimationTime) {
-          var k = (0.4 * this.judgeSize) / this.judgeAnimationTime;
-          var b = this.judgeSize - k * (judge.timing + this.judgeAnimationTime);
-          size = k * currentTime + b;
-          width =
-            (40 / (this.judgeAnimationTime * 0.25)) *
-            (judge.timing + this.judgeAnimationTime - currentTime);
-        } else {
-          size = 0;
-          width = 0;
-        }
-        if (judge.type == "far") {
-          size *= 0.6;
-        }
-        painter.beginPath();
-        painter.moveTo(this.middle, this.Y - size);
-        painter.lineTo(this.middle + size, this.Y);
-        painter.lineTo(this.middle, this.Y + size);
-        painter.lineTo(this.middle - size, this.Y);
-        painter.lineTo(this.middle, this.Y - size);
-        painter.closePath();
-        painter.strokeStyle = "rgba(255,255,255," + this.colorOpacity + ")";
-        for (var temp = 2; temp < width; temp++) {
-          painter.lineWidth = temp / 2;
-          painter.stroke();
-        }
-        if (judge.type == "pure") {
-          var gradient = painter.createLinearGradient(
-            this.middle - size,
-            this.Y - size,
-            this.middle + size,
-            this.Y + size
-          );
-          for (temp = 0; temp <= 10; temp++) {
-            gradient.addColorStop("" + temp / 10, this.colorList[temp]);
-          }
-          painter.strokeStyle = gradient;
-        } else {
-          painter.strokeStyle = "rgba(100,149,237," + this.colorOpacity + ")";
-        }
-        for (temp = 2; temp < width; temp++) {
-          painter.lineWidth = temp / 2;
-          painter.stroke();
-        }
-        painter.beginPath();
-        var scale = 1.5;
-        painter.moveTo(this.middle, this.Y - scale * size);
-        painter.lineTo(this.middle + scale * size, this.Y);
-        painter.lineTo(this.middle, this.Y + scale * size);
-        painter.lineTo(this.middle - scale * size, this.Y);
-        painter.lineTo(this.middle, this.Y - scale * size);
-        painter.closePath();
-        painter.strokeStyle =
-          "rgba(255,255,255," + 0.1 * this.colorOpacity + ")";
-        for (temp = 2; temp < 3 * width; temp++) {
-          painter.lineWidth = temp;
-          painter.stroke();
-          temp += 3;
-        }
-      }
-    },
+    
     paintNotes() {
       if (!this.myTrack.judgeFinished) {
         for (
@@ -511,19 +354,7 @@ export default {
         painter.fillStyle = "rgb(203, 105, 121)";
         painter.fill();
       } else if (note.noteType == 1) {
-        painter.beginPath();
-        painter.moveTo(this.middle, y - this.whiteLength);
-        painter.lineTo(this.middle + this.whiteLength, y);
-        painter.lineTo(this.middle, y + this.whiteLength);
-        painter.lineTo(this.middle - this.whiteLength, y);
-        painter.lineTo(this.middle, y - this.whiteLength);
-        painter.closePath();
-        painter.fillStyle = "rgb(255,255,255)";
-        painter.fill();
-        painter.strokeStyle = "rgb(0,0,0)";
-        painter.lineWidth = 1;
-        painter.stroke();
-        if (canMirror) {
+         if (canMirror) {
           tempY = 2 * this.Y - y;
           painter.beginPath();
           painter.moveTo(this.middle, tempY - this.whiteLength);
@@ -538,6 +369,19 @@ export default {
           painter.lineWidth = 1;
           painter.stroke();
         }
+        painter.beginPath();
+        painter.moveTo(this.middle, y - this.whiteLength);
+        painter.lineTo(this.middle + this.whiteLength, y);
+        painter.lineTo(this.middle, y + this.whiteLength);
+        painter.lineTo(this.middle - this.whiteLength, y);
+        painter.lineTo(this.middle, y - this.whiteLength);
+        painter.closePath();
+        painter.fillStyle = "rgb(255,255,255)";
+        painter.fill();
+        painter.strokeStyle = "rgb(0,0,0)";
+        painter.lineWidth = 1;
+        painter.stroke();
+       
       }
     },
     initiate() {
@@ -593,6 +437,7 @@ export default {
           if (currentTime > timing - lostTime) {
             if (currentTime > timing + lostTime) {
               this.addCount({
+                type: "lost",
                 key: "lostCount",
                 message: "因超时没有按到而判定为Lost",
                 judgeTime: currentTime,
@@ -601,12 +446,12 @@ export default {
               this.addNoteCount();
             } else if (this.Global.keyIsHold[currentKey]) {
               this.addCount({
+                type: "pure",
                 key: "pureCount",
                 message: "pure",
                 judgeTime: currentTime,
                 timing: timing,
               });
-              this.myTrack.judges.push({ type: "pure", timing: currentTime });
               this.$forceUpdate();
               this.addNoteCount();
             }
@@ -615,6 +460,7 @@ export default {
           if (currentTime > timing - lostTime) {
             if (currentTime > timing + lostTime) {
               this.addCount({
+                type: "lost",
                 key: "lostCount",
                 message: "因超时没有按到而判定为Lost",
                 judgeTime: currentTime,
@@ -627,14 +473,11 @@ export default {
                 currentJudge < timing + pureTime
               ) {
                 this.addCount({
+                  type: "pure",
                   key: "pureCount",
                   message: "pure",
                   judgeTime: currentJudge,
                   timing: timing,
-                });
-                this.myTrack.judges.push({
-                  type: "pure",
-                  timing: currentJudge,
                 });
                 this.$forceUpdate();
                 this.myGlobal.keyUsed[currentKey] = true;
@@ -644,6 +487,7 @@ export default {
                 currentJudge < timing + farTime
               ) {
                 this.addCount({
+                  type: "far",
                   key: "farCount",
                   message:
                     currentJudge < timing
@@ -652,7 +496,6 @@ export default {
                   judgeTime: currentJudge,
                   timing: timing,
                 });
-                this.myTrack.judges.push({ type: "far", timing: currentJudge });
                 this.$forceUpdate();
                 this.myGlobal.keyUsed[currentKey] = true;
                 this.addNoteCount();
@@ -661,6 +504,7 @@ export default {
                 currentJudge < timing + lostTime
               ) {
                 this.addCount({
+                  type: "lost",
                   key: "lostCount",
                   message:
                     currentJudge < timing
@@ -680,6 +524,9 @@ export default {
     },
     //主进程+1
     addCount(param) {
+      if (param.type != "lost") {
+       this.myTrack.judges.push(param)
+      }
       this.$emit("addCount", param);
     },
     //判定note+1
