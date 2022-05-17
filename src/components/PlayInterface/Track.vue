@@ -25,7 +25,7 @@ export default {
       pinkLength: 23,
       whiteLength: 15,
       judgeSize: 300,
-      judgeAnimationTime: 250,
+      judgeAnimationTime: 300,
       colorOpacity: 0.02,
       mirrorOpacity: 0.1,
     };
@@ -222,7 +222,10 @@ export default {
     },
   },
   methods: {
-    paintTrack() {
+    async paintTrack() {
+      //画判定结果
+      await this.paintJudges();
+      await this.paintNotes();
       var painter = this.Global.trackPainter;
       if (this.width > 4 && this.height > 0) {
         var longerThanScreen = this.height > this.Global.screenHeight - this.Y;
@@ -361,11 +364,9 @@ export default {
           painter.shadowBlur = 0;
         }
 
-        //画判定结果
-        this.paintJudges();
+        
       }
-
-      this.paintNotes();
+      
     },
     paintJudges() {
       var painter = this.Global.judgePainter;
@@ -413,7 +414,6 @@ export default {
             this.Y + size
           );
           for (temp = 0; temp <= 10; temp++) {
-            console.log(this.colorList[temp]);
             gradient.addColorStop("" + temp / 10, this.colorList[temp]);
           }
           painter.strokeStyle = gradient;
