@@ -1,25 +1,67 @@
 <template>
   <div class="play-interface">
     <div class="header">
-      <div class="header-button">
+      <div class="header-buttons">
         <div>
-          <el-button icon="el-icon-refresh-left" size="small" @click="reStart"
+          <el-button
+            v-if="menuOpened"
+            icon="el-icon-s-unfold"
+            size="small"
+            class="header-button"
+            @click="changeMenuDisplay"
+            type="text"
+            >打开菜单</el-button
+          >
+          <el-button
+            v-else
+            icon="el-icon-s-fold"
+            size="small"
+            class="header-button"
+            @click="changeMenuDisplay"
+            type="text"
+            >关上菜单</el-button
+          >
+          <el-button
+            icon="el-icon-refresh-left"
+            size="small"
+            @click="reStart"
+            class="header-button"
+            type="text"
             >重播</el-button
           >
           <el-button
             v-if="isRunning"
             size="small"
             icon="el-icon-video-pause"
+            class="header-button"
             @click="pause"
+            type="text"
             >暂停</el-button
           >
-          <el-button v-else icon="el-icon-video-play" size="small" @click="play"
+          <el-button
+            v-else
+            icon="el-icon-video-play"
+            size="small"
+            class="header-button"
+            @click="play"
+            type="text"
             >播放</el-button
+          >
+          <el-button
+            icon="el-icon-s-operation"
+            size="small"
+            type="text"
+            class="header-button"
+            >全局设置</el-button
           >
         </div>
         <div>
-          <el-button size="small">保存</el-button>
-          <el-button size="small">保存并返回</el-button>
+          <el-button size="small" type="text" class="header-button"
+            >保存</el-button
+          >
+          <el-button size="small" type="text" class="header-button"
+            >保存并返回</el-button
+          >
         </div>
       </div>
       <div class="header-slide">
@@ -35,8 +77,12 @@
         </div>
       </div>
     </div>
+    <div :class="menuOpened ? 'sider-opened' : 'sider-closed'"></div>
     <div class="select">
-      <div id="play-interface-container">
+      <div
+        :class="menuOpened ? 'container-small' : 'container-big'"
+        id="play-interface-container"
+      >
         <!-- 音频 -->
         <audio
           id="audioSong"
@@ -149,6 +195,9 @@ export default {
       playInterface: null,
       isRunning: false,
       sliding: false,
+      menuOpened: true,
+      volume: 1,
+      minStep: 100,
     };
   },
   computed: {
@@ -222,24 +271,10 @@ export default {
     this.global.notePainter = this.global.noteCanvas.getContext("2d");
     this.global.trackPainter = this.global.trackCanvas.getContext("2d");
     this.global.judgePainter = this.global.judgeCanvas.getContext("2d");
-    this.global.screenWidth = this.playInterface.offsetWidth;
-    this.global.screenHeight = this.playInterface.offsetHeight;
-    that.global.noteCanvas.height = that.playInterface.offsetHeight;
-    that.global.trackCanvas.height = that.playInterface.offsetHeight;
-    that.global.judgeCanvas.height = that.playInterface.offsetHeight;
-    that.global.noteCanvas.width = that.playInterface.offsetWidth;
-    that.global.trackCanvas.width = that.playInterface.offsetWidth;
-    that.global.judgeCanvas.width = that.playInterface.offsetWidth;
+    this.resize();
     window.onresize = () => {
       return (() => {
-        that.global.screenWidth = that.playInterface.offsetWidth;
-        that.global.screenHeight = that.playInterface.offsetHeight;
-        that.global.noteCanvas.height = that.playInterface.offsetHeight;
-        that.global.trackCanvas.height = that.playInterface.offsetHeight;
-        that.global.judgeCanvas.height = that.playInterface.offsetHeight;
-        that.global.noteCanvas.width = that.playInterface.offsetWidth;
-        that.global.trackCanvas.width = that.playInterface.offsetWidth;
-        that.global.judgeCanvas.width = that.playInterface.offsetWidth;
+        that.resize();
       })();
     };
     document.onkeydown = function(e) {
@@ -253,8 +288,21 @@ export default {
           } else {
             that.play();
           }
-        }
+        } 
       }
+      if (e.key == "ArrowUp") {
+          if (that.volume <= 0.9) that.audio.volume += 0.1;
+          that.volume = that.audio.volume;
+        } else if (e.key == "ArrowDown") {
+          if (that.volume >= 0.1) that.audio.volume -= 0.1;
+          that.volume = that.audio.volume;
+        } else if (e.key == "ArrowLeft") {
+          that.audio.currentTime -= that.minStep / 1000;
+          that.resetTrack();
+        } else if (e.key == "ArrowRight") {
+          that.audio.currentTime += that.minStep / 1000;
+          that.resetTrack();
+        }
     };
     document.onkeyup = function(e) {
       that.global.keyIsHold[e.key.toUpperCase()] = false;
@@ -263,6 +311,24 @@ export default {
   },
 
   methods: {
+    resize() {
+      const that = this;
+      this.playInterface = document.getElementById("play-interface-container");
+      that.global.screenWidth = that.playInterface.offsetWidth;
+      that.global.screenHeight = that.playInterface.offsetHeight;
+      that.global.noteCanvas.height = that.playInterface.offsetHeight;
+      that.global.trackCanvas.height = that.playInterface.offsetHeight;
+      that.global.judgeCanvas.height = that.playInterface.offsetHeight;
+      that.global.noteCanvas.width = that.playInterface.offsetWidth;
+      that.global.trackCanvas.width = that.playInterface.offsetWidth;
+      that.global.judgeCanvas.width = that.playInterface.offsetWidth;
+    },
+    changeMenuDisplay() {
+      this.menuOpened = !this.menuOpened;
+      setTimeout(() => {
+        this.resize();
+      }, 500);
+    },
     //获取谱面信息
     getChart() {
       this.chart = chart;
@@ -300,6 +366,8 @@ export default {
       this.sortTrack();
       this.generateImagePath();
       this.audio = document.getElementById("audioSong");
+      this.volume = this.$store.state.volume;
+      this.audio.volume = this.$store.state.volume;
       this.run();
     },
 
@@ -375,6 +443,7 @@ export default {
 
     play() {
       this.audio.play();
+      this.resetTrack();
       this.sliding = false;
       this.isRunning = true;
     },
@@ -438,17 +507,27 @@ export default {
 
   user-select: none;
 }
+.header-button {
+  color: white;
+}
+
+.header-button :hover {
+  color: rgb(234, 234, 234);
+}
+
+.header-button :active {
+  color: rgb(212, 212, 212);
+}
 
 .header {
   position: absolute;
   top: 0;
-  height: 90px;
+  height: 80px;
   width: 100%;
-  padding: 5px 0;
-  background: white;
+  background: #242f42;
 }
-.header-button {
-  padding: 5px 10px;
+.header-buttons {
+  padding: 10px 10px 0px 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -459,9 +538,41 @@ export default {
 
 #play-interface-container {
   position: absolute;
-  top: 100px;
-  height: calc(100vh - 100px);
-  width: 100%;
+  top: 80px;
+  height: calc(100vh - 80px);
+  background-color: white;
+}
+
+@keyframes sider-close {
+  0% {
+    top: 80px;
+    height: calc(100vh - 80px);
+  }
+  100% {
+    bottom: -400px;
+  }
+}
+.sider-closed {
+  animation: sider-close 0.5s ease-out;
+  position: absolute;
+  top: 80px;
+  height: calc(100vh - 80px);
+  background: white;
+}
+
+.sider-opened {
+  position: absolute;
+  top: 80px;
+  height: calc(100vh - 80px);
+}
+.container-small {
+  left: 300px;
+  width: calc(100vw - 300px);
+}
+
+.container-big {
+  left: 0px;
+  width: 100vw;
 }
 .header-slide-item {
   width: 96%;
