@@ -4,7 +4,7 @@
       <div class="header-buttons">
         <div>
           <el-button
-            v-if="menuOpened"
+            v-if="!menuOpened"
             icon="el-icon-s-unfold"
             size="small"
             class="header-button"
@@ -83,6 +83,9 @@
         :class="menuOpened ? 'container-small' : 'container-big'"
         id="play-interface-container"
       >
+        <div
+          
+        > </div>
         <!-- 音频 -->
         <audio
           id="audioSong"
@@ -133,14 +136,16 @@
           v-for="Track in chart.tracks"
           :key="Track"
         >
-          <Track
-            :Track="Track"
-            :Global="global"
-            v-if="
-              global.currentTime > Track.startTiming &&
-                global.currentTime < Track.endTiming
-            "
-          />
+          <div>
+            <Track
+              :Track="Track"
+              :Global="global"
+              v-if="
+                global.currentTime > Track.startTiming &&
+                  global.currentTime < Track.endTiming
+              "
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -197,7 +202,9 @@ export default {
       sliding: false,
       menuOpened: true,
       volume: 1,
-      minStep: 100,
+      minStep: 10,
+      currentSelectTrack:null,
+      currentTracks: [],
     };
   },
   computed: {
@@ -288,29 +295,61 @@ export default {
           } else {
             that.play();
           }
-        } 
+        }
       }
       if (e.key == "ArrowUp") {
-          if (that.volume <= 0.9) that.audio.volume += 0.1;
-          that.volume = that.audio.volume;
-        } else if (e.key == "ArrowDown") {
-          if (that.volume >= 0.1) that.audio.volume -= 0.1;
-          that.volume = that.audio.volume;
-        } else if (e.key == "ArrowLeft") {
-          that.audio.currentTime -= that.minStep / 1000;
-          that.resetTrack();
-        } else if (e.key == "ArrowRight") {
-          that.audio.currentTime += that.minStep / 1000;
-          that.resetTrack();
-        }
+        if (that.volume <= 0.9) that.audio.volume += 0.1;
+        that.volume = that.audio.volume;
+      } else if (e.key == "ArrowDown") {
+        if (that.volume >= 0.1) that.audio.volume -= 0.1;
+        that.volume = that.audio.volume;
+      } else if (e.key == "ArrowLeft") {
+        that.audio.currentTime -= that.minStep / 1000;
+        that.resetTrack();
+      } else if (e.key == "ArrowRight") {
+        that.audio.currentTime += that.minStep / 1000;
+        that.resetTrack();
+      }
+      
     };
     document.onkeyup = function(e) {
       that.global.keyIsHold[e.key.toUpperCase()] = false;
+
+    };
+    this.playInterface.onmousedown=function(e){
+      console.log(e);
+      that.calculateCurrentTracks();
+      for(var i=0;i<that.currentTracks.length;i++){
+        var track=that.currentTracks[i]
+        var left=(track.tempPositionX - track.tempWidth) *
+        that.global.screenWidth
+        var right=(track.tempPositionX + track.tempWidth) *
+        that.global.screenWidth
+        if(e.offsetX>left&&e.offsetX<right){
+          that.currentSelectTrack=track
+        }
+      }
     };
     this.initiate();
   },
 
   methods: {
+    calculateCurrentTracks() {
+      this.currentTracks = [];
+      for (var i = 0; i < this.chart.tracks.length; i++) {
+        if (
+          this.global.currentTime > this.chart.tracks[i].startTiming &&
+          this.global.currentTime < this.chart.tracks[i].endTiming
+        ) {
+          this.currentTracks.push(this.chart.tracks[i]);
+        }
+      }
+    },
+    setIndex(){
+      for(var i=0;i<this.chart.tracks.length;i++){
+        this.chart.tracks[i].index=i;
+      }
+    },
     resize() {
       const that = this;
       this.playInterface = document.getElementById("play-interface-container");
@@ -327,17 +366,19 @@ export default {
       this.menuOpened = !this.menuOpened;
       setTimeout(() => {
         this.resize();
-      }, 500);
+      }, 10);
     },
     //获取谱面信息
     getChart() {
       this.chart = chart;
+      this.setIndex();
     },
     //给轨道排序
     sortTrack() {
       this.chart.tracks.sort(function(a, b) {
         return b.startTiming - a.startTiming;
       });
+      this.setIndex();
     },
     //运行
     run() {
@@ -431,8 +472,11 @@ export default {
       this.resetTrack();
       if (this.isRunning) {
         this.sliding = false;
-        this.audio.play();
         this.resetTrack();
+        setTimeout(() => {
+          this.resetTrack();
+          this.audio.play();
+        }, 50);
       }
     },
 
@@ -442,10 +486,13 @@ export default {
     },
 
     play() {
-      this.audio.play();
       this.resetTrack();
       this.sliding = false;
       this.isRunning = true;
+      setTimeout(() => {
+        this.resetTrack();
+        this.audio.play();
+      }, 50);
     },
 
     reStart() {
@@ -453,7 +500,10 @@ export default {
       this.audio.currentTime = 0;
       this.global.currentTime = 0;
       if (this.isRunning) {
-        this.audio.play();
+        setTimeout(() => {
+          this.resetTrack();
+          this.audio.play();
+        }, 50);
       }
     },
 
@@ -467,7 +517,10 @@ export default {
         var last = track.notes.length;
         for (var j = track.notes.length - 1; j >= 0; j--) {
           track.notes[j].judged = false;
-          if (track.notes[j].timing > this.global.currentTime) {
+          if (
+            track.notes[j].timing + this.global.lostTime >
+            this.global.currentTime
+          ) {
             index = j;
           }
           if (
@@ -543,27 +596,21 @@ export default {
   background-color: white;
 }
 
-@keyframes sider-close {
-  0% {
-    top: 80px;
-    height: calc(100vh - 80px);
-  }
-  100% {
-    bottom: -400px;
-  }
-}
 .sider-closed {
-  animation: sider-close 0.5s ease-out;
   position: absolute;
   top: 80px;
   height: calc(100vh - 80px);
   background: white;
+  width: 0px;
+  left: 0px;
 }
 
 .sider-opened {
   position: absolute;
   top: 80px;
   height: calc(100vh - 80px);
+  width: 300px;
+  left: 0px;
 }
 .container-small {
   left: 300px;
