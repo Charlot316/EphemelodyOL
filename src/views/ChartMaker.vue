@@ -83,9 +83,6 @@
         :class="menuOpened ? 'container-small' : 'container-big'"
         id="play-interface-container"
       >
-        <div
-          
-        > </div>
         <!-- 音频 -->
         <audio
           id="audioSong"
@@ -147,6 +144,26 @@
             />
           </div>
         </div>
+        <div
+          v-if="
+            currentSelectTrack != null &&
+              global.currentTime > currentSelectTrack.startTiming &&
+              global.currentTime < currentSelectTrack.endTiming
+          "
+          :style="{
+            position: 'absolute',
+            top: '0px',
+            left:
+              (currentSelectTrack.tempPositionX -
+                currentSelectTrack.tempWidth) *
+                global.screenWidth +
+              'px',
+            width:
+              2 * currentSelectTrack.tempWidth * global.screenWidth - 4 + 'px',
+            height: global.finalY * global.screenHeight + 'px',
+            border: '2px solid rgb(255,0,0)',
+          }"
+        ></div>
       </div>
     </div>
   </div>
@@ -203,7 +220,7 @@ export default {
       menuOpened: true,
       volume: 1,
       minStep: 10,
-      currentSelectTrack:null,
+      currentSelectTrack: null,
       currentTracks: [],
     };
   },
@@ -310,23 +327,22 @@ export default {
         that.audio.currentTime += that.minStep / 1000;
         that.resetTrack();
       }
-      
     };
     document.onkeyup = function(e) {
       that.global.keyIsHold[e.key.toUpperCase()] = false;
-
     };
-    this.playInterface.onmousedown=function(e){
-      console.log(e);
+    this.playInterface.onmousedown = function(e) {
       that.calculateCurrentTracks();
-      for(var i=0;i<that.currentTracks.length;i++){
-        var track=that.currentTracks[i]
-        var left=(track.tempPositionX - track.tempWidth) *
-        that.global.screenWidth
-        var right=(track.tempPositionX + track.tempWidth) *
-        that.global.screenWidth
-        if(e.offsetX>left&&e.offsetX<right){
-          that.currentSelectTrack=track
+      for (var i = 0; i < that.currentTracks.length; i++) {
+        var track = that.currentTracks[i];
+        var left =
+          (track.tempPositionX - track.tempWidth) * that.global.screenWidth;
+        var right =
+          (track.tempPositionX + track.tempWidth) * that.global.screenWidth;
+        if (e.offsetX > left && e.offsetX < right) {
+          that.currentSelectTrack = track;
+          that.$forceUpdate();
+          console.log(track);
         }
       }
     };
@@ -345,9 +361,9 @@ export default {
         }
       }
     },
-    setIndex(){
-      for(var i=0;i<this.chart.tracks.length;i++){
-        this.chart.tracks[i].index=i;
+    setIndex() {
+      for (var i = 0; i < this.chart.tracks.length; i++) {
+        this.chart.tracks[i].index = i;
       }
     },
     resize() {
