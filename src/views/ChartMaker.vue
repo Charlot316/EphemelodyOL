@@ -148,7 +148,9 @@
           v-if="
             currentSelectTrack != null &&
               global.currentTime > currentSelectTrack.startTiming &&
-              global.currentTime < currentSelectTrack.endTiming
+              global.currentTime < currentSelectTrack.endTiming&&
+              currentSelectTrack.tempPositionX>=0&&
+              currentSelectTrack.tempPositionX<=1
           "
           :style="{
             position: 'absolute',
