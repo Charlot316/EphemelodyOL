@@ -77,7 +77,10 @@
         </div>
       </div>
     </div>
-    <div :class="menuOpened ? 'sider-opened' : 'sider-closed'"></div>
+    <div v-if="menuOpened" :class="menuOpened ? 'sider-opened' : 'sider-closed'">
+      
+    
+    </div>
     <div class="select">
       <div
         :class="menuOpened ? 'container-small' : 'container-big'"

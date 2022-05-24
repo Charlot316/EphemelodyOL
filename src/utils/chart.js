@@ -4048,7 +4048,7 @@ var chart = {
     ],
     songLength: 42500,
     defaultBackground: "http://pic.mcatk.com/charlot-pictures/netsuai-0.jpg",
-    songUrl: "http://10.251.0.251:8000/media/1.mp3",
+    songUrl: "http://localhost:8090/1.wav",
     changeBackgroundOperations: [{
             startTime: 17576,
             background: "http://pic.mcatk.com/charlot-pictures/netsuai-black.jpg",
@@ -7830,7 +7830,7 @@ var chart2 = {
     ],
     songLength: 55000,
     defaultBackground: "http://pic.mcatk.com/charlot-pictures/world-execute-me-0.PNG",
-    songUrl: "http://10.251.0.251:8000/media/2.wav",
+    songUrl: "http://localhost:8090/2.wav",
     changeBackgroundOperations: [{
             trackId: 0,
             type: 4,
