@@ -425,6 +425,7 @@ export default {
       noteCanvas: null,
       trackCanvas: null,
       judgeCanvas: null,
+      repaint:false,
     };
   },
   mounted() {

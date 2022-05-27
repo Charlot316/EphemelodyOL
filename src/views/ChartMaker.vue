@@ -77,10 +77,10 @@
         </div>
       </div>
     </div>
-    <div v-if="menuOpened" :class="menuOpened ? 'sider-opened' : 'sider-closed'">
-      
-    
-    </div>
+    <div
+      v-if="menuOpened"
+      :class="menuOpened ? 'sider-opened' : 'sider-closed'"
+    ></div>
     <div class="select">
       <div
         :class="menuOpened ? 'container-small' : 'container-big'"
@@ -151,9 +151,9 @@
           v-if="
             currentSelectTrack != null &&
               global.currentTime > currentSelectTrack.startTiming &&
-              global.currentTime < currentSelectTrack.endTiming&&
-              currentSelectTrack.tempPositionX>=0&&
-              currentSelectTrack.tempPositionX<=1
+              global.currentTime < currentSelectTrack.endTiming &&
+              currentSelectTrack.tempPositionX >= 0 &&
+              currentSelectTrack.tempPositionX <= 1
           "
           :style="{
             position: 'absolute',
@@ -289,6 +289,7 @@ export default {
       noteCanvas: null,
       trackCanvas: null,
       judgeCanvas: null,
+      repaint: false,
     };
   },
   mounted() {
@@ -560,6 +561,10 @@ export default {
           track.judgeFinished = true;
         }
       }
+    },
+    //重新绘制
+    repaint() {
+      this.global.repaint = !this.global.repaint;
     },
   },
 };

@@ -1,17 +1,17 @@
 <template>
   <div>
     <div v-for="judge in myTrack.judges" :key="judge">
-      <judge-painter :middle="middle" :Y="Y" :Global="Global"  :judge="judge"/>
+      <judge-painter :middle="middle" :Y="Y" :Global="Global" :judge="judge" />
     </div>
   </div>
 </template>
 
 <script>
-import JudgePainter from './JudgePainter'
+import JudgePainter from "./JudgePainter";
 export default {
   props: ["Track", "Global"],
   components: {
-    JudgePainter
+    JudgePainter,
   },
   data() {
     return {
@@ -45,7 +45,8 @@ export default {
         this.setHeightAndTop();
         while (
           this.myTrack.judges.length > 0 &&
-          this.myTrack.judges[0].timing+this.judgeAnimationTime < this.Global.currentTime
+          this.myTrack.judges[0].timing + this.judgeAnimationTime <
+            this.Global.currentTime
         ) {
           this.myTrack.judges = this.myTrack.judges.slice(1);
         }
@@ -66,6 +67,9 @@ export default {
       this.paintTrack();
     },
     "Global.screenWidth"() {
+      this.paintTrack();
+    },
+    "Global.repaint"() {
       this.paintTrack();
     },
     "Track.moveOperations": {
@@ -283,7 +287,6 @@ export default {
       }
     },
 
-    
     paintNotes() {
       if (!this.myTrack.judgeFinished) {
         for (
@@ -354,7 +357,7 @@ export default {
         painter.fillStyle = "rgb(203, 105, 121)";
         painter.fill();
       } else if (note.noteType == 1) {
-         if (canMirror) {
+        if (canMirror) {
           tempY = 2 * this.Y - y;
           painter.beginPath();
           painter.moveTo(this.middle, tempY - this.whiteLength);
@@ -381,7 +384,6 @@ export default {
         painter.strokeStyle = "rgb(0,0,0)";
         painter.lineWidth = 1;
         painter.stroke();
-       
       }
     },
     initiate() {
@@ -525,7 +527,7 @@ export default {
     //主进程+1
     addCount(param) {
       if (param.type != "lost") {
-       this.myTrack.judges.push(param)
+        this.myTrack.judges.push(param);
       }
       this.$emit("addCount", param);
     },
