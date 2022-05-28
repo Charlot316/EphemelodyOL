@@ -158,7 +158,6 @@
             :min="displayStart"
             :max="displayEnd"
             :step="minStep"
-            show-stops
             @change="changeTime"
             @mousedown="SlideMouseDown"
             @mouseup="SlideMouseUp"
@@ -428,11 +427,13 @@ export default {
         }
       }
       if (e.key == "ArrowUp") {
-        if (that.volume <= 90) that.audio.volume += 0.1;
-        that.volume = Math.ceil(that.audio.volume * 100);
+        if (that.volume <= 90) that.volume += 10;
+        else that.volume = 100;
+        that.audio.volume =that.volume/100
       } else if (e.key == "ArrowDown") {
-        if (that.volume >= 10) that.audio.volume -= 0.1;
-        that.volume = Math.ceil(that.audio.volume * 100);
+        if (that.volume >= 10) that.volume -= 10;
+        else that.volume = 0;
+        that.audio.volume =that.volume/100
       } else if (e.key == "ArrowLeft") {
         that.audio.currentTime -= that.keyStep / 1000;
         that.resetTrack();
