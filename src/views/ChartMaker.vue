@@ -52,8 +52,26 @@
             size="small"
             type="text"
             class="header-button"
+            @click="
+              globalSetting = true;
+              log(globalSetting);
+            "
             >全局设置</el-button
           >
+          <el-dialog v-model="globalSetting" @closed="globalSetting = false">
+            <div>音量设置</div>
+            <div>bpm</div>
+            <div>
+              显示时间区域
+              <el-slider
+                v-model="global.currentTime"
+                range
+                :min="0"
+                :max="chart.songLength"
+                @change="changeDisplayArea"
+              ></el-slider>
+            </div>
+          </el-dialog>
         </div>
         <div>
           <el-button size="small" type="text" class="header-button"
@@ -68,8 +86,10 @@
         <div class="header-slide-item">
           <el-slider
             v-model="global.currentTime"
-            :min="0"
-            :max="chart.songLength"
+            :min="displayStart"
+            :max="displayEnd"
+            :step="minStep"
+            show-stops
             @change="changeTime"
             @mousedown="SlideMouseDown"
             @mouseup="SlideMouseUp"
@@ -77,14 +97,12 @@
         </div>
       </div>
     </div>
+    <!-- 侧边栏 -->
     <div
-    
       v-if="menuOpened"
       :class="menuOpened ? 'sider-opened' : 'sider-closed'"
-    >
-    
-    
-    </div>
+    ></div>
+    <!-- 谱面展示 -->
     <div class="select">
       <div
         :class="menuOpened ? 'container-small' : 'container-big'"
@@ -228,9 +246,12 @@ export default {
       sliding: false,
       menuOpened: true,
       volume: 1,
-      minStep: 10,
+      minStep: 1000,
       currentSelectTrack: null,
       currentTracks: [],
+      globalSetting: false, //是否显示全局设置
+      displayStart: 0,
+      displayEnd: 0,
     };
   },
   computed: {
@@ -360,6 +381,7 @@ export default {
   },
 
   methods: {
+    //计算当前轨道
     calculateCurrentTracks() {
       this.currentTracks = [];
       for (var i = 0; i < this.chart.tracks.length; i++) {
@@ -371,11 +393,13 @@ export default {
         }
       }
     },
+    //设置轨道index
     setIndex() {
       for (var i = 0; i < this.chart.tracks.length; i++) {
         this.chart.tracks[i].index = i;
       }
     },
+    //调整画布
     resize() {
       const that = this;
       this.playInterface = document.getElementById("play-interface-container");
@@ -388,6 +412,7 @@ export default {
       that.global.trackCanvas.width = that.playInterface.offsetWidth;
       that.global.judgeCanvas.width = that.playInterface.offsetWidth;
     },
+    //调整画布
     changeMenuDisplay() {
       this.menuOpened = !this.menuOpened;
       setTimeout(() => {
@@ -398,6 +423,8 @@ export default {
     getChart() {
       this.chart = chart;
       this.setIndex();
+      this.displayStart = 0;
+      this.displayEnd = this.chart.songLength;
     },
     //给轨道排序
     sortTrack() {
@@ -416,6 +443,12 @@ export default {
         this.resetTrack();
       }
       if (this.global.currentTime >= this.chart.songLength) {
+        this.isRunning = false;
+      }
+      if(this.global.currentTime>=this.displayEnd){
+        this.audio.currentTime=this.displayEnd/1000
+        this.audio.pause()
+        this.pause();
         this.isRunning = false;
       }
       requestAnimationFrame(this.run);
@@ -485,13 +518,13 @@ export default {
       this.global.currentTime = this.global.currentTime - 1;
       this.audio.currentTime = this.global.currentTime / 1000;
     },
-
+    //鼠标按下时间轴
     SlideMouseDown() {
       this.audio.pause();
       this.sliding = true;
       this.resetTrack();
     },
-
+    //鼠标从时间轴上抬起
     SlideMouseUp() {
       this.sliding = false;
       this.audio.currentTime = this.global.currentTime / 1000;
@@ -505,12 +538,12 @@ export default {
         }, 50);
       }
     },
-
+    //暂停
     pause() {
       this.audio.pause();
       this.isRunning = false;
     },
-
+    //播放
     play() {
       this.resetTrack();
       this.sliding = false;
@@ -520,7 +553,7 @@ export default {
         this.audio.play();
       }, 50);
     },
-
+    //重新开始
     reStart() {
       this.resetTrack();
       this.audio.currentTime = 0;
@@ -532,7 +565,7 @@ export default {
         }, 50);
       }
     },
-
+    //重置轨道
     resetTrack() {
       this.global.keyPressTime = [];
       this.global.keyIsHold = [];
@@ -569,6 +602,14 @@ export default {
     //重新绘制
     repaint() {
       this.global.repaint = !this.global.repaint;
+    },
+    //
+    changeDisplayArea(values) {
+      this.displayStart = values[0];
+      this.displayEnd = values[1];
+      this.global.currentTime = this.displayStart;
+      this.audio.currentTime = this.global.currentTime / 1000;
+      this.resetTrack();
     },
   },
 };
