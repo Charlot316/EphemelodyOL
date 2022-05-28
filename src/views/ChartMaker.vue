@@ -58,19 +58,83 @@
             "
             >全局设置</el-button
           >
-          <el-dialog v-model="globalSetting" @closed="globalSetting = false">
-            <div>音量设置</div>
-            <div>bpm</div>
-            <div>
-              显示时间区域
-              <el-slider
-                v-model="global.currentTime"
-                range
-                :min="0"
-                :max="chart.songLength"
-                @change="changeDisplayArea"
-              ></el-slider>
-            </div>
+          <el-dialog
+            v-model="globalSetting"
+            @closed="globalSetting = false"
+            width="650px"
+          >
+            <el-form :model="form" label-width="120px" style="padding: 20px;">
+              <el-form-item label="音量">
+                <el-input-number v-model="volume" :min="0" :max="100" @change="changeVolume"/>
+                <el-tooltip
+                  class="item"
+                  effect="dark"
+                  content="按键盘上下键同样可以调节音量"
+                  placement="top-start"
+                  style="margin-left:10px;"
+                >
+                  <i class="el-icon-question" />
+                </el-tooltip>
+              </el-form-item>
+              <el-form-item label="快进最小间隔">
+                <el-input-number
+                  v-model="keyStep"
+                  :min="1"
+                  :max="chart.songLength"
+                />
+                <el-tooltip
+                  class="item"
+                  effect="dark"
+                  content="按键盘左右键可以调整时间轴，本项可以调整按一次左键或者右键快进的时间多少"
+                  placement="top-start"
+                  style="margin-left:10px;"
+                >
+                  <i class="el-icon-question" />
+                </el-tooltip>
+              </el-form-item>
+              <el-form-item label="音符最小间隔">
+                <el-input-number
+                  v-model="minStep"
+                  :min="10"
+                  :max="chart.songLength"
+                />
+                <el-tooltip
+                  class="item"
+                  effect="dark"
+                  content="以毫秒为单位。当您使用播放敲谱模式键入音符的时候，音符会吸附到最近的断点上。您可以根据音乐的最小节拍时长设置本项，让音符的时机更加贴合音乐的节奏。"
+                  placement="top-start"
+                  style="margin-left:10px;"
+                >
+                  <i class="el-icon-question" />
+                </el-tooltip>
+              </el-form-item>
+              <el-form-item label="显示时间区域">
+                <el-col :span="12">
+                  开始时间点<el-input-number
+                    v-model="displayStart"
+                    :min="0"
+                    :max="chart.songLength"
+                  />
+                </el-col>
+                <el-col :span="12">
+                  结束时间点<el-input-number
+                    v-model="displayEnd"
+                    :min="0"
+                    :max="chart.songLength"
+                  />
+                </el-col>
+              </el-form-item>
+              <el-form-item label="">
+                <el-slider
+                  v-model="global.currentTime"
+                  range
+                  :min="0"
+                  :max="chart.songLength"
+                  @change="changeDisplayArea"
+                ></el-slider>
+              </el-form-item>
+            </el-form>
+            <div></div>
           </el-dialog>
         </div>
         <div>
@@ -101,7 +165,10 @@
     <div
       v-if="menuOpened"
       :class="menuOpened ? 'sider-opened' : 'sider-closed'"
-    ></div>
+    >
+    <MenuPanel/>
+    <TrackPanel/>
+    </div>
     <!-- 谱面展示 -->
     <div class="select">
       <div
@@ -198,11 +265,14 @@
 
 <script>
 import Track from "@/components/PlayInterface/Track";
-import "animate.css";
+import MenuPanel from "@/components/ChartMaker/MenuPanel";
+import TrackPanel from "@/components/ChartMaker/TrackPanel";
 import { chart } from "@/utils/chart.js";
 export default {
   components: {
     Track,
+    MenuPanel,
+    TrackPanel,
   },
   watch: {
     "global.currentTime"() {
@@ -245,13 +315,15 @@ export default {
       isRunning: false,
       sliding: false,
       menuOpened: true,
-      volume: 1,
-      minStep: 1000,
+      volume: 100,
+      minStep: 10,
+      keyStep:10,
       currentSelectTrack: null,
       currentTracks: [],
       globalSetting: false, //是否显示全局设置
       displayStart: 0,
       displayEnd: 0,
+      form: {},
     };
   },
   computed: {
@@ -346,16 +418,16 @@ export default {
         }
       }
       if (e.key == "ArrowUp") {
-        if (that.volume <= 0.9) that.audio.volume += 0.1;
-        that.volume = that.audio.volume;
+        if (that.volume <= 90) that.audio.volume += 0.1;
+        that.volume = Math.ceil(that.audio.volume * 100);
       } else if (e.key == "ArrowDown") {
-        if (that.volume >= 0.1) that.audio.volume -= 0.1;
-        that.volume = that.audio.volume;
+        if (that.volume >= 10) that.audio.volume -= 0.1;
+        that.volume = Math.ceil(that.audio.volume * 100);
       } else if (e.key == "ArrowLeft") {
-        that.audio.currentTime -= that.minStep / 1000;
+        that.audio.currentTime -= that.keyStep / 1000;
         that.resetTrack();
       } else if (e.key == "ArrowRight") {
-        that.audio.currentTime += that.minStep / 1000;
+        that.audio.currentTime += that.keyStep / 1000;
         that.resetTrack();
       }
     };
@@ -445,9 +517,9 @@ export default {
       if (this.global.currentTime >= this.chart.songLength) {
         this.isRunning = false;
       }
-      if(this.global.currentTime>=this.displayEnd){
-        this.audio.currentTime=this.displayEnd/1000
-        this.audio.pause()
+      if (this.global.currentTime >= this.displayEnd) {
+        this.audio.currentTime = this.displayEnd / 1000;
+        this.audio.pause();
         this.pause();
         this.isRunning = false;
       }
@@ -610,6 +682,9 @@ export default {
       this.global.currentTime = this.displayStart;
       this.audio.currentTime = this.global.currentTime / 1000;
       this.resetTrack();
+    },
+    changeVolume(){
+      this.audio.volume = this.volume/100;
     },
   },
 };
