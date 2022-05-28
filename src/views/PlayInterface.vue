@@ -582,7 +582,7 @@ export default {
           this.$forceUpdate();
           this.audio.currentTime = 0;
           this.audio.muted = false;
-          this.audio.volume=this.$store.state.volume
+          this.audio.volume = this.$store.state.volume/100;
           this.run();
         }, 500);
       }

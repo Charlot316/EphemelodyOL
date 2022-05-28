@@ -10,7 +10,7 @@ export default createStore({
         user_id: "",
         role: 2,
         refreshRate: 90,
-        volume: 1.0,
+        volume: 100,
     },
     mutations: {
         login(state, username) {

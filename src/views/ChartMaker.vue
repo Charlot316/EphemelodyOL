@@ -65,7 +65,12 @@
           >
             <el-form :model="form" label-width="120px" style="padding: 20px;">
               <el-form-item label="音量">
-                <el-input-number v-model="volume" :min="0" :max="100" @change="changeVolume"/>
+                <el-input-number
+                  v-model="volume"
+                  :min="0"
+                  :max="100"
+                  @change="changeVolume"
+                />
                 <el-tooltip
                   class="item"
                   effect="dark"
@@ -166,8 +171,8 @@
       v-if="menuOpened"
       :class="menuOpened ? 'sider-opened' : 'sider-closed'"
     >
-    <MenuPanel/>
-    <TrackPanel/>
+      <MenuPanel />
+      <TrackPanel />
     </div>
     <!-- 谱面展示 -->
     <div class="select">
@@ -317,7 +322,7 @@ export default {
       menuOpened: true,
       volume: 100,
       minStep: 10,
-      keyStep:10,
+      keyStep: 10,
       currentSelectTrack: null,
       currentTracks: [],
       globalSetting: false, //是否显示全局设置
@@ -403,6 +408,11 @@ export default {
       return (() => {
         that.resize();
       })();
+    };
+    document.onmouseup = function() {
+      if (that.sliding) {
+        that.SlideMouseUp();
+      }
     };
     document.onkeydown = function(e) {
       if (!e.repeat) {
@@ -539,7 +549,7 @@ export default {
       this.generateImagePath();
       this.audio = document.getElementById("audioSong");
       this.volume = this.$store.state.volume;
-      this.audio.volume = this.$store.state.volume;
+      this.audio.volume = this.$store.state.volume/100;
       this.run();
     },
 
@@ -628,8 +638,8 @@ export default {
     //重新开始
     reStart() {
       this.resetTrack();
-      this.audio.currentTime = 0;
-      this.global.currentTime = 0;
+      this.audio.currentTime = this.displayStart / 1000;
+      this.global.currentTime = this.displayStart;
       if (this.isRunning) {
         setTimeout(() => {
           this.resetTrack();
@@ -683,8 +693,8 @@ export default {
       this.audio.currentTime = this.global.currentTime / 1000;
       this.resetTrack();
     },
-    changeVolume(){
-      this.audio.volume = this.volume/100;
+    changeVolume() {
+      this.audio.volume = this.volume / 100;
     },
   },
 };
