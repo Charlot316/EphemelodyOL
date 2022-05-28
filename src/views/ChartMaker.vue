@@ -232,7 +232,7 @@
           <div>
             <Track
               :Track="Track"
-              :Global="global"
+              :global="global"
               v-if="
                 global.currentTime > Track.startTiming &&
                   global.currentTime < Track.endTiming

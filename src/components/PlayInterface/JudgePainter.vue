@@ -5,7 +5,7 @@ const colorOpacity = 0.04;
 export default {
   data() {
     return {
-      myGlobal: this.Global,
+      myglobal: this.global,
       judgeSize: 300,
       judgeAnimationTime: 300,
       colorList: [
@@ -24,9 +24,9 @@ export default {
       flakes:[],
     };
   },
-  props: ["Y", "middle", "Global", "judge"],
+  props: ["Y", "middle", "global", "judge"],
   watch: {
-    "Global.currentTime"() {
+    "global.currentTime"() {
       this.judgePainter(this.judge);
     },
   },
@@ -41,8 +41,8 @@ export default {
       //this.paintFlakes(judge);
     },
     paintJudge(judge) {
-      var painter = this.Global.judgePainter;
-      var currentTime = this.Global.currentTime;
+      var painter = this.global.judgePainter;
+      var currentTime = this.global.currentTime;
       var size = 0;
       var width = 0;
     if(currentTime < judge.timing ) currentTime=judge.timing 
@@ -111,7 +111,7 @@ export default {
       painter.globalCompositeOperation = "source-over";
     },
     // paintFlakes(judge) {
-    //   var painter = this.Global.judgePainter;
+    //   var painter = this.global.judgePainter;
     //   var size = 0;
     //   var width = 0;
     //   if (currentTime < judge.timing + this.judgeAnimationTime * 0.75) {

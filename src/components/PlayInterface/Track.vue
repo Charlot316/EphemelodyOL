@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-for="judge in myTrack.judges" :key="judge">
-      <judge-painter :middle="middle" :Y="Y" :Global="Global" :judge="judge" />
+      <judge-painter :middle="middle" :Y="Y" :global="global" :judge="judge" />
     </div>
   </div>
 </template>
@@ -9,14 +9,14 @@
 <script>
 import JudgePainter from "./JudgePainter";
 export default {
-  props: ["Track", "Global"],
+  props: ["Track", "global"],
   components: {
     JudgePainter,
   },
   data() {
     return {
       myTrack: this.Track,
-      myGlobal: this.Global,
+      myglobal: this.global,
       lengthForBlackPoint: 10,
       widthPath: [],
       positionXPath: [],
@@ -35,8 +35,8 @@ export default {
     };
   },
   watch: {
-    "Global.currentTime"() {
-      if (this.Global.currentTime > 0) {
+    "global.currentTime"() {
+      if (this.global.currentTime > 0) {
         this.myTrack.tempPositionX = this.getPositionX();
         this.myTrack.tempWidth = this.getWidth();
         this.myTrack.tempR = this.getRGB()[0];
@@ -46,7 +46,7 @@ export default {
         while (
           this.myTrack.judges.length > 0 &&
           this.myTrack.judges[0].timing + this.judgeAnimationTime <
-            this.Global.currentTime
+            this.global.currentTime
         ) {
           this.myTrack.judges = this.myTrack.judges.slice(1);
         }
@@ -54,22 +54,22 @@ export default {
       }
       while (
         this.myTrack.lastNote < this.myTrack.notes.length - 1 &&
-        this.Global.currentTime >
+        this.global.currentTime >
           this.myTrack.notes[this.myTrack.lastNote + 1].timing -
-            this.Global.remainingTime
+            this.global.remainingTime
       ) {
         this.myTrack.lastNote++;
       }
       this.judge();
     },
-    "Global.screenHeight"() {
+    "global.screenHeight"() {
       this.setHeightAndTop();
       this.paintTrack();
     },
-    "Global.screenWidth"() {
+    "global.screenWidth"() {
       this.paintTrack();
     },
-    "Global.repaint"() {
+    "global.repaint"() {
       this.paintTrack();
     },
     "Track.moveOperations": {
@@ -103,11 +103,11 @@ export default {
   computed: {
     isActive() {
       if (this.Track.type == 1) {
-        var currentTime = this.Global.currentTime;
-        var keyPressTime = this.Global.keyPressTime[
+        var currentTime = this.global.currentTime;
+        var keyPressTime = this.global.keyPressTime[
           this.Track.key.toUpperCase()
         ];
-        var isHolding = this.Global.keyIsHold[this.Track.key.toUpperCase()];
+        var isHolding = this.global.keyIsHold[this.Track.key.toUpperCase()];
         return (
           isHolding ||
           (currentTime - keyPressTime > 0 && currentTime - keyPressTime < 175)
@@ -115,41 +115,41 @@ export default {
       } else return false;
     },
     lengthForKey() {
-      if (this.Global.screenHeight * 0.1 > 30) {
+      if (this.global.screenHeight * 0.1 > 30) {
         return 30;
       } else {
-        return this.Global.screenHeight * 0.1;
+        return this.global.screenHeight * 0.1;
       }
     },
     finalHeight() {
-      return this.Global.screenHeight * this.Global.finalY;
+      return this.global.screenHeight * this.global.finalY;
     },
     width() {
-      return 2 * this.Track.tempWidth * this.Global.screenWidth;
+      return 2 * this.Track.tempWidth * this.global.screenWidth;
     },
     halfWidth() {
-      return this.Track.tempWidth * this.Global.screenWidth;
+      return this.Track.tempWidth * this.global.screenWidth;
     },
     left() {
       return (
         (this.Track.tempPositionX - this.Track.tempWidth) *
-        this.Global.screenWidth
+        this.global.screenWidth
       );
     },
     middle() {
-      return this.Track.tempPositionX * this.Global.screenWidth;
+      return this.Track.tempPositionX * this.global.screenWidth;
     },
     Y() {
-      return this.Global.finalY * this.Global.screenHeight;
+      return this.global.finalY * this.global.screenHeight;
     },
   },
   methods: {
     async paintTrack() {
       //画判定结果
       await this.paintNotes();
-      var painter = this.Global.trackPainter;
+      var painter = this.global.trackPainter;
       if (this.width > 4 && this.height > 0) {
-        var longerThanScreen = this.height > this.Global.screenHeight - this.Y;
+        var longerThanScreen = this.height > this.global.screenHeight - this.Y;
         //填充长方形主体
         painter.beginPath();
         painter.rect(this.left + 2, this.top, this.width - 4, this.height);
@@ -174,7 +174,7 @@ export default {
           this.left + 2,
           this.Y,
           this.width - 4,
-          longerThanScreen ? this.Global.screenHeight - this.Y : this.height
+          longerThanScreen ? this.global.screenHeight - this.Y : this.height
         );
         painter.fillStyle =
           "rgba(" +
@@ -203,7 +203,7 @@ export default {
         painter.moveTo(this.left, this.Y);
         painter.lineTo(
           this.left,
-          longerThanScreen ? this.Global.screenHeight : this.Y + this.height
+          longerThanScreen ? this.global.screenHeight : this.Y + this.height
         );
         painter.strokeStyle = "rgba(255,255,255,0.1)";
         painter.lineWidth = 2;
@@ -220,7 +220,7 @@ export default {
         painter.moveTo(this.left + this.width, this.Y);
         painter.lineTo(
           this.left + this.width,
-          longerThanScreen ? this.Global.screenHeight : this.Y + this.height
+          longerThanScreen ? this.global.screenHeight : this.Y + this.height
         );
         painter.strokeStyle = "rgba(255,255,255,0.1)";
         painter.lineWidth = 2;
@@ -238,7 +238,7 @@ export default {
         painter.moveTo(this.middle, this.Y);
         painter.lineTo(
           this.middle,
-          longerThanScreen ? this.Global.screenHeight : this.Y + this.height
+          longerThanScreen ? this.global.screenHeight : this.Y + this.height
         );
         painter.strokeStyle = "rgba(0,0,0,0.05)";
         painter.lineWidth = 1;
@@ -299,16 +299,16 @@ export default {
       }
     },
     paintNote(note) {
-      var painter = this.Global.notePainter;
+      var painter = this.global.notePainter;
       var y =
-        ((this.Global.finalY / this.Global.remainingTime) *
-          this.Global.currentTime -
-          (this.Global.finalY / this.Global.remainingTime) *
-            (note.timing - this.Global.remainingTime)) *
-        this.Global.screenHeight;
+        ((this.global.finalY / this.global.remainingTime) *
+          this.global.currentTime -
+          (this.global.finalY / this.global.remainingTime) *
+            (note.timing - this.global.remainingTime)) *
+        this.global.screenHeight;
       var canMirror =
-        y / this.Global.screenHeight > 0.6 &&
-        y / this.Global.screenHeight < 0.8;
+        y / this.global.screenHeight > 0.6 &&
+        y / this.global.screenHeight < 0.8;
       if (note.noteType == 0) {
         if (canMirror) {
           var tempY = 2 * this.Y - y;
@@ -399,12 +399,12 @@ export default {
       var last = track.notes.length;
       for (var j = track.notes.length - 1; j >= 0; j--) {
         track.notes[j].judged = false;
-        if (track.notes[j].timing > this.Global.currentTime) {
+        if (track.notes[j].timing > this.global.currentTime) {
           index = j;
         }
         if (
-          this.Global.currentTime <
-          track.notes[j].timing - this.Global.remainingTime
+          this.global.currentTime <
+          track.notes[j].timing - this.global.remainingTime
         ) {
           last = j;
         }
@@ -428,13 +428,13 @@ export default {
           currentKey = this.Track.notes[
             this.myTrack.currentNote
           ].key.toUpperCase();
-        let currentJudge = this.Global.keyPressTime[currentKey];
-        let currentTime = this.Global.currentTime;
+        let currentJudge = this.global.keyPressTime[currentKey];
+        let currentTime = this.global.currentTime;
         let timing = this.Track.notes[this.myTrack.currentNote].timing;
-        let pureTime = this.Global.pureTime;
-        let farTime = this.Global.farTime;
-        let lostTime = this.Global.lostTime;
-        let isUsed = this.Global.keyUsed[currentKey];
+        let pureTime = this.global.pureTime;
+        let farTime = this.global.farTime;
+        let lostTime = this.global.lostTime;
+        let isUsed = this.global.keyUsed[currentKey];
         if (this.Track.notes[this.myTrack.currentNote].noteType == 1) {
           if (currentTime > timing - lostTime) {
             if (currentTime > timing + lostTime) {
@@ -446,7 +446,7 @@ export default {
                 timing: timing,
               });
               this.addNoteCount();
-            } else if (this.Global.keyIsHold[currentKey]) {
+            } else if (this.global.keyIsHold[currentKey]) {
               this.addCount({
                 type: "pure",
                 key: "pureCount",
@@ -482,7 +482,7 @@ export default {
                   timing: timing,
                 });
                 this.$forceUpdate();
-                this.myGlobal.keyUsed[currentKey] = true;
+                this.myglobal.keyUsed[currentKey] = true;
                 this.addNoteCount();
               } else if (
                 currentJudge > timing - farTime &&
@@ -499,7 +499,7 @@ export default {
                   timing: timing,
                 });
                 this.$forceUpdate();
-                this.myGlobal.keyUsed[currentKey] = true;
+                this.myglobal.keyUsed[currentKey] = true;
                 this.addNoteCount();
               } else if (
                 currentJudge > timing - lostTime &&
@@ -516,7 +516,7 @@ export default {
                   timing: timing,
                 });
                 this.$forceUpdate();
-                this.myGlobal.keyUsed[currentKey] = true;
+                this.myglobal.keyUsed[currentKey] = true;
                 this.addNoteCount();
               }
             }
@@ -800,7 +800,7 @@ export default {
 
     //获取当前位置
     getPositionX() {
-      var currentTime = this.Global.currentTime;
+      var currentTime = this.global.currentTime;
       var currentX = this.positionXPath[this.positionXIndex];
       if (
         !(currentTime <= currentX.endTime && currentTime >= currentX.startTime)
@@ -821,7 +821,7 @@ export default {
 
     //获取当前宽度
     getWidth() {
-      var currentTime = this.Global.currentTime;
+      var currentTime = this.global.currentTime;
       var currentWidth = this.widthPath[this.widthIndex];
       if (
         !(
@@ -845,7 +845,7 @@ export default {
 
     //获取当前颜色
     getRGB() {
-      var currentTime = this.Global.currentTime;
+      var currentTime = this.global.currentTime;
       var currentRGB = this.RGBPath[this.RGBIndex];
       if (
         !(
@@ -870,23 +870,23 @@ export default {
 
     //轨道出场退场的高度动画
     setHeightAndTop() {
-      let k = this.Global.finalY / this.animationTime;
+      let k = this.global.finalY / this.animationTime;
       if (
-        this.Global.currentTime <
+        this.global.currentTime <
         this.myTrack.startTiming + this.animationTime
       ) {
         this.top =
           this.finalHeight -
-          (k * this.Global.currentTime - k * this.myTrack.startTiming) *
-            this.Global.screenHeight;
+          (k * this.global.currentTime - k * this.myTrack.startTiming) *
+            this.global.screenHeight;
       } else if (
-        this.Global.currentTime >
+        this.global.currentTime >
         this.myTrack.endTiming - this.animationTime
       ) {
         this.top =
           this.finalHeight -
-          (-k * this.Global.currentTime + k * this.myTrack.endTiming) *
-            this.Global.screenHeight;
+          (-k * this.global.currentTime + k * this.myTrack.endTiming) *
+            this.global.screenHeight;
       } else {
         this.top = 0;
       }

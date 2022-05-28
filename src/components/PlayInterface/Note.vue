@@ -56,7 +56,7 @@
 
 <script>
 export default {
-  props: ["Note", "Global", "left"],
+  props: ["Note", "global", "left"],
   data() {
     return {
       myNote: this.Note,
@@ -66,24 +66,24 @@ export default {
     };
   },
   watch: {
-    "Global.currentTime"() {
+    "global.currentTime"() {
       this.myNote.positionY =
-        (this.Global.finalY / this.Global.remainingTime) *
-          this.Global.currentTime -
-        (this.Global.finalY / this.Global.remainingTime) *
-          (this.Note.timing - this.Global.remainingTime);
+        (this.global.finalY / this.global.remainingTime) *
+          this.global.currentTime -
+        (this.global.finalY / this.global.remainingTime) *
+          (this.Note.timing - this.global.remainingTime);
     },
   },
   created() {
     this.myNote.positionY =
-        (this.Global.finalY / this.Global.remainingTime) *
-          this.Global.currentTime -
-        (this.Global.finalY / this.Global.remainingTime) *
-          (this.Note.timing - this.Global.remainingTime);
+        (this.global.finalY / this.global.remainingTime) *
+          this.global.currentTime -
+        (this.global.finalY / this.global.remainingTime) *
+          (this.Note.timing - this.global.remainingTime);
   },
   computed: {
     top() {
-      return this.Note.positionY * this.Global.screenHeight;
+      return this.Note.positionY * this.global.screenHeight;
     },
     offsetDiagonal() {
       if (this.Note.noteType == 0) {

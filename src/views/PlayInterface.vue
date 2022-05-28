@@ -130,7 +130,7 @@
       >
         <Track
           :Track="Track"
-          :Global="global"
+          :global="global"
           @addCount="addCount"
           v-if="
             global.currentTime > Track.startTiming &&
