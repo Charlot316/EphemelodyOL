@@ -241,6 +241,7 @@
           </div>
         </div>
         <div
+          class="selected-track"
           v-if="
             currentSelectTrack != null &&
               global.currentTime > currentSelectTrack.startTiming &&
@@ -257,9 +258,10 @@
                 global.screenWidth +
               'px',
             width:
-              2 * currentSelectTrack.tempWidth * global.screenWidth - 4 + 'px',
-            height: global.finalY * global.screenHeight + 'px',
-            border: '2px solid rgb(255,0,0)',
+              2 * currentSelectTrack.tempWidth * global.screenWidth -4+ 'px',
+            height: global.finalY * global.screenHeight-2 + 'px',
+            border: '2px solid rgba(255,255,255,1)',
+            background:'rgba(255,255,255,0.2)',
           }"
         ></div>
       </div>
@@ -429,11 +431,11 @@ export default {
       if (e.key == "ArrowUp") {
         if (that.volume <= 90) that.volume += 10;
         else that.volume = 100;
-        that.audio.volume =that.volume/100
+        that.audio.volume = that.volume / 100;
       } else if (e.key == "ArrowDown") {
         if (that.volume >= 10) that.volume -= 10;
         else that.volume = 0;
-        that.audio.volume =that.volume/100
+        that.audio.volume = that.volume / 100;
       } else if (e.key == "ArrowLeft") {
         that.audio.currentTime -= that.keyStep / 1000;
         that.resetTrack();
@@ -550,7 +552,7 @@ export default {
       this.generateImagePath();
       this.audio = document.getElementById("audioSong");
       this.volume = this.$store.state.volume;
-      this.audio.volume = this.$store.state.volume/100;
+      this.audio.volume = this.$store.state.volume / 100;
       this.run();
     },
 
@@ -782,5 +784,9 @@ export default {
   width: 96%;
   padding: 0px 2%;
   float: left;
+}
+.selected-track {
+  -webkit-box-shadow: 0 0 20px 10px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 20px 10px rgba(0, 0, 0, 0.5);
 }
 </style>
