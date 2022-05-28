@@ -1,15 +1,25 @@
 <template>
   <div class="track-panel-container">
+    <el-button type="text" class="return-button" @click="$emit('returnMenu')">返回</el-button>
     <el-collapse>
-      <el-collapse-item title="背景操作"> </el-collapse-item>
-      <el-collapse-item title="当前轨道" name="2"> </el-collapse-item>
-      <el-collapse-item title="全局插入音符" name="3"> </el-collapse-item>
+      <el-collapse-item title="位置操作" name="1"> </el-collapse-item>
+      <el-collapse-item title="宽度操作" name="2"> </el-collapse-item>
+      <el-collapse-item title="颜色操作" name="3"> </el-collapse-item>
     </el-collapse>
   </div>
 </template>
 
 <script>
-export default {};
+
+export default {
+  props:['Track','global'],
+  data(){
+    return{
+      myTrack:this.Track,
+      myGlobal:this.global,
+    }
+  }
+};
 </script>
 
 <style scope>
@@ -18,4 +28,7 @@ export default {};
   width: 90%;
   padding: 0% 5%;
 }
+.return-button{color:#303133}
+.return-button:hover{color:#949494}
+.return-button:active{color:#000000}
 </style>

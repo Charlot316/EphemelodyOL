@@ -170,8 +170,14 @@
       v-if="menuOpened"
       :class="menuOpened ? 'sider-opened' : 'sider-closed'"
     >
-      <MenuPanel />
-      <TrackPanel />
+      <TrackPanel
+        v-if="currentSelectTrack != null"
+        @Track="currentSelectTrack"
+        @global="global"
+        @returnMenu="returnMenu"
+      />
+
+      <MenuPanel v-else />
     </div>
     <!-- 谱面展示 -->
     <div class="select">
@@ -258,10 +264,10 @@
                 global.screenWidth +
               'px',
             width:
-              2 * currentSelectTrack.tempWidth * global.screenWidth -4+ 'px',
-            height: global.finalY * global.screenHeight-2 + 'px',
+              2 * currentSelectTrack.tempWidth * global.screenWidth - 4 + 'px',
+            height: global.finalY * global.screenHeight - 2 + 'px',
             border: '2px solid rgba(255,255,255,1)',
-            background:'rgba(255,255,255,0.2)',
+            background: 'rgba(255,255,255,0.2)',
           }"
         ></div>
       </div>
@@ -458,7 +464,6 @@ export default {
         if (e.offsetX > left && e.offsetX < right) {
           that.currentSelectTrack = track;
           that.$forceUpdate();
-          console.log(track);
         }
       }
     };
@@ -698,6 +703,9 @@ export default {
     },
     changeVolume() {
       this.audio.volume = this.volume / 100;
+    },
+    returnMenu() {
+      this.currentSelectTrack = null;
     },
   },
 };
