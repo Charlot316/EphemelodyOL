@@ -6,7 +6,20 @@
           v-for="operation in chart.changeBackgroundOperations"
           :key="operation"
         >
-          <BackgroundOperation :chart="chart" :operation="operation" :global="global"/>
+          <transition
+            name="fade"
+            enter-active-class="animate__animated animate__fadeInLeft"
+            leave-active-class="animate__animated animate__fadeOutLeft"
+          >
+            <BackgroundOperation
+              v-show="
+                global.currentTime > operation.startTime &&
+                  global.currentTime < operation.endTime
+              "
+              :chart="chart"
+              :operation="operation"
+              :global="global"
+          /></transition>
         </div>
       </el-collapse-item>
 
@@ -22,12 +35,20 @@
 <script>
 import BackgroundOperation from "./BackgroundOperation";
 import TrackCard from "./TrackCard";
+import "animate.css";
 export default {
   props: ["chart", "global"],
   components: { BackgroundOperation, TrackCard },
 };
 </script>
-
+<style>
+.animate__animated.animate__fadeInLeft {
+  --animate-duration: 0.5s;
+}
+.animate__animated.animate__fadeOutLeft {
+  --animate-duration: 0.5s;
+}
+</style>
 <style scope>
 .menu-panel-container {
   height: calc(100vh - 80px);

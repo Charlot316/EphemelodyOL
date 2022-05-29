@@ -73,6 +73,7 @@ export default {
       this.paintTrack();
     },
     "global.recalculateTrack"() {
+      this.setIndex();
       this.generatePositionXPath();
       this.myTrack.tempPositionX = this.getPositionX();
       this.generateWidthPath();
@@ -375,6 +376,7 @@ export default {
     },
     initiate() {
       this.setHeightAndTop();
+      this.setIndex();
       this.generateWidthPath();
       this.generatePositionXPath();
       this.generateRGBPath();
@@ -878,6 +880,17 @@ export default {
         this.top = 0;
       }
       this.height = this.finalHeight - this.top;
+    },
+    setIndex() {
+      for (var i = 0; i < this.myTrack.moveOperations.length; i++) {
+        this.myTrack.moveOperations[i].index = i;
+      }
+      for (i = 0; i < this.myTrack.changeWidthOperations.length; i++) {
+        this.myTrack.changeWidthOperations[i].index = i;
+      }
+      for (i = 0; i < this.myTrack.changeColorOperations.length; i++) {
+        this.myTrack.changeColorOperations[i].index = i;
+      }
     },
   },
 };
