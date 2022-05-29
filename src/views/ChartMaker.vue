@@ -330,6 +330,12 @@ export default {
         );
       }
     },
+    "global.reCalculateChartMaker"() {
+      if (this.chart.changeBackgroundOperations) {
+        this.generateImagePath();
+         this.sortTrack();
+      }
+    },
   },
   data() {
     return {
@@ -416,7 +422,8 @@ export default {
       trackCanvas: null,
       judgeCanvas: null,
       repaint: false,
-      recalculateTrack: false,
+      reCalculateTrack: false,
+      reCalculateChartMaker: false,
     };
   },
   mounted() {
@@ -563,7 +570,6 @@ export default {
     //获取谱面信息
     getChart() {
       this.chart = chart;
-      this.setIndex();
       this.displayStart = 0;
       this.displayEnd = this.chart.songLength;
     },
@@ -771,9 +777,8 @@ export default {
       this.global.repaint = !this.global.repaint;
     },
     //重新绘制
-    recalculateTrack() {
-      this.global.recalculateTrack = !this.global.recalculateTrack;
-      this.repaint();
+    reCalculateTrack() {
+      this.global.reCalculateTrack = !this.global.reCalculateTrack;
     },
     //时间区域调整
     changeDisplayArea(values) {
@@ -794,15 +799,13 @@ export default {
   },
 };
 </script>
-<style>
+<style scoped>
 .animate__animated.animate__fadeInLeft {
   --animate-duration: 0.5s;
 }
 .animate__animated.animate__fadeOutLeft {
-  --animate-duration: 0.2s;
+  --animate-duration: 0.5s;
 }
-</style>
-<style scoped>
 .play-interface {
   height: 100%;
   width: 100%;

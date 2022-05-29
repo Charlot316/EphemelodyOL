@@ -11,31 +11,41 @@
               type="text"
               class="plus-button"
               icon="el-icon-circle-plus"
-            >新增</el-button>
+              @click="newOperation"
+              >新增</el-button
+            >
           </div>
           <div>
             <el-switch v-model="operationShowAll" active-text="显示全部" />
           </div>
         </div>
-        <div
-          v-for="operation in chart.changeBackgroundOperations"
-          :key="operation"
+        <transition-group
+          name="flip-list"
+          enter-active-class="animate__animated animate__fadeInLeft"
+          leave-active-class="animate__animated animate__fadeOutLeft"
         >
-          <transition
-            name="fade"
-            enter-active-class="animate__animated animate__fadeInLeft"
-            leave-active-class="animate__animated animate__fadeOutLeft"
+          <div
+            v-for="operation in chart.changeBackgroundOperations"
+            :key="operation"
           >
-            <BackgroundOperation
-              v-show="
-                operationShowAll||global.currentTime > operation.startTime &&
-                  global.currentTime < operation.endTime
-              "
-              :chart="chart"
-              :operation="operation"
-              :global="global"
-          /></transition>
-        </div>
+            <transition
+              name="flip-list"
+              enter-active-class="animate__animated animate__fadeInLeft"
+              leave-active-class="animate__animated animate__fadeOutLeft"
+            >
+              <BackgroundOperation
+                v-show="
+                  operationShowAll ||
+                    (global.currentTime > operation.startTime &&
+                      global.currentTime < operation.endTime)
+                "
+                :chart="chart"
+                :operation="operation"
+                :global="global"
+              />
+            </transition>
+          </div>
+        </transition-group>
       </el-collapse-item>
 
       <el-collapse-item title=" 当前轨道" name="2">
@@ -54,19 +64,38 @@ import "animate.css";
 export default {
   props: ["chart", "global"],
   data() {
-    return { operationShowAll: true, trackShowAll: true };
+    return {
+      operationShowAll: true,
+      trackShowAll: true,
+      myChart: this.chart,
+      myGlobal: this.global,
+    };
   },
   components: { BackgroundOperation, TrackCard },
+  watch: {
+    chart() {
+      this.myChart = this.chart;
+    },
+  },
+  methods: {
+    updateOperation() {
+      this.myGlobal.reCalculateChartMaker = !this.myGlobal
+        .reCalculateChartMaker;
+    },
+    newOperation() {
+      var operation = {
+        startTime: 0,
+        background: this.myChart.defaultBackground,
+      };
+      this.myChart.changeBackgroundOperations.push(operation);
+      this.updateOperation();
+      setTimeout(() => {
+        this.myChart.changeBackgroundOperations[0].edit = true;
+      }, 10);
+    },
+  },
 };
 </script>
-<style>
-.animate__animated.animate__fadeInLeft {
-  --animate-duration: 0.5s;
-}
-.animate__animated.animate__fadeOutLeft {
-  --animate-duration: 0.5s;
-}
-</style>
 <style scope>
 .menu-panel-container {
   height: calc(100vh - 80px);
@@ -82,5 +111,15 @@ export default {
 }
 .plus-button:active {
   color: #529b2e;
+}
+.flip-list-move {
+  transition: transform 1s;
+}
+
+.animate__animated.animate__fadeInLeft {
+  --animate-duration: 0.2s;
+}
+.animate__animated.animate__fadeOutLeft {
+  --animate-duration: 0.2s;
 }
 </style>

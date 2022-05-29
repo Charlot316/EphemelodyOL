@@ -39,9 +39,10 @@ export default {
       if (this.global.currentTime > 0) {
         this.myTrack.tempPositionX = this.getPositionX();
         this.myTrack.tempWidth = this.getWidth();
-        this.myTrack.tempR = this.getRGB()[0];
-        this.myTrack.tempG = this.getRGB()[1];
-        this.myTrack.tempB = this.getRGB()[2];
+        var RGB = this.getRGB();
+        this.myTrack.tempR = RGB[0];
+        this.myTrack.tempG = RGB[1];
+        this.myTrack.tempB = RGB[2];
         this.setHeightAndTop();
         while (
           this.myTrack.judges.length > 0 &&
@@ -72,16 +73,17 @@ export default {
     "global.repaint"() {
       this.paintTrack();
     },
-    "global.recalculateTrack"() {
+    "global.reCalculateTrack"() {
       this.setIndex();
       this.generatePositionXPath();
       this.myTrack.tempPositionX = this.getPositionX();
       this.generateWidthPath();
       this.myTrack.tempWidth = this.getWidth();
       this.generateRGBPath();
-      this.myTrack.tempR = this.getRGB()[0];
-      this.myTrack.tempG = this.getRGB()[1];
-      this.myTrack.tempB = this.getRGB()[2];
+      var RGB = this.getRGB();
+      this.myTrack.tempR = RGB[0];
+      this.myTrack.tempG = RGB[1];
+      this.myTrack.tempB = RGB[2];
       this.paintTrack();
     },
   },

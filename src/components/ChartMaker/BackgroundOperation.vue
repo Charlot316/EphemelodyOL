@@ -19,30 +19,31 @@
           <div style="font-weight:800">操作{{ operation.index + 1 }}</div>
           <div>
             <el-button
-              v-if="!edit"
+              v-if="!myOperation.edit"
               type="text"
               class="edit-button"
               icon="el-icon-s-tools"
-              @click="edit = true"
+              @click="startEdit"
             />
             <el-button
-              v-if="edit"
+              v-if="myOperation.edit"
               type="text"
               class="cancel-button"
               icon="el-icon-error"
-              @click="edit = false"
+              @click="myOperation.edit = false"
             />
             <el-button
-              v-if="edit"
+              v-if="myOperation.edit"
               type="text"
               class="ok-button"
               icon="el-icon-success"
-              @click="edit = false"
+              @click="saveOperation"
             />
             <el-button
               type="text"
               class="delete-button"
               icon="el-icon-remove"
+              @click="deleteOperation"
             />
           </div>
         </div>
@@ -51,28 +52,119 @@
         </div>
       </div>
     </div>
-    <div v-show="edit">
-      ceshi
+    <div v-show="myOperation.edit">
+      <el-form
+        :model="tempOperation"
+        :rules="rules"
+        ref="form"
+        @submit.prevent="saveOperation"
+      >
+        <el-form-item label="时机" label-width="80px" prop="startTime">
+          <el-input
+            @keydown.enter="saveOperation"
+            v-model="tempOperation.startTime"
+            style="width:100px"
+          />
+          <el-tooltip
+            class="item"
+            effect="dark"
+            content="设置操作的时机"
+            placement="top-start"
+            style="margin-left:10px;"
+          >
+            <i class="el-icon-question" />
+          </el-tooltip>
+        </el-form-item>
+      </el-form>
     </div>
   </div>
 </template>
 
 <script>
 export default {
-  props: ["operation", "global"],
+  props: ["operation", "global", "chart"],
   data() {
+    var checkStartTime = (rule, value, callback) => {
+      if (!value) {
+        rule;
+        return callback(new Error("时机不能为空"));
+      }
+      if (Number.isNaN(value)) {
+        callback(new Error("请输入数字值"));
+      } else {
+        if (value < 0) {
+          callback(new Error("时机不能小于0"));
+        } else if (value > this.chart.songLength) {
+          callback(new Error("时机不能超过歌曲长度"));
+        } else {
+          callback();
+        }
+      }
+    };
     return {
       myOperation: this.operation,
-      edit: false,
+      myGlobal: this.global,
+      myChart: this.chart,
+      tempOperation: {},
+      form: {},
+      rules: {
+        startTime: [{ validator: checkStartTime, trigger: "blur" }],
+        background: [{ required: true, trigger: "blur" }],
+      },
     };
   },
   created() {
-    console.log(this.operation);
+    this.myOperation.edit = false;
+  },
+  methods: {
+    updateOperation() {
+      this.myGlobal.reCalculateChartMaker = !this.myGlobal
+        .reCalculateChartMaker;
+    },
+    startEdit() {
+      this.myOperation.edit = true;
+      this.tempOperation = JSON.parse(JSON.stringify(this.myOperation));
+    },
+    saveOperation() {
+      this.$refs["form"].validate((valid) => {
+        if (valid) {
+          setTimeout(() => {
+            this.updateOperation();
+          }, 500);
+
+          for (var key in this.tempOperation) {
+            this.myOperation[key] = this.tempOperation[key];
+          }
+          this.myOperation.edit = false;
+        } else {
+          return false;
+        }
+      });
+    },
+    deleteOperation() {
+      this.$confirm("您确定删除该操作?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      }).then(() => {
+        this.myChart.changeBackgroundOperations.splice(
+          this.myOperation.index,
+          1
+        );
+        this.updateOperation();
+        this.$notify({
+          title: "成功",
+          message: "删除成功",
+          position: "top-left",
+          type: "success",
+        });
+      });
+    },
   },
   computed: {
     currentClass() {
       var currentClass = "";
-      if (this.edit) {
+      if (this.myOperation.edit) {
         currentClass = "edit ";
       } else {
         currentClass = "not-edit ";
