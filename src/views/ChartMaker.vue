@@ -488,6 +488,9 @@ export default {
       for (var i = 0; i < this.chart.tracks.length; i++) {
         this.chart.tracks[i].index = i;
       }
+      for (var j = 0; j < this.chart.changeBackgroundOperations; j++) {
+        this.chart.changeBackgroundOperations[j].index = j;
+      }
     },
     //调整画布
     resize() {
