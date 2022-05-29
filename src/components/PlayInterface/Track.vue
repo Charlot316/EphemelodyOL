@@ -72,29 +72,16 @@ export default {
     "global.repaint"() {
       this.paintTrack();
     },
-    "Track.moveOperations": {
-      handler() {
-        this.generatePositionXPath();
-        this.myTrack.tempPositionX = this.getPositionX();
-      },
-      deep: true,
-    },
-    "Track.changeWidthOperations": {
-      handler() {
-        this.generateWidthPath();
-        this.myTrack.tempWidth = this.getWidth();
-      },
-      deep: true,
-    },
-
-    "Track.changeColorOperations": {
-      handler() {
-        this.generateRGBPath();
-        this.myTrack.tempR = this.getRGB()[0];
-        this.myTrack.tempG = this.getRGB()[1];
-        this.myTrack.tempB = this.getRGB()[2];
-      },
-      deep: true,
+    "global.recalculateTrack"() {
+      this.generatePositionXPath();
+      this.myTrack.tempPositionX = this.getPositionX();
+      this.generateWidthPath();
+      this.myTrack.tempWidth = this.getWidth();
+      this.generateRGBPath();
+      this.myTrack.tempR = this.getRGB()[0];
+      this.myTrack.tempG = this.getRGB()[1];
+      this.myTrack.tempB = this.getRGB()[2];
+      this.paintTrack();
     },
   },
   created() {

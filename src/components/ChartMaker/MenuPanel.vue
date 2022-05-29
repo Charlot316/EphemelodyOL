@@ -6,7 +6,7 @@
           v-for="operation in chart.changeBackgroundOperations"
           :key="operation"
         >
-          <BackgroundOperation :chart="chart" :operation="operation" />
+          <BackgroundOperation :chart="chart" :operation="operation" :global="global"/>
         </div>
       </el-collapse-item>
 

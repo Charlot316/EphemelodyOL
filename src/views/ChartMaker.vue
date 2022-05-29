@@ -166,19 +166,35 @@
       </div>
     </div>
     <!-- 侧边栏 -->
-    <div
-      v-if="menuOpened"
-      :class="menuOpened ? 'sider-opened' : 'sider-closed'"
+    <transition
+      name="fade"
+      enter-active-class="animate__animated animate__fadeInLeft"
+      leave-active-class="animate__animated animate__fadeOutLeft"
     >
-      <TrackPanel
-        v-if="currentSelectTrack != null"
-        :Track="currentSelectTrack"
-        :global="global"
-        @returnMenu="returnMenu"
-      />
+      <div
+        v-if="menuOpened"
+        :class="menuOpened ? 'sider-opened' : 'sider-closed'"
+      >
+        <transition
+          name="fade"
+          enter-active-class="animate__animated animate__fadeInLeft"
+          leave-active-class="animate__animated animate__fadeOutLeft"
+          ><TrackPanel
+            key="trackpanel"
+            v-show="currentSelectTrack != null"
+            :Track="currentSelectTrack"
+            :global="global"
+            @returnMenu="returnMenu"
+        /></transition>
 
-      <MenuPanel :global="global" :chart="chart" v-else />
-    </div>
+        <MenuPanel
+          key="menupanel"
+          :global="global"
+          :chart="chart"
+          v-show="currentSelectTrack == null"
+        /></div
+    ></transition>
+
     <!-- 谱面展示 -->
     <div class="select">
       <div
@@ -280,6 +296,7 @@ import Track from "@/components/PlayInterface/Track";
 import MenuPanel from "@/components/ChartMaker/MenuPanel";
 import TrackPanel from "@/components/ChartMaker/TrackPanel";
 import { chart } from "@/utils/chart.js";
+import "animate.css";
 export default {
   components: {
     Track,
@@ -399,6 +416,7 @@ export default {
       trackCanvas: null,
       judgeCanvas: null,
       repaint: false,
+      recalculateTrack: false,
     };
   },
   mounted() {
@@ -488,7 +506,7 @@ export default {
       for (var i = 0; i < this.chart.tracks.length; i++) {
         this.chart.tracks[i].index = i;
       }
-      for (var j = 0; j < this.chart.changeBackgroundOperations; j++) {
+      for (var j = 0; j < this.chart.changeBackgroundOperations.length; j++) {
         this.chart.changeBackgroundOperations[j].index = j;
       }
     },
@@ -508,9 +526,14 @@ export default {
     //调整画布
     changeMenuDisplay() {
       this.menuOpened = !this.menuOpened;
+      for (var i = 0; i < 510; i += 16) {
+        setTimeout(() => {
+          this.resize();
+        }, i);
+      }
       setTimeout(() => {
-        this.resize();
-      }, 10);
+        this.repaint();
+      }, 520);
     },
     //获取谱面信息
     getChart() {
@@ -594,12 +617,14 @@ export default {
             startTime: start,
             endTime: nextOperation.startTime,
           });
+          operation.endTime = nextOperation.startTime;
         } else {
           this.imagePath.push({
             url: operation.background,
             startTime: start,
             endTime: this.chart.songLength + 1000,
           });
+          operation.endTime = this.chart.songLength + 1000;
         }
       }
     },
@@ -694,9 +719,38 @@ export default {
     },
     //重新绘制
     repaint() {
+      if (this.global.notePainter) {
+        this.global.notePainter.clearRect(
+          0,
+          0,
+          this.global.noteCanvas.width,
+          this.global.noteCanvas.height
+        );
+      }
+      if (this.global.trackPainter) {
+        this.global.trackPainter.clearRect(
+          0,
+          0,
+          this.global.trackCanvas.width,
+          this.global.trackCanvas.height
+        );
+      }
+      if (this.global.judgePainter) {
+        this.global.judgePainter.clearRect(
+          0,
+          0,
+          this.global.judgeCanvas.width,
+          this.global.judgeCanvas.height
+        );
+      }
       this.global.repaint = !this.global.repaint;
     },
-    //
+    //重新绘制
+    recalculateTrack() {
+      this.global.recalculateTrack = !this.global.recalculateTrack;
+      this.repaint();
+    },
+    //时间区域调整
     changeDisplayArea(values) {
       this.displayStart = values[0];
       this.displayEnd = values[1];
@@ -704,16 +758,25 @@ export default {
       this.audio.currentTime = this.global.currentTime / 1000;
       this.resetTrack();
     },
+    //改变音量
     changeVolume() {
       this.audio.volume = this.volume / 100;
     },
+    //返回到菜单
     returnMenu() {
       this.currentSelectTrack = null;
     },
   },
 };
 </script>
-
+<style>
+.animate__animated.animate__fadeInLeft {
+  --animate-duration: 0.5s;
+}
+.animate__animated.animate__fadeOutLeft {
+  --animate-duration: 0.2s;
+}
+</style>
 <style scoped>
 .play-interface {
   height: 100%;
@@ -785,11 +848,13 @@ export default {
 .container-small {
   left: 300px;
   width: calc(100vw - 300px);
+  transition: 0.5s;
 }
 
 .container-big {
   left: 0px;
   width: 100vw;
+  transition: 0.5s;
 }
 .header-slide-item {
   width: 96%;
