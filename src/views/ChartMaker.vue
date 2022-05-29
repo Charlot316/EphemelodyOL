@@ -576,7 +576,7 @@ export default {
     //给轨道排序
     sortTrack() {
       this.chart.tracks.sort(function(a, b) {
-        return b.startTiming - a.startTiming;
+        return a.startTiming - b.startTiming;
       });
       this.setIndex();
     },

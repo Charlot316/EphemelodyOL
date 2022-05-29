@@ -138,10 +138,10 @@ export default {
     },
      newTrack() {
       var operation = {
-        startTime: 0,
+        startTiming: 0,
         background: this.myChart.defaultBackground,
       };
-      this.myChart.changeBackgroundOperations.push(operation);
+      this.myChart.tracks.push(operation);
       this.updateOperation();
       setTimeout(() => {
         this.myChart.changeBackgroundOperations[0].edit = true;
@@ -156,6 +156,8 @@ export default {
   width: 90%;
   padding: 0% 5%;
   overflow: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 .plus-button {
   color: #67c23a;
@@ -175,5 +177,10 @@ export default {
 }
 .animate__animated.animate__fadeOutLeft {
   --animate-duration: 0.2s;
+}
+.-webkit-scrollbar {
+
+display:none /* Chrome Safari */
+
 }
 </style>

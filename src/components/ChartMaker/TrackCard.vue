@@ -10,10 +10,10 @@
         <div
           style="width:100%;height:20px; display: flex;justify-content: space-between; align-items: center;line-height: 20px;"
         >
-          <div style="font-weight:800">操作{{ track.index + 1 }}</div>
+          <div style="font-weight:800">轨道{{ track.index + 1 }}</div>
           <div>
             <el-button
-              v-if="!mytrack.edit"
+              v-if="!myTrack.edit"
               type="text"
               class="edit-button"
               icon="el-icon-s-tools"
@@ -62,7 +62,7 @@
           <el-tooltip
             class="item"
             effect="dark"
-            content="设置操作的时机"
+            content="设置轨道的时机"
             placement="top-start"
             style="margin-left:10px;"
           >
@@ -96,7 +96,7 @@ export default {
       }
     };
     return {
-      mytrack: this.track,
+      myTrack: this.track,
       myGlobal: this.global,
       myChart: this.chart,
       tempTrack: {},
