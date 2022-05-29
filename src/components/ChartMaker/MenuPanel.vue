@@ -2,7 +2,12 @@
   <div class="menu-panel-container">
     <el-collapse>
       <el-collapse-item title=" 背景操作" name="1">
-        <BackgroundOperation />
+        <div
+          v-for="operation in chart.changeBackgroundOperations"
+          :key="operation"
+        >
+          <BackgroundOperation :chart="chart" :operation="operation" />
+        </div>
       </el-collapse-item>
 
       <el-collapse-item title=" 当前轨道" name="2">
@@ -18,7 +23,7 @@
 import BackgroundOperation from "./BackgroundOperation";
 import TrackCard from "./TrackCard";
 export default {
-  props:['chart','global'],
+  props: ["chart", "global"],
   components: { BackgroundOperation, TrackCard },
 };
 </script>
@@ -28,5 +33,6 @@ export default {
   height: calc(100vh - 80px);
   width: 90%;
   padding: 0% 5%;
+  overflow: auto;
 }
 </style>

@@ -620,7 +620,7 @@ export default {
           });
         } else {
           this.imagePath.push({
-            url: defaultBackground,
+            url: operation.background,
             startTime: start,
             endTime: this.chart.songLength + 1000,
           });

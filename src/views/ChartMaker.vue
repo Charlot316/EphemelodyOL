@@ -172,12 +172,12 @@
     >
       <TrackPanel
         v-if="currentSelectTrack != null"
-        @Track="currentSelectTrack"
-        @global="global"
+        :Track="currentSelectTrack"
+        :global="global"
         @returnMenu="returnMenu"
       />
 
-      <MenuPanel v-else />
+      <MenuPanel :global="global" :chart="chart" v-else />
     </div>
     <!-- 谱面展示 -->
     <div class="select">
@@ -596,7 +596,7 @@ export default {
           });
         } else {
           this.imagePath.push({
-            url: defaultBackground,
+            url: operation.background,
             startTime: start,
             endTime: this.chart.songLength + 1000,
           });
