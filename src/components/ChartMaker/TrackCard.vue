@@ -3,8 +3,8 @@
     <div
       style="width:100%;display: flex;justify-content: space-between;border: none;"
     >
-      <div>
-      <h1>轨道</h1>
+      <div  style="width: 70px;height:70px;border-radius: 5px;">
+      
       </div>
       <div style="width:calc(100% - 80px);">
         <div

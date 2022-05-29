@@ -54,7 +54,6 @@
             class="header-button"
             @click="
               globalSetting = true;
-              log(globalSetting);
             "
             >全局设置</el-button
           >
@@ -64,6 +63,24 @@
             width="650px"
           >
             <el-form :model="form" label-width="120px" style="padding: 20px;">
+            <el-form-item label="时间">
+                <el-input-number
+                  v-model="global.currentTime"
+                  :min="0"
+                  :max="chart.songLength"
+                  @change="changeTime"
+                  :step="keyStep"
+                />
+                <el-tooltip
+                  class="item"
+                  effect="dark"
+                  content="可以在此输入精确的时间，以毫秒为单位"
+                  placement="top-start"
+                  style="margin-left:10px;"
+                >
+                  <i class="el-icon-question" />
+                </el-tooltip>
+              </el-form-item>
               <el-form-item label="音量">
                 <el-input-number
                   v-model="volume"

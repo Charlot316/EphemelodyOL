@@ -1,7 +1,7 @@
 <template>
   <div class="menu-panel-container">
     <el-collapse>
-      <el-collapse-item title=" 背景操作" name="1">
+      <el-collapse-item title="背景操作" name="1">
         <div
           style="width:100%;height:20px;display: flex;margin-bottom:20px;
           justify-content: space-between; align-items: center;"
@@ -48,7 +48,7 @@
         </transition-group>
       </el-collapse-item>
 
-      <el-collapse-item title=" 当前轨道" name="2">
+      <el-collapse-item title="轨道列表" name="2">
          <div
           style="width:100%;height:20px;display: flex;margin-bottom:20px;
           justify-content: space-between; align-items: center;"
@@ -156,8 +156,7 @@ export default {
   width: 90%;
   padding: 0% 5%;
   overflow: auto;
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+  -ms-overflow-style:none;
 }
 .plus-button {
   color: #67c23a;
@@ -178,9 +177,9 @@ export default {
 .animate__animated.animate__fadeOutLeft {
   --animate-duration: 0.2s;
 }
-.-webkit-scrollbar {
 
-display:none /* Chrome Safari */
 
-}
+.menu-panel-container::-webkit-scrollbar{width:0!important}
+
+
 </style>
