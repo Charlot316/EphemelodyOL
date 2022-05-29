@@ -431,7 +431,23 @@ export default {
     this.resize();
     window.onresize = () => {
       return (() => {
-        that.resize();
+        for (var i = 0; i < 510; i += 16) {
+          setTimeout(() => {
+            if (this.global.trackPainter) {
+              this.global.trackPainter.clearRect(
+                0,
+                0,
+                this.global.trackCanvas.width,
+                this.global.trackCanvas.height
+              );
+            }
+            this.resize();
+            this.repaint();
+          }, i);
+        }
+        setTimeout(() => {
+          this.repaint();
+        }, 520);
       })();
     };
     document.onmouseup = function() {
@@ -528,7 +544,16 @@ export default {
       this.menuOpened = !this.menuOpened;
       for (var i = 0; i < 510; i += 16) {
         setTimeout(() => {
+          if (this.global.trackPainter) {
+            this.global.trackPainter.clearRect(
+              0,
+              0,
+              this.global.trackCanvas.width,
+              this.global.trackCanvas.height
+            );
+          }
           this.resize();
+          this.repaint();
         }, i);
       }
       setTimeout(() => {
