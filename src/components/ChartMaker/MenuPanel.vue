@@ -3,6 +3,21 @@
     <el-collapse>
       <el-collapse-item title=" 背景操作" name="1">
         <div
+          style="width:100%;height:20px;display: flex;margin-bottom:20px;
+          justify-content: space-between; align-items: center;"
+        >
+          <div>
+            <el-button
+              type="text"
+              class="plus-button"
+              icon="el-icon-circle-plus"
+            >新增</el-button>
+          </div>
+          <div>
+            <el-switch v-model="operationShowAll" active-text="显示全部" />
+          </div>
+        </div>
+        <div
           v-for="operation in chart.changeBackgroundOperations"
           :key="operation"
         >
@@ -13,7 +28,7 @@
           >
             <BackgroundOperation
               v-show="
-                global.currentTime > operation.startTime &&
+                operationShowAll||global.currentTime > operation.startTime &&
                   global.currentTime < operation.endTime
               "
               :chart="chart"
@@ -38,6 +53,9 @@ import TrackCard from "./TrackCard";
 import "animate.css";
 export default {
   props: ["chart", "global"],
+  data() {
+    return { operationShowAll: true, trackShowAll: true };
+  },
   components: { BackgroundOperation, TrackCard },
 };
 </script>
@@ -55,5 +73,14 @@ export default {
   width: 90%;
   padding: 0% 5%;
   overflow: auto;
+}
+.plus-button {
+  color: #67c23a;
+}
+.plus-button:hover {
+  color: #95d475;
+}
+.plus-button:active {
+  color: #529b2e;
 }
 </style>

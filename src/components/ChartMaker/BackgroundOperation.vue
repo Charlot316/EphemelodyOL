@@ -5,7 +5,7 @@
     >
       <div>
         <el-image
-          style="width: 70px;height:70px;"
+          style="width: 70px;height:70px;border-radius: 5px;"
           :src="operation.background"
           fit="fit"
           class="image"
@@ -99,7 +99,6 @@ export default {
   width: calc(100% - 30px);
   margin: 10px;
   padding: 5px;
-
   -webkit-border-radius: 5px;
   border-radius: 5px;
   transition: 0.5s;
@@ -115,7 +114,7 @@ export default {
 }
 .current-operation {
   background: white;
-  color: black;
+  color: #303133;
   -webkit-box-shadow: 0 0 9px 4px rgba(127, 127, 127, 0.5);
   box-shadow: 0 0 9px 4px rgba(127, 127, 127, 0.5);
   transition: 0.5s;
