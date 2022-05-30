@@ -527,8 +527,8 @@ export default {
     resize() {
       const that = this;
       this.playInterface = document.getElementById("play-interface-container");
-      that.global.screenWidth = that.playInterface.offsetWidth;
-      that.global.screenHeight = that.playInterface.offsetHeight;
+      that.global.screenWidth = document.documentElement.clientWidth;
+      that.global.screenHeight = document.documentElement.clientHeight;
       that.global.noteCanvas.height = that.playInterface.offsetHeight;
       that.global.trackCanvas.height = that.playInterface.offsetHeight;
       that.global.judgeCanvas.height = that.playInterface.offsetHeight;
@@ -558,6 +558,12 @@ export default {
 
     //运行
     run() {
+      if (
+        document.documentElement.clientWidth != this.global.screenWidth ||
+        document.documentElement.clientHeight != this.global.screenHeight
+      ) {
+        this.resize();
+      }
       this.global.notePainter.clearRect(
         0,
         0,
@@ -641,7 +647,6 @@ export default {
           this.audio.muted = false;
           this.audio.volume = this.$store.state.volume / 100;
           this.run();
-          this.resize();
         }, 500);
       }
     },
@@ -717,8 +722,7 @@ export default {
         setTimeout(() => {
           this.loadingStatus.canRun = true;
           this.$forceUpdate();
-          this.resize();
-        }, 3000);
+        }, 1000);
       }
     },
     //暂停
