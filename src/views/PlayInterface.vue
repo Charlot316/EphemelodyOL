@@ -1,7 +1,12 @@
 <template>
   <div class="play-interface select" id="play-interface-container">
     <div v-if="!loadingStatus.runStart" class="show-info">
-      <img :src="chart.defaultBackground" class="loading-background" />
+      <img
+        :src="chart.defaultBackground"
+        class="loading-background"
+        style="user-drag:none;"
+      />
+      <div style="position:absolute;width:100vw;height:100vh;"></div>
       <div
         :class="
           loadingStatus.runReady ? 'info-container-out' : 'info-container'
@@ -413,6 +418,7 @@ export default {
       keyPressTime: [],
       keyIsHold: [],
       keyUsed: [],
+      keyMap: [],
       pureCount: 0,
       farCount: 0,
       lostCount: 0,
@@ -425,7 +431,7 @@ export default {
       noteCanvas: null,
       trackCanvas: null,
       judgeCanvas: null,
-      repaint:false,
+      repaint: false,
     };
   },
   mounted() {
@@ -437,24 +443,10 @@ export default {
     this.global.notePainter = this.global.noteCanvas.getContext("2d");
     this.global.trackPainter = this.global.trackCanvas.getContext("2d");
     this.global.judgePainter = this.global.judgeCanvas.getContext("2d");
-    this.global.screenWidth = this.playInterface.offsetWidth;
-    this.global.screenHeight = this.playInterface.offsetHeight;
-    that.global.noteCanvas.height = that.playInterface.offsetHeight;
-    that.global.trackCanvas.height = that.playInterface.offsetHeight;
-    that.global.judgeCanvas.height = that.playInterface.offsetHeight;
-    that.global.noteCanvas.width = that.playInterface.offsetWidth;
-    that.global.trackCanvas.width = that.playInterface.offsetWidth;
-    that.global.judgeCanvas.width = that.playInterface.offsetWidth;
+    this.resize();
     window.onresize = () => {
       return (() => {
-        that.global.screenWidth = that.playInterface.offsetWidth;
-        that.global.screenHeight = that.playInterface.offsetHeight;
-        that.global.noteCanvas.height = that.playInterface.offsetHeight;
-        that.global.trackCanvas.height = that.playInterface.offsetHeight;
-        that.global.judgeCanvas.height = that.playInterface.offsetHeight;
-        that.global.noteCanvas.width = that.playInterface.offsetWidth;
-        that.global.trackCanvas.width = that.playInterface.offsetWidth;
-        that.global.judgeCanvas.width = that.playInterface.offsetWidth;
+        that.resize();
       })();
     };
 
@@ -474,11 +466,76 @@ export default {
     document.onkeyup = function(e) {
       that.global.keyIsHold[e.key.toUpperCase()] = false;
     };
+    document.addEventListener("gesturestart", function(e) {
+      e.preventDefault();
+    });
+    this.playInterface.ontouchstart = function(e) {
+      if (that.chart.tracks) {
+        var currentTime = that.global.currentTime;
+        var currentTracks = [];
+        for (var i = 0; i < that.chart.tracks.length; i++) {
+          var track = that.chart.tracks[i];
+          if (
+            currentTime > track.startTiming &&
+            currentTime < track.endTiming &&
+            track.type == 1
+          ) {
+            currentTracks.push(track);
+          }
+        }
+        for (var j = 0; j < e.touches.length; j++) {
+          for (var k = 0; k < currentTracks.length; k++) {
+            track = currentTracks[k];
+            var touch = e.touches[j];
+            var left =
+              (track.tempPositionX - track.tempWidth) * that.global.screenWidth;
+            var right =
+              (track.tempPositionX + track.tempWidth) * that.global.screenWidth;
 
+            if (touch.clientX > left && touch.clientX < right) {
+              var key = track.key.toUpperCase();
+              that.global.keyPressTime[key] = currentTime;
+              that.global.keyIsHold[key] = true;
+              that.global.keyUsed[key] = false;
+              that.global.keyMap[touch.identifier] = key;
+            }
+          }
+        }
+      }
+      if (e.touches.length > 1) {
+        e.preventDefault();
+      }
+    };
+    var lastTouchEnd = 0;
+    this.playInterface.ontouchend = function(e) {
+      var now = new Date().getTime();
+      if (now - lastTouchEnd <= 300) {
+        e.preventDefault();
+      }
+      lastTouchEnd = now;
+      if (that.chart.tracks) {
+        for (var j = 0; j < e.changedTouches.length; j++) {
+          var touch = e.changedTouches[j];
+          that.global.keyIsHold[that.global.keyMap[touch.identifier]] = false;
+        }
+      }
+    };
     this.initiate();
   },
 
   methods: {
+    resize() {
+      const that = this;
+      this.playInterface = document.getElementById("play-interface-container");
+      that.global.screenWidth = that.playInterface.offsetWidth;
+      that.global.screenHeight = that.playInterface.offsetHeight;
+      that.global.noteCanvas.height = that.playInterface.offsetHeight;
+      that.global.trackCanvas.height = that.playInterface.offsetHeight;
+      that.global.judgeCanvas.height = that.playInterface.offsetHeight;
+      that.global.noteCanvas.width = that.playInterface.offsetWidth;
+      that.global.trackCanvas.width = that.playInterface.offsetWidth;
+      that.global.judgeCanvas.width = that.playInterface.offsetWidth;
+    },
     //获取谱面信息
     getChart() {
       this.chart = chart;
@@ -582,8 +639,9 @@ export default {
           this.$forceUpdate();
           this.audio.currentTime = 0;
           this.audio.muted = false;
-          this.audio.volume = this.$store.state.volume/100;
+          this.audio.volume = this.$store.state.volume / 100;
           this.run();
+          this.resize();
         }, 500);
       }
     },
@@ -659,7 +717,8 @@ export default {
         setTimeout(() => {
           this.loadingStatus.canRun = true;
           this.$forceUpdate();
-        }, 1000);
+          this.resize();
+        }, 3000);
       }
     },
     //暂停
@@ -679,6 +738,8 @@ export default {
       this.pauseVisible = false;
       this.global.keyPressTime = [];
       this.global.keyIsHold = [];
+      this.global.keyUsed = [];
+      this.global.keyMap = [];
       this.global.pureCount = 0;
       this.global.farCount = 0;
       this.global.lostCount = 0;
@@ -702,8 +763,8 @@ export default {
 
 <style scoped>
 .play-interface {
-  height: 100%;
-  width: 100%;
+  height: 100vh;
+  width: 100vw;
   background: white;
   overflow: auto;
 }
@@ -846,8 +907,8 @@ export default {
   position: absolute;
   left: 0;
   top: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   object-fit: fill;
   -webkit-user-drag: none;
   animation-name: backgroung-image;
