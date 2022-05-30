@@ -86,13 +86,24 @@ export default {
           this.global.currentTime <
             this.chart.changeBackgroundOperations[i].endTime
         ) {
-          if(i>0)
-          document
-            .querySelector(
-              "#backgroundOperation" +
-                this.chart.changeBackgroundOperations[i-1].index
-            )
-            .scrollIntoView(true);
+          if (i > 0)
+            setTimeout(() => {
+              document
+                .querySelector(
+                  "#backgroundOperation" +
+                    this.chart.changeBackgroundOperations[i - 1].index
+                )
+                .scrollIntoView(true);
+            }, 500);
+          else
+            setTimeout(() => {
+              document
+                .querySelector(
+                  "#backgroundOperation" +
+                    this.chart.changeBackgroundOperations[0].index
+                )
+                .scrollIntoView(true);
+            }, 500);
           break;
         }
       }
