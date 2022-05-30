@@ -320,11 +320,11 @@ export default {
         this.global.currentTime > this.track.startTiming &&
         this.global.currentTime < this.track.endTiming
       ) {
-        currentClass += "current-track";
+        currentClass += "current-operation";
       } else if (this.global.currentTime > this.track.endTiming) {
-        currentClass += "passed-track";
+        currentClass += "passed-operation";
       } else if (this.global.currentTime < this.track.startTiming) {
-        currentClass += "to-come-track ";
+        currentClass += "to-come-operation ";
       }
       return currentClass;
     },
@@ -349,36 +349,6 @@ export default {
   padding: 5px;
   -webkit-border-radius: 5px;
   border-radius: 5px;
-  transition: 0.5s;
-}
-.current-track {
-  background: #2f2f2f;
-  color: rgb(171, 171, 171);
-  box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.5);
-  transition: 0.5s;
-}
-.current-track .el-form-item__label {
-  color: rgb(171, 171, 171);
-  transition: 0.5s;
-}
-.passed-track {
-  background: rgb(144, 144, 144);
-  color: rgb(45, 45, 45);
-  box-shadow: 0 0 0px 0px rgba(127, 127, 127, 0.5);
-  transition: 0.5s;
-}
-.passed-track .el-form-item__label {
-  color: rgb(45, 45, 45);
-  transition: 0.5s;
-}
-.to-come-track {
-  background: #2f2f2f;
-  color: rgb(171, 171, 171);
-  box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.5);
-  transition: 0.5s;
-}
-.to-come-track .el-form-item__label {
-  color: rgb(171, 171, 171);
   transition: 0.5s;
 }
 .delete-button {

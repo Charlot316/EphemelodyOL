@@ -204,36 +204,6 @@ export default {
   border-radius: 5px;
   transition: 0.5s;
 }
-.current-operation {
-  background: #2f2f2f;
-  color: rgb(171, 171, 171);
-  box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.5);
-  transition: 0.5s;
-}
-.current-operation .el-form-item__label {
-  color: rgb(171, 171, 171);
-  transition: 0.5s;
-}
-.passed-operation {
-  background: rgb(80, 80, 80);
-  color: rgb(40, 40, 40);
-  box-shadow: 0 0 0px 0px rgba(127, 127, 127, 0.5);
-  transition: 0.5s;
-}
-.passed-operation .el-form-item__label {
-  color: rgb(171, 171, 171);
-  transition: 0.5s;
-}
-.to-come-operation {
-  background: #2f2f2f;
-  color: rgb(171, 171, 171);
-  box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.5);
-  transition: 0.5s;
-}
-.to-come-operation .el-form-item__label {
-  color: rgb(171, 171, 171);
-  transition: 0.5s;
-}
 .delete-button {
   color: #f56c6c;
 }

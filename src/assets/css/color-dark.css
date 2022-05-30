@@ -1,28 +1,35 @@
-.header{
-    background-color: #242f42;
+.current-operation {
+    background: rgb(47, 47, 47);
+    color: rgb(171, 171, 171);
+    box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.5);
+    transition: 0.5s;
 }
-.login-wrap{
-    background: #324157;
+
+.current-operation .el-form-item__label {
+    color: rgb(171, 171, 171);
+    transition: 0.5s;
 }
-.plugins-tips{
-    background: #eef1f6;
+
+.passed-operation {
+    background: rgb(30, 30, 30);
+    color: rgb(100, 100, 100);
+    box-shadow: 0 0 0px 0px rgba(127, 127, 127, 0.5);
+    transition: 0.5s;
 }
-.plugins-tips a{
-    color: #20a0ff;
+
+.passed-operation .el-form-item__label {
+    color: rgb(171, 171, 171);
+    transition: 0.5s;
 }
-.el-upload--text em {
-    color: #20a0ff;
+
+.to-come-operation {
+    background: #2f2f2f;
+    color: rgb(171, 171, 171);
+    box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.5);
+    transition: 0.5s;
 }
-.pure-button{
-    background: #20a0ff;
-}
-.tags-li.active {
-    border: 1px solid #409EFF;
-    background-color: #409EFF;
-}
-.message-title{
-    color: #20a0ff;
-}
-.collapse-btn:hover{
-    background: rgb(40,52,70);
+
+.to-come-operation .el-form-item__label {
+    color: rgb(171, 171, 171);
+    transition: 0.5s;
 }

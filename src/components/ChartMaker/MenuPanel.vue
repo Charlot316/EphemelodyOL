@@ -133,6 +133,7 @@ export default {
   height: calc(100vh - 350px);
   width: 90%;
   padding: 0% 5%;
+  border:1px solid rgba(255, 255, 255, 0.1); 
   overflow: auto;
   -ms-overflow-style: none;
 }
