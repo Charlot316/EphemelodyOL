@@ -4,25 +4,29 @@
       style="width:100%;display: flex;justify-content: space-between;border: none;"
     >
       <div style="width: 70px;height:70px;border-radius: 5px;position:relative">
-      <el-image
+        <el-image
           style="position:absolute;top:0;left:0;width: 70px;height:70px;border-radius: 5px;"
           src="http://pic.mcatk.com/charlot-pictures/8B0C2D47-6D1E-4916-BE4C-EFD5C6A5D998_1_201_a.jpeg"
           fit="fit"
           class="image"
         />
-      <div style="position:absolute;top:0;left:0;width: 70px;height:70px;border-radius: 5px;
-        text-align:center; line-height: 70px; color:white; text-shadow:2px 2px 5px black; font-size: 50px;">
-        {{myTrack.type==1?myTrack.key.toUpperCase():'虚'}}
+        <div
+          style="position:absolute;top:0;left:0;width: 70px;height:70px;border-radius: 5px;
+        text-align:center; line-height: 70px; color:white; text-shadow:2px 2px 5px black; font-size: 50px;"
+        >
+          {{ myTrack.type == 1 ? myTrack.key.toUpperCase() : "虚" }}
         </div>
         <div
-        v-if=" global.currentTime >track.startTiming &&
-       global.currentTime < track.endTiming"
+          v-if="
+            global.currentTime > track.startTiming &&
+              global.currentTime < track.endTiming
+          "
           :style="{
             position: absolute,
             height: '70px',
             top: 0,
             marginLeft:
-              (myTrack.tempPositionX - myTrack.tempWidth) * 160+75 + 'px',
+              (myTrack.tempPositionX - myTrack.tempWidth) * 160 + 75 + 'px',
             width: 2 * myTrack.tempWidth * 160 + 'px',
             background:
               'rgba(' +
@@ -34,7 +38,6 @@
               ',0.5)',
           }"
         ></div>
-        
       </div>
       <div style="width:calc(100% - 80px);">
         <div
@@ -76,7 +79,7 @@
         </div>
       </div>
     </div>
-    <div v-show="myTrack.edit">
+    <div v-show="myTrack.edit" style="margin-top:20px;">
       <el-form
         :model="tempTrack"
         :rules="rules"
@@ -87,7 +90,7 @@
           <el-input
             @keydown.enter="saveTrack"
             v-model="tempTrack.startTiming"
-            style="width:100px"
+            style="width:130px"
           />
           <el-tooltip
             class="item"
@@ -99,11 +102,11 @@
             <i class="el-icon-question" />
           </el-tooltip>
         </el-form-item>
-          <el-form-item label="结束时机" label-width="80px" prop="endTiming">
+        <el-form-item label="结束时机" label-width="80px" prop="endTiming">
           <el-input
             @keydown.enter="saveTrack"
             v-model="tempTrack.endTiming"
-            style="width:100px"
+            style="width:130px"
           />
           <el-tooltip
             class="item"
@@ -115,11 +118,11 @@
             <i class="el-icon-question" />
           </el-tooltip>
         </el-form-item>
-         <el-form-item label="默认颜色" label-width="80px" prop="endTiming">
+        <el-form-item label="横坐标" label-width="80px" prop="positionX">
           <el-input
             @keydown.enter="saveTrack"
-            v-model="tempTrack.endTiming"
-            style="width:100px"
+            v-model="tempTrack.positionX"
+            style="width:130px"
           />
           <el-tooltip
             class="item"
@@ -131,16 +134,28 @@
             <i class="el-icon-question" />
           </el-tooltip>
         </el-form-item>
-         <el-form-item label="宽度" label-width="80px" prop="endTiming">
+        <el-form-item label="宽度" label-width="80px" prop="width">
           <el-input
             @keydown.enter="saveTrack"
-            v-model="tempTrack.endTiming"
-            style="width:100px"
+            v-model="tempTrack.width"
+            style="width:130px"
           />
           <el-tooltip
             class="item"
             effect="dark"
             content="设置轨道的结束时机"
+            placement="top-start"
+            style="margin-left:10px;"
+          >
+            <i class="el-icon-question" />
+          </el-tooltip>
+        </el-form-item>
+        <el-form-item label="默认颜色" label-width="80px" prop="color">
+          <el-color-picker v-model="tempTrack.color" color-format="rgb" />
+          <el-tooltip
+            class="item"
+            effect="dark"
+            content="设置轨道的默认颜色"
             placement="top-start"
             style="margin-left:10px;"
           >
@@ -168,9 +183,9 @@ export default {
           callback(new Error("开始时机不能小于0"));
         } else if (value > this.chart.songLength) {
           callback(new Error("开始时机不能超过歌曲长度"));
-        } else if(value>this.tempTrack.endTiming){
+        } else if (value > this.tempTrack.endTiming) {
           callback(new Error("开始时机不能超过结束时机"));
-        }else{
+        } else {
           callback();
         }
       }
@@ -187,11 +202,33 @@ export default {
           callback(new Error("时机不能小于0"));
         } else if (value > this.chart.songLength) {
           callback(new Error("时机不能超过歌曲长度"));
-        } else if(value<this.tempTrack.startTiming){
+        } else if (value < this.tempTrack.startTiming) {
           callback(new Error("开始时机不能小于开始时机"));
-        }else {
+        } else {
           callback();
         }
+      }
+    };
+    var checkWidth = (rule, value, callback) => {
+      if (!value) {
+        rule;
+        return callback(new Error("宽度不能为空"));
+      }
+      if (parseFloat(value).toString() == "NaN") {
+        callback(new Error("请输入数字值"));
+      } else {
+        callback();
+      }
+    };
+    var checkPositionX = (rule, value, callback) => {
+      if (!value) {
+        rule;
+        return callback(new Error("横坐标不能为空"));
+      }
+      if (parseFloat(value).toString() == "NaN") {
+        callback(new Error("请输入数字值"));
+      } else {
+        callback();
       }
     };
     return {
@@ -201,8 +238,17 @@ export default {
       tempTrack: {},
       form: {},
       rules: {
-        startTiming: [{ validator: checkStartTime, trigger: "blur" }],
-        endTiming: [{ validator: checkEndTime, trigger: "blur" }],
+        startTiming: [
+          { required: true, validator: checkStartTime, trigger: "blur" },
+        ],
+        endTiming: [
+          { required: true, validator: checkEndTime, trigger: "blur" },
+        ],
+        width: [{ required: true, validator: checkWidth, trigger: "blur" }],
+        positionX: [
+          { required: true, validator: checkPositionX, trigger: "blur" },
+        ],
+        color: [{ required: true, message: "请选择颜色", trigger: "blur" }],
       },
     };
   },
@@ -211,12 +257,19 @@ export default {
   },
   methods: {
     updateTrack() {
-      this.myGlobal.reCalculateChartMaker = !this.myGlobal
-        .reCalculateChartMaker;
+      this.myGlobal.reCalculateTrack = !this.myGlobal.reCalculateTrack;
     },
     startEdit() {
       this.myTrack.edit = true;
       this.tempTrack = JSON.parse(JSON.stringify(this.myTrack));
+      this.tempTrack.color =
+        "rgb(" +
+        this.myTrack.R +
+        "," +
+        this.myTrack.G +
+        "," +
+        this.myTrack.B +
+        ")";
     },
     saveTrack() {
       this.$refs["form"].validate((valid) => {
@@ -228,6 +281,10 @@ export default {
           for (var key in this.tempTrack) {
             this.myTrack[key] = this.tempTrack[key];
           }
+          var rgb=this.tempTrack.color.substring(4,this.tempTrack.color.length-1).split(",");
+          this.myTrack.R=rgb[0]
+          this.myTrack.G=rgb[1]
+          this.myTrack.B=rgb[2]
           this.myTrack.edit = false;
         } else {
           return false;
@@ -235,7 +292,7 @@ export default {
       });
     },
     deleteTrack() {
-      this.$confirm("您确定删除该操作?", "提示", {
+      this.$confirm("您确定删除该轨道?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning",
@@ -286,7 +343,7 @@ export default {
   transition: 0.5s;
 }
 .edit {
-  height: 270px;
+  height: 400px;
   width: calc(100% - 30px);
   margin: 10px;
   padding: 5px;

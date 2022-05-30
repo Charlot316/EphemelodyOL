@@ -108,7 +108,7 @@ export default {
       tempOperation: {},
       form: {},
       rules: {
-        startTime: [{ validator: checkStartTime, trigger: "blur" }],
+        startTime: [{ required:true,validator: checkStartTime, trigger: "blur" }],
         background: [{ required: true, trigger: "blur" }],
       },
     };
