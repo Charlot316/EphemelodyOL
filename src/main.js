@@ -1,4 +1,4 @@
-import {createApp} from 'vue'
+import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
@@ -16,18 +16,17 @@ app
     .mount('#app')
 
 router.beforeEach((to, from, next) => {
-    if(to.matched.some(res => res.meta.requireAuth)){
-        if(store.state.islogin){
+    if (to.matched.some(res => res.meta.requireAuth)) {
+        if (store.state.islogin) {
             next();
+        } else {
+            next({
+                path: '/login',
+                query: { redirect: to.fullPath }
+            });
+
         }
-        else{
-            next({path: '/login',
-            query: {redirect: to.fullPath} 
-        });
-           
-        }
-    }
-    else{
+    } else {
         next();
     }
 });

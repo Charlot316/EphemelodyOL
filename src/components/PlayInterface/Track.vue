@@ -84,6 +84,9 @@ export default {
       this.myTrack.tempR = RGB[0];
       this.myTrack.tempG = RGB[1];
       this.myTrack.tempB = RGB[2];
+      this.myTrack.notes.sort(function(a, b) {
+        return a.timing - b.timing;
+      });
       this.paintTrack();
     },
   },
@@ -553,18 +556,11 @@ export default {
         startTime: 0,
         endTime: start,
       });
-      let tempK1 = this.myTrack.width / this.animationTime;
-      this.widthPath.push({
-        type: 1,
-        k: tempK1,
-        b: -tempK1 * this.myTrack.startTiming,
-        startTime: start,
-        endTime: start + this.animationTime,
-      });
+    
       this.widthPath.push({
         type: 0,
         width: this.myTrack.width,
-        startTime: start + this.animationTime,
+        startTime: start,
         endTime: end,
       });
 
@@ -600,27 +596,9 @@ export default {
             type: 0,
             width: operation.endWidth,
             startTime: end,
-            endTime: this.Track.endTiming - this.animationTime,
-          });
-          let tempK2 = -operation.endWidth / this.animationTime;
-          this.widthPath.push({
-            type: 1,
-            k: tempK2,
-            b: -tempK2 * this.myTrack.endTiming,
-            startTime: this.Track.endTiming - this.animationTime,
-            endTime: this.Track.endTiming,
+            endTime: this.Track.endTiming ,
           });
         }
-      }
-      if (length == 0) {
-        let tempK3 = -this.myTrack.width / this.animationTime;
-        this.widthPath.push({
-          type: 1,
-          k: tempK3,
-          b: -tempK3 * this.myTrack.endTiming,
-          startTime: this.Track.endTiming - this.animationTime,
-          endTime: this.Track.endTiming,
-        });
       }
     },
     //生成轨道位置路径

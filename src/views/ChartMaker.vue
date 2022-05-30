@@ -52,9 +52,7 @@
             size="small"
             type="text"
             class="header-button"
-            @click="
-              globalSetting = true;
-            "
+            @click="globalSetting = true"
             >全局设置</el-button
           >
           <el-dialog
@@ -63,7 +61,7 @@
             width="650px"
           >
             <el-form :model="form" label-width="120px" style="padding: 20px;">
-            <el-form-item label="时间">
+              <el-form-item label="时间">
                 <el-input-number
                   v-model="global.currentTime"
                   :min="0"
@@ -168,19 +166,6 @@
           >
         </div>
       </div>
-      <div class="header-slide">
-        <div class="header-slide-item">
-          <el-slider
-            v-model="global.currentTime"
-            :min="displayStart"
-            :max="displayEnd"
-            :step="minStep"
-            @change="changeTime"
-            @mousedown="SlideMouseDown"
-            @mouseup="SlideMouseUp"
-          ></el-slider>
-        </div>
-      </div>
     </div>
     <!-- 侧边栏 -->
     <transition
@@ -192,23 +177,22 @@
         v-if="menuOpened"
         :class="menuOpened ? 'sider-opened' : 'sider-closed'"
       >
-        <transition
-          name="fade"
-          enter-active-class="animate__animated animate__fadeInLeft"
-          leave-active-class="animate__animated animate__fadeOutLeft"
-          ><TrackPanel
-            key="trackpanel"
-            v-show="currentSelectTrack != null"
-            :Track="currentSelectTrack"
-            :global="global"
-            @returnMenu="returnMenu"
-        /></transition>
-
-        <MenuPanel
-          key="menupanel"
+        <MenuPanel key="menupanel" :global="global" :chart="chart" /></div
+    ></transition>
+    <transition
+      name="fade"
+      enter-active-class="animate__animated animate__fadeInLeft"
+      leave-active-class="animate__animated animate__fadeOutLeft"
+    >
+      <div
+        v-if="menuOpened"
+        :class="menuOpened ? 'sider-opened-track' : 'sider-closed-track'"
+      >
+        <TrackPanel
+          key="trackpanel"
+          :Track="currentSelectTrack"
           :global="global"
           :chart="chart"
-          v-show="currentSelectTrack == null"
         /></div
     ></transition>
 
@@ -305,6 +289,29 @@
         ></div>
       </div>
     </div>
+    <transition
+      name="fade"
+      enter-active-class="animate__animated animate__fadeInUp"
+      leave-active-class="animate__animated animate__fadeOutDown"
+    >
+      <div
+        v-if="menuOpened"
+        :class="menuOpened ? 'footer-opened' : 'footer-closed'"
+      >
+        <div class="header-slide">
+          <div class="header-slide-item">
+            <el-slider
+              v-model="global.currentTime"
+              :min="displayStart"
+              :max="displayEnd"
+              :step="minStep"
+              @change="changeTime"
+              @mousedown="SlideMouseDown"
+              @mouseup="SlideMouseUp"
+            ></el-slider>
+          </div>
+        </div></div
+    ></transition>
   </div>
 </template>
 
@@ -350,7 +357,7 @@ export default {
     "global.reCalculateChartMaker"() {
       if (this.chart.changeBackgroundOperations) {
         this.generateImagePath();
-         this.sortTrack();
+        this.sortTrack();
       }
     },
   },
@@ -823,6 +830,13 @@ export default {
 .animate__animated.animate__fadeOutLeft {
   --animate-duration: 0.5s;
 }
+
+.animate__animated.animate__fadeInUp {
+  --animate-duration: 0.5s;
+}
+.animate__animated.animate__fadeOutDown {
+  --animate-duration: 0.5s;
+}
 .play-interface {
   height: 100%;
   width: 100%;
@@ -853,7 +867,7 @@ export default {
 .header {
   position: absolute;
   top: 0;
-  height: 80px;
+  height: 50px;
   width: 100%;
   background: #242f42;
 }
@@ -869,36 +883,74 @@ export default {
 
 #play-interface-container {
   position: absolute;
-  top: 80px;
-  height: calc(100vh - 80px);
-  background-color: white;
+  top: 50px;
+  
 }
 
 .sider-closed {
   position: absolute;
-  top: 80px;
-  height: calc(100vh - 80px);
-  background: white;
+  top: 50px;
+  height: calc(100vh - 40px);
+  background: rgb(32,32,32);
   width: 0px;
   left: 0px;
 }
 
 .sider-opened {
   position: absolute;
-  top: 80px;
-  height: calc(100vh - 80px);
+  top: 50px;
+  height: calc(100vh - 350px);
+  background: rgb(32,32,32);
   width: 300px;
   left: 0px;
 }
-.container-small {
+
+.sider-closed-track {
+  position: absolute;
+  top: 50px;
+  height: calc(100vh - 50px);
+  background: rgb(32,32,32);
+  width: 0px;
+  left: 0px;
+}
+
+.sider-opened-track {
+  position: absolute;
+  top: 50px;
+  height: calc(100vh - 350px);
+  background: rgb(32,32,32);
+  width: 300px;
   left: 300px;
-  width: calc(100vw - 300px);
+}
+
+.footer-closed {
+  position: absolute;
+  bottom: 0px;
+  height: 0px;
+  background: white;
+  width: 100vw;
+  left: 0px;
+}
+
+.footer-opened {
+  position: absolute;
+  bottom: 0px;
+  height: 300px;
+  background: white;
+  width: 100vw;
+  left: 0px;
+}
+.container-small {
+  left: 600px;
+  width: calc(100vw - 600px);
+  height: calc(100vh - 340px);
   transition: 0.5s;
 }
 
 .container-big {
   left: 0px;
   width: 100vw;
+  height: calc(100vh - 40px);
   transition: 0.5s;
 }
 .header-slide-item {

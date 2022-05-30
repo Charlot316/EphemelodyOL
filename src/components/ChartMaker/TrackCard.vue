@@ -127,7 +127,7 @@
           <el-tooltip
             class="item"
             effect="dark"
-            content="设置轨道的结束时机"
+            content="设置轨道的横坐标，请输入一个小数，代表轨道横坐标占画面全宽的比例"
             placement="top-start"
             style="margin-left:10px;"
           >
@@ -143,7 +143,7 @@
           <el-tooltip
             class="item"
             effect="dark"
-            content="设置轨道的结束时机"
+            content="设置轨道的宽度，您输入的数值是宽度的一半，它是轨道一半的宽度占整个画面的比例"
             placement="top-start"
             style="margin-left:10px;"
           >
@@ -202,8 +202,6 @@ export default {
           callback(new Error("时机不能小于0"));
         } else if (value > this.chart.songLength) {
           callback(new Error("时机不能超过歌曲长度"));
-        } else if (value < this.tempTrack.startTiming) {
-          callback(new Error("开始时机不能小于开始时机"));
         } else {
           callback();
         }
@@ -258,6 +256,8 @@ export default {
   methods: {
     updateTrack() {
       this.myGlobal.reCalculateTrack = !this.myGlobal.reCalculateTrack;
+      this.myGlobal.reCalculateChartMaker = !this.myGlobal
+        .reCalculateChartMaker;
     },
     startEdit() {
       this.myTrack.edit = true;
@@ -352,24 +352,33 @@ export default {
   transition: 0.5s;
 }
 .current-track {
-  background: white;
-  color: #303133;
-  -webkit-box-shadow: 0 0 9px 4px rgba(127, 127, 127, 0.5);
-  box-shadow: 0 0 9px 4px rgba(127, 127, 127, 0.5);
+  background: #2f2f2f;
+  color: rgb(171, 171, 171);
+  box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.5);
+  transition: 0.5s;
+}
+.current-track .el-form-item__label {
+  color: rgb(171, 171, 171);
   transition: 0.5s;
 }
 .passed-track {
-  background: #f3f1f1;
-  color: rgb(110, 110, 110);
-  -webkit-box-shadow: 0 0 0px 0px rgba(127, 127, 127, 0.5);
+  background: rgb(144, 144, 144);
+  color: rgb(45, 45, 45);
   box-shadow: 0 0 0px 0px rgba(127, 127, 127, 0.5);
   transition: 0.5s;
 }
+.passed-track .el-form-item__label {
+  color: rgb(45, 45, 45);
+  transition: 0.5s;
+}
 .to-come-track {
-  background: white;
-  color: rgb(32, 32, 32);
-  -webkit-box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.5);
+  background: #2f2f2f;
+  color: rgb(171, 171, 171);
   box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.5);
+  transition: 0.5s;
+}
+.to-come-track .el-form-item__label {
+  color: rgb(171, 171, 171);
   transition: 0.5s;
 }
 .delete-button {

@@ -205,24 +205,33 @@ export default {
   transition: 0.5s;
 }
 .current-operation {
-  background: white;
-  color: #303133;
-  -webkit-box-shadow: 0 0 9px 4px rgba(127, 127, 127, 0.5);
-  box-shadow: 0 0 9px 4px rgba(127, 127, 127, 0.5);
+  background: #2f2f2f;
+  color: rgb(171, 171, 171);
+  box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.5);
+  transition: 0.5s;
+}
+.current-operation .el-form-item__label {
+  color: rgb(171, 171, 171);
   transition: 0.5s;
 }
 .passed-operation {
-  background: #f3f1f1;
-  color: rgb(110, 110, 110);
-  -webkit-box-shadow: 0 0 0px 0px rgba(127, 127, 127, 0.5);
+  background: rgb(80, 80, 80);
+  color: rgb(40, 40, 40);
   box-shadow: 0 0 0px 0px rgba(127, 127, 127, 0.5);
   transition: 0.5s;
 }
+.passed-operation .el-form-item__label {
+  color: rgb(171, 171, 171);
+  transition: 0.5s;
+}
 .to-come-operation {
-  background: white;
-  color: rgb(32, 32, 32);
-  -webkit-box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.5);
+  background: #2f2f2f;
+  color: rgb(171, 171, 171);
   box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.5);
+  transition: 0.5s;
+}
+.to-come-operation .el-form-item__label {
+  color: rgb(171, 171, 171);
   transition: 0.5s;
 }
 .delete-button {
@@ -252,4 +261,5 @@ export default {
 .cancel-button:active {
   color: #73767a;
 }
+
 </style>
