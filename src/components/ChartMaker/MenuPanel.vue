@@ -94,7 +94,7 @@ export default {
                     this.chart.changeBackgroundOperations[i - 1].index
                 )
                 .scrollIntoView(true);
-            }, 500);
+            }, 200);
           else
             setTimeout(() => {
               document
@@ -103,7 +103,7 @@ export default {
                     this.chart.changeBackgroundOperations[0].index
                 )
                 .scrollIntoView(true);
-            }, 500);
+            }, 200);
           break;
         }
       }
