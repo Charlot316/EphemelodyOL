@@ -89,7 +89,7 @@ export default {
         rule;
         return callback(new Error("时机不能为空"));
       }
-      if (Number.isNaN(value)) {
+      if (parseFloat(value).toString() == "NaN") {
         callback(new Error("请输入数字值"));
       } else {
         if (value < 0) {

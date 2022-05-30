@@ -3,8 +3,38 @@
     <div
       style="width:100%;display: flex;justify-content: space-between;border: none;"
     >
-      <div  style="width: 70px;height:70px;border-radius: 5px;">
-      
+      <div style="width: 70px;height:70px;border-radius: 5px;position:relative">
+      <el-image
+          style="position:absolute;top:0;left:0;width: 70px;height:70px;border-radius: 5px;"
+          src="http://pic.mcatk.com/charlot-pictures/8B0C2D47-6D1E-4916-BE4C-EFD5C6A5D998_1_201_a.jpeg"
+          fit="fit"
+          class="image"
+        />
+      <div style="position:absolute;top:0;left:0;width: 70px;height:70px;border-radius: 5px;
+        text-align:center; line-height: 70px; color:white; text-shadow:2px 2px 5px black; font-size: 50px;">
+        {{myTrack.type==1?myTrack.key.toUpperCase():'虚'}}
+        </div>
+        <div
+        v-if=" global.currentTime >track.startTiming &&
+       global.currentTime < track.endTiming"
+          :style="{
+            position: absolute,
+            height: '70px',
+            top: 0,
+            marginLeft:
+              (myTrack.tempPositionX - myTrack.tempWidth) * 160+75 + 'px',
+            width: 2 * myTrack.tempWidth * 160 + 'px',
+            background:
+              'rgba(' +
+              myTrack.tempR +
+              ',' +
+              myTrack.tempG +
+              ',' +
+              myTrack.tempB +
+              ',0.5)',
+          }"
+        ></div>
+        
       </div>
       <div style="width:calc(100% - 80px);">
         <div
@@ -53,7 +83,7 @@
         ref="form"
         @submit.prevent="saveTrack"
       >
-        <el-form-item label="时机" label-width="80px" prop="startTiming">
+        <el-form-item label="开始时机" label-width="80px" prop="startTiming">
           <el-input
             @keydown.enter="saveTrack"
             v-model="tempTrack.startTiming"
@@ -62,7 +92,55 @@
           <el-tooltip
             class="item"
             effect="dark"
-            content="设置轨道的时机"
+            content="设置轨道的开始时机"
+            placement="top-start"
+            style="margin-left:10px;"
+          >
+            <i class="el-icon-question" />
+          </el-tooltip>
+        </el-form-item>
+          <el-form-item label="结束时机" label-width="80px" prop="endTiming">
+          <el-input
+            @keydown.enter="saveTrack"
+            v-model="tempTrack.endTiming"
+            style="width:100px"
+          />
+          <el-tooltip
+            class="item"
+            effect="dark"
+            content="设置轨道的结束时机"
+            placement="top-start"
+            style="margin-left:10px;"
+          >
+            <i class="el-icon-question" />
+          </el-tooltip>
+        </el-form-item>
+         <el-form-item label="默认颜色" label-width="80px" prop="endTiming">
+          <el-input
+            @keydown.enter="saveTrack"
+            v-model="tempTrack.endTiming"
+            style="width:100px"
+          />
+          <el-tooltip
+            class="item"
+            effect="dark"
+            content="设置轨道的结束时机"
+            placement="top-start"
+            style="margin-left:10px;"
+          >
+            <i class="el-icon-question" />
+          </el-tooltip>
+        </el-form-item>
+         <el-form-item label="宽度" label-width="80px" prop="endTiming">
+          <el-input
+            @keydown.enter="saveTrack"
+            v-model="tempTrack.endTiming"
+            style="width:100px"
+          />
+          <el-tooltip
+            class="item"
+            effect="dark"
+            content="设置轨道的结束时机"
             placement="top-start"
             style="margin-left:10px;"
           >
@@ -83,14 +161,35 @@ export default {
         rule;
         return callback(new Error("时机不能为空"));
       }
-      if (Number.isNaN(value)) {
+      if (parseFloat(value).toString() == "NaN") {
+        callback(new Error("请输入数字值"));
+      } else {
+        if (value < 0) {
+          callback(new Error("开始时机不能小于0"));
+        } else if (value > this.chart.songLength) {
+          callback(new Error("开始时机不能超过歌曲长度"));
+        } else if(value>this.tempTrack.endTiming){
+          callback(new Error("开始时机不能超过结束时机"));
+        }else{
+          callback();
+        }
+      }
+    };
+    var checkEndTime = (rule, value, callback) => {
+      if (!value) {
+        rule;
+        return callback(new Error("时机不能为空"));
+      }
+      if (parseFloat(value).toString() == "NaN") {
         callback(new Error("请输入数字值"));
       } else {
         if (value < 0) {
           callback(new Error("时机不能小于0"));
         } else if (value > this.chart.songLength) {
           callback(new Error("时机不能超过歌曲长度"));
-        } else {
+        } else if(value<this.tempTrack.startTiming){
+          callback(new Error("开始时机不能小于开始时机"));
+        }else {
           callback();
         }
       }
@@ -103,7 +202,7 @@ export default {
       form: {},
       rules: {
         startTiming: [{ validator: checkStartTime, trigger: "blur" }],
-        background: [{ required: true, trigger: "blur" }],
+        endTiming: [{ validator: checkEndTime, trigger: "blur" }],
       },
     };
   },
@@ -141,10 +240,7 @@ export default {
         cancelButtonText: "取消",
         type: "warning",
       }).then(() => {
-        this.myChart.tracks.splice(
-          this.myTrack.index,
-          1
-        );
+        this.myChart.tracks.splice(this.myTrack.index, 1);
         this.updateTrack();
         this.$notify({
           title: "成功",
@@ -190,7 +286,7 @@ export default {
   transition: 0.5s;
 }
 .edit {
-  height: 170px;
+  height: 270px;
   width: calc(100% - 30px);
   margin: 10px;
   padding: 5px;

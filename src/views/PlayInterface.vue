@@ -750,16 +750,44 @@ export default {
       this.global.combo = 0;
       this.global.maxCombo = 0;
       this.global.score = 0;
-      // for (var i = 0; i < this.chart.tracks.length; i++) {
-      //   var track = this.chart.tracks[i];
-      //   for (var j = 0; j < track.notes.length; j++) {
-      //     track.notes[j].judged = false;
-      //   }
-      // }
+      this.resetTrack();
       this.audio.currentTime = 0;
       this.audio.play();
-    },
 
+    },
+resetTrack() {
+      this.global.keyPressTime = [];
+      this.global.keyIsHold = [];
+      this.global.keyUsed = [];
+      for (var i = 0; i < this.chart.tracks.length; i++) {
+        var track = this.chart.tracks[i];
+        var index = 0;
+        var last = track.notes.length;
+        for (var j = track.notes.length - 1; j >= 0; j--) {
+          track.notes[j].judged = false;
+          if (
+            track.notes[j].timing + this.global.lostTime >
+            this.global.currentTime
+          ) {
+            index = j;
+          }
+          if (
+            this.global.currentTime <
+            track.notes[j].timing - this.global.remainingTime
+          ) {
+            last = j;
+          }
+        }
+        track.judges = [];
+        track.currentNote = index;
+        track.lastNote = last - 1;
+        if (track.currentNote != track.notes.length) {
+          track.judgeFinished = false;
+        } else {
+          track.judgeFinished = true;
+        }
+      }
+    },
     back() {},
   },
 };
