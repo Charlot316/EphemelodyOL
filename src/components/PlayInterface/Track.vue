@@ -32,6 +32,8 @@ export default {
       pinkLength: 23,
       whiteLength: 15,
       mirrorOpacity: 0.1,
+      isJudgingHold: false,
+      tempJudge: {},
     };
   },
   watch: {
@@ -137,6 +139,7 @@ export default {
     },
   },
   methods: {
+    //画轨道
     async paintTrack() {
       //画判定结果
       await this.paintNotes();
@@ -280,6 +283,7 @@ export default {
       }
     },
 
+    //画所有note
     paintNotes() {
       if (!this.myTrack.judgeFinished) {
         for (
@@ -291,17 +295,21 @@ export default {
         }
       }
     },
+
+    //画单个note
     paintNote(note) {
       var painter = this.global.notePainter;
+      var currentTime = this.global.currentTime;
       var y =
-        ((this.global.finalY / this.global.remainingTime) *
-          this.global.currentTime -
+        ((this.global.finalY / this.global.remainingTime) * currentTime -
           (this.global.finalY / this.global.remainingTime) *
             (note.timing - this.global.remainingTime)) *
         this.global.screenHeight;
       var canMirror =
-        y / this.global.screenHeight > 0.6 &&
-        y / this.global.screenHeight < 0.8;
+        (note.noteType != 1 &&
+          y / this.global.screenHeight >= 0.6 &&
+          y / this.global.screenHeight < 0.8) ||
+        (note.noteType == 1 && y / this.global.screenHeight > 0.6);
       if (note.noteType == 0) {
         if (canMirror) {
           var tempY = 2 * this.Y - y;
@@ -344,12 +352,91 @@ export default {
         painter.lineTo(this.middle - this.pinkLength, y);
         painter.lineTo(this.middle, y - this.pinkLength);
         painter.closePath();
-        painter.globalCompositeOperation = "destination-out";
-        painter.fill();
-        painter.globalCompositeOperation = "source-over";
         painter.fillStyle = "rgb(203, 105, 121)";
         painter.fill();
       } else if (note.noteType == 1) {
+        var keyLength = 0;
+        if (currentTime < note.timing)
+          keyLength =
+            ((note.endTiming - note.timing) / this.global.remainingTime) *
+            this.global.finalY *
+            this.global.screenHeight;
+        else if (currentTime < note.endTiming) {
+          keyLength =
+            ((note.endTiming - currentTime) / this.global.remainingTime) *
+            this.global.finalY *
+            this.global.screenHeight;
+          y = this.global.finalY * this.global.screenHeight;
+        } else keyLength = 0;
+        if (canMirror) {
+          tempY = 2 * this.Y - y;
+          //黑色部分
+          painter.beginPath();
+          painter.moveTo(this.middle + this.blackLength, tempY);
+          painter.lineTo(this.middle + this.blackLength, tempY + keyLength);
+          painter.lineTo(this.middle, tempY + keyLength + this.blackLength);
+          painter.lineTo(this.middle - this.blackLength, tempY + keyLength);
+          painter.lineTo(this.middle - this.blackLength, tempY);
+          painter.lineTo(this.middle, tempY - this.blackLength);
+          painter.closePath();
+          painter.fillStyle = "rgba(22, 22, 14,0.1)";
+          painter.fill();
+          //上粉块
+          painter.beginPath();
+          painter.moveTo(this.middle + this.pinkLength, tempY);
+          painter.lineTo(this.middle, tempY + this.pinkLength);
+          painter.lineTo(this.middle - this.pinkLength, tempY);
+          painter.lineTo(this.middle, tempY - this.pinkLength);
+          painter.closePath();
+          painter.globalCompositeOperation = "destination-out";
+          painter.fillStyle = "rgba(203, 105, 121,1)";
+          painter.fill();
+          painter.globalCompositeOperation = "source-over";
+          painter.fillStyle = "rgba(203, 105, 121,0.1)";
+          painter.fill();
+          //下粉块
+          painter.beginPath();
+          painter.moveTo(this.middle + this.pinkLength, tempY + keyLength);
+          painter.lineTo(this.middle, tempY + keyLength + this.pinkLength);
+          painter.lineTo(this.middle - this.pinkLength, tempY + keyLength);
+          painter.lineTo(this.middle, tempY + keyLength - this.pinkLength);
+          painter.closePath();
+          painter.globalCompositeOperation = "destination-out";
+          painter.fillStyle = "rgba(203, 105, 121,1)";
+          painter.fill();
+          painter.globalCompositeOperation = "source-over";
+          painter.fillStyle = "rgba(203, 105, 121,0.1)";
+          painter.fill();
+        }
+        painter.beginPath();
+        painter.moveTo(this.middle + this.blackLength, y);
+        painter.lineTo(this.middle + this.blackLength, y - keyLength);
+        painter.lineTo(this.middle, y - keyLength - this.blackLength);
+        painter.lineTo(this.middle - this.blackLength, y - keyLength);
+        painter.lineTo(this.middle - this.blackLength, y);
+        painter.lineTo(this.middle, y + this.blackLength);
+        painter.closePath();
+        painter.fillStyle = "rgb(22, 22, 14)";
+        painter.fill();
+        //下粉块
+        painter.beginPath();
+        painter.moveTo(this.middle + this.pinkLength, y);
+        painter.lineTo(this.middle, y + this.pinkLength);
+        painter.lineTo(this.middle - this.pinkLength, y);
+        painter.lineTo(this.middle, y - this.pinkLength);
+        painter.closePath();
+        painter.fillStyle = "rgb(203, 105, 121)";
+        painter.fill();
+        //上粉块
+        painter.beginPath();
+        painter.moveTo(this.middle + this.pinkLength, y - keyLength);
+        painter.lineTo(this.middle, y - keyLength + this.pinkLength);
+        painter.lineTo(this.middle - this.pinkLength, y - keyLength);
+        painter.lineTo(this.middle, y - keyLength - this.pinkLength);
+        painter.closePath();
+        painter.fillStyle = "rgb(203, 105, 121)";
+        painter.fill();
+      } else if (note.noteType == 2) {
         if (canMirror) {
           tempY = 2 * this.Y - y;
           painter.beginPath();
@@ -379,6 +466,8 @@ export default {
         painter.stroke();
       }
     },
+
+    //初始化
     initiate() {
       this.setHeightAndTop();
       this.setIndex();
@@ -413,6 +502,8 @@ export default {
       this.myTrack.tempB = this.getRGB()[2];
       this.paintTrack();
     },
+
+    //判定
     judge() {
       if (this.Track.notes.length > 0 && !this.myTrack.judgeFinished) {
         let currentKey = "";
@@ -429,95 +520,198 @@ export default {
         let farTime = this.global.farTime;
         let lostTime = this.global.lostTime;
         let isUsed = this.global.keyUsed[currentKey];
-        if (this.Track.notes[this.myTrack.currentNote].noteType == 1) {
-          if (currentTime > timing - lostTime) {
-            if (currentTime > timing + lostTime) {
+        let isHold = this.global.keyIsHold[currentKey];
+        let note = this.Track.notes[this.myTrack.currentNote];
+        if (this.isJudgingHold) {
+          if (currentTime > note.endTiming) {
+            this.isJudgingHold = false;
+            this.addCount(this.tempJudge);
+            this.addNoteCount();
+          } else if (!isHold) {
+            this.isJudgingHold = false;
+            this.addNoteCount();
+            if (currentTime > note.endTiming - farTime) {
+              this.addCount(this.tempJudge);
+            } else {
               this.addCount({
                 type: "lost",
                 key: "lostCount",
-                message: "因超时没有按到而判定为Lost",
+                message: "因提前释放长键判定为Lost",
                 judgeTime: currentTime,
-                timing: timing,
+                timing: note.endTiming,
               });
-              this.addNoteCount();
-            } else if (this.global.keyIsHold[currentKey]) {
-              this.addCount({
-                type: "pure",
-                key: "pureCount",
-                message: "pure",
-                judgeTime: currentTime,
-                timing: timing,
-              });
-              this.$forceUpdate();
-              this.addNoteCount();
             }
           }
         } else {
-          if (currentTime > timing - lostTime) {
-            if (currentTime > timing + lostTime) {
-              this.addCount({
-                type: "lost",
-                key: "lostCount",
-                message: "因超时没有按到而判定为Lost",
-                judgeTime: currentTime,
-                timing: timing,
-              });
-              this.addNoteCount();
-            } else if (!isUsed) {
-              if (
-                currentJudge > timing - pureTime &&
-                currentJudge < timing + pureTime
-              ) {
+          if (note.noteType == 2) {
+            if (currentTime > timing - lostTime) {
+              if (currentTime > timing + farTime) {
+                this.addCount({
+                  type: "lost",
+                  key: "lostCount",
+                  message: "因超时没有按到而判定为Lost",
+                  judgeTime: currentTime,
+                  timing: timing,
+                });
+                this.addNoteCount();
+              } else if (this.global.keyIsHold[currentKey]) {
                 this.addCount({
                   type: "pure",
                   key: "pureCount",
                   message: "pure",
-                  judgeTime: currentJudge,
+                  judgeTime: currentTime,
                   timing: timing,
                 });
                 this.$forceUpdate();
-                this.myglobal.keyUsed[currentKey] = true;
                 this.addNoteCount();
-              } else if (
-                currentJudge > timing - farTime &&
-                currentJudge < timing + farTime
-              ) {
-                this.addCount({
-                  type: "far",
-                  key: "farCount",
-                  message:
-                    currentJudge < timing
-                      ? "因为过早按下而判定为far(early)"
-                      : "因为过晚按下而判定为far(late)",
-                  judgeTime: currentJudge,
-                  timing: timing,
-                });
-                this.$forceUpdate();
-                this.myglobal.keyUsed[currentKey] = true;
-                this.addNoteCount();
-              } else if (
-                currentJudge > timing - lostTime &&
-                currentJudge < timing + lostTime
-              ) {
+              }
+            }
+          } else if (note.noteType == 0) {
+            if (currentTime > timing - lostTime) {
+              if (currentTime > timing + lostTime) {
                 this.addCount({
                   type: "lost",
                   key: "lostCount",
-                  message:
-                    currentJudge < timing
-                      ? "因为过早按下而判定为lost(early)"
-                      : "因为过晚按下而判定为lost(late)",
-                  judgeTime: currentJudge,
+                  message: "因超时没有按到而判定为Lost",
+                  judgeTime: currentTime,
                   timing: timing,
                 });
-                this.$forceUpdate();
-                this.myglobal.keyUsed[currentKey] = true;
                 this.addNoteCount();
+              } else if (!isUsed) {
+                if (
+                  currentJudge > timing - pureTime &&
+                  currentJudge < timing + pureTime
+                ) {
+                  this.addCount({
+                    type: "pure",
+                    key: "pureCount",
+                    message: "pure",
+                    judgeTime: currentJudge,
+                    timing: timing,
+                  });
+                  this.$forceUpdate();
+                  this.myglobal.keyUsed[currentKey] = true;
+                  this.addNoteCount();
+                } else if (
+                  currentJudge > timing - farTime &&
+                  currentJudge < timing + farTime
+                ) {
+                  this.addCount({
+                    type: "far",
+                    key: "farCount",
+                    message:
+                      currentJudge < timing
+                        ? "因为过早按下而判定为far(early)"
+                        : "因为过晚按下而判定为far(late)",
+                    judgeTime: currentJudge,
+                    timing: timing,
+                  });
+                  this.$forceUpdate();
+                  this.myglobal.keyUsed[currentKey] = true;
+                  this.addNoteCount();
+                } else if (
+                  currentJudge > timing - lostTime &&
+                  currentJudge < timing + lostTime
+                ) {
+                  this.addCount({
+                    type: "lost",
+                    key: "lostCount",
+                    message:
+                      currentJudge < timing
+                        ? "因为过早按下而判定为lost(early)"
+                        : "因为过晚按下而判定为lost(late)",
+                    judgeTime: currentJudge,
+                    timing: timing,
+                  });
+                  this.$forceUpdate();
+                  this.myglobal.keyUsed[currentKey] = true;
+                  this.addNoteCount();
+                }
+              }
+            }
+          } else {
+            if (currentTime > timing - lostTime) {
+              if (currentTime > timing + lostTime) {
+                this.addCount({
+                  type: "lost",
+                  key: "lostCount",
+                  message: "因超时没有按到而判定为Lost",
+                  judgeTime: currentTime,
+                  timing: timing,
+                });
+                this.addNoteCount();
+              } else if (!isUsed) {
+                if (
+                  currentJudge > timing - pureTime &&
+                  currentJudge < timing + pureTime
+                ) {
+                  this.tempJudge = {
+                    type: "pure",
+                    key: "pureCount",
+                    message: "pure",
+                    judgeTime: currentJudge,
+                    timing: note.endTiming,
+                  };
+                  this.myTrack.judges.push({
+                    type: "pure",
+                    key: "pureCount",
+                    message: "pure",
+                    judgeTime: currentJudge,
+                    timing: timing,
+                  });
+                  this.myglobal.keyUsed[currentKey] = true;
+                  this.isJudgingHold = true;
+                } else if (
+                  currentJudge > timing - farTime &&
+                  currentJudge < timing + farTime
+                ) {
+                  this.tempJudge = {
+                    type: "far",
+                    key: "farCount",
+                    message:
+                      currentJudge < timing
+                        ? "因为过早按下而判定为far(early)"
+                        : "因为过晚按下而判定为far(late)",
+                    judgeTime: currentJudge,
+                    timing: note.endTiming,
+                  };
+                  this.myTrack.judges.push({
+                    type: "far",
+                    key: "farCount",
+                    message:
+                      currentJudge < timing
+                        ? "因为过早按下而判定为far(early)"
+                        : "因为过晚按下而判定为far(late)",
+                    judgeTime: currentJudge,
+                    timing: timing,
+                  });
+                  this.myglobal.keyUsed[currentKey] = true;
+                  this.isJudgingHold = true;
+                } else if (
+                  currentJudge > timing - lostTime &&
+                  currentJudge < timing + lostTime
+                ) {
+                  this.addCount({
+                    type: "lost",
+                    key: "lostCount",
+                    message:
+                      currentJudge < timing
+                        ? "因为过早按下而判定为lost(early)"
+                        : "因为过晚按下而判定为lost(late)",
+                    judgeTime: currentJudge,
+                    timing: timing,
+                  });
+                  this.$forceUpdate();
+                  this.myglobal.keyUsed[currentKey] = true;
+                  this.addNoteCount();
+                }
               }
             }
           }
         }
       }
     },
+
     //主进程+1
     addCount(param) {
       if (param.type != "lost") {
@@ -525,6 +719,7 @@ export default {
       }
       this.$emit("addCount", param);
     },
+
     //判定note+1
     addNoteCount() {
       if (this.myTrack.currentNote < this.Track.notes.length - 1) {
@@ -556,7 +751,7 @@ export default {
         startTime: 0,
         endTime: start,
       });
-    
+
       this.widthPath.push({
         type: 0,
         width: this.myTrack.width,
@@ -596,7 +791,7 @@ export default {
             type: 0,
             width: operation.endWidth,
             startTime: end,
-            endTime: this.Track.endTiming ,
+            endTime: this.Track.endTiming,
           });
         }
       }

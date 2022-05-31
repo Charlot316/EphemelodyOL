@@ -90,6 +90,7 @@ var chart = {
                     noteType: 1,
                     key: "d",
                     timing: 13200,
+                    endTiming: 13381,
                 },
                 {
                     noteType: 0,

@@ -20,11 +20,11 @@
         >
       </div>
       <div>
-        <el-switch
-          v-model="operationShowAll"
-          inline-prompt
-          active-text="显示全部"
-        />
+        <el-button
+          type="text"
+          class="show-button"
+          @click="operationShowAll = !operationShowAll"
+          >{{operationShowAll?'显示当前':'显示全部'}}</el-button>
       </div>
     </div>
 
@@ -145,6 +145,15 @@ export default {
 }
 .plus-button:active {
   color: #529b2e;
+}
+.show-button {
+  color: #c1c1c1;
+}
+.show-button:hover {
+  color: #d0d0d0;
+}
+.show-button:active {
+  color: #656565;
 }
 .flip-list-move {
   transition: transform 1s;

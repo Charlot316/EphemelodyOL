@@ -869,7 +869,7 @@ export default {
   top: 0;
   height: 50px;
   width: 100%;
-  background: #242f42;
+  background: rgb(39,39,39);
 }
 .header-buttons {
   padding: 10px 10px 0px 10px;

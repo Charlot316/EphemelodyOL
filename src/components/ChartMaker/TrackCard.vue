@@ -22,10 +22,10 @@
               global.currentTime < track.endTiming
           "
           :style="{
-            position: absolute,
+            position: 'absolute',
             height: '70px',
             top: 0,
-            marginLeft:
+            left:
               (myTrack.tempPositionX - myTrack.tempWidth) * 160 + 75 + 'px',
             width: 2 * myTrack.tempWidth * 160 + 'px',
             background:
@@ -312,19 +312,19 @@ export default {
     currentClass() {
       var currentClass = "";
       if (this.myTrack.edit) {
-        currentClass = "edit ";
+        currentClass = "edit-track ";
       } else {
-        currentClass = "not-edit ";
+        currentClass = "not-edit-track ";
       }
       if (
         this.global.currentTime > this.track.startTiming &&
         this.global.currentTime < this.track.endTiming
       ) {
-        currentClass += "current-operation";
+        currentClass += "current-track";
       } else if (this.global.currentTime > this.track.endTiming) {
-        currentClass += "passed-operation";
+        currentClass += "passed-track";
       } else if (this.global.currentTime < this.track.startTiming) {
-        currentClass += "to-come-operation ";
+        currentClass += "to-come-track";
       }
       return currentClass;
     },
@@ -333,7 +333,7 @@ export default {
 </script>
 
 <style scope>
-.not-edit {
+.not-edit-track {
   height: 70px;
   width: calc(100% - 30px);
   margin: 10px;
@@ -342,7 +342,7 @@ export default {
   border-radius: 5px;
   transition: 0.5s;
 }
-.edit {
+.edit-track {
   height: 400px;
   width: calc(100% - 30px);
   margin: 10px;
@@ -377,5 +377,40 @@ export default {
 }
 .cancel-button:active {
   color: #73767a;
+}
+.current-track {
+    background: rgb(47, 47, 47);
+    color: rgb(171, 171, 171);
+    box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.5);
+    transition: 0.5s;
+}
+
+.current-track .el-form-item__label {
+    color: rgb(171, 171, 171);
+    transition: 0.5s;
+}
+
+.passed-track {
+    background: rgb(30, 30, 30);
+    color: rgb(100, 100, 100);
+    box-shadow: 0 0 0px 0px rgba(127, 127, 127, 0.5);
+    transition: 0.5s;
+}
+
+.passed-track .el-form-item__label {
+    color: rgb(171, 171, 171);
+    transition: 0.5s;
+}
+
+.to-come-track {
+    background: #2f2f2f;
+    color: rgb(171, 171, 171);
+    box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.5);
+    transition: 0.5s;
+}
+
+.to-come-track .el-form-item__label {
+    color: rgb(171, 171, 171);
+    transition: 0.5s;
 }
 </style>
