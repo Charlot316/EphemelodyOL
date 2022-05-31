@@ -85,6 +85,37 @@
         ref="form"
         @submit.prevent="saveTrack"
       >
+        <el-form-item label="轨道类别" label-width="80px" prop="type">
+          <el-radio-group v-model="tempTrack.type">
+            <el-radio :label="0">虚轨</el-radio>
+            <el-radio :label="1">实轨</el-radio>
+          </el-radio-group>
+          <el-tooltip
+            class="item"
+            effect="dark"
+            content="设置轨道的类别，如果是虚轨，则轨道下方不会出现提示字母，如果虚轨上有音符，请您确认在音符对应的时机该轨道移动到音符字母对应的实轨上"
+            placement="top-start"
+            style="margin-left:10px;"
+          >
+            <i class="el-icon-question" />
+          </el-tooltip>
+        </el-form-item>
+        <el-form-item label="按键" label-width="80px" prop="key">
+          <el-input
+            @keydown.enter="saveTrack"
+            v-model="tempTrack.key"
+            style="width:130px"
+          />
+          <el-tooltip
+            class="item"
+            effect="dark"
+            content="设置轨道的按键"
+            placement="top-start"
+            style="margin-left:10px;"
+          >
+            <i class="el-icon-question" />
+          </el-tooltip>
+        </el-form-item>
         <el-form-item label="开始时机" label-width="80px" prop="startTiming">
           <el-input
             @keydown.enter="saveTrack"
@@ -170,6 +201,18 @@
 export default {
   props: ["track", "global", "chart"],
   data() {
+    var checkKey = (rule, value, callback) => {
+      if (!value) {
+        rule;
+        return callback(new Error("按键不能为空"));
+      }
+      var reg = /^[A-Za-z]$/;
+      if (reg.test(value)) {
+        callback();
+      } else {
+        callback(new Error("按键必须是单个字母"));
+      }
+    };
     var checkStartTime = (rule, value, callback) => {
       if (!value) {
         rule;
@@ -235,6 +278,8 @@ export default {
       tempTrack: {},
       form: {},
       rules: {
+        type: [{ required: true, message: "请选择轨道类别", trigger: "blur" }],
+        key: [{ required: true, validator: checkKey, trigger: "blur" }],
         startTiming: [
           { required: true, validator: checkStartTime, trigger: "blur" },
         ],
@@ -252,6 +297,7 @@ export default {
   created() {
     this.myTrack.edit = false;
     this.tempTrack = JSON.parse(JSON.stringify(this.myTrack));
+    this.tempTrack.key = this.tempTrack.key.toUpperCase();
     this.tempTrack.color =
       "rgb(" +
       this.myTrack.R +
@@ -270,6 +316,7 @@ export default {
     startEdit() {
       this.myTrack.edit = true;
       this.tempTrack = JSON.parse(JSON.stringify(this.myTrack));
+      this.tempTrack.key = this.tempTrack.key.toUpperCase();
       this.tempTrack.color =
         "rgb(" +
         this.myTrack.R +
@@ -289,6 +336,7 @@ export default {
           for (var key in this.tempTrack) {
             this.myTrack[key] = this.tempTrack[key];
           }
+          this.myTrack.key = this.myTrack.key.toUpperCase();
           var rgb = this.tempTrack.color
             .substring(4, this.tempTrack.color.length - 1)
             .split(",");
@@ -353,7 +401,7 @@ export default {
   transition: 0.5s;
 }
 .edit-track {
-  height: 400px;
+  height: 505px;
   width: calc(100% - 30px);
   margin: 10px;
   padding: 5px;
