@@ -323,7 +323,7 @@ export default {
         currentClass += "current-track";
       } else if (this.global.currentTime > this.track.endTiming) {
         currentClass += "passed-track";
-      } else if (this.global.currentTime < this.track.startTiming) {
+      } else {
         currentClass += "to-come-track";
       }
       return currentClass;

@@ -1,7 +1,7 @@
 <template>
   <div class="menu-panel-container">
     <h4
-      style="padding:5px;margin-top:10px;margin-bottom:5x;color:rgb(225,225,225)"
+      style="padding:5px;margin-top:10px;margin-bottom:5x;color:rgb(225,225,225);margin-left:10px;"
     >
       背景操作
     </h4>
@@ -14,6 +14,7 @@
         <el-button
           type="text"
           class="plus-button"
+          style="margin-left:10px;"
           icon="el-icon-circle-plus"
           @click="newOperation"
           >新增</el-button
@@ -23,8 +24,17 @@
         <el-button
           type="text"
           class="show-button"
+          style="margin-right:5px;"
+          @click="autoScroll = !autoScroll"
+          >{{ autoScroll ? "关闭滚动" : "开启滚动" }}</el-button
+        >
+        <el-button
+          type="text"
+          class="show-button"
+          style="margin-right:13px;"
           @click="operationShowAll = !operationShowAll"
-          >{{operationShowAll?'显示当前':'显示全部'}}</el-button>
+          >{{ operationShowAll ? "显示当前" : "显示全部" }}</el-button
+        >
       </div>
     </div>
 
@@ -68,7 +78,7 @@ export default {
   data() {
     return {
       operationShowAll: true,
-      trackShowAll: true,
+      autoScroll: true,
       myChart: this.chart,
       myGlobal: this.global,
     };
@@ -79,32 +89,34 @@ export default {
       this.myChart = this.chart;
     },
     "global.currentTime"() {
-      for (var i = 0; i < this.chart.changeBackgroundOperations.length; i++) {
-        if (
-          this.global.currentTime >
-            this.chart.changeBackgroundOperations[i].startTime &&
-          this.global.currentTime <
-            this.chart.changeBackgroundOperations[i].endTime
-        ) {
-          if (i > 0)
-            setTimeout(() => {
-              document
-                .querySelector(
-                  "#backgroundOperation" +
-                    this.chart.changeBackgroundOperations[i - 1].index
-                )
-                .scrollIntoView(true);
-            }, 200);
-          else
-            setTimeout(() => {
-              document
-                .querySelector(
-                  "#backgroundOperation" +
-                    this.chart.changeBackgroundOperations[0].index
-                )
-                .scrollIntoView(true);
-            }, 200);
-          break;
+      if (this.autoScroll) {
+        for (var i = 0; i < this.chart.changeBackgroundOperations.length; i++) {
+          if (
+            this.global.currentTime >
+              this.chart.changeBackgroundOperations[i].startTime &&
+            this.global.currentTime <
+              this.chart.changeBackgroundOperations[i].endTime
+          ) {
+            if (i > 0)
+              setTimeout(() => {
+                document
+                  .querySelector(
+                    "#backgroundOperation" +
+                      this.chart.changeBackgroundOperations[i - 1].index
+                  )
+                  .scrollIntoView(true);
+              }, 200);
+            else
+              setTimeout(() => {
+                document
+                  .querySelector(
+                    "#backgroundOperation" +
+                      this.chart.changeBackgroundOperations[0].index
+                  )
+                  .scrollIntoView(true);
+              }, 200);
+            break;
+          }
         }
       }
     },
@@ -130,10 +142,9 @@ export default {
 </script>
 <style scope>
 .menu-panel-container {
-  height: calc(100vh - 350px);
+  height: 100%;
   width: 90%;
   padding: 0% 5%;
-  border:1px solid rgba(255, 255, 255, 0.1); 
   overflow: auto;
   -ms-overflow-style: none;
 }

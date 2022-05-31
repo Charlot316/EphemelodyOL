@@ -176,6 +176,7 @@
       <div
         v-if="menuOpened"
         :class="menuOpened ? 'sider-opened' : 'sider-closed'"
+        :style="{'--footerHeight':footerHeight+'px'}"
       >
         <MenuPanel key="menupanel" :global="global" :chart="chart" /></div
     ></transition>
@@ -183,10 +184,12 @@
       name="fade"
       enter-active-class="animate__animated animate__fadeInLeft"
       leave-active-class="animate__animated animate__fadeOutLeft"
+      
     >
       <div
         v-if="menuOpened"
         :class="menuOpened ? 'sider-opened-track' : 'sider-closed-track'"
+        :style="{'--footerHeight':footerHeight+'px'}"
       >
         <TrackPanel
           key="trackpanel"
@@ -201,6 +204,7 @@
       <div
         :class="menuOpened ? 'container-small' : 'container-big'"
         id="play-interface-container"
+        :style="{'--footerHeight':footerHeight+'px'}"
       >
         <!-- 音频 -->
         <audio
@@ -289,6 +293,22 @@
         ></div>
       </div>
     </div>
+    <div :class="menuOpened ? 'time-controller-small' : 'time-controller-big'" :style="{'--footerHeight':footerHeight+'px'}">
+      <div class="header-slide">
+        <div class="header-slide-item">
+          <el-slider
+            v-model="global.currentTime"
+            :min="displayStart"
+            :max="displayEnd"
+            :step="minStep"
+            @change="changeTime"
+            @mousedown="SlideMouseDown"
+            @mouseup="SlideMouseUp"
+          ></el-slider>
+        </div>
+      </div>
+    </div>
+    <!-- 时间轴 -->
     <transition
       name="fade"
       enter-active-class="animate__animated animate__fadeInUp"
@@ -297,20 +317,8 @@
       <div
         v-if="menuOpened"
         :class="menuOpened ? 'footer-opened' : 'footer-closed'"
-      >
-        <div class="header-slide">
-          <div class="header-slide-item">
-            <el-slider
-              v-model="global.currentTime"
-              :min="displayStart"
-              :max="displayEnd"
-              :step="minStep"
-              @change="changeTime"
-              @mousedown="SlideMouseDown"
-              @mouseup="SlideMouseUp"
-            ></el-slider>
-          </div>
-        </div></div
+        :style="{'--footerHeight':footerHeight+'px'}"
+      ></div
     ></transition>
   </div>
 </template>
@@ -383,6 +391,7 @@ export default {
       displayStart: 0,
       displayEnd: 0,
       form: {},
+      footerHeight:300,
     };
   },
   computed: {
@@ -573,7 +582,7 @@ export default {
     //调整画布
     changeMenuDisplay() {
       this.menuOpened = !this.menuOpened;
-      for (var i = 0; i < 510; i += 16) {
+      for (var i = 0; i < 1000; i += 16) {
         setTimeout(() => {
           if (this.global.trackPainter) {
             this.global.trackPainter.clearRect(
@@ -840,7 +849,7 @@ export default {
 .play-interface {
   height: 100%;
   width: 100%;
-  background: white;
+  background: rgb(55, 55, 55);
   overflow: auto;
 }
 .select {
@@ -869,7 +878,7 @@ export default {
   top: 0;
   height: 50px;
   width: 100%;
-  background: rgb(39,39,39);
+  background: rgb(39, 39, 39);
 }
 .header-buttons {
   padding: 10px 10px 0px 10px;
@@ -884,14 +893,13 @@ export default {
 #play-interface-container {
   position: absolute;
   top: 50px;
-  
 }
 
 .sider-closed {
   position: absolute;
   top: 50px;
-  height: calc(100vh - 40px);
-  background: rgb(32,32,32);
+   height: calc(100% - 50px - var(--footerHeight));
+  background: rgb(32, 32, 32);
   width: 0px;
   left: 0px;
 }
@@ -899,8 +907,8 @@ export default {
 .sider-opened {
   position: absolute;
   top: 50px;
-  height: calc(100vh - 350px);
-  background: rgb(32,32,32);
+   height: calc(100% - 50px - var(--footerHeight));
+  background: rgb(32, 32, 32);
   width: 300px;
   left: 0px;
 }
@@ -908,8 +916,8 @@ export default {
 .sider-closed-track {
   position: absolute;
   top: 50px;
-  height: calc(100vh - 50px);
-  background: rgb(32,32,32);
+   height: calc(100% - 50px - var(--footerHeight));
+  background: rgb(32, 32, 32);
   width: 0px;
   left: 0px;
 }
@@ -917,8 +925,8 @@ export default {
 .sider-opened-track {
   position: absolute;
   top: 50px;
-  height: calc(100vh - 350px);
-  background: rgb(32,32,32);
+  height: calc(100% - 50px - var(--footerHeight));
+  background: rgb(32, 32, 32);
   width: 300px;
   left: 300px;
 }
@@ -927,30 +935,49 @@ export default {
   position: absolute;
   bottom: 0px;
   height: 0px;
-  background: white;
   width: 100vw;
   left: 0px;
+  
 }
 
 .footer-opened {
   position: absolute;
   bottom: 0px;
-  height: 300px;
-  background: white;
+  height: var(--footerHeight);
+  background: rgb(55, 55, 55);
   width: 100vw;
   left: 0px;
 }
 .container-small {
   left: 600px;
   width: calc(100vw - 600px);
-  height: calc(100vh - 340px);
+  height: calc(100% - 120px - var(--footerHeight));
   transition: 0.5s;
 }
 
 .container-big {
   left: 0px;
   width: 100vw;
-  height: calc(100vh - 40px);
+  height: calc(100% - 120px);
+  transition: 0.5s;
+}
+
+.time-controller-small {
+  position: absolute;
+  left: 600px;
+  bottom: var(--footerHeight);
+  height: 80px;
+  width: calc(100vw - 600px);
+  background: rgb(32, 30, 32);
+  transition: 0.5s;
+}
+.time-controller-big {
+  position: absolute;
+  left: 0px;
+  bottom: 0px;
+  height: 80px;
+  width: 100vw;
+  background: rgb(32, 30, 32);
   transition: 0.5s;
 }
 .header-slide-item {
@@ -961,5 +988,12 @@ export default {
 .selected-track {
   -webkit-box-shadow: 0 0 20px 10px rgba(0, 0, 0, 0.5);
   box-shadow: 0 0 20px 10px rgba(0, 0, 0, 0.5);
+}
+::v-deep .el-slider__bar{
+  background-color: rgb(138, 138, 138);
+}
+
+::v-deep .el-slider__button{
+  border: 0px solid rgb(138, 138, 138);
 }
 </style>

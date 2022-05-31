@@ -176,7 +176,7 @@ export default {
         currentClass += "current-operation";
       } else if (this.global.currentTime > this.operation.endTime) {
         currentClass += "passed-operation";
-      } else if (this.global.currentTime < this.operation.startTime) {
+      } else {
         currentClass += "to-come-operation ";
       }
       return currentClass;
