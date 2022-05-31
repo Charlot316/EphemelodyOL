@@ -214,9 +214,9 @@ export default {
       }
     };
     var checkStartTime = (rule, value, callback) => {
-      if (!value) {
+      if (value!=0&&!value) {
         rule;
-        return callback(new Error("时机不能为空"));
+        return callback(new Error("开始时机不能为空"));
       }
       if (parseFloat(value).toString() == "NaN") {
         callback(new Error("请输入数字值"));
@@ -233,9 +233,9 @@ export default {
       }
     };
     var checkEndTime = (rule, value, callback) => {
-      if (!value) {
+      if (value!=0&&!value) {
         rule;
-        return callback(new Error("时机不能为空"));
+        return callback(new Error("结束时机不能为空"));
       }
       if (parseFloat(value).toString() == "NaN") {
         callback(new Error("请输入数字值"));
@@ -244,7 +244,9 @@ export default {
           callback(new Error("时机不能小于0"));
         } else if (value > this.chart.songLength) {
           callback(new Error("时机不能超过歌曲长度"));
-        } else {
+        } else if(value < this.tempTrack.startTiming+150){
+          callback(new Error("轨道出现时间不能过短"));
+        }else {
           callback();
         }
       }

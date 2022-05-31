@@ -118,6 +118,12 @@ export default {
     newTrack() {
       var track = {
         startTiming: 0,
+        endTiming:150,
+        type:1,
+        key:'D',
+        R:'160',
+        G:'160',
+        B:'160',
         background: this.myChart.defaultBackground,
       };
       this.myChart.tracks.push(track);
