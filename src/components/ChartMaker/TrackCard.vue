@@ -109,7 +109,7 @@
           <el-tooltip
             class="item"
             effect="dark"
-            content="设置轨道的按键"
+            content="设置轨道的按键，请输入单个字母，不区分大小写"
             placement="top-start"
             style="margin-left:10px;"
           >
