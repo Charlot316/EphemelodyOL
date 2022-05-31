@@ -176,7 +176,10 @@
       <div
         v-if="menuOpened"
         :class="menuOpened ? 'sider-opened' : 'sider-closed'"
-        :style="{'--footerHeight':footerHeight+'px'}"
+        :style="{
+          '--footerHeight': footerHeight + 'px',
+          '--documentHeight': documentHeight + 'px',
+        }"
       >
         <MenuPanel key="menupanel" :global="global" :chart="chart" /></div
     ></transition>
@@ -184,12 +187,14 @@
       name="fade"
       enter-active-class="animate__animated animate__fadeInLeft"
       leave-active-class="animate__animated animate__fadeOutLeft"
-      
     >
       <div
         v-if="menuOpened"
         :class="menuOpened ? 'sider-opened-track' : 'sider-closed-track'"
-        :style="{'--footerHeight':footerHeight+'px'}"
+        :style="{
+          '--footerHeight': footerHeight + 'px',
+          '--documentHeight': documentHeight + 'px',
+        }"
       >
         <TrackPanel
           key="trackpanel"
@@ -204,7 +209,10 @@
       <div
         :class="menuOpened ? 'container-small' : 'container-big'"
         id="play-interface-container"
-        :style="{'--footerHeight':footerHeight+'px'}"
+        :style="{
+          '--footerHeight': footerHeight + 'px',
+          '--documentHeight': documentHeight + 'px',
+        }"
       >
         <!-- 音频 -->
         <audio
@@ -293,7 +301,13 @@
         ></div>
       </div>
     </div>
-    <div :class="menuOpened ? 'time-controller-small' : 'time-controller-big'" :style="{'--footerHeight':footerHeight+'px'}">
+    <div
+      :class="menuOpened ? 'time-controller-small' : 'time-controller-big'"
+      :style="{
+        '--footerHeight': footerHeight + 'px',
+        '--documentHeight': documentHeight + 'px',
+      }"
+    >
       <div class="header-slide">
         <div class="header-slide-item">
           <el-slider
@@ -317,7 +331,10 @@
       <div
         v-if="menuOpened"
         :class="menuOpened ? 'footer-opened' : 'footer-closed'"
-        :style="{'--footerHeight':footerHeight+'px'}"
+        :style="{
+          '--footerHeight': footerHeight + 'px',
+          '--documentHeight': documentHeight + 'px',
+        }"
       ></div
     ></transition>
   </div>
@@ -371,6 +388,8 @@ export default {
   },
   data() {
     return {
+      documentWidth: 0,
+      documentHeight: 0,
       chart: {
         songLength: 0,
       },
@@ -391,7 +410,7 @@ export default {
       displayStart: 0,
       displayEnd: 0,
       form: {},
-      footerHeight:300,
+      footerHeight: 300,
     };
   },
   computed: {
@@ -469,8 +488,12 @@ export default {
     this.global.trackPainter = this.global.trackCanvas.getContext("2d");
     this.global.judgePainter = this.global.judgeCanvas.getContext("2d");
     this.resize();
+    this.documentHeight = document.documentElement.clientHeight;
+    this.documentWidth = document.documentElement.clientWidth;
     window.onresize = () => {
       return (() => {
+        that.documentHeight = document.documentElement.clientHeight;
+        that.documentWidth = document.documentElement.clientWidth;
         for (var i = 0; i < 510; i += 16) {
           setTimeout(() => {
             if (this.global.trackPainter) {
@@ -649,6 +672,12 @@ export default {
       this.volume = this.$store.state.volume;
       this.audio.volume = this.$store.state.volume / 100;
       this.run();
+      setTimeout(() => {
+        this.resize();
+      }, 1000);
+      setTimeout(() => {
+        this.resize();
+      }, 2000);
     },
 
     //生成图片路径
@@ -847,8 +876,8 @@ export default {
   --animate-duration: 0.5s;
 }
 .play-interface {
-  height: 100%;
-  width: 100%;
+  height: 100vh;
+  width: 100vw;
   background: rgb(55, 55, 55);
   overflow: auto;
 }
@@ -893,12 +922,13 @@ export default {
 #play-interface-container {
   position: absolute;
   top: 50px;
+  background: rgb(32, 32, 32);
 }
 
 .sider-closed {
   position: absolute;
   top: 50px;
-   height: calc(100% - 50px - var(--footerHeight));
+  height: calc(var(--documentHeight) - 50px - var(--footerHeight));
   background: rgb(32, 32, 32);
   width: 0px;
   left: 0px;
@@ -907,16 +937,19 @@ export default {
 .sider-opened {
   position: absolute;
   top: 50px;
-   height: calc(100% - 50px - var(--footerHeight));
+  height: calc(var(--documentHeight) - 50px - var(--footerHeight));
   background: rgb(32, 32, 32);
   width: 300px;
   left: 0px;
+  overflow: auto;
+  -ms-overflow-style: none;
+  padding-bottom: 20px;
 }
 
 .sider-closed-track {
   position: absolute;
   top: 50px;
-   height: calc(100% - 50px - var(--footerHeight));
+  height: calc(var(--documentHeight) - 50px - var(--footerHeight));
   background: rgb(32, 32, 32);
   width: 0px;
   left: 0px;
@@ -925,10 +958,19 @@ export default {
 .sider-opened-track {
   position: absolute;
   top: 50px;
-  height: calc(100% - 50px - var(--footerHeight));
+  height: calc(var(--documentHeight) - 50px - var(--footerHeight));
   background: rgb(32, 32, 32);
   width: 300px;
   left: 300px;
+  overflow: auto;
+  -ms-overflow-style: none;
+  padding-bottom: 20px;
+}
+.sider-opened-track::-webkit-scrollbar {
+  width: 0 !important;
+}
+.sider-opened::-webkit-scrollbar {
+  width: 0 !important;
 }
 
 .footer-closed {
@@ -937,7 +979,6 @@ export default {
   height: 0px;
   width: 100vw;
   left: 0px;
-  
 }
 
 .footer-opened {
@@ -950,15 +991,17 @@ export default {
 }
 .container-small {
   left: 600px;
+  top: 50px;
   width: calc(100vw - 600px);
-  height: calc(100% - 120px - var(--footerHeight));
+  height: calc(var(--documentHeight) - 120px - var(--footerHeight));
   transition: 0.5s;
 }
 
 .container-big {
   left: 0px;
+  top: 50px;
   width: 100vw;
-  height: calc(100% - 120px);
+  height: calc(var(--documentHeight) - 120px);
   transition: 0.5s;
 }
 

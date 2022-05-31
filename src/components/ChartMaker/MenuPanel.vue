@@ -142,11 +142,8 @@ export default {
 </script>
 <style scope>
 .menu-panel-container {
-  height: 100%;
   width: 90%;
   padding: 0% 5%;
-  overflow: auto;
-  -ms-overflow-style: none;
 }
 .plus-button {
   color: #67c23a;

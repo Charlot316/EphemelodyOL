@@ -131,12 +131,10 @@ export default {
 </script>
 <style scope>
 .track-panel-container {
-  height: 100%;
   width: calc(90% - 1px);
   padding: 0% 5%;
-  overflow: auto;
-  -ms-overflow-style: none;
   border: 0px solid rgba(255, 255, 255, 0.2);
+  background: rgb(32, 32, 32);
   border-left-width: 1px;
 }
 .plus-button {
