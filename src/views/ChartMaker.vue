@@ -1,161 +1,11 @@
 <template>
-  <div class="play-interface">
+  <div class="play-interface select">
     <div class="header">
       <div class="header-buttons">
         <div>
-          <el-button
-            v-if="!menuOpened"
-            icon="el-icon-s-unfold"
-            size="small"
-            class="header-button"
-            @click="changeMenuDisplay"
-            type="text"
-            >打开菜单</el-button
+          <el-button size="small" type="text" class="header-button"
+            >返回</el-button
           >
-          <el-button
-            v-else
-            icon="el-icon-s-fold"
-            size="small"
-            class="header-button"
-            @click="changeMenuDisplay"
-            type="text"
-            >关上菜单</el-button
-          >
-          <el-button
-            icon="el-icon-refresh-left"
-            size="small"
-            @click="reStart"
-            class="header-button"
-            type="text"
-            >重播</el-button
-          >
-          <el-button
-            v-if="isRunning"
-            size="small"
-            icon="el-icon-video-pause"
-            class="header-button"
-            @click="pause"
-            type="text"
-            >暂停</el-button
-          >
-          <el-button
-            v-else
-            icon="el-icon-video-play"
-            size="small"
-            class="header-button"
-            @click="play"
-            type="text"
-            >播放</el-button
-          >
-          <el-button
-            icon="el-icon-s-operation"
-            size="small"
-            type="text"
-            class="header-button"
-            @click="globalSetting = true"
-            >全局设置</el-button
-          >
-          <el-dialog
-            v-model="globalSetting"
-            @closed="globalSetting = false"
-            width="650px"
-          >
-            <el-form :model="form" label-width="120px" style="padding: 20px;">
-              <el-form-item label="时间">
-                <el-input-number
-                  v-model="global.currentTime"
-                  :min="0"
-                  :max="chart.songLength"
-                  @change="changeTime"
-                  :step="keyStep"
-                />
-                <el-tooltip
-                  class="item"
-                  effect="dark"
-                  content="可以在此输入精确的时间，以毫秒为单位"
-                  placement="top-start"
-                  style="margin-left:10px;"
-                >
-                  <i class="el-icon-question" />
-                </el-tooltip>
-              </el-form-item>
-              <el-form-item label="音量">
-                <el-input-number
-                  v-model="volume"
-                  :min="0"
-                  :max="100"
-                  @change="changeVolume"
-                />
-                <el-tooltip
-                  class="item"
-                  effect="dark"
-                  content="按键盘上下键同样可以调节音量"
-                  placement="top-start"
-                  style="margin-left:10px;"
-                >
-                  <i class="el-icon-question" />
-                </el-tooltip>
-              </el-form-item>
-              <el-form-item label="快进最小间隔">
-                <el-input-number
-                  v-model="keyStep"
-                  :min="1"
-                  :max="chart.songLength"
-                />
-                <el-tooltip
-                  class="item"
-                  effect="dark"
-                  content="按键盘左右键可以调整时间轴，本项可以调整按一次左键或者右键快进的时间多少"
-                  placement="top-start"
-                  style="margin-left:10px;"
-                >
-                  <i class="el-icon-question" />
-                </el-tooltip>
-              </el-form-item>
-              <el-form-item label="音符最小间隔">
-                <el-input-number
-                  v-model="minStep"
-                  :min="10"
-                  :max="chart.songLength"
-                />
-                <el-tooltip
-                  class="item"
-                  effect="dark"
-                  content="以毫秒为单位。当您使用播放敲谱模式键入音符的时候，音符会吸附到最近的断点上。您可以根据音乐的最小节拍时长设置本项，让音符的时机更加贴合音乐的节奏。"
-                  placement="top-start"
-                  style="margin-left:10px;"
-                >
-                  <i class="el-icon-question" />
-                </el-tooltip>
-              </el-form-item>
-              <el-form-item label="显示时间区域">
-                <el-col :span="12">
-                  开始时间点<el-input-number
-                    v-model="displayStart"
-                    :min="0"
-                    :max="chart.songLength"
-                  />
-                </el-col>
-                <el-col :span="12">
-                  结束时间点<el-input-number
-                    v-model="displayEnd"
-                    :min="0"
-                    :max="chart.songLength"
-                  />
-                </el-col>
-              </el-form-item>
-              <el-form-item label="">
-                <el-slider
-                  v-model="global.currentTime"
-                  range
-                  :min="0"
-                  :max="chart.songLength"
-                  @change="changeDisplayArea"
-                ></el-slider>
-              </el-form-item>
-            </el-form>
-            <div></div>
-          </el-dialog>
         </div>
         <div>
           <el-button size="small" type="text" class="header-button"
@@ -308,6 +158,54 @@
         '--documentHeight': documentHeight + 'px',
       }"
     >
+      <div class="time-control-buttons">
+        <el-button
+          v-if="!menuOpened"
+          size="small"
+          class="header-button"
+          @click="changeMenuDisplay"
+          type="text"
+          ><i class="el-icon-full-screen"
+        /></el-button>
+        <el-button
+          v-else
+          size="small"
+          class="header-button"
+          @click="changeMenuDisplay"
+          type="text"
+          ><i class="el-icon-full-screen"
+        /></el-button>
+        <el-button
+          size="small"
+          @click="reStart"
+          class="header-button"
+          type="text"
+          ><i class="el-icon-refresh-left"
+        /></el-button>
+        <el-button
+          v-if="isRunning"
+          size="small"
+          class="header-button"
+          @click="pause"
+          type="text"
+          ><i class="el-icon-video-pause"
+        /></el-button>
+        <el-button
+          v-else
+          size="small"
+          class="header-button"
+          @click="play"
+          type="text"
+          ><i class="el-icon-video-play"
+        /></el-button>
+        <el-button
+          size="small"
+          type="text"
+          class="header-button"
+          @click="globalSetting = true"
+          ><i class="el-icon-setting"
+        /></el-button>
+      </div>
       <div class="header-slide">
         <div class="header-slide-item">
           <el-slider
@@ -318,9 +216,112 @@
             @change="changeTime"
             @mousedown="SlideMouseDown"
             @mouseup="SlideMouseUp"
+            @touchstart="SlideMouseDown"
+            @touchend="SlideMouseUp"
           ></el-slider>
         </div>
       </div>
+      <el-dialog
+        v-model="globalSetting"
+        @closed="globalSetting = false"
+        width="650px"
+      >
+        <el-form :model="form" label-width="120px" style="padding: 20px;">
+          <el-form-item label="时间">
+            <el-input-number
+              v-model="global.currentTime"
+              :min="0"
+              :max="chart.songLength"
+              @change="changeTime"
+              :step="keyStep"
+            />
+            <el-tooltip
+              class="item"
+              effect="dark"
+              content="可以在此输入精确的时间，以毫秒为单位"
+              placement="top-start"
+              style="margin-left:10px;"
+            >
+              <i class="el-icon-question" />
+            </el-tooltip>
+          </el-form-item>
+          <el-form-item label="音量">
+            <el-input-number
+              v-model="volume"
+              :min="0"
+              :max="100"
+              @change="changeVolume"
+            />
+            <el-tooltip
+              class="item"
+              effect="dark"
+              content="按键盘上下键同样可以调节音量"
+              placement="top-start"
+              style="margin-left:10px;"
+            >
+              <i class="el-icon-question" />
+            </el-tooltip>
+          </el-form-item>
+          <el-form-item label="快进最小间隔">
+            <el-input-number
+              v-model="keyStep"
+              :min="1"
+              :max="chart.songLength"
+            />
+            <el-tooltip
+              class="item"
+              effect="dark"
+              content="按键盘左右键可以调整时间轴，本项可以调整按一次左键或者右键快进的时间多少"
+              placement="top-start"
+              style="margin-left:10px;"
+            >
+              <i class="el-icon-question" />
+            </el-tooltip>
+          </el-form-item>
+          <el-form-item label="音符最小间隔">
+            <el-input-number
+              v-model="minStep"
+              :min="10"
+              :max="chart.songLength"
+            />
+            <el-tooltip
+              class="item"
+              effect="dark"
+              content="以毫秒为单位。当您使用播放敲谱模式键入音符的时候，音符会吸附到最近的断点上。您可以根据音乐的最小节拍时长设置本项，让音符的时机更加贴合音乐的节奏。"
+              placement="top-start"
+              style="margin-left:10px;"
+            >
+              <i class="el-icon-question" />
+            </el-tooltip>
+          </el-form-item>
+          <el-form-item label="显示时间区域">
+            <el-col :span="12">
+              开始时间点<el-input-number
+                v-model="displayStart"
+                :min="0"
+                :max="chart.songLength"
+              />
+            </el-col>
+            <el-col :span="12">
+              结束时间点<el-input-number
+                v-model="displayEnd"
+                :min="0"
+                :max="chart.songLength"
+              />
+            </el-col>
+          </el-form-item>
+          <el-form-item label="">
+            <el-slider
+              v-model="global.currentTime"
+              range
+              :min="0"
+              :max="chart.songLength"
+              @change="changeDisplayArea"
+            ></el-slider>
+          </el-form-item>
+        </el-form>
+        <div></div>
+      </el-dialog>
     </div>
     <!-- 时间轴 -->
     <transition
@@ -335,8 +336,15 @@
           '--footerHeight': footerHeight + 'px',
           '--documentHeight': documentHeight + 'px',
         }"
-      ></div
-    ></transition>
+      >
+        <div
+          style="height:5px;width:100%;cursor:ns-resize"
+          id="footer-resizer"
+          @mousedown="canDrag = true"
+        ></div>
+        <div style="height:calc(100% - 5px);width:100%;"></div>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -388,6 +396,7 @@ export default {
   },
   data() {
     return {
+      canDrag: false,
       documentWidth: 0,
       documentHeight: 0,
       chart: {
@@ -540,17 +549,20 @@ export default {
         else that.volume = 0;
         that.audio.volume = that.volume / 100;
       } else if (e.key == "ArrowLeft") {
-        that.audio.currentTime -= that.keyStep / 1000;
-        that.resetTrack();
+        that.minusTime(that.keyStep / 1000);
       } else if (e.key == "ArrowRight") {
         that.audio.currentTime += that.keyStep / 1000;
-        that.resetTrack();
+        that.plusTime(that.keyStep / 1000);
       }
     };
     document.onkeyup = function(e) {
       that.global.keyIsHold[e.key.toUpperCase()] = false;
     };
     this.playInterface.onmousedown = function(e) {
+      if (that.currentSelectTrack != null) {
+        that.currentSelectTrack.edit = false;
+        that.currentSelectTrack = null
+      }
       that.calculateCurrentTracks();
       for (var i = 0; i < that.currentTracks.length; i++) {
         var track = that.currentTracks[i];
@@ -560,14 +572,43 @@ export default {
           (track.tempPositionX + track.tempWidth) * that.global.screenWidth;
         if (e.offsetX > left && e.offsetX < right) {
           that.currentSelectTrack = track;
+          track.edit = true;
+          document
+            .querySelector("#trackCard" + track.index)
+            .scrollIntoView(true);
           that.$forceUpdate();
         }
       }
     };
     this.initiate();
+
+    document.onmousemove = function(e) {
+      if (that.canDrag) {
+        if (e.clientY > 130 && e.clientY < that.documentHeight - 100) {
+          that.footerHeight = that.documentHeight - e.clientY;
+          that.resize();
+          setTimeout(() => {
+            that.repaint();
+          }, 10);
+        }
+      }
+    };
+    document.onmouseup = function() {
+      that.canDrag = false;
+    };
   },
 
   methods: {
+    minusTime(value) {
+      this.audio.currentTime -= value;
+      this.global.currentTime = this.audio.currentTime;
+      this.resetTrack();
+    },
+    plusTime(value) {
+      this.audio.currentTime += value;
+      this.global.currentTime = this.audio.currentTime;
+      this.resetTrack();
+    },
     //计算当前轨道
     calculateCurrentTracks() {
       this.currentTracks = [];
@@ -675,9 +716,6 @@ export default {
       setTimeout(() => {
         this.resize();
       }, 1000);
-      setTimeout(() => {
-        this.resize();
-      }, 2000);
     },
 
     //生成图片路径
@@ -729,6 +767,7 @@ export default {
       this.global.currentTime = this.global.currentTime - 1;
       this.audio.currentTime = this.global.currentTime / 1000;
     },
+
     //鼠标按下时间轴
     SlideMouseDown() {
       this.audio.pause();
@@ -915,9 +954,6 @@ export default {
   justify-content: space-between;
   align-items: center;
 }
-.header-slide {
-  width: 100%;
-}
 
 #play-interface-container {
   position: absolute;
@@ -994,7 +1030,6 @@ export default {
   top: 50px;
   width: calc(100vw - 600px);
   height: calc(var(--documentHeight) - 120px - var(--footerHeight));
-  transition: 0.5s;
 }
 
 .container-big {
@@ -1005,6 +1040,11 @@ export default {
   transition: 0.5s;
 }
 
+.header-slide {
+  width: 100%;
+  height: 40px;
+}
+
 .time-controller-small {
   position: absolute;
   left: 600px;
@@ -1012,7 +1052,6 @@ export default {
   height: 80px;
   width: calc(100vw - 600px);
   background: rgb(32, 30, 32);
-  transition: 0.5s;
 }
 .time-controller-big {
   position: absolute;
@@ -1021,7 +1060,14 @@ export default {
   height: 80px;
   width: 100vw;
   background: rgb(32, 30, 32);
-  transition: 0.5s;
+}
+.time-control-buttons .header-button {
+  font-size: 30px;
+}
+.time-control-buttons {
+  height: 40px;
+  text-align: center;
+  align-items: center;
 }
 .header-slide-item {
   width: 96%;
@@ -1032,11 +1078,11 @@ export default {
   -webkit-box-shadow: 0 0 20px 10px rgba(0, 0, 0, 0.5);
   box-shadow: 0 0 20px 10px rgba(0, 0, 0, 0.5);
 }
-::v-deep .el-slider__bar{
+::v-deep .el-slider__bar {
   background-color: rgb(138, 138, 138);
 }
 
-::v-deep .el-slider__button{
-  border: 0px solid rgb(138, 138, 138);
+::v-deep .el-slider__button {
+  border: 2px solid rgb(138, 138, 138);
 }
 </style>

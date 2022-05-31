@@ -25,7 +25,8 @@
             position: 'absolute',
             height: '70px',
             top: 0,
-            left: (myTrack.tempPositionX - myTrack.tempWidth) * 160 + 75 + 'px',
+            left:
+              (myTrack.tempPositionX - myTrack.tempWidth) * 160 + 75 + 'px',
             width: 2 * myTrack.tempWidth * 160 + 'px',
             background:
               'rgba(' +
@@ -251,15 +252,6 @@ export default {
   },
   created() {
     this.myTrack.edit = false;
-    this.tempTrack = JSON.parse(JSON.stringify(this.myTrack));
-    this.tempTrack.color =
-      "rgb(" +
-      this.myTrack.R +
-      "," +
-      this.myTrack.G +
-      "," +
-      this.myTrack.B +
-      ")";
   },
   methods: {
     updateTrack() {
@@ -289,12 +281,10 @@ export default {
           for (var key in this.tempTrack) {
             this.myTrack[key] = this.tempTrack[key];
           }
-          var rgb = this.tempTrack.color
-            .substring(4, this.tempTrack.color.length - 1)
-            .split(",");
-          this.myTrack.R = rgb[0];
-          this.myTrack.G = rgb[1];
-          this.myTrack.B = rgb[2];
+          var rgb=this.tempTrack.color.substring(4,this.tempTrack.color.length-1).split(",");
+          this.myTrack.R=rgb[0]
+          this.myTrack.G=rgb[1]
+          this.myTrack.B=rgb[2]
           this.myTrack.edit = false;
         } else {
           return false;
@@ -389,38 +379,38 @@ export default {
   color: #73767a;
 }
 .current-track {
-  background: rgb(47, 47, 47);
-  color: rgb(171, 171, 171);
-  box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.5);
-  transition: 0.5s;
+    background: rgb(47, 47, 47);
+    color: rgb(171, 171, 171);
+    box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.5);
+    transition: 0.5s;
 }
 
 .current-track .el-form-item__label {
-  color: rgb(171, 171, 171);
-  transition: 0.5s;
+    color: rgb(171, 171, 171);
+    transition: 0.5s;
 }
 
 .passed-track {
-  background: rgb(30, 30, 30);
-  color: rgb(100, 100, 100);
-  box-shadow: 0 0 0px 0px rgba(127, 127, 127, 0.5);
-  transition: 0.5s;
+    background: rgb(30, 30, 30);
+    color: rgb(100, 100, 100);
+    box-shadow: 0 0 0px 0px rgba(127, 127, 127, 0.5);
+    transition: 0.5s;
 }
 
 .passed-track .el-form-item__label {
-  color: rgb(171, 171, 171);
-  transition: 0.5s;
+    color: rgb(171, 171, 171);
+    transition: 0.5s;
 }
 
 .to-come-track {
-  background: #2f2f2f;
-  color: rgb(171, 171, 171);
-  box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.5);
-  transition: 0.5s;
+    background: #2f2f2f;
+    color: rgb(171, 171, 171);
+    box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.5);
+    transition: 0.5s;
 }
 
 .to-come-track .el-form-item__label {
-  color: rgb(171, 171, 171);
-  transition: 0.5s;
+    color: rgb(171, 171, 171);
+    transition: 0.5s;
 }
 </style>
