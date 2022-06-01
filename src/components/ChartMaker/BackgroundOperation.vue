@@ -161,7 +161,6 @@ export default {
         this.$notify({
           title: "成功",
           message: "删除成功",
-          position: "top-left",
           type: "success",
         });
       });
