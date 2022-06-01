@@ -588,10 +588,13 @@ export default {
           (track.tempPositionX + track.tempWidth) * that.global.screenWidth;
         if (e.offsetX > left && e.offsetX < right) {
           that.currentSelectTrack = track;
-          track.edit = true;
+
           document
             .querySelector("#trackCard" + track.index)
             .scrollIntoView(true);
+          setTimeout(() => {
+            that.currentSelectTrack.edit = true;
+          }, 10);
           that.$forceUpdate();
         }
       }
