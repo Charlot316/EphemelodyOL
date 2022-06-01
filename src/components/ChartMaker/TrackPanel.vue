@@ -66,6 +66,7 @@
               :track="track"
               :global="global"
               :id="'trackCard' + track.index"
+              @editStatus="editStatus"
             />
           </transition>
         </div>
@@ -81,6 +82,7 @@ export default {
   props: ["chart", "global", "Height"],
   data() {
     return {
+      editFinished:true,
       trackShowAll: true,
       autoScroll: true,
       myChart: this.chart,
@@ -95,7 +97,7 @@ export default {
           if (
             this.global.currentTime > this.chart.tracks[i].startTiming &&
             this.global.currentTime < this.chart.tracks[i].endTiming
-          ) {   
+          ) {
             if (i > 2)
               setTimeout(() => {
                 document
@@ -118,28 +120,52 @@ export default {
     },
   },
   methods: {
+    editStatus(param) {
+      this.editFinished = param;
+    },
     updateOperation() {
       this.myGlobal.reCalculateChartMaker = !this.myGlobal
         .reCalculateChartMaker;
     },
     newTrack() {
-      var track = {
-        startTiming: 0,
-        endTiming: 150,
-        isNew: true,
-        type: 1,
-        key: "D",
-        R: "160",
-        G: "160",
-        B: "160",
-        background: this.myChart.defaultBackground,
-      };
-      this.myChart.tracks.push(track);
-      this.updateOperation();
-      setTimeout(() => {
-        this.myChart.tracks[0].edit = true;
+      if (this.editFinished) {
+        this.editFinished=false;
+        var track = {
+          startTiming: 0,
+          endTiming: 150,
+          isNew: true,
+          type: 1,
+          key: "D",
+          R: "160",
+          G: "160",
+          B: "160",
+          background: this.myChart.defaultBackground,
+        };
+        this.myChart.tracks.push(track);
+        this.updateOperation();
         document.querySelector("#trackCard0").scrollIntoView(true);
-      }, 10);
+        setTimeout(() => {
+          this.myChart.tracks[0].edit = true;
+        }, 10);
+      } else {
+        this.$notify({
+          title: "提示",
+          message: "请先完成正在编辑的轨道",
+          type: "warning",
+        });
+        for (
+          var i = 0;
+          i < this.myChart.tracks.length;
+          i++
+        ) {
+          if (this.myChart.tracks[i].edit) {
+            document
+              .querySelector("#trackCard" + i)
+              .scrollIntoView(true);
+            break;
+          }
+        }
+      }
     },
   },
 };
@@ -180,7 +206,7 @@ export default {
   width: 0 !important;
 }
 
-.track-container-container{
+.track-container-container {
   overflow-y: scroll;
 }
 </style>

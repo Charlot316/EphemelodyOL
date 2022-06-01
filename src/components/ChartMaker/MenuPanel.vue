@@ -68,7 +68,6 @@
               :operation="operation"
               :global="global"
               @editStatus="editStatus"
-              :editFinished="editFinished"
             />
           </transition>
         </div>
@@ -140,7 +139,7 @@ export default {
     },
     newOperation() {
       if (this.editFinished) {
-        this.editFinished=false;
+        this.editFinished = false;
         var operation = {
           startTime: 0,
           isNew: true,
@@ -148,9 +147,9 @@ export default {
         };
         this.myChart.changeBackgroundOperations.push(operation);
         this.updateOperation();
+        document.querySelector("#backgroundOperation0").scrollIntoView(true);
         setTimeout(() => {
           this.myChart.changeBackgroundOperations[0].edit = true;
-          document.querySelector("#backgroundOperation0").scrollIntoView(true);
         }, 10);
       } else {
         this.$notify({

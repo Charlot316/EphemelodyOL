@@ -82,7 +82,7 @@
 
 <script>
 export default {
-  props: ["operation", "global", "chart", "editFinished"],
+  props: ["operation", "global", "chart"],
   data() {
     var checkStartTime = (rule, value, callback) => {
       if (!value) {
@@ -124,29 +124,8 @@ export default {
         .reCalculateChartMaker;
     },
     startEdit() {
-      if (this.editFinished) {
-        this.myOperation.edit = true;
-        this.tempOperation = JSON.parse(JSON.stringify(this.myOperation));
-        this.$emit("editStatus", false);
-      } else {
-        this.$notify({
-          title: "提示",
-          message: "请先完成正在编辑的操作",
-          type: "warning",
-        });
-        for (
-          var i = 0;
-          i < this.myChart.changeBackgroundOperations.length;
-          i++
-        ) {
-          if (this.myChart.changeBackgroundOperations[i].edit) {
-            document
-              .querySelector("#backgroundOperation" + i)
-              .scrollIntoView(true);
-            break;
-          }
-        }
-      }
+      this.myOperation.edit = true;
+      this.tempOperation = JSON.parse(JSON.stringify(this.myOperation));
     },
     saveOperation() {
       this.$refs["form"].validate((valid) => {
@@ -160,7 +139,6 @@ export default {
           }
           this.myOperation.edit = false;
           this.myOperation.isNew = false;
-          this.$emit("editStatus", true);
         } else {
           return false;
         }
@@ -172,6 +150,9 @@ export default {
         cancelButtonText: "取消",
         type: "warning",
       }).then(() => {
+        if (this.myOperation.isNew) {
+          this.$emit("editStatus", true);
+        }
         this.myChart.changeBackgroundOperations.splice(
           this.myOperation.index,
           1

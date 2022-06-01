@@ -351,6 +351,7 @@ export default {
           this.myTrack.G = rgb[1];
           this.myTrack.B = rgb[2];
           this.myTrack.edit = false;
+          if (this.myTrack.isNew) this.$emit("editStatus", true);
           this.myTrack.isNew = false;
           this.myTrack.tempTrack = {};
         } else {
@@ -364,6 +365,7 @@ export default {
         cancelButtonText: "取消",
         type: "warning",
       }).then(() => {
+        if (this.myTrack.isNew) this.$emit("editStatus", true);
         this.myChart.tracks.splice(this.myTrack.index, 1);
         this.updateTrack();
         this.$notify({
