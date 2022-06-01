@@ -82,7 +82,7 @@
 
 <script>
 export default {
-  props: ["operation", "global", "chart"],
+  props: ["operation", "global", "chart", "editFinished"],
   data() {
     var checkStartTime = (rule, value, callback) => {
       if (!value) {
@@ -124,8 +124,29 @@ export default {
         .reCalculateChartMaker;
     },
     startEdit() {
-      this.myOperation.edit = true;
-      this.tempOperation = JSON.parse(JSON.stringify(this.myOperation));
+      if (this.editFinished) {
+        this.myOperation.edit = true;
+        this.tempOperation = JSON.parse(JSON.stringify(this.myOperation));
+        this.$emit("editStatus", false);
+      } else {
+        this.$notify({
+          title: "提示",
+          message: "请先完成正在编辑的操作",
+          type: "warning",
+        });
+        for (
+          var i = 0;
+          i < this.myChart.changeBackgroundOperations.length;
+          i++
+        ) {
+          if (this.myChart.changeBackgroundOperations[i].edit) {
+            document
+              .querySelector("#backgroundOperation" + i)
+              .scrollIntoView(true);
+            break;
+          }
+        }
+      }
     },
     saveOperation() {
       this.$refs["form"].validate((valid) => {
@@ -139,6 +160,7 @@ export default {
           }
           this.myOperation.edit = false;
           this.myOperation.isNew = false;
+          this.$emit("editStatus", true);
         } else {
           return false;
         }

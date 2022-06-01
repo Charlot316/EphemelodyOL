@@ -39,7 +39,10 @@
         </div>
       </div>
     </div>
-    <div class="menu-container-container"   :style="{ height: Height - 70 + 'px' }">
+    <div
+      class="menu-container-container"
+      :style="{ height: Height - 70 + 'px' }"
+    >
       <transition-group
         name="flip-list"
         enter-active-class="animate__animated animate__fadeInUp"
@@ -64,6 +67,8 @@
               :chart="chart"
               :operation="operation"
               :global="global"
+              @editStatus="editStatus"
+              :editFinished="editFinished"
             />
           </transition>
         </div>
@@ -76,7 +81,7 @@
 import BackgroundOperation from "./BackgroundOperation";
 import "animate.css";
 export default {
-  props: ["chart", "global","Height"],
+  props: ["chart", "global", "Height"],
 
   data() {
     return {
@@ -84,6 +89,7 @@ export default {
       autoScroll: true,
       myChart: this.chart,
       myGlobal: this.global,
+      editFinished: true,
     };
   },
   components: { BackgroundOperation },
@@ -129,18 +135,42 @@ export default {
       this.myGlobal.reCalculateChartMaker = !this.myGlobal
         .reCalculateChartMaker;
     },
+    editStatus(param) {
+      this.editFinished = param;
+    },
     newOperation() {
-      var operation = {
-        startTime: 0,
-        isNew: true,
-        background: this.myChart.defaultBackground,
-      };
-      this.myChart.changeBackgroundOperations.push(operation);
-      this.updateOperation();
-      setTimeout(() => {
-        this.myChart.changeBackgroundOperations[0].edit = true;
-        document.querySelector("#backgroundOperation0").scrollIntoView(true);
-      }, 10);
+      if (this.editFinished) {
+        this.editFinished=false;
+        var operation = {
+          startTime: 0,
+          isNew: true,
+          background: this.myChart.defaultBackground,
+        };
+        this.myChart.changeBackgroundOperations.push(operation);
+        this.updateOperation();
+        setTimeout(() => {
+          this.myChart.changeBackgroundOperations[0].edit = true;
+          document.querySelector("#backgroundOperation0").scrollIntoView(true);
+        }, 10);
+      } else {
+        this.$notify({
+          title: "提示",
+          message: "请先完成正在编辑的操作",
+          type: "warning",
+        });
+        for (
+          var i = 0;
+          i < this.myChart.changeBackgroundOperations.length;
+          i++
+        ) {
+          if (this.myChart.changeBackgroundOperations[i].edit) {
+            document
+              .querySelector("#backgroundOperation" + i)
+              .scrollIntoView(true);
+            break;
+          }
+        }
+      }
     },
   },
 };
@@ -192,7 +222,7 @@ export default {
   width: 0 !important;
 }
 
-.menu-container-container{
+.menu-container-container {
   overflow-y: scroll;
 }
 </style>
