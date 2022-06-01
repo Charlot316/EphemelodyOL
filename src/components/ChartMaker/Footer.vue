@@ -100,7 +100,7 @@ export default {
   overflow: auto;
 }
 .footer-right {
-  height: calc(100% - 50px);
+  height: calc(100% - 55px);
   width: calc(100vw - 300px);
   background: rgb(32, 32, 32);
   position: absolute;
