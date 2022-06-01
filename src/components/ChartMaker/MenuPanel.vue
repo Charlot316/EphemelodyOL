@@ -1,75 +1,74 @@
 <template>
   <div class="menu-panel-container">
-    <el-affix :offset="50">
-      <div style="background:rgb(32, 32, 32);">
-        <h4
-          style="padding:5px;padding-top:10px;padding-bottom:5x;color:rgb(225,225,225);padding-left:10px;"
-        >
-          背景操作
-        </h4>
-        <hr style="border:0.5px solid rgba(100,100,100,0.1)" />
-        <div
-          style="width:100%;height:20px;padding:5px;display: flex;
+    <div style="background:rgb(32, 32, 32);height:70px;">
+      <h4
+        style="padding:5px;padding-top:10px;padding-bottom:5x;color:rgb(225,225,225);padding-left:10px;"
+      >
+        背景操作
+      </h4>
+      <hr style="border:0.5px solid rgba(100,100,100,0.1)" />
+      <div
+        style="width:100%;height:20px;padding:5px;display: flex;
           justify-content: space-between; align-items: center;"
-        >
-          <div>
-            <el-button
-              type="text"
-              style="margin-left:10px;"
-              class="plus-button"
-              icon="el-icon-circle-plus"
-              @click="newOperation"
-              >新增</el-button
-            >
-          </div>
-          <div>
-            <el-button
-              type="text"
-              class="show-button"
-              style="margin-right:5px;"
-              @click="autoScroll = !autoScroll"
-              >{{ autoScroll ? "关闭滚动" : "开启滚动" }}</el-button
-            >
-            <el-button
-              type="text"
-              class="show-button"
-              style="margin-right:13px;"
-              @click="operationShowAll = !operationShowAll"
-              >{{ operationShowAll ? "显示当前" : "显示全部" }}</el-button
-            >
-          </div>
+      >
+        <div>
+          <el-button
+            type="text"
+            style="margin-left:10px;"
+            class="plus-button"
+            icon="el-icon-circle-plus"
+            @click="newOperation"
+            >新增</el-button
+          >
+        </div>
+        <div>
+          <el-button
+            type="text"
+            class="show-button"
+            style="margin-right:5px;"
+            @click="autoScroll = !autoScroll"
+            >{{ autoScroll ? "关闭滚动" : "开启滚动" }}</el-button
+          >
+          <el-button
+            type="text"
+            class="show-button"
+            style="margin-right:13px;"
+            @click="operationShowAll = !operationShowAll"
+            >{{ operationShowAll ? "显示当前" : "显示全部" }}</el-button
+          >
         </div>
       </div>
-    </el-affix>
-
-    <transition-group
-      name="flip-list"
-      enter-active-class="animate__animated animate__fadeInUp"
-      leave-active-class="animate__animated animate__fadeOutUp"
-    >
-      <div
-        v-for="operation in chart.changeBackgroundOperations"
-        :key="operation"
+    </div>
+    <div class="menu-container-container"   :style="{ height: Height - 70 + 'px' }">
+      <transition-group
+        name="flip-list"
+        enter-active-class="animate__animated animate__fadeInUp"
+        leave-active-class="animate__animated animate__fadeOutUp"
       >
-        <transition
-          name="flip-list"
-          enter-active-class="animate__animated animate__fadeInUp"
-          leave-active-class="animate__animated animate__fadeOutUp"
+        <div
+          v-for="operation in chart.changeBackgroundOperations"
+          :key="operation"
         >
-          <BackgroundOperation
-            v-show="
-              operationShowAll ||
-                (global.currentTime > operation.startTime &&
-                  global.currentTime < operation.endTime)
-            "
-            :id="'backgroundOperation' + operation.index"
-            :chart="chart"
-            :operation="operation"
-            :global="global"
-          />
-        </transition>
-      </div>
-    </transition-group>
+          <transition
+            name="flip-list"
+            enter-active-class="animate__animated animate__fadeInUp"
+            leave-active-class="animate__animated animate__fadeOutUp"
+          >
+            <BackgroundOperation
+              v-show="
+                operationShowAll ||
+                  (global.currentTime > operation.startTime &&
+                    global.currentTime < operation.endTime)
+              "
+              :id="'backgroundOperation' + operation.index"
+              :chart="chart"
+              :operation="operation"
+              :global="global"
+            />
+          </transition>
+        </div>
+      </transition-group>
+    </div>
   </div>
 </template>
 
@@ -77,7 +76,7 @@
 import BackgroundOperation from "./BackgroundOperation";
 import "animate.css";
 export default {
-  props: ["chart", "global"],
+  props: ["chart", "global","Height"],
 
   data() {
     return {
@@ -189,7 +188,11 @@ export default {
   --animate-duration: 0.2s;
 }
 
-.menu-panel-container::-webkit-scrollbar {
+.menu-container-container::-webkit-scrollbar {
   width: 0 !important;
+}
+
+.menu-container-container{
+  overflow-y: scroll;
 }
 </style>

@@ -1,48 +1,50 @@
 <template>
   <div class="track-panel-container">
-    <el-affix :offset="50">
-      <div style="background:rgb(32, 32, 32);">
-        <h4
-          style="padding:5px;padding-top:10px;padding-bottom:5x;color:rgb(225,225,225);padding-left:10px;"
-        >
-          轨道列表
-        </h4>
-        <hr style="border:0.5px solid rgba(100,100,100,0.1)" />
-        <div
-          style="width:100%;height:20px;padding:5px;display: flex;
+    <div style="background:rgb(32, 32, 32);height:70px;">
+      <h4
+        style="padding:5px;padding-top:10px;padding-bottom:5x;color:rgb(225,225,225);padding-left:10px;"
+      >
+        轨道列表
+      </h4>
+      <hr style="border:0.5px solid rgba(100,100,100,0.1)" />
+      <div
+        style="width:100%;height:20px;padding:5px;display: flex;
           justify-content: space-between; align-items: center;"
-        >
-          <div>
-            <el-button
-              type="text"
-              style="margin-left:10px;"
-              class="plus-button"
-              icon="el-icon-circle-plus"
-              @click="newTrack"
-              >新增</el-button
-            >
-          </div>
-          <div>
-            <el-button
-              type="text"
-              class="show-button"
-              style="margin-right:5px;"
-              @click="autoScroll = !autoScroll"
-              >{{ autoScroll ? "关闭滚动" : "开启滚动" }}</el-button
-            >
-            <el-button
-              type="text"
-              class="show-button"
-              style="margin-right:13px;"
-              @click="trackShowAll = !trackShowAll"
-              >{{ trackShowAll ? "显示当前" : "显示全部" }}</el-button
-            >
-          </div>
+      >
+        <div>
+          <el-button
+            type="text"
+            style="margin-left:10px;"
+            class="plus-button"
+            icon="el-icon-circle-plus"
+            @click="newTrack"
+            >新增</el-button
+          >
+        </div>
+        <div>
+          <el-button
+            type="text"
+            class="show-button"
+            style="margin-right:5px;"
+            @click="autoScroll = !autoScroll"
+            >{{ autoScroll ? "关闭滚动" : "开启滚动" }}</el-button
+          >
+          <el-button
+            type="text"
+            class="show-button"
+            style="margin-right:13px;"
+            @click="trackShowAll = !trackShowAll"
+            >{{ trackShowAll ? "显示当前" : "显示全部" }}</el-button
+          >
         </div>
       </div>
-    </el-affix>
+    </div>
 
-    <div v-if="chart.tracks">
+    <div
+      class="track-container-container"
+      :style="{ height: Height - 70 + 'px' }"
+      v-if="chart.tracks"
+    >
       <transition-group
         name="flip-list"
         enter-active-class="animate__animated animate__fadeInUp"
@@ -76,7 +78,7 @@
 import TrackCard from "./TrackCard";
 import "animate.css";
 export default {
-  props: ["chart", "global"],
+  props: ["chart", "global", "Height"],
   data() {
     return {
       trackShowAll: true,
@@ -93,7 +95,7 @@ export default {
           if (
             this.global.currentTime > this.chart.tracks[i].startTiming &&
             this.global.currentTime < this.chart.tracks[i].endTiming
-          ) {
+          ) {   
             if (i > 2)
               setTimeout(() => {
                 document
@@ -146,6 +148,7 @@ export default {
 .track-panel-container {
   width: 90%;
   padding: 0% 5%;
+  height: 100%;
 }
 .plus-button {
   color: #67c23a;
@@ -173,7 +176,11 @@ export default {
   --animate-duration: 0.2s;
 }
 
-.track-panel-container::-webkit-scrollbar {
+.track-container-container::-webkit-scrollbar {
   width: 0 !important;
+}
+
+.track-container-container{
+  overflow-y: scroll;
 }
 </style>

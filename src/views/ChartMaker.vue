@@ -31,7 +31,13 @@
           '--documentHeight': documentHeight + 'px',
         }"
       >
-        <MenuPanel key="menupanel" :global="global" :chart="chart" /></div
+        <MenuPanel
+          key="menupanel"
+          :Height="documentHeight-footerHeight-50"
+          :footerHeight="footerHeight"
+          :global="global"
+          :chart="chart"
+        /></div
     ></transition>
     <transition
       name="fade"
@@ -48,6 +54,7 @@
       >
         <TrackPanel
           key="trackpanel"
+          :Height="documentHeight-footerHeight-50"
           :Track="currentSelectTrack"
           :global="global"
           :chart="chart"
@@ -343,7 +350,7 @@
           @mousedown="canDrag = true"
         ></div>
         <div style="height:calc(100% - 5px);width:100%;">
-        <Footer/>
+          <Footer />
         </div>
       </div>
     </transition>
@@ -1005,12 +1012,6 @@ export default {
   overflow: auto;
   -ms-overflow-style: none;
   padding-bottom: 20px;
-}
-.sider-opened-track::-webkit-scrollbar {
-  width: 0 !important;
-}
-.sider-opened::-webkit-scrollbar {
-  width: 0 !important;
 }
 
 .footer-closed {
