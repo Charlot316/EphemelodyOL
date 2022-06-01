@@ -140,6 +140,7 @@ export default {
       this.updateOperation();
       setTimeout(() => {
         this.myChart.changeBackgroundOperations[0].edit = true;
+        document.querySelector("#backgroundOperation0").scrollIntoView(true);
       }, 10);
     },
   },

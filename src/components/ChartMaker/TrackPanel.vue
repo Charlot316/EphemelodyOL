@@ -136,6 +136,7 @@ export default {
       this.updateOperation();
       setTimeout(() => {
         this.myChart.tracks[0].edit = true;
+        document.querySelector("#trackCard0").scrollIntoView(true);
       }, 10);
     },
   },
