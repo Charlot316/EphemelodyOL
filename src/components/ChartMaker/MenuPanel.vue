@@ -1,42 +1,46 @@
 <template>
   <div class="menu-panel-container">
-    <h4
-      style="padding:5px;margin-top:10px;margin-bottom:5x;color:rgb(225,225,225);margin-left:10px;"
-    >
-      背景操作
-    </h4>
-    <hr style="border:0.5px solid rgba(100,100,100,0.1)" />
-    <div
-      style="width:100%;height:20px;padding:5px;display: flex;
+    <el-affix :offset="50">
+      <div style="background:rgb(32, 32, 32);">
+        <h4
+          style="padding:5px;padding-top:10px;padding-bottom:5x;color:rgb(225,225,225);padding-left:10px;"
+        >
+          背景操作
+        </h4>
+        <hr style="border:0.5px solid rgba(100,100,100,0.1)" />
+        <div
+          style="width:100%;height:20px;padding:5px;display: flex;
           justify-content: space-between; align-items: center;"
-    >
-      <div>
-        <el-button
-          type="text"
-          class="plus-button"
-          style="margin-left:10px;"
-          icon="el-icon-circle-plus"
-          @click="newOperation"
-          >新增</el-button
         >
+          <div>
+            <el-button
+              type="text"
+              style="margin-left:10px;"
+              class="plus-button"
+              icon="el-icon-circle-plus"
+              @click="newOperation"
+              >新增</el-button
+            >
+          </div>
+          <div>
+            <el-button
+              type="text"
+              class="show-button"
+              style="margin-right:5px;"
+              @click="autoScroll = !autoScroll"
+              >{{ autoScroll ? "关闭滚动" : "开启滚动" }}</el-button
+            >
+            <el-button
+              type="text"
+              class="show-button"
+              style="margin-right:13px;"
+              @click="operationShowAll = !operationShowAll"
+              >{{ operationShowAll ? "显示当前" : "显示全部" }}</el-button
+            >
+          </div>
+        </div>
       </div>
-      <div>
-        <el-button
-          type="text"
-          class="show-button"
-          style="margin-right:5px;"
-          @click="autoScroll = !autoScroll"
-          >{{ autoScroll ? "关闭滚动" : "开启滚动" }}</el-button
-        >
-        <el-button
-          type="text"
-          class="show-button"
-          style="margin-right:13px;"
-          @click="operationShowAll = !operationShowAll"
-          >{{ operationShowAll ? "显示当前" : "显示全部" }}</el-button
-        >
-      </div>
-    </div>
+    </el-affix>
 
     <transition-group
       name="flip-list"
@@ -129,7 +133,7 @@ export default {
     newOperation() {
       var operation = {
         startTime: 0,
-        isNew:true,
+        isNew: true,
         background: this.myChart.defaultBackground,
       };
       this.myChart.changeBackgroundOperations.push(operation);
@@ -143,8 +147,11 @@ export default {
 </script>
 <style scope>
 .menu-panel-container {
-  width: 90%;
   padding: 0% 5%;
+  width: calc(90% - 1px);
+  border: 0px solid rgba(255, 255, 255, 0.2);
+  background: rgb(32, 32, 32);
+  border-right-width: 1px;
 }
 .plus-button {
   color: #67c23a;

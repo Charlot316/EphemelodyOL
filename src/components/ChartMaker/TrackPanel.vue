@@ -1,42 +1,47 @@
 <template>
   <div class="track-panel-container">
-    <h4
-      style="padding:5px;margin-top:10px;margin-bottom:5x;color:rgb(225,225,225);margin-left:10px;"
-    >
-      轨道列表
-    </h4>
-    <hr style="border:0.5px solid rgba(100,100,100,0.1)" />
-    <div
-      style="width:100%;height:20px;padding:5px;display: flex;
+    <el-affix :offset="50">
+      <div style="background:rgb(32, 32, 32);">
+        <h4
+          style="padding:5px;padding-top:10px;padding-bottom:5x;color:rgb(225,225,225);padding-left:10px;"
+        >
+          轨道列表
+        </h4>
+        <hr style="border:0.5px solid rgba(100,100,100,0.1)" />
+        <div
+          style="width:100%;height:20px;padding:5px;display: flex;
           justify-content: space-between; align-items: center;"
-    >
-      <div>
-        <el-button
-          type="text"
-          style="margin-left:10px;"
-          class="plus-button"
-          icon="el-icon-circle-plus"
-          @click="newTrack"
-          >新增</el-button
         >
+          <div>
+            <el-button
+              type="text"
+              style="margin-left:10px;"
+              class="plus-button"
+              icon="el-icon-circle-plus"
+              @click="newTrack"
+              >新增</el-button
+            >
+          </div>
+          <div>
+            <el-button
+              type="text"
+              class="show-button"
+              style="margin-right:5px;"
+              @click="autoScroll = !autoScroll"
+              >{{ autoScroll ? "关闭滚动" : "开启滚动" }}</el-button
+            >
+            <el-button
+              type="text"
+              class="show-button"
+              style="margin-right:13px;"
+              @click="trackShowAll = !trackShowAll"
+              >{{ trackShowAll ? "显示当前" : "显示全部" }}</el-button
+            >
+          </div>
+        </div>
       </div>
-      <div>
-        <el-button
-          type="text"
-          class="show-button"
-          style="margin-right:5px;"
-          @click="autoScroll = !autoScroll"
-          >{{ autoScroll ? "关闭滚动" : "开启滚动" }}</el-button
-        >
-        <el-button
-          type="text"
-          class="show-button"
-          style="margin-right:13px;"
-          @click="trackShowAll = !trackShowAll"
-          >{{ trackShowAll ? "显示当前" : "显示全部" }}</el-button
-        >
-      </div>
-    </div>
+    </el-affix>
+
     <div v-if="chart.tracks">
       <transition-group
         name="flip-list"
@@ -118,13 +123,13 @@ export default {
     newTrack() {
       var track = {
         startTiming: 0,
-        endTiming:150,
-        isNew:true,
-        type:1,
-        key:'D',
-        R:'160',
-        G:'160',
-        B:'160',
+        endTiming: 150,
+        isNew: true,
+        type: 1,
+        key: "D",
+        R: "160",
+        G: "160",
+        B: "160",
         background: this.myChart.defaultBackground,
       };
       this.myChart.tracks.push(track);
@@ -138,11 +143,8 @@ export default {
 </script>
 <style scope>
 .track-panel-container {
-  width: calc(90% - 1px);
+  width: 90%;
   padding: 0% 5%;
-  border: 0px solid rgba(255, 255, 255, 0.2);
-  background: rgb(32, 32, 32);
-  border-left-width: 1px;
 }
 .plus-button {
   color: #67c23a;
