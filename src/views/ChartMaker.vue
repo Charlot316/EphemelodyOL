@@ -338,11 +338,11 @@
         }"
       >
         <div
-          style="height:1px;width:100%;cursor:ns-resize"
+          style="height:5px;width:100%;cursor:ns-resize"
           id="footer-resizer"
           @mousedown="canDrag = true"
         ></div>
-        <div style="height:calc(100% - 1px);width:100%;"></div>
+        <div style="height:calc(100% - 5px);width:100%;"></div>
       </div>
     </transition>
   </div>
