@@ -342,7 +342,9 @@
           id="footer-resizer"
           @mousedown="canDrag = true"
         ></div>
-        <div style="height:calc(100% - 5px);width:100%;"></div>
+        <div style="height:calc(100% - 5px);width:100%;">
+        <Footer/>
+        </div>
       </div>
     </transition>
   </div>
@@ -352,6 +354,7 @@
 import Track from "@/components/PlayInterface/Track";
 import MenuPanel from "@/components/ChartMaker/MenuPanel";
 import TrackPanel from "@/components/ChartMaker/TrackPanel";
+import Footer from "@/components/ChartMaker/Footer";
 import { chart } from "@/utils/chart.js";
 import "animate.css";
 export default {
@@ -359,6 +362,7 @@ export default {
     Track,
     MenuPanel,
     TrackPanel,
+    Footer,
   },
   watch: {
     "global.currentTime"() {

@@ -129,6 +129,7 @@ export default {
     newOperation() {
       var operation = {
         startTime: 0,
+        isNew:true,
         background: this.myChart.defaultBackground,
       };
       this.myChart.changeBackgroundOperations.push(operation);

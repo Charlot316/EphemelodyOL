@@ -3,7 +3,9 @@
     <div
       style="width:100%;display: flex;justify-content: space-between;border: none;"
     >
-      <div style="width: 70px;height:70px;border-radius: 5px;position:relative;pointer-events: none;">
+      <div
+        style="width: 70px;height:70px;border-radius: 5px;position:relative;pointer-events: none;"
+      >
         <el-image
           style="position:absolute;top:0;left:0;width: 70px;height:70px;border-radius: 5px;"
           src="http://pic.mcatk.com/charlot-pictures/8B0C2D47-6D1E-4916-BE4C-EFD5C6A5D998_1_201_a.jpeg"
@@ -52,7 +54,7 @@
               @click="startEdit"
             />
             <el-button
-              v-if="myTrack.edit"
+              v-if="myTrack.edit && !myTrack.isNew"
               type="text"
               class="cancel-button"
               icon="el-icon-error"
@@ -181,7 +183,10 @@
           </el-tooltip>
         </el-form-item>
         <el-form-item label="默认颜色" label-width="80px" prop="color">
-          <el-color-picker v-model="myTrack.tempTrack.color" color-format="rgb" />
+          <el-color-picker
+            v-model="myTrack.tempTrack.color"
+            color-format="rgb"
+          />
           <el-tooltip
             class="item"
             effect="dark"
@@ -214,7 +219,7 @@ export default {
       }
     };
     var checkStartTime = (rule, value, callback) => {
-      if (value!=0&&!value) {
+      if (value != 0 && !value) {
         rule;
         return callback(new Error("开始时机不能为空"));
       }
@@ -233,7 +238,7 @@ export default {
       }
     };
     var checkEndTime = (rule, value, callback) => {
-      if (value!=0&&!value) {
+      if (value != 0 && !value) {
         rule;
         return callback(new Error("结束时机不能为空"));
       }
@@ -244,9 +249,9 @@ export default {
           callback(new Error("时机不能小于0"));
         } else if (value > this.chart.songLength) {
           callback(new Error("时机不能超过歌曲长度"));
-        } else if(value < this.myTrack.tempTrack.startTiming+150){
+        } else if (value < this.myTrack.tempTrack.startTiming + 150) {
           callback(new Error("轨道出现时间不能过短"));
-        }else {
+        } else {
           callback();
         }
       }
@@ -333,10 +338,10 @@ export default {
           setTimeout(() => {
             this.updateTrack();
           }, 500);
-          console.l
+          console.l;
           for (var key in this.myTrack.tempTrack) {
-            if(key!='tempTrack')
-            this.myTrack[key] = this.myTrack.tempTrack[key];
+            if (key != "tempTrack")
+              this.myTrack[key] = this.myTrack.tempTrack[key];
           }
           this.myTrack.key = this.myTrack.key.toUpperCase();
           var rgb = this.myTrack.tempTrack.color
@@ -346,7 +351,8 @@ export default {
           this.myTrack.G = rgb[1];
           this.myTrack.B = rgb[2];
           this.myTrack.edit = false;
-          this.myTrack.tempTrack={}
+          this.myTrack.isNew = false;
+          this.myTrack.tempTrack = {};
         } else {
           return false;
         }

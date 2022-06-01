@@ -119,6 +119,7 @@ export default {
       var track = {
         startTiming: 0,
         endTiming:150,
+        isNew:true,
         type:1,
         key:'D',
         R:'160',
