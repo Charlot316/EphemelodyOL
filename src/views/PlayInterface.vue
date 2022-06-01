@@ -362,7 +362,7 @@ export default {
       ) {
         return this.global.screenWidth;
       } else {
-        if (this.global.currentTime < time + waitLoad) {
+        if (this.global.currentTime <= time + waitLoad) {
           if (this.global.currentTime < waitLoad) {
             return 0;
           } else
@@ -753,9 +753,8 @@ export default {
       this.resetTrack();
       this.audio.currentTime = 0;
       this.audio.play();
-
     },
-resetTrack() {
+    resetTrack() {
       this.global.keyPressTime = [];
       this.global.keyIsHold = [];
       this.global.keyUsed = [];

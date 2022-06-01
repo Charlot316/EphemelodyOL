@@ -338,11 +338,11 @@
         }"
       >
         <div
-          style="height:5px;width:100%;cursor:ns-resize"
+          style="height:1px;width:100%;cursor:ns-resize"
           id="footer-resizer"
           @mousedown="canDrag = true"
         ></div>
-        <div style="height:calc(100% - 5px);width:100%;"></div>
+        <div style="height:calc(100% - 1px);width:100%;"></div>
       </div>
     </transition>
   </div>
@@ -432,7 +432,7 @@ export default {
       ) {
         return this.global.screenWidth;
       } else {
-        if (this.global.currentTime < time + waitLoad) {
+        if (this.global.currentTime <= time + waitLoad) {
           if (this.global.currentTime < waitLoad) {
             return 0;
           } else
@@ -561,7 +561,7 @@ export default {
     this.playInterface.onmousedown = function(e) {
       if (that.currentSelectTrack != null) {
         that.currentSelectTrack.edit = false;
-        that.currentSelectTrack = null
+        that.currentSelectTrack = null;
       }
       that.calculateCurrentTracks();
       for (var i = 0; i < that.currentTracks.length; i++) {
