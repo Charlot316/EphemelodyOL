@@ -29,6 +29,7 @@
             @currentTrack="currentTrack"
           />
         </div>
+        <div class="time-indicater" :style="{width:'1px',background:'rgb(255,255,255)',height:'100%',position:'absolute',top:scrollTop+'px',left:(global.currentTime / displayAreaTime)*(global.documentWidth-300)+'px'}"></div>
       </div>
     </div>
   </div>
@@ -48,6 +49,7 @@ export default {
       myChart: this.chart,
       myGlobal: this.global,
       scrollLeft:0,
+      scrollTop:0,
       displayAreaTime:10000,
     };
   },
@@ -69,6 +71,7 @@ export default {
       var element=document.getElementById("footer-right-scroll");
       document.getElementById("footer-left-scroll").scrollTop = element.scrollTop;
       this.scrollLeft=element.scrollLeft;
+      this.scrollTop=element.scrollTop;
     },
   },
 };

@@ -28,11 +28,6 @@ export default {
   },
   watch: {
     "global.currentTime"() {
-      this.myNote.positionY =
-        (this.global.finalY / this.global.remainingTime) *
-          this.global.currentTime -
-        (this.global.finalY / this.global.remainingTime) *
-          (this.Note.timing - this.global.remainingTime);
     },
   },
   created() {},

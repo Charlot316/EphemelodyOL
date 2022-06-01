@@ -69,7 +69,7 @@
         id="play-interface-container"
         :style="{
           '--footerHeight': footerHeight + 'px',
-          '--documentHeight': documentHeight + 'px',
+          '--documentHeight': global.documentHeight + 'px',
         }"
       >
         <!-- 音频 -->
@@ -163,7 +163,7 @@
       :class="menuOpened ? 'time-controller-small' : 'time-controller-big'"
       :style="{
         '--footerHeight': footerHeight + 'px',
-        '--documentHeight': documentHeight + 'px',
+        '--documentHeight': global.documentHeight + 'px',
       }"
     >
       <div class="time-control-buttons">
@@ -342,7 +342,7 @@
         :class="menuOpened ? 'footer-opened' : 'footer-closed'"
         :style="{
           '--footerHeight': footerHeight + 'px',
-          '--documentHeight': documentHeight + 'px',
+          '--documentHeight': global.documentHeight + 'px',
         }"
       >
         <div
