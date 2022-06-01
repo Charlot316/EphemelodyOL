@@ -58,6 +58,7 @@
           :Track="currentSelectTrack"
           :global="global"
           :chart="chart"
+          @currentTrack="currentTrack"
         /></div
     ></transition>
 
@@ -350,7 +351,11 @@
           @mousedown="canDrag = true"
         ></div>
         <div style="height:calc(100% - 5px);width:100%;">
-          <Footer />
+          <Footer
+            :chart="chart"
+            :global="global"
+            @currentTrack="currentTrack"
+          />
         </div>
       </div>
     </transition>
@@ -610,6 +615,11 @@ export default {
   },
 
   methods: {
+    currentTrack(param) {
+      if (this.currentSelectTrack != null) this.currentSelectTrack.edit = false;
+      this.currentSelectTrack = param;
+      this.$forceUpdate();
+    },
     minusTime(value) {
       this.audio.currentTime -= value;
       this.global.currentTime = this.audio.currentTime;

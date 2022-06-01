@@ -67,6 +67,7 @@
               :global="global"
               :id="'trackCard' + track.index"
               @editStatus="editStatus"
+              @currentTrack="currentTrack"
             />
           </transition>
         </div>
@@ -120,6 +121,9 @@ export default {
     },
   },
   methods: {
+    currentTrack(param) {
+      this.$emit("currentTrack", param);
+    },
     editStatus(param) {
       this.editFinished = param;
     },

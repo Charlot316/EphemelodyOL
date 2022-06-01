@@ -1,5 +1,5 @@
 <template>
-  <div :class="currentClass">
+  <div :class="currentClass" @dblclick="currentTrack">
     <div
       style="width:100%;display: flex;justify-content: space-between;border: none;"
     >
@@ -318,6 +318,10 @@ export default {
       this.myGlobal.reCalculateTrack = !this.myGlobal.reCalculateTrack;
       this.myGlobal.reCalculateChartMaker = !this.myGlobal
         .reCalculateChartMaker;
+    },
+    currentTrack() {
+      this.$emit("currentTrack", this.myTrack);
+      this.startEdit();
     },
     startEdit() {
       this.myTrack.edit = true;
