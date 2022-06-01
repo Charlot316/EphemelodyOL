@@ -1,7 +1,11 @@
 <template>
   <div :class="track.edit ? 'panel-edit' : 'panel-no-edit'">
     <div class="track-tracks">
-      <div :class="track.edit ? 'note-track-edit' : 'note-track'"></div>
+      <div :class="track.edit ? 'note-track-edit' : 'note-track'">
+      <div v-for="note in track.notes" :key="note">
+      <note :track="track" :global="global" :note="note" :displayAreaTime="displayAreaTime"/>
+      </div>
+      </div>
       <transition
         name="fade"
         enter-active-class="animate__animated animate__fadeInDown"
@@ -43,8 +47,10 @@
 
 <script>
 import "animate.css";
+import Note from "./Note";
 export default {
-  props: ["track", "global", "chart", "scrollLeft"],
+  props: ["track", "global", "chart", "scrollLeft","displayAreaTime"],
+  components:{Note},
 };
 </script>
 
@@ -76,13 +82,12 @@ export default {
   left: 0;
 }
 .note-track {
-  background: rgb(255, 255, 255);
+  background: rgb(56, 56, 56);
   position: absolute;
   top: 5px;
   left: 0px;
   height: 80px;
   transition: 0.5s;
-  width: 10000px;
 }
 .note-track-edit {
   background: rgb(255, 255, 255);
@@ -90,7 +95,6 @@ export default {
   left: 0px;
   top: 40px;
   height: 80px;
-  width: 10000px;
   transition: 0.5s;
 }
 .positionX-track {
@@ -107,7 +111,6 @@ export default {
   left: 0px;
   top: 280px;
   height: 80px;
-  width: 10000px;
 }
 .color-track {
   background: rgb(83, 195, 208);
@@ -115,7 +118,6 @@ export default {
   left: 0px;
   top: 400px;
   height: 80px;
-  width: 10000px;
 }
 
 .note-track-label {

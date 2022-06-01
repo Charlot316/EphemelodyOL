@@ -28,12 +28,12 @@
         :class="menuOpened ? 'sider-opened' : 'sider-closed'"
         :style="{
           '--footerHeight': footerHeight + 'px',
-          '--documentHeight': documentHeight + 'px',
+          '--documentHeight': global.documentHeight + 'px',
         }"
       >
         <MenuPanel
           key="menupanel"
-          :Height="documentHeight - footerHeight - 50"
+          :Height="global.documentHeight - footerHeight - 50"
           :footerHeight="footerHeight"
           :global="global"
           :chart="chart"
@@ -49,12 +49,12 @@
         :class="menuOpened ? 'sider-opened-track' : 'sider-closed-track'"
         :style="{
           '--footerHeight': footerHeight + 'px',
-          '--documentHeight': documentHeight + 'px',
+          '--documentHeight': global.documentHeight + 'px',
         }"
       >
         <TrackPanel
           key="trackpanel"
-          :Height="documentHeight - footerHeight - 50"
+          :Height="global.documentHeight - footerHeight - 50"
           :Track="currentSelectTrack"
           :global="global"
           :chart="chart"
@@ -413,8 +413,6 @@ export default {
   data() {
     return {
       canDrag: false,
-      documentWidth: 0,
-      documentHeight: 0,
       chart: {
         songLength: 0,
       },
@@ -507,12 +505,12 @@ export default {
     this.global.trackPainter = this.global.trackCanvas.getContext("2d");
     this.global.judgePainter = this.global.judgeCanvas.getContext("2d");
     this.resize();
-    this.documentHeight = document.documentElement.clientHeight;
-    this.documentWidth = document.documentElement.clientWidth;
+    this.global.documentHeight = document.documentElement.clientHeight;
+    this.global.documentWidth = document.documentElement.clientWidth;
     window.onresize = () => {
       return (() => {
-        that.documentHeight = document.documentElement.clientHeight;
-        that.documentWidth = document.documentElement.clientWidth;
+        that.global.documentHeight = document.documentElement.clientHeight;
+        that.global.documentWidth = document.documentElement.clientWidth;
         for (var i = 0; i < 510; i += 16) {
           setTimeout(() => {
             if (this.global.trackPainter) {
@@ -597,8 +595,8 @@ export default {
 
     document.onmousemove = function(e) {
       if (that.canDrag) {
-        if (e.clientY > 130 && e.clientY < that.documentHeight - 100) {
-          that.footerHeight = that.documentHeight - e.clientY;
+        if (e.clientY > 130 && e.clientY < that.global.documentHeight - 100) {
+          that.footerHeight = that.global.documentHeight - e.clientY;
           that.resize();
           setTimeout(() => {
             that.repaint();

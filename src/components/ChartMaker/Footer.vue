@@ -25,6 +25,7 @@
             :track="track"
             :global="global"
             :scrollLeft="scrollLeft"
+            :displayAreaTime="displayAreaTime"
             @currentTrack="currentTrack"
           />
         </div>
@@ -47,6 +48,7 @@ export default {
       myChart: this.chart,
       myGlobal: this.global,
       scrollLeft:0,
+      displayAreaTime:10000,
     };
   },
   watch: {
