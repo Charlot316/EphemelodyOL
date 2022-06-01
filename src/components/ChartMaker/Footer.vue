@@ -21,6 +21,7 @@
       <div class="footer-right" id="footer-right-scroll" @scroll="rightScroll">
         <div v-for="track in chart.tracks" :key="track">
           <TrackCardPanel
+            :id="'trackCardPanel' + track.index"
             :chart="chart"
             :track="track"
             :global="global"
@@ -29,7 +30,21 @@
             @currentTrack="currentTrack"
           />
         </div>
-        <div class="time-indicater" :style="{width:'1px',background:'rgb(255,255,255)',height:'100%',position:'absolute',top:scrollTop+'px',left:(global.currentTime / displayAreaTime)*(global.documentWidth-300)+'px'}"></div>
+        <div
+          class="time-indicater"
+          id="time-indicater"
+          :style="{
+            width: '1px',
+            background: 'rgb(255,255,255)',
+            height: '100%',
+            position: 'absolute',
+            top: scrollTop + 'px',
+            left:
+              (global.currentTime / displayAreaTime) *
+                (global.documentWidth - 300) +
+              'px',
+          }"
+        ></div>
       </div>
     </div>
   </div>
@@ -48,12 +63,36 @@ export default {
     return {
       myChart: this.chart,
       myGlobal: this.global,
-      scrollLeft:0,
-      scrollTop:0,
-      displayAreaTime:10000,
+      scrollLeft: 0,
+      scrollTop: 0,
+      displayAreaTime: 10000,
     };
   },
   watch: {
+    "global.currentTime"() {
+      this.scrollLeft =
+        (this.global.currentTime / this.displayAreaTime) *
+          (this.global.documentWidth - 300) -
+        (this.global.documentWidth - 300) / 2;
+      document.getElementById(
+        "footer-right-scroll"
+      ).scrollLeft = this.scrollLeft;
+
+      for (var i = 0; i < this.chart.tracks.length; i++) {
+        if (
+          this.global.currentTime > this.chart.tracks[i].startTiming &&
+          this.global.currentTime < this.chart.tracks[i].endTiming
+        ) {
+          setTimeout(() => {
+            document
+              .querySelector("#trackCardPanel" + this.chart.tracks[i].index)
+              .scrollIntoView(true);
+          }, 200);
+
+          break;
+        }
+      }
+    },
     chart() {
       this.myChart = this.chart;
     },
@@ -68,10 +107,11 @@ export default {
       ).scrollTop = document.getElementById("footer-left-scroll").scrollTop;
     },
     rightScroll() {
-      var element=document.getElementById("footer-right-scroll");
-      document.getElementById("footer-left-scroll").scrollTop = element.scrollTop;
-      this.scrollLeft=element.scrollLeft;
-      this.scrollTop=element.scrollTop;
+      var element = document.getElementById("footer-right-scroll");
+      document.getElementById("footer-left-scroll").scrollTop =
+        element.scrollTop;
+      this.scrollLeft = element.scrollLeft;
+      this.scrollTop = element.scrollTop;
     },
   },
 };
