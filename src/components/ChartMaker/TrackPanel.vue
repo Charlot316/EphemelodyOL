@@ -82,7 +82,7 @@ export default {
   props: ["chart", "global", "Height"],
   data() {
     return {
-      editFinished:true,
+      editFinished: true,
       trackShowAll: true,
       autoScroll: true,
       myChart: this.chart,
@@ -129,7 +129,7 @@ export default {
     },
     newTrack() {
       if (this.editFinished) {
-        this.editFinished=false;
+        this.editFinished = false;
         var track = {
           startTiming: 0,
           endTiming: 150,
@@ -140,6 +140,10 @@ export default {
           G: "160",
           B: "160",
           background: this.myChart.defaultBackground,
+          notes: [],
+          moveOperations: [],
+          changeWidthOperations: [],
+          changeColorOperations: [],
         };
         this.myChart.tracks.push(track);
         this.updateOperation();
@@ -153,15 +157,9 @@ export default {
           message: "请先完成正在编辑的轨道",
           type: "warning",
         });
-        for (
-          var i = 0;
-          i < this.myChart.tracks.length;
-          i++
-        ) {
+        for (var i = 0; i < this.myChart.tracks.length; i++) {
           if (this.myChart.tracks[i].edit) {
-            document
-              .querySelector("#trackCard" + i)
-              .scrollIntoView(true);
+            document.querySelector("#trackCard" + i).scrollIntoView(true);
             break;
           }
         }

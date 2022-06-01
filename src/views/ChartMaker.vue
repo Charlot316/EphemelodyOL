@@ -33,7 +33,7 @@
       >
         <MenuPanel
           key="menupanel"
-          :Height="documentHeight-footerHeight-50"
+          :Height="documentHeight - footerHeight - 50"
           :footerHeight="footerHeight"
           :global="global"
           :chart="chart"
@@ -54,7 +54,7 @@
       >
         <TrackPanel
           key="trackpanel"
-          :Height="documentHeight-footerHeight-50"
+          :Height="documentHeight - footerHeight - 50"
           :Track="currentSelectTrack"
           :global="global"
           :chart="chart"
