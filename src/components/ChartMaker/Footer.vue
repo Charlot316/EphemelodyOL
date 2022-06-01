@@ -24,6 +24,7 @@
             :chart="chart"
             :track="track"
             :global="global"
+            :scrollLeft="scrollLeft"
             @currentTrack="currentTrack"
           />
         </div>
@@ -45,6 +46,7 @@ export default {
     return {
       myChart: this.chart,
       myGlobal: this.global,
+      scrollLeft:0,
     };
   },
   watch: {
@@ -62,9 +64,9 @@ export default {
       ).scrollTop = document.getElementById("footer-left-scroll").scrollTop;
     },
     rightScroll() {
-      document.getElementById(
-        "footer-left-scroll"
-      ).scrollTop = document.getElementById("footer-right-scroll").scrollTop;
+      var element=document.getElementById("footer-right-scroll");
+      document.getElementById("footer-left-scroll").scrollTop = element.scrollTop;
+      this.scrollLeft=element.scrollLeft;
     },
   },
 };
@@ -106,7 +108,7 @@ export default {
   position: absolute;
   top: 50px;
   left: 300px;
-  padding-top:5px;
+  padding-top: 5px;
   overflow: auto;
 }
 

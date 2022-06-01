@@ -20,10 +20,21 @@
         enter-active-class="animate__animated animate__fadeInDown"
         leave-active-class="animate__animated animate__fadeOutUp"
         ><div v-if="track.edit">
-          <div class="note-track-label">音符轨道</div>
-          <div class="positionX-track-label">坐标操作</div>
-          <div class="width-track-label">宽度操作</div>
-          <div class="color-track-label">色彩操作</div>
+          <div class="note-track-label" :style="{ left: scrollLeft + 'px' }">
+            音符轨道
+          </div>
+          <div
+            class="positionX-track-label"
+            :style="{ left: scrollLeft + 'px' }"
+          >
+            坐标操作
+          </div>
+          <div class="width-track-label" :style="{ left: scrollLeft + 'px' }">
+            宽度操作
+          </div>
+          <div class="color-track-label" :style="{ left: scrollLeft + 'px' }">
+            色彩操作
+          </div>
         </div>
       </transition>
     </div>
@@ -33,7 +44,7 @@
 <script>
 import "animate.css";
 export default {
-  props: ["track", "global", "chart"],
+  props: ["track", "global", "chart", "scrollLeft"],
 };
 </script>
 
@@ -108,31 +119,31 @@ export default {
 }
 
 .note-track-label {
-  color: white;
+  color: rgb(210, 210, 210);
   position: absolute;
   left: 0px;
-  top: 20px;
-  width:100px;
+  top: 15px;
+  width: 300px;
 }
 .positionX-track-label {
-  color: white;
+  color: rgb(210, 210, 210);
   position: absolute;
   left: 0px;
-  top: 140px;
-  width:100px;
+  top: 135px;
+  width: 300px;
 }
 .width-track-label {
-  color: white;
+  color: rgb(210, 210, 210);
   position: absolute;
   left: 0px;
-  top: 260px;
-  width:100px;
+  top: 255px;
+  width: 300px;
 }
 .color-track-label {
-  color: white;
+  color: rgb(210, 210, 210);
   position: absolute;
   left: 0px;
-  top: 380px;
-  width:100px;
+  top: 375px;
+  width: 300px;
 }
 </style>
