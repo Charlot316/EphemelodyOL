@@ -325,6 +325,9 @@ export default {
     },
     startEdit() {
       this.myTrack.edit = true;
+      document
+        .querySelector("#trackCard" + this.myTrack.index)
+        .scrollIntoView(true);
       this.myTrack.tempTrack = JSON.parse(JSON.stringify(this.myTrack));
       this.myTrack.tempTrack.key = this.myTrack.tempTrack.key.toUpperCase();
       this.myTrack.tempTrack.color =
