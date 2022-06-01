@@ -210,5 +210,6 @@ export default {
 
 .track-container-container {
   overflow-y: scroll;
+  padding-bottom:20px;
 }
 </style>
