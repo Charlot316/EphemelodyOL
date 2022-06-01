@@ -3,7 +3,7 @@
     <div
       style="width:100%;display: flex;justify-content: space-between;border: none;"
     >
-      <div style="width: 70px;height:70px;border-radius: 5px;position:relative">
+      <div style="width: 70px;height:70px;border-radius: 5px;position:relative;pointer-events: none;">
         <el-image
           style="position:absolute;top:0;left:0;width: 70px;height:70px;border-radius: 5px;"
           src="http://pic.mcatk.com/charlot-pictures/8B0C2D47-6D1E-4916-BE4C-EFD5C6A5D998_1_201_a.jpeg"
@@ -80,13 +80,13 @@
     </div>
     <div v-show="myTrack.edit" style="margin-top:20px;">
       <el-form
-        :model="tempTrack"
+        :model="myTrack.tempTrack"
         :rules="rules"
         ref="form"
         @submit.prevent="saveTrack"
       >
         <el-form-item label="轨道类别" label-width="80px" prop="type">
-          <el-radio-group v-model="tempTrack.type">
+          <el-radio-group v-model="myTrack.tempTrack.type">
             <el-radio :label="0">虚轨</el-radio>
             <el-radio :label="1">实轨</el-radio>
           </el-radio-group>
@@ -103,7 +103,7 @@
         <el-form-item label="按键" label-width="80px" prop="key">
           <el-input
             @keydown.enter="saveTrack"
-            v-model="tempTrack.key"
+            v-model="myTrack.tempTrack.key"
             style="width:130px"
           />
           <el-tooltip
@@ -119,7 +119,7 @@
         <el-form-item label="开始时机" label-width="80px" prop="startTiming">
           <el-input
             @keydown.enter="saveTrack"
-            v-model="tempTrack.startTiming"
+            v-model="myTrack.tempTrack.startTiming"
             style="width:130px"
           />
           <el-tooltip
@@ -135,7 +135,7 @@
         <el-form-item label="结束时机" label-width="80px" prop="endTiming">
           <el-input
             @keydown.enter="saveTrack"
-            v-model="tempTrack.endTiming"
+            v-model="myTrack.tempTrack.endTiming"
             style="width:130px"
           />
           <el-tooltip
@@ -151,7 +151,7 @@
         <el-form-item label="横坐标" label-width="80px" prop="positionX">
           <el-input
             @keydown.enter="saveTrack"
-            v-model="tempTrack.positionX"
+            v-model="myTrack.tempTrack.positionX"
             style="width:130px"
           />
           <el-tooltip
@@ -167,7 +167,7 @@
         <el-form-item label="宽度" label-width="80px" prop="width">
           <el-input
             @keydown.enter="saveTrack"
-            v-model="tempTrack.width"
+            v-model="myTrack.tempTrack.width"
             style="width:130px"
           />
           <el-tooltip
@@ -181,7 +181,7 @@
           </el-tooltip>
         </el-form-item>
         <el-form-item label="默认颜色" label-width="80px" prop="color">
-          <el-color-picker v-model="tempTrack.color" color-format="rgb" />
+          <el-color-picker v-model="myTrack.tempTrack.color" color-format="rgb" />
           <el-tooltip
             class="item"
             effect="dark"
@@ -225,7 +225,7 @@ export default {
           callback(new Error("开始时机不能小于0"));
         } else if (value > this.chart.songLength) {
           callback(new Error("开始时机不能超过歌曲长度"));
-        } else if (value > this.tempTrack.endTiming) {
+        } else if (value > this.myTrack.tempTrack.endTiming) {
           callback(new Error("开始时机不能超过结束时机"));
         } else {
           callback();
@@ -244,7 +244,7 @@ export default {
           callback(new Error("时机不能小于0"));
         } else if (value > this.chart.songLength) {
           callback(new Error("时机不能超过歌曲长度"));
-        } else if(value < this.tempTrack.startTiming+150){
+        } else if(value < this.myTrack.tempTrack.startTiming+150){
           callback(new Error("轨道出现时间不能过短"));
         }else {
           callback();
@@ -277,7 +277,6 @@ export default {
       myTrack: this.track,
       myGlobal: this.global,
       myChart: this.chart,
-      tempTrack: {},
       form: {},
       rules: {
         type: [{ required: true, message: "请选择轨道类别", trigger: "blur" }],
@@ -298,9 +297,9 @@ export default {
   },
   created() {
     this.myTrack.edit = false;
-    this.tempTrack = JSON.parse(JSON.stringify(this.myTrack));
-    this.tempTrack.key = this.tempTrack.key.toUpperCase();
-    this.tempTrack.color =
+    this.myTrack.tempTrack = JSON.parse(JSON.stringify(this.myTrack));
+    this.myTrack.tempTrack.key = this.myTrack.tempTrack.key.toUpperCase();
+    this.myTrack.tempTrack.color =
       "rgb(" +
       this.myTrack.R +
       "," +
@@ -317,9 +316,9 @@ export default {
     },
     startEdit() {
       this.myTrack.edit = true;
-      this.tempTrack = JSON.parse(JSON.stringify(this.myTrack));
-      this.tempTrack.key = this.tempTrack.key.toUpperCase();
-      this.tempTrack.color =
+      this.myTrack.tempTrack = JSON.parse(JSON.stringify(this.myTrack));
+      this.myTrack.tempTrack.key = this.myTrack.tempTrack.key.toUpperCase();
+      this.myTrack.tempTrack.color =
         "rgb(" +
         this.myTrack.R +
         "," +
@@ -334,18 +333,20 @@ export default {
           setTimeout(() => {
             this.updateTrack();
           }, 500);
-
-          for (var key in this.tempTrack) {
-            this.myTrack[key] = this.tempTrack[key];
+          console.l
+          for (var key in this.myTrack.tempTrack) {
+            if(key!='tempTrack')
+            this.myTrack[key] = this.myTrack.tempTrack[key];
           }
           this.myTrack.key = this.myTrack.key.toUpperCase();
-          var rgb = this.tempTrack.color
-            .substring(4, this.tempTrack.color.length - 1)
+          var rgb = this.myTrack.tempTrack.color
+            .substring(4, this.myTrack.tempTrack.color.length - 1)
             .split(",");
           this.myTrack.R = rgb[0];
           this.myTrack.G = rgb[1];
           this.myTrack.B = rgb[2];
           this.myTrack.edit = false;
+          this.myTrack.tempTrack={}
         } else {
           return false;
         }
