@@ -200,6 +200,9 @@ export default {
 .animate__animated.animate__fadeInUp {
   --animate-duration: 0.2s;
 }
+.animate__animated.animate__fadeInDown {
+  --animate-duration: 0.5s;
+}
 .animate__animated.animate__fadeOutUp {
   --animate-duration: 0.2s;
 }

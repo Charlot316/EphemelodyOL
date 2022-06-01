@@ -52,31 +52,37 @@
         </div>
       </div>
     </div>
-    <div v-show="myOperation.edit">
-      <el-form
-        :model="tempOperation"
-        :rules="rules"
-        ref="form"
-        @submit.prevent="saveOperation"
-      >
-        <el-form-item label="时机" label-width="80px" prop="startTime">
-          <el-input
-            @keydown.enter="saveOperation"
-            v-model="tempOperation.startTime"
-            style="width:100px"
-          />
-          <el-tooltip
-            class="item"
-            effect="dark"
-            content="设置操作的时机"
-            placement="top-start"
-            style="margin-left:10px;"
-          >
-            <i class="el-icon-question" />
-          </el-tooltip>
-        </el-form-item>
-      </el-form>
-    </div>
+    <transition
+      name="flip-list"
+      enter-active-class="animate__animated animate__fadeInDown"
+      leave-active-class="animate__animated animate__fadeOutUp"
+    >
+      <div v-show="myOperation.edit">
+        <el-form
+          :model="tempOperation"
+          :rules="rules"
+          ref="form"
+          @submit.prevent="saveOperation"
+        >
+          <el-form-item label="时机" label-width="80px" prop="startTime">
+            <el-input
+              @keydown.enter="saveOperation"
+              v-model="tempOperation.startTime"
+              style="width:100px"
+            />
+            <el-tooltip
+              class="item"
+              effect="dark"
+              content="设置操作的时机"
+              placement="top-start"
+              style="margin-left:10px;"
+            >
+              <i class="el-icon-question" />
+            </el-tooltip>
+          </el-form-item>
+        </el-form>
+      </div>
+    </transition>
   </div>
 </template>
 

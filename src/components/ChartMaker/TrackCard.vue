@@ -80,125 +80,131 @@
         </div>
       </div>
     </div>
-    <div v-show="myTrack.edit" style="margin-top:20px;">
-      <el-form
-        :model="myTrack.tempTrack"
-        :rules="rules"
-        ref="form"
-        @submit.prevent="saveTrack"
-      >
-        <el-form-item label="轨道类别" label-width="80px" prop="type">
-          <el-radio-group v-model="myTrack.tempTrack.type">
-            <el-radio :label="0">虚轨</el-radio>
-            <el-radio :label="1">实轨</el-radio>
-          </el-radio-group>
-          <el-tooltip
-            class="item"
-            effect="dark"
-            content="设置轨道的类别，如果是虚轨，则轨道下方不会出现提示字母，如果虚轨上有音符，请您确认在音符对应的时机该轨道移动到音符字母对应的实轨上"
-            placement="top-start"
-            style="margin-left:10px;"
-          >
-            <i class="el-icon-question" />
-          </el-tooltip>
-        </el-form-item>
-        <el-form-item label="按键" label-width="80px" prop="key">
-          <el-input
-            @keydown.enter="saveTrack"
-            v-model="myTrack.tempTrack.key"
-            style="width:130px"
-          />
-          <el-tooltip
-            class="item"
-            effect="dark"
-            content="设置轨道的按键，请输入单个字母，不区分大小写"
-            placement="top-start"
-            style="margin-left:10px;"
-          >
-            <i class="el-icon-question" />
-          </el-tooltip>
-        </el-form-item>
-        <el-form-item label="开始时机" label-width="80px" prop="startTiming">
-          <el-input
-            @keydown.enter="saveTrack"
-            v-model="myTrack.tempTrack.startTiming"
-            style="width:130px"
-          />
-          <el-tooltip
-            class="item"
-            effect="dark"
-            content="设置轨道的开始时机"
-            placement="top-start"
-            style="margin-left:10px;"
-          >
-            <i class="el-icon-question" />
-          </el-tooltip>
-        </el-form-item>
-        <el-form-item label="结束时机" label-width="80px" prop="endTiming">
-          <el-input
-            @keydown.enter="saveTrack"
-            v-model="myTrack.tempTrack.endTiming"
-            style="width:130px"
-          />
-          <el-tooltip
-            class="item"
-            effect="dark"
-            content="设置轨道的结束时机"
-            placement="top-start"
-            style="margin-left:10px;"
-          >
-            <i class="el-icon-question" />
-          </el-tooltip>
-        </el-form-item>
-        <el-form-item label="横坐标" label-width="80px" prop="positionX">
-          <el-input
-            @keydown.enter="saveTrack"
-            v-model="myTrack.tempTrack.positionX"
-            style="width:130px"
-          />
-          <el-tooltip
-            class="item"
-            effect="dark"
-            content="设置轨道的横坐标，请输入一个小数，代表轨道横坐标占画面全宽的比例"
-            placement="top-start"
-            style="margin-left:10px;"
-          >
-            <i class="el-icon-question" />
-          </el-tooltip>
-        </el-form-item>
-        <el-form-item label="宽度" label-width="80px" prop="width">
-          <el-input
-            @keydown.enter="saveTrack"
-            v-model="myTrack.tempTrack.width"
-            style="width:130px"
-          />
-          <el-tooltip
-            class="item"
-            effect="dark"
-            content="设置轨道的宽度，您输入的数值是宽度的一半，它是轨道一半的宽度占整个画面的比例"
-            placement="top-start"
-            style="margin-left:10px;"
-          >
-            <i class="el-icon-question" />
-          </el-tooltip>
-        </el-form-item>
-        <el-form-item label="默认颜色" label-width="80px" prop="color">
-          <el-color-picker
-            v-model="myTrack.tempTrack.color"
-            color-format="rgb"
-          />
-          <el-tooltip
-            class="item"
-            effect="dark"
-            content="设置轨道的默认颜色"
-            placement="top-start"
-            style="margin-left:10px;"
-          >
-            <i class="el-icon-question" />
-          </el-tooltip>
-        </el-form-item>
-      </el-form>
-    </div>
+    <transition
+      name="flip-list"
+      enter-active-class="animate__animated animate__fadeInDown"
+      leave-active-class="animate__animated animate__fadeOutUp"
+    >
+      <div v-show="myTrack.edit" style="margin-top:20px;">
+        <el-form
+          :model="myTrack.tempTrack"
+          :rules="rules"
+          ref="form"
+          @submit.prevent="saveTrack"
+        >
+          <el-form-item label="轨道类别" label-width="80px" prop="type">
+            <el-radio-group v-model="myTrack.tempTrack.type">
+              <el-radio :label="0">虚轨</el-radio>
+              <el-radio :label="1">实轨</el-radio>
+            </el-radio-group>
+            <el-tooltip
+              class="item"
+              effect="dark"
+              content="设置轨道的类别，如果是虚轨，则轨道下方不会出现提示字母，如果虚轨上有音符，请您确认在音符对应的时机该轨道移动到音符字母对应的实轨上"
+              placement="top-start"
+              style="margin-left:10px;"
+            >
+              <i class="el-icon-question" />
+            </el-tooltip>
+          </el-form-item>
+          <el-form-item label="按键" label-width="80px" prop="key">
+            <el-input
+              @keydown.enter="saveTrack"
+              v-model="myTrack.tempTrack.key"
+              style="width:130px"
+            />
+            <el-tooltip
+              class="item"
+              effect="dark"
+              content="设置轨道的按键，请输入单个字母，不区分大小写"
+              placement="top-start"
+              style="margin-left:10px;"
+            >
+              <i class="el-icon-question" />
+            </el-tooltip>
+          </el-form-item>
+          <el-form-item label="开始时机" label-width="80px" prop="startTiming">
+            <el-input
+              @keydown.enter="saveTrack"
+              v-model="myTrack.tempTrack.startTiming"
+              style="width:130px"
+            />
+            <el-tooltip
+              class="item"
+              effect="dark"
+              content="设置轨道的开始时机"
+              placement="top-start"
+              style="margin-left:10px;"
+            >
+              <i class="el-icon-question" />
+            </el-tooltip>
+          </el-form-item>
+          <el-form-item label="结束时机" label-width="80px" prop="endTiming">
+            <el-input
+              @keydown.enter="saveTrack"
+              v-model="myTrack.tempTrack.endTiming"
+              style="width:130px"
+            />
+            <el-tooltip
+              class="item"
+              effect="dark"
+              content="设置轨道的结束时机"
+              placement="top-start"
+              style="margin-left:10px;"
+            >
+              <i class="el-icon-question" />
+            </el-tooltip>
+          </el-form-item>
+          <el-form-item label="横坐标" label-width="80px" prop="positionX">
+            <el-input
+              @keydown.enter="saveTrack"
+              v-model="myTrack.tempTrack.positionX"
+              style="width:130px"
+            />
+            <el-tooltip
+              class="item"
+              effect="dark"
+              content="设置轨道的横坐标，请输入一个小数，代表轨道横坐标占画面全宽的比例"
+              placement="top-start"
+              style="margin-left:10px;"
+            >
+              <i class="el-icon-question" />
+            </el-tooltip>
+          </el-form-item>
+          <el-form-item label="宽度" label-width="80px" prop="width">
+            <el-input
+              @keydown.enter="saveTrack"
+              v-model="myTrack.tempTrack.width"
+              style="width:130px"
+            />
+            <el-tooltip
+              class="item"
+              effect="dark"
+              content="设置轨道的宽度，您输入的数值是宽度的一半，它是轨道一半的宽度占整个画面的比例"
+              placement="top-start"
+              style="margin-left:10px;"
+            >
+              <i class="el-icon-question" />
+            </el-tooltip>
+          </el-form-item>
+          <el-form-item label="默认颜色" label-width="80px" prop="color">
+            <el-color-picker
+              v-model="myTrack.tempTrack.color"
+              color-format="rgb"
+            />
+            <el-tooltip
+              class="item"
+              effect="dark"
+              content="设置轨道的默认颜色"
+              placement="top-start"
+              style="margin-left:10px;"
+            >
+              <i class="el-icon-question" />
+            </el-tooltip>
+          </el-form-item>
+        </el-form>
+      </div>
+    </transition>
   </div>
 </template>
 
