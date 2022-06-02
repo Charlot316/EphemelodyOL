@@ -24,6 +24,8 @@
         @scroll="rightScroll"
         @click="rightClick($event)"
         @mousemove="rightMouseMove($event)"
+        @mousedown="rightClicked=true"
+        @mouseup="rightClicked=false"
       >
         <div v-for="track in chart.tracks" :key="track">
           <TrackCardPanel
@@ -89,6 +91,7 @@ export default {
       audio: null,
       indicatorLeft: 0,
       rightScrollElement: null,
+      rightClicked:true,
     };
   },
   mounted() {
@@ -149,6 +152,13 @@ export default {
     rightMouseMove(e) {
       let x = e.clientX - 300 + this.scrollLeft;
       this.indicatorLeft = x;
+      if(this.rightClicked){
+        var currentTime =
+          (x / (this.global.documentWidth - 300)) * this.displayAreaTime;
+        this.audio.currentTime = currentTime / 1000;
+        this.myGlobal.currentTime = currentTime;
+        this.resetTrack();
+      }
     },
     currentTrack(param) {
       this.$emit("currentTrack", param);
@@ -176,9 +186,9 @@ export default {
       this.scrollTop = this.rightScrollElement.scrollTop;
     },
       resetTrack() {
-      this.global.keyPressTime = [];
-      this.global.keyIsHold = [];
-      this.global.keyUsed = [];
+      this.myGlobal.keyPressTime = [];
+      this.myGlobal.keyIsHold = [];
+      this.myGlobal.keyUsed = [];
       for (var i = 0; i < this.chart.tracks.length; i++) {
         var track = this.chart.tracks[i];
         var index = 0;
