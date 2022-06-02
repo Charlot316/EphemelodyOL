@@ -255,8 +255,6 @@ export default {
           callback(new Error("时机不能小于0"));
         } else if (value > this.chart.songLength) {
           callback(new Error("时机不能超过歌曲长度"));
-        } else if (value < this.myTrack.tempTrack.startTiming + 150) {
-          callback(new Error("轨道出现时间不能过短"));
         } else {
           callback();
         }

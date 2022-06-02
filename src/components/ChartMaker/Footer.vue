@@ -85,9 +85,10 @@ export default {
       myGlobal: this.global,
       scrollLeft: 0,
       scrollTop: 0,
-      displayAreaTime: 10000,
+      displayAreaTime: 1000,
       audio: null,
       indicatorLeft: 0,
+      rightScrollElement: null,
     };
   },
   mounted() {
@@ -95,14 +96,27 @@ export default {
   },
   watch: {
     "global.currentTime"() {
-      this.scrollLeft =
-        (this.global.currentTime / this.displayAreaTime) *
-          (this.global.documentWidth - 300) -
-        (this.global.documentWidth - 300) / 2;
-      if (this.scrollLeft < 0) this.scrollLeft = 0;
-      document.getElementById(
-        "footer-right-scroll"
-      ).scrollLeft = this.scrollLeft;
+      if (this.rightScrollElement == null) {
+        this.rightScrollElement = document.getElementById(
+          "footer-right-scroll"
+        );
+      }
+      if (
+        this.global.currentTime <=
+        this.chart.songLength - this.displayAreaTime / 2
+      ) {
+        var scrollLeft =
+          (this.global.currentTime / this.displayAreaTime) *
+            (this.global.documentWidth - 300) -
+          (this.global.documentWidth - 300) / 2;
+        if (scrollLeft < 0) scrollLeft = 0;
+        if (!this.audio.paused) {
+          this.rightScrollElement.scrollLeft = scrollLeft;
+          this.scrollLeft = scrollLeft;
+        }
+
+        // }
+      }
 
       for (var i = 0; i < this.chart.tracks.length; i++) {
         if (
@@ -134,22 +148,31 @@ export default {
     rightMouseMove(e) {
       let x = e.clientX - 300 + this.scrollLeft;
       this.indicatorLeft = x;
-      console.log(e);
     },
     currentTrack(param) {
       this.$emit("currentTrack", param);
     },
     leftScroll() {
-      document.getElementById(
-        "footer-right-scroll"
-      ).scrollTop = document.getElementById("footer-left-scroll").scrollTop;
+      if (this.rightScrollElement == null) {
+        this.rightScrollElement = document.getElementById(
+          "footer-right-scroll"
+        );
+      }
+      this.rightScrollElement.scrollTop = document.getElementById(
+        "footer-left-scroll"
+      ).scrollTop;
     },
     rightScroll() {
-      var element = document.getElementById("footer-right-scroll");
-      document.getElementById("footer-left-scroll").scrollTop =
-        element.scrollTop;
-      this.scrollLeft = element.scrollLeft;
-      this.scrollTop = element.scrollTop;
+      if (this.rightScrollElement == null) {
+        this.rightScrollElement = document.getElementById(
+          "footer-right-scroll"
+        );
+      }
+      document.getElementById(
+        "footer-left-scroll"
+      ).scrollTop = this.rightScrollElement.scrollTop;
+      this.scrollLeft = this.rightScrollElement.scrollLeft;
+      this.scrollTop = this.rightScrollElement.scrollTop;
     },
   },
 };

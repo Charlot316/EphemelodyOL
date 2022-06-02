@@ -2,11 +2,21 @@
   <div
     :class="track.edit ? 'panel-edit' : 'panel-no-edit'"
     :style="{
-      width: (chart.songLength / displayAreaTime) * global.documentWidth + 'px',
+      width:
+        (chart.songLength / displayAreaTime) * (global.documentWidth - 300) +
+        'px',
     }"
   >
     <div class="track-tracks">
-      <div :class="track.edit ? 'note-track-edit' : 'note-track'">
+      <div
+        :class="track.edit ? 'note-track-edit' : 'note-track'"
+        :style="{
+          width:
+            (chart.songLength / displayAreaTime) *
+              (global.documentWidth - 300) +
+            'px',
+        }"
+      >
         <div v-for="note in track.notes" :key="note">
           <note
             :track="track"
@@ -22,9 +32,33 @@
         leave-active-class="animate__animated animate__fadeOutUp"
       >
         <div v-if="track.edit">
-          <div class="positionX-track"></div>
-          <div class="width-track"></div>
-          <div class="color-track"></div>
+          <div
+            class="positionX-track"
+            :style="{
+              width:
+                (chart.songLength / displayAreaTime) *
+                  (global.documentWidth - 300) +
+                'px',
+            }"
+          ></div>
+          <div
+            class="width-track"
+            :style="{
+              width:
+                (chart.songLength / displayAreaTime) *
+                  (global.documentWidth - 300) +
+                'px',
+            }"
+          ></div>
+          <div
+            class="color-track"
+            :style="{
+              width:
+                (chart.songLength / displayAreaTime) *
+                  (global.documentWidth - 300) +
+                'px',
+            }"
+          ></div>
         </div>
       </transition>
     </div>
@@ -92,20 +126,22 @@ export default {
   left: 0;
 }
 .note-track {
-  background: rgb(56, 56, 56);
+  background: rgb(70, 70, 70);
   position: absolute;
   top: 5px;
   left: 0px;
   height: 80px;
   transition: 0.5s;
+  width: 100%;
 }
 .note-track-edit {
-  background: rgb(255, 255, 255);
+  background: rgb(70, 70, 70);
   position: absolute;
   left: 0px;
   top: 40px;
   height: 80px;
   transition: 0.5s;
+  width: 100%;
 }
 .positionX-track {
   background: rgb(255, 165, 165);
@@ -113,7 +149,6 @@ export default {
   left: 0px;
   top: 160px;
   height: 80px;
-  width: 10000px;
 }
 .width-track {
   background: rgb(184, 223, 107);
