@@ -495,6 +495,7 @@ export default {
       reCalculateChartMaker: false,
       mouseDown: false,
       mouseUp: true,
+      mouseMove: false,
       clientX: 0,
       clientY: 0,
     };
@@ -597,6 +598,7 @@ export default {
     document.onmousemove = function(e) {
       that.global.clientX = e.clientX;
       that.global.clientY = e.clientY;
+      that.global.mouseMove = !that.global.mouseMove;
       if (that.canDrag) {
         if (e.clientY > 130 && e.clientY < that.global.documentHeight - 100) {
           that.footerHeight = that.global.documentHeight - e.clientY;
@@ -614,7 +616,9 @@ export default {
       that.canDrag = false;
       that.global.mouseUp = !that.global.mouseUp;
     };
-    document.onmousedown = function() {
+    document.onmousedown = function(e) {
+      that.global.clientX = e.clientX;
+      that.global.clientY = e.clientY;
       that.global.mouseDown = !that.global.mouseDown;
     };
   },

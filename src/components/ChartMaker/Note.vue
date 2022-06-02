@@ -3,17 +3,20 @@
     <div v-if="note.noteType == 0">
       <el-image
         @dragstart.prevent
-        style="width:40px;height:40px;user-select:none;"
+        @mousedown="canMove = true"
+        style="width:40px;height:40px;user-select:none;cursor:ew-resize"
         src="http://pic.mcatk.com/charlot-pictures/EpheHitNote.png"
       />
     </div>
     <div v-if="note.noteType == 1">
       <div
+        @mousedown="passedTime=global.currentTime-note.timing;canMove = true"
         :style="{
           userSelect: 'none',
           height: '38px',
           position: 'absolute',
           background: 'rgb(22, 22, 14)',
+          cursor: 'ew-resize',
           width:
             ((myNote.endTiming - myNote.timing) / this.displayAreaTime) *
               (this.global.documentWidth - 300) +
@@ -45,8 +48,9 @@
     </div>
     <div v-if="note.noteType == 2">
       <el-image
+        @mousedown="canMove = true"
         @dragstart.prevent
-        style="width:40px;height:40px;"
+        style="width:40px;height:40px;cursor:ew-resize"
         src="http://pic.mcatk.com/charlot-pictures/EpheSlideNote.png"
       />
     </div>
@@ -61,12 +65,35 @@ export default {
       myNote: this.note,
       myTrack: this.track,
       myGlobal: this.global,
+      canMove: false,
+      passedTime:0,
     };
   },
   watch: {
-    "global.currentTime"() {},
+    "global.mouseUp"() {
+      this.canMove = false;
+    },
+    "global.mouseMove"() {
+      if (this.canMove) {
+        if (
+          this.global.currentTime > this.track.startTiming &&
+          this.global.currentTime < this.track.endTiming
+        ) {
+          if (this.myNote.noteType == 1) {
+            
+            this.duration = this.note.endTiming - this.note.timing;
+            this.myNote.timing = this.global.currentTime -this.passedTime ;
+            this.myNote.endTiming = this.myNote.timing + this.myNote.duration;
+          } else {
+            this.myNote.timing = this.global.currentTime;
+          }
+          this.myTrack.notes.sort(function(a, b) {
+            return a.timing - b.timing;
+          });
+        }
+      }
+    },
   },
-  created() {},
   computed: {
     left() {
       return (

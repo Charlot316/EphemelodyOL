@@ -22,9 +22,11 @@
         class="footer-right"
         id="footer-right-scroll"
         @scroll="rightScroll"
-        @click="rightClick($event)"
         @mousemove="rightMouseMove($event)"
-        @mousedown="rightClicked = true"
+        @mousedown="
+          rightClick($event);
+          rightClicked = true;
+        "
       >
         <div v-for="track in chart.tracks" :key="track">
           <TrackCardPanel
@@ -86,7 +88,7 @@ export default {
       myGlobal: this.global,
       scrollLeft: 0,
       scrollTop: 0,
-      displayAreaTime: 1000,
+      displayAreaTime: 10000,
       audio: null,
       indicatorLeft: 0,
       rightScrollElement: null,
@@ -106,22 +108,37 @@ export default {
           "footer-right-scroll"
         );
       }
-      if (
-        this.global.currentTime <=
-        this.chart.songLength - this.displayAreaTime / 2
-      ) {
+      // if (
+      //   this.global.currentTime <=
+      //   this.chart.songLength - this.displayAreaTime / 2
+      // ) {
+
+      if (!this.audio.paused) {
         var scrollLeft =
           (this.global.currentTime / this.displayAreaTime) *
             (this.global.documentWidth - 300) -
           (this.global.documentWidth - 300) / 2;
         if (scrollLeft < 0) scrollLeft = 0;
-        if (!this.audio.paused) {
-          this.rightScrollElement.scrollLeft = scrollLeft;
-          this.scrollLeft = scrollLeft;
-        }
-
-        // }
+        this.rightScrollElement.scrollLeft = scrollLeft;
+        this.scrollLeft = scrollLeft;
       }
+
+      //   // }
+      // } else {
+      //   if (!this.audio.paused) {
+      //     if (
+      //       this.scrollLeft <
+      //       (this.global.currentTime / this.displayAreaTime) *
+      //         (this.global.documentWidth - 300) -
+      //         (this.global.documentWidth - 300) / 2
+      //     )
+      //       this.scrollLeft =
+      //         (this.chart.songLength / this.displayAreaTime) *
+      //           (this.global.documentWidth - 300) -
+      //         (this.global.documentWidth - 300) / 2;
+      //     this.rightScrollElement.scrollLeft = this.scrollLeft;
+      //   }
+      // }
 
       for (var i = 0; i < this.chart.tracks.length; i++) {
         if (
