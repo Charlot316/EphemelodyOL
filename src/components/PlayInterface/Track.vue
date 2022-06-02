@@ -367,7 +367,9 @@ export default {
             this.global.finalY *
             this.global.screenHeight;
           y = this.global.finalY * this.global.screenHeight;
-        } else keyLength = 0;
+        } else {
+          keyLength = 0;
+        }
         if (canMirror) {
           tempY = 2 * this.Y - y;
           //黑色部分

@@ -108,10 +108,6 @@ export default {
           "footer-right-scroll"
         );
       }
-      // if (
-      //   this.global.currentTime <=
-      //   this.chart.songLength - this.displayAreaTime / 2
-      // ) {
 
       if (!this.audio.paused) {
         var scrollLeft =
@@ -120,25 +116,9 @@ export default {
           (this.global.documentWidth - 300) / 2;
         if (scrollLeft < 0) scrollLeft = 0;
         this.rightScrollElement.scrollLeft = scrollLeft;
-        this.scrollLeft = scrollLeft;
+        this.scrollLeft = this.rightScrollElement.scrollLeft ;
       }
 
-      //   // }
-      // } else {
-      //   if (!this.audio.paused) {
-      //     if (
-      //       this.scrollLeft <
-      //       (this.global.currentTime / this.displayAreaTime) *
-      //         (this.global.documentWidth - 300) -
-      //         (this.global.documentWidth - 300) / 2
-      //     )
-      //       this.scrollLeft =
-      //         (this.chart.songLength / this.displayAreaTime) *
-      //           (this.global.documentWidth - 300) -
-      //         (this.global.documentWidth - 300) / 2;
-      //     this.rightScrollElement.scrollLeft = this.scrollLeft;
-      //   }
-      // }
 
       for (var i = 0; i < this.chart.tracks.length; i++) {
         if (

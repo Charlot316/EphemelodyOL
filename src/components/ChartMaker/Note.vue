@@ -4,19 +4,19 @@
       <el-image
         @dragstart.prevent
         @mousedown="canMove = true"
-        style="width:40px;height:40px;user-select:none;cursor:ew-resize"
+        style="width:40px;height:40px;user-select:none;cursor:nesw-resize"
         src="http://pic.mcatk.com/charlot-pictures/EpheHitNote.png"
       />
     </div>
     <div v-if="note.noteType == 1">
       <div
-        @mousedown="passedTime=global.currentTime-note.timing;canMove = true"
+        @mousedown="longNoteCanMove"
         :style="{
           userSelect: 'none',
           height: '38px',
           position: 'absolute',
           background: 'rgb(22, 22, 14)',
-          cursor: 'ew-resize',
+          cursor: 'nesw-resize',
           width:
             ((myNote.endTiming - myNote.timing) / this.displayAreaTime) *
               (this.global.documentWidth - 300) +
@@ -50,7 +50,7 @@
       <el-image
         @mousedown="canMove = true"
         @dragstart.prevent
-        style="width:40px;height:40px;cursor:ew-resize"
+        style="width:40px;height:40px;cursor:nesw-resize"
         src="http://pic.mcatk.com/charlot-pictures/EpheSlideNote.png"
       />
     </div>
@@ -66,7 +66,7 @@ export default {
       myTrack: this.track,
       myGlobal: this.global,
       canMove: false,
-      passedTime:0,
+      passedTime: 0,
     };
   },
   watch: {
@@ -80,10 +80,13 @@ export default {
           this.global.currentTime < this.track.endTiming
         ) {
           if (this.myNote.noteType == 1) {
-            
             this.duration = this.note.endTiming - this.note.timing;
-            this.myNote.timing = this.global.currentTime -this.passedTime ;
-            this.myNote.endTiming = this.myNote.timing + this.myNote.duration;
+            this.myNote.timing = Math.ceil(
+              this.global.currentTime - this.passedTime
+            );
+            this.myNote.endTiming = this.myNote.timing + this.duration;
+            console.log(this.myNote.endTiming);
+            this.$forceUpdate();
           } else {
             this.myNote.timing = this.global.currentTime;
           }
@@ -100,6 +103,14 @@ export default {
         (this.myNote.timing / this.displayAreaTime) *
         (this.global.documentWidth - 300)
       );
+    },
+  },
+  methods: {
+    longNoteCanMove() {
+      setTimeout(() => {
+        this.passedTime = Math.ceil(this.global.currentTime - this.note.timing);
+      }, 10);
+      this.canMove = true;
     },
   },
 };
