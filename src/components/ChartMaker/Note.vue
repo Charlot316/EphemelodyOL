@@ -1,5 +1,5 @@
 <template>
-  <div :style="{position:'absolute',top:'20px',left:left+'px'}">
+  <div :style="{position:'absolute',top:'20px',left:left-20 +'px'}">
     <div v-if="note.noteType == 0">
       <el-image
         style="width:40px;height:40px;"

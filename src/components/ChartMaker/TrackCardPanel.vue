@@ -1,10 +1,20 @@
 <template>
-  <div :class="track.edit ? 'panel-edit' : 'panel-no-edit'">
+  <div
+    :class="track.edit ? 'panel-edit' : 'panel-no-edit'"
+    :style="{
+      width: (chart.songLength / displayAreaTime) * global.documentWidth + 'px',
+    }"
+  >
     <div class="track-tracks">
       <div :class="track.edit ? 'note-track-edit' : 'note-track'">
-      <div v-for="note in track.notes" :key="note">
-      <note :track="track" :global="global" :note="note" :displayAreaTime="displayAreaTime"/>
-      </div>
+        <div v-for="note in track.notes" :key="note">
+          <note
+            :track="track"
+            :global="global"
+            :note="note"
+            :displayAreaTime="displayAreaTime"
+          />
+        </div>
       </div>
       <transition
         name="fade"
@@ -49,8 +59,8 @@
 import "animate.css";
 import Note from "./Note";
 export default {
-  props: ["track", "global", "chart", "scrollLeft","displayAreaTime"],
-  components:{Note},
+  props: ["track", "global", "chart", "scrollLeft", "displayAreaTime"],
+  components: { Note },
 };
 </script>
 
