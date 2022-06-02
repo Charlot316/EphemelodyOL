@@ -18,7 +18,13 @@
           </div>
         </div>
       </div>
-      <div class="footer-right" id="footer-right-scroll" @scroll="rightScroll">
+      <div
+        class="footer-right"
+        id="footer-right-scroll"
+        @scroll="rightScroll"
+        @click="rightClick($event)"
+        @mousemove="rightMouseMove($event)"
+      >
         <div v-for="track in chart.tracks" :key="track">
           <TrackCardPanel
             :id="'trackCardPanel' + track.index"
@@ -35,14 +41,28 @@
           id="time-indicater"
           :style="{
             width: '1px',
-            background: 'rgb(255,255,255)',
+            background: 'rgb(255,255,0)',
             height: '100%',
             position: 'absolute',
+            pointerEvents: 'none',
             top: scrollTop + 'px',
             left:
               (global.currentTime / displayAreaTime) *
                 (global.documentWidth - 300) +
               'px',
+          }"
+        ></div>
+        <div
+          class="time-indicater-false"
+          id="time-indicater-false"
+          :style="{
+            width: '1px',
+            background: 'rgb(255,255,255)',
+            height: '100%',
+            position: 'absolute',
+            pointerEvents: 'none',
+            top: scrollTop + 'px',
+            left: indicatorLeft + 'px',
           }"
         ></div>
       </div>
@@ -66,7 +86,12 @@ export default {
       scrollLeft: 0,
       scrollTop: 0,
       displayAreaTime: 10000,
+      audio: null,
+      indicatorLeft: 0,
     };
+  },
+  mounted() {
+    this.audio = document.getElementById("audioSong");
   },
   watch: {
     "global.currentTime"() {
@@ -99,6 +124,18 @@ export default {
     },
   },
   methods: {
+    rightClick(e) {
+      let x = e.clientX - 300 + this.scrollLeft;
+      var currentTime =
+        (x / (this.global.documentWidth - 300)) * this.displayAreaTime;
+      this.audio.currentTime = currentTime / 1000;
+      this.myGlobal.currentTime = currentTime;
+    },
+    rightMouseMove(e) {
+      let x = e.clientX - 300 + this.scrollLeft;
+      this.indicatorLeft = x;
+      console.log(e);
+    },
     currentTrack(param) {
       this.$emit("currentTrack", param);
     },
