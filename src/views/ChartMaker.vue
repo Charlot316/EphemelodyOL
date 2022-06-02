@@ -493,6 +493,10 @@ export default {
       repaint: false,
       reCalculateTrack: false,
       reCalculateChartMaker: false,
+      mouseDown: false,
+      mouseUp: true,
+      clientX: 0,
+      clientY: 0,
     };
   },
   mounted() {
@@ -530,11 +534,7 @@ export default {
         }, 520);
       })();
     };
-    document.onmouseup = function() {
-      if (that.sliding) {
-        that.SlideMouseUp();
-      }
-    };
+
     document.onkeydown = function(e) {
       if (!e.repeat) {
         that.global.keyPressTime[e.key.toUpperCase()] = that.global.currentTime;
@@ -563,6 +563,7 @@ export default {
         that.plusTime(that.keyStep / 1000);
       }
     };
+
     document.onkeyup = function(e) {
       that.global.keyIsHold[e.key.toUpperCase()] = false;
     };
@@ -594,6 +595,8 @@ export default {
     this.initiate();
 
     document.onmousemove = function(e) {
+      that.global.clientX = e.clientX;
+      that.global.clientY = e.clientY;
       if (that.canDrag) {
         if (e.clientY > 130 && e.clientY < that.global.documentHeight - 100) {
           that.footerHeight = that.global.documentHeight - e.clientY;
@@ -605,7 +608,14 @@ export default {
       }
     };
     document.onmouseup = function() {
+      if (that.sliding) {
+        that.SlideMouseUp();
+      }
       that.canDrag = false;
+      that.global.mouseUp = !that.global.mouseUp;
+    };
+    document.onmousedown = function() {
+      that.global.mouseDown = !that.global.mouseDown;
     };
   },
 

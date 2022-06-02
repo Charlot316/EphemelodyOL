@@ -46,6 +46,24 @@
         >
           <div style="font-weight:800">轨道{{ track.index + 1 }}</div>
           <div>
+            <el-tooltip
+              class="item"
+              effect="dark"
+              :content="
+                myTrack.showInTimeline ? '在时间轴中隐去' : '在时间轴中显示'
+              "
+              placement="top"
+            >
+              <el-button
+                type="text"
+
+              class="hide-button"
+                :icon="
+                  myTrack.showInTimeline ? 'el-icon-minus' : 'el-icon-view'
+                "
+                @click="myTrack.showInTimeline = !myTrack.showInTimeline"
+              />
+            </el-tooltip>
             <el-button
               v-if="!myTrack.edit"
               type="text"
@@ -306,6 +324,7 @@ export default {
   },
   created() {
     this.myTrack.edit = false;
+    this.myTrack.showInTimeline = true;
     this.myTrack.tempTrack = JSON.parse(JSON.stringify(this.myTrack));
     this.myTrack.tempTrack.key = this.myTrack.tempTrack.key.toUpperCase();
     this.myTrack.tempTrack.color =
@@ -429,6 +448,15 @@ export default {
   -webkit-border-radius: 5px;
   border-radius: 5px;
   transition: 0.5s;
+}
+.hide-button {
+  color: rgb(254,188,46);
+}
+.hide-button:hover {
+  color:  rgb(255, 210, 114);
+}
+.hide-button:active {
+  color:  rgb(227, 166, 33);
 }
 .delete-button {
   color: #f56c6c;
