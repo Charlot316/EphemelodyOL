@@ -544,7 +544,7 @@ export default {
           }
         } else {
           if (note.noteType == 2) {
-            if (currentTime > timing - lostTime) {
+            if (currentTime > timing - farTime) {
               if (currentTime > timing + farTime) {
                 this.addCount({
                   type: "lost",
@@ -567,7 +567,7 @@ export default {
               }
             }
           } else if (note.noteType == 0) {
-            if (currentTime > timing - lostTime) {
+            if (currentTime > timing - farTime) {
               if (currentTime > timing + lostTime) {
                 this.addCount({
                   type: "lost",
@@ -630,7 +630,7 @@ export default {
               }
             }
           } else {
-            if (currentTime > timing - lostTime) {
+            if (currentTime > timing - farTime) {
               if (currentTime > timing + farTime) {
                 this.addCount({
                   type: "lost",
