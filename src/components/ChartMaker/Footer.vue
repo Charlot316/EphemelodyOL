@@ -74,6 +74,7 @@ export default {
         (this.global.currentTime / this.displayAreaTime) *
           (this.global.documentWidth - 300) -
         (this.global.documentWidth - 300) / 2;
+      if (this.scrollLeft < 0) this.scrollLeft = 0;
       document.getElementById(
         "footer-right-scroll"
       ).scrollLeft = this.scrollLeft;
