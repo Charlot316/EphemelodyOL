@@ -2,13 +2,15 @@
   <div :style="{ position: 'absolute', top: '20px', left: left - 20 + 'px' }">
     <div v-if="note.noteType == 0">
       <el-image
-        style="width:40px;height:40px;"
+        @dragstart.prevent
+        style="width:40px;height:40px;user-select:none;"
         src="http://pic.mcatk.com/charlot-pictures/EpheHitNote.png"
       />
     </div>
     <div v-if="note.noteType == 1">
       <div
         :style="{
+          userSelect: 'none',
           height: '38px',
           position: 'absolute',
           background: 'rgb(22, 22, 14)',
@@ -21,11 +23,14 @@
         }"
       ></div>
       <el-image
-        style="width:40px;height:40px;position:absolute;left:0;top:0;"
+        @dragstart.prevent
+        style="width:40px;height:40px;position:absolute;left:0;top:0;user-select: none;"
         src="http://pic.mcatk.com/charlot-pictures/EpheHitNote.png"
       />
       <el-image
+        @dragstart.prevent
         :style="{
+          userSelect: 'none',
           height: '40px',
           width: '40px',
           position: 'absolute',
@@ -40,6 +45,7 @@
     </div>
     <div v-if="note.noteType == 2">
       <el-image
+        @dragstart.prevent
         style="width:40px;height:40px;"
         src="http://pic.mcatk.com/charlot-pictures/EpheSlideNote.png"
       />
