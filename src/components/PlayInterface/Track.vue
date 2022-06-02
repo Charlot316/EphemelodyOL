@@ -631,7 +631,7 @@ export default {
             }
           } else {
             if (currentTime > timing - lostTime) {
-              if (currentTime > timing + lostTime) {
+              if (currentTime > timing + farTime) {
                 this.addCount({
                   type: "lost",
                   key: "lostCount",
