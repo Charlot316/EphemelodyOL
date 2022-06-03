@@ -8,15 +8,27 @@
           id="footer-left-scroll"
           @scroll="leftScroll"
         >
-          <div v-for="track in chart.tracks" :key="track">
-            <TrackCard
-              v-if="track.showInTimeline"
-              :chart="chart"
-              :track="track"
-              :global="global"
-              @currentTrack="currentTrack"
-            />
-          </div>
+          <transition-group
+            name="flip-list"
+            enter-active-class="animate__animated animate__fadeInUp"
+            leave-active-class="animate__animated animate__fadeOutUp"
+          >
+            <div v-for="track in chart.tracks" :key="track">
+              <transition
+                name="flip-list"
+                enter-active-class="animate__animated animate__fadeInUp"
+                leave-active-class="animate__animated animate__fadeOutUp"
+              >
+                <TrackCard
+                  v-if="track.showInTimeline"
+                  :chart="chart"
+                  :track="track"
+                  :global="global"
+                  @currentTrack="currentTrack"
+                />
+              </transition>
+            </div>
+          </transition-group>
         </div>
       </div>
       <div
@@ -29,18 +41,31 @@
           rightClicked = true;
         "
       >
-        <div v-for="track in chart.tracks" :key="track">
-          <TrackCardPanel
-            v-if="track.showInTimeline"
-            :id="'trackCardPanel' + track.index"
-            :chart="chart"
-            :track="track"
-            :global="global"
-            :scrollLeft="scrollLeft"
-            :displayAreaTime="displayAreaTime"
-            @currentTrack="currentTrack"
-          />
-        </div>
+        <transition-group
+          name="flip-list"
+          enter-active-class="animate__animated animate__fadeInUp"
+          leave-active-class="animate__animated animate__fadeOutUp"
+        >
+          <div v-for="track in chart.tracks" :key="track">
+            <transition
+              name="flip-list"
+              enter-active-class="animate__animated animate__fadeInUp"
+              leave-active-class="animate__animated animate__fadeOutUp"
+            >
+              <TrackCardPanel
+                v-if="track.showInTimeline"
+                :id="'trackCardPanel' + track.index"
+                :chart="chart"
+                :track="track"
+                :global="global"
+                :scrollLeft="scrollLeft"
+                :displayAreaTime="displayAreaTime"
+                @currentTrack="currentTrack"
+              />
+            </transition>
+          </div>
+        </transition-group>
+
         <div
           class="time-indicater"
           id="time-indicater"

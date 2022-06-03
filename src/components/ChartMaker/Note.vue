@@ -2,7 +2,6 @@
   <div
     @click="
       edit = true;
-      confirmed = false;
     "
     :style="{
       position: 'absolute',
@@ -11,76 +10,85 @@
       zIndex: zIndex,
     }"
   >
-    <div v-if="note.noteType == 0">
-      <el-image
-        @dragstart.prevent
-        @mousedown="
-          canMove = true;
-          zIndex = 10;
-        "
-        style="width:40px;height:40px;user-select:none;cursor: move;"
-        src="http://pic.mcatk.com/charlot-pictures/EpheHitNote.png"
-      />
-    </div>
-    <div v-if="note.noteType == 1">
-      <div
-        @mousedown="longNoteCanMove"
-        :style="{
-          userSelect: 'none',
-          height: '38px',
-          position: 'absolute',
-          background: 'rgb(22, 22, 14)',
-          cursor: 'move',
-          width:
-            ((myNote.endTiming - myNote.timing) / this.displayAreaTime) *
-              (this.global.documentWidth - 300) +
-            'px',
-          left: '20px',
-          top: '1px',
-        }"
-      ></div>
-      <el-image
-        @dragstart.prevent
-        @mousedown="
-          leftMove = true;
-          zIndex = 10;
-        "
-        style="width:40px;height:40px;position:absolute;left:0;top:0;user-select: none;cursor:w-resize;"
-        src="http://pic.mcatk.com/charlot-pictures/EpheHitNote.png"
-      />
-      <el-image
-        @dragstart.prevent
-        @mousedown="
-          rightMove = true;
-          zIndex = 10;
-        "
-        :style="{
-          userSelect: 'none',
-          height: '40px',
-          width: '40px',
-          position: 'absolute',
-          cursor: 'e-resize',
-          left:
-            ((myNote.endTiming - myNote.timing) / this.displayAreaTime) *
-              (this.global.documentWidth - 300) +
-            'px',
-          top: '0px',
-        }"
-        src="http://pic.mcatk.com/charlot-pictures/EpheHitNote.png"
-      />
-    </div>
-    <div v-if="note.noteType == 2">
-      <el-image
-        @mousedown="
-          canMove = true;
-          zIndex = 10;
-        "
-        @dragstart.prevent
-        style="width:40px;height:40px;cursor: move;"
-        src="http://pic.mcatk.com/charlot-pictures/EpheSlideNote.png"
-      />
-    </div>
-    <div :style="{position:'absolute',top:'-80px',left:'0px',height:'80px',width:'250px',background:'rgb(255,255,255)'}"></div>
+    <el-popover v-model:visible="edit" placement="top" width="400" trigger="manual">
+      <el-button size="small" text @click="edit = false;">cancel</el-button>
+      <el-button size="small" type="primary" @click="edit = false"
+        >confirm</el-button
+      >
+      <template #reference>
+        <div>
+          <div v-if="note.noteType == 0">
+            <el-image
+              @dragstart.prevent
+              @mousedown="
+                canMove = true;
+                zIndex = 10;
+              "
+              style="width:40px;height:40px;user-select:none;cursor: move;"
+              src="http://pic.mcatk.com/charlot-pictures/EpheHitNote.png"
+            />
+          </div>
+          <div v-if="note.noteType == 1">
+            <div
+              @mousedown="longNoteCanMove"
+              :style="{
+                userSelect: 'none',
+                height: '38px',
+                position: 'absolute',
+                background: 'rgb(22, 22, 14)',
+                cursor: 'move',
+                width:
+                  ((myNote.endTiming - myNote.timing) / this.displayAreaTime) *
+                    (this.global.documentWidth - 300) +
+                  'px',
+                left: '20px',
+                top: '1px',
+              }"
+            ></div>
+            <el-image
+              @dragstart.prevent
+              @mousedown="
+                leftMove = true;
+                zIndex = 10;
+              "
+              style="width:40px;height:40px;position:absolute;left:0;top:0;user-select: none;cursor:w-resize;"
+              src="http://pic.mcatk.com/charlot-pictures/EpheHitNote.png"
+            />
+            <el-image
+              @dragstart.prevent
+              @mousedown="
+                rightMove = true;
+                zIndex = 10;
+              "
+              :style="{
+                userSelect: 'none',
+                height: '40px',
+                width: '40px',
+                position: 'absolute',
+                cursor: 'e-resize',
+                left:
+                  ((myNote.endTiming - myNote.timing) / this.displayAreaTime) *
+                    (this.global.documentWidth - 300) +
+                  'px',
+                top: '0px',
+              }"
+              src="http://pic.mcatk.com/charlot-pictures/EpheHitNote.png"
+            />
+          </div>
+          <div v-if="note.noteType == 2">
+            <el-image
+              @mousedown="
+                canMove = true;
+                zIndex = 10;
+              "
+              @dragstart.prevent
+              style="width:40px;height:40px;cursor: move;"
+              src="http://pic.mcatk.com/charlot-pictures/EpheSlideNote.png"
+            />
+          </div>
+        </div>
+      </template>
+    </el-popover>
   </div>
 </template>
 
@@ -98,15 +106,9 @@ export default {
       passedTime: 0,
       zIndex: 0,
       edit: false,
-      confirmed: false,
     };
   },
   watch: {
-    edit() {
-      if (!this.confirmed) {
-        this.edit = true;
-      }
-    },
     "global.mouseUp"() {
       this.canMove = false;
       this.leftMove = false;
