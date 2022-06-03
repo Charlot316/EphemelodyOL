@@ -80,6 +80,7 @@
         src="http://pic.mcatk.com/charlot-pictures/EpheSlideNote.png"
       />
     </div>
+    <div :style="{position:'absolute',top:'-80px',left:'0px',height:'80px',width:'250px',background:'rgb(255,255,255)'}"></div>
   </div>
 </template>
 

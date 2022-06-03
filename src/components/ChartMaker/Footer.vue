@@ -10,6 +10,7 @@
         >
           <div v-for="track in chart.tracks" :key="track">
             <TrackCard
+              v-if="track.showInTimeline"
               :chart="chart"
               :track="track"
               :global="global"
@@ -30,6 +31,7 @@
       >
         <div v-for="track in chart.tracks" :key="track">
           <TrackCardPanel
+            v-if="track.showInTimeline"
             :id="'trackCardPanel' + track.index"
             :chart="chart"
             :track="track"
@@ -116,9 +118,8 @@ export default {
           (this.global.documentWidth - 300) / 2;
         if (scrollLeft < 0) scrollLeft = 0;
         this.rightScrollElement.scrollLeft = scrollLeft;
-        this.scrollLeft = this.rightScrollElement.scrollLeft ;
+        this.scrollLeft = this.rightScrollElement.scrollLeft;
       }
-
 
       for (var i = 0; i < this.chart.tracks.length; i++) {
         if (
