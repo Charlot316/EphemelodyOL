@@ -433,7 +433,7 @@ export default {
       displayStart: 0,
       displayEnd: 0,
       form: {},
-      footerHeight: 300,
+      footerHeight: 416,
     };
   },
   computed: {
@@ -558,8 +558,10 @@ export default {
         else that.volume = 0;
         that.audio.volume = that.volume / 100;
       } else if (e.key == "ArrowLeft") {
+        e.preventDefault();
         that.minusTime(that.keyStep / 1000);
       } else if (e.key == "ArrowRight") {
+        e.preventDefault();
         that.audio.currentTime += that.keyStep / 1000;
         that.plusTime(that.keyStep / 1000);
       }
