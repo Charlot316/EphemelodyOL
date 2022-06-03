@@ -11,9 +11,9 @@
     }"
   >
     <el-popover v-model:visible="edit" placement="top" width="400" trigger="manual">
-      <el-button size="small" text @click="edit = false;">cancel</el-button>
+      <el-button size="small" text @click="edit = false;">取消</el-button>
       <el-button size="small" type="primary" @click="edit = false"
-        >confirm</el-button
+        >确认</el-button
       >
       <template #reference>
         <div>
