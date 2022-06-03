@@ -1,9 +1,23 @@
 <template>
-  <div :style="{ position: 'absolute', top: '20px', left: left - 20 + 'px' }">
+  <div
+    @click="
+      edit = true;
+      confirmed = false;
+    "
+    :style="{
+      position: 'absolute',
+      top: '20px',
+      left: left - 20 + 'px',
+      zIndex: zIndex,
+    }"
+  >
     <div v-if="note.noteType == 0">
       <el-image
         @dragstart.prevent
-        @mousedown="canMove = true"
+        @mousedown="
+          canMove = true;
+          zIndex = 10;
+        "
         style="width:40px;height:40px;user-select:none;cursor: move;"
         src="http://pic.mcatk.com/charlot-pictures/EpheHitNote.png"
       />
@@ -27,19 +41,25 @@
       ></div>
       <el-image
         @dragstart.prevent
-        @mousedown="leftMove = true"
+        @mousedown="
+          leftMove = true;
+          zIndex = 10;
+        "
         style="width:40px;height:40px;position:absolute;left:0;top:0;user-select: none;cursor:w-resize;"
         src="http://pic.mcatk.com/charlot-pictures/EpheHitNote.png"
       />
       <el-image
         @dragstart.prevent
-        @mousedown="rightMove = true"
+        @mousedown="
+          rightMove = true;
+          zIndex = 10;
+        "
         :style="{
           userSelect: 'none',
           height: '40px',
           width: '40px',
           position: 'absolute',
-          cursor:'e-resize',
+          cursor: 'e-resize',
           left:
             ((myNote.endTiming - myNote.timing) / this.displayAreaTime) *
               (this.global.documentWidth - 300) +
@@ -51,7 +71,10 @@
     </div>
     <div v-if="note.noteType == 2">
       <el-image
-        @mousedown="canMove = true"
+        @mousedown="
+          canMove = true;
+          zIndex = 10;
+        "
         @dragstart.prevent
         style="width:40px;height:40px;cursor: move;"
         src="http://pic.mcatk.com/charlot-pictures/EpheSlideNote.png"
@@ -72,13 +95,22 @@ export default {
       leftMove: false,
       rightMove: false,
       passedTime: 0,
+      zIndex: 0,
+      edit: false,
+      confirmed: false,
     };
   },
   watch: {
+    edit() {
+      if (!this.confirmed) {
+        this.edit = true;
+      }
+    },
     "global.mouseUp"() {
       this.canMove = false;
       this.leftMove = false;
       this.rightMove = false;
+      this.zIndex = 0;
     },
     "global.mouseMove"() {
       if (this.canMove) {
@@ -129,6 +161,10 @@ export default {
         this.passedTime = Math.ceil(this.global.currentTime - this.note.timing);
       }, 10);
       this.canMove = true;
+      this.zIndex = 10;
+    },
+    breforeLeave() {
+      console.log(this.edit);
     },
   },
 };
