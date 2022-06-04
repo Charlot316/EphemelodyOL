@@ -6,6 +6,23 @@
           type="text"
           class="show-button"
           style="margin-right:5px;"
+          @click="
+            myGlobal.timeSort = !myGlobal.timeSort;
+            updateTrack();
+          "
+          >{{ myGlobal.timeSort ? "改为坐标排序" : "改为时间排序" }}</el-button
+        >
+        <el-button
+          type="text"
+          class="show-button"
+          style="margin-right:5px;"
+          @click="showNoRemain = !showNoRemain"
+          >{{ showNoRemain ? "关闭无音符轨道" : "显示无音符轨道" }}</el-button
+        >
+        <el-button
+          type="text"
+          class="show-button"
+          style="margin-right:5px;"
           @click="autoScroll = !autoScroll"
           >{{ autoScroll ? "关闭滚动" : "开启滚动" }}</el-button
         >
@@ -23,13 +40,7 @@
           @click="showFake = !showFake"
           >{{ showFake ? "关闭虚轨" : "显示虚轨" }}</el-button
         >
-        <el-button
-          type="text"
-          class="show-button"
-          style="margin-right:5px;"
-          @click="showNoRemain = !showNoRemain"
-          >{{ showNoRemain ? "关闭无音符轨道" : "显示无音符轨道" }}</el-button
-        >
+
         <el-button
           type="text"
           :class="currentNoteType == 0 ? 'show-button-selected' : 'show-button'"
@@ -57,6 +68,13 @@
           style="margin-right:5px;"
           @click="currentNoteType = 3"
           >单击删除</el-button
+        >
+        <el-button
+          type="text"
+          class="show-button"
+          style="margin-right:5px;"
+          @click="enableEdit = !enableEdit"
+          >{{ enableEdit ? "禁用编辑弹窗" : "开启编辑弹窗" }}</el-button
         >
       </div>
       <div class="footer-header-right">
@@ -93,7 +111,8 @@
                           ? false
                           : track.notes[track.notes.length - 1].noteType == 1
                           ? global.currentTime >
-                            track.notes[track.notes.length - 1].endTiming
+                              track.notes[track.notes.length - 1].endTiming ||
+                            global.currentTime < track.notes[0].timing
                             ? false
                             : track.type == 1
                             ? this.showReal
@@ -103,7 +122,8 @@
                             ? true
                             : false
                           : global.currentTime >
-                            track.notes[track.notes.length - 1].timing
+                              track.notes[track.notes.length - 1].timing ||
+                            global.currentTime < track.notes[0].timing
                           ? false
                           : track.type == 1
                           ? this.showReal
@@ -160,7 +180,8 @@
                         ? false
                         : track.notes[track.notes.length - 1].noteType == 1
                         ? global.currentTime >
-                          track.notes[track.notes.length - 1].endTiming
+                            track.notes[track.notes.length - 1].endTiming ||
+                          global.currentTime < track.notes[0].timing
                           ? false
                           : track.type == 1
                           ? this.showReal
@@ -170,7 +191,8 @@
                           ? true
                           : false
                         : global.currentTime >
-                          track.notes[track.notes.length - 1].timing
+                            track.notes[track.notes.length - 1].timing ||
+                          global.currentTime < track.notes[0].timing
                         ? false
                         : track.type == 1
                         ? this.showReal
@@ -195,6 +217,7 @@
                 :global="global"
                 :scrollLeft="scrollLeft"
                 :displayAreaTime="displayAreaTime"
+                :enableEdit="enableEdit"
                 @currentTrack="currentTrack"
               />
             </transition>
@@ -260,6 +283,7 @@ export default {
       showFake: true,
       showNoRemain: true,
       currentNoteType: 0,
+      enableEdit: true,
     };
   },
   mounted() {
@@ -311,13 +335,18 @@ export default {
   },
   computed: {},
   methods: {
+    updateTrack() {
+      this.myGlobal.reCalculateTrack = !this.myGlobal.reCalculateTrack;
+      this.myGlobal.reCalculateChartMaker = !this.myGlobal
+        .reCalculateChartMaker;
+    },
     rightClick(e) {
       let x = e.clientX - 300 + this.scrollLeft;
       var currentTime =
         (x / (this.global.documentWidth - 300)) * this.displayAreaTime;
       this.audio.currentTime = currentTime / 1000;
       this.myGlobal.currentTime = currentTime;
-      this.resetTrack();
+      this.updateTrack();
     },
     rightMouseMove(e) {
       let x = e.clientX - 300 + this.scrollLeft;
@@ -327,7 +356,7 @@ export default {
           (x / (this.global.documentWidth - 300)) * this.displayAreaTime;
         this.audio.currentTime = currentTime / 1000;
         this.myGlobal.currentTime = currentTime;
-        this.resetTrack();
+        this.updateTrack();
       }
     },
     currentTrack(param) {
@@ -354,40 +383,6 @@ export default {
       ).scrollTop = this.rightScrollElement.scrollTop;
       this.scrollLeft = this.rightScrollElement.scrollLeft;
       this.scrollTop = this.rightScrollElement.scrollTop;
-    },
-    resetTrack() {
-      this.myGlobal.keyPressTime = [];
-      this.myGlobal.keyIsHold = [];
-      this.myGlobal.keyUsed = [];
-      for (var i = 0; i < this.chart.tracks.length; i++) {
-        var track = this.chart.tracks[i];
-        var index = 0;
-        var last = track.notes.length;
-        for (var j = track.notes.length - 1; j >= 0; j--) {
-          track.notes[j].judged = false;
-          track.notes[j].index = j;
-          if (
-            track.notes[j].timing + this.global.lostTime >
-            this.global.currentTime
-          ) {
-            index = j;
-          }
-          if (
-            this.global.currentTime <
-            track.notes[j].timing - this.global.remainingTime
-          ) {
-            last = j;
-          }
-        }
-        track.judges = [];
-        track.currentNote = index;
-        track.lastNote = last - 1;
-        if (track.currentNote != track.notes.length) {
-          track.judgeFinished = false;
-        } else {
-          track.judgeFinished = true;
-        }
-      }
     },
   },
 };
@@ -442,6 +437,7 @@ export default {
 }
 .footer-header-left {
   padding-left: 25px;
+  min-width: 860px;
 }
 .footer-header-right {
   padding-right: 25px;
@@ -455,5 +451,14 @@ export default {
 }
 .show-button-selected:active {
   color: #529b2e;
+}
+.show-button {
+  color: #b9b9b9;
+}
+.show-button:hover {
+  color: #dfdfdf;
+}
+.show-button:active {
+  color: #808080;
 }
 </style>

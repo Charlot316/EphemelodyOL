@@ -1,6 +1,6 @@
 <template>
   <div
-    @click="startEdit"
+    @click="selfClicked"
     :style="{
       position: 'absolute',
       top: '20px',
@@ -194,7 +194,14 @@
 
 <script>
 export default {
-  props: ["note", "global", "track", "displayAreaTime"],
+  props: [
+    "note",
+    "global",
+    "track",
+    "displayAreaTime",
+    "currentNoteType",
+    "enableEdit",
+  ],
   data() {
     var checkKey = (rule, value, callback) => {
       if (!value) {
@@ -303,9 +310,6 @@ export default {
           } else {
             this.myNote.timing = Math.ceil(this.global.currentTime);
           }
-          this.myTrack.notes.sort(function(a, b) {
-            return a.timing - b.timing;
-          });
         }
       } else if (this.leftMove) {
         if (
@@ -331,6 +335,10 @@ export default {
     },
   },
   methods: {
+    selfClicked() {
+      if (this.currentNoteType == 3) this.deleteSelf();
+      else if (this.enableEdit) this.startEdit();
+    },
     updateTrack() {
       this.myGlobal.reCalculateTrack = !this.myGlobal.reCalculateTrack;
       this.myGlobal.reCalculateChartMaker = !this.myGlobal
@@ -371,14 +379,17 @@ export default {
         cancelButtonText: "取消",
         type: "warning",
       }).then(() => {
-        this.myTrack.notes.splice(this.myNote.index, 1);
-        this.updateTrack();
+        this.deleteSelf();
         this.$notify({
           title: "成功",
           message: "删除成功",
           type: "success",
         });
       });
+    },
+    deleteSelf() {
+      this.myTrack.notes.splice(this.myNote.index, 1);
+      this.updateTrack();
     },
   },
 };

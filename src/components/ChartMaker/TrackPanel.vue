@@ -150,6 +150,7 @@ export default {
           changeColorOperations: [],
         };
         this.myChart.tracks.push(track);
+        this.myGlobal.timeSort = true;
         this.updateOperation();
         document.querySelector("#trackCard0").scrollIntoView(true);
         setTimeout(() => {
@@ -213,6 +214,6 @@ export default {
 
 .track-container-container {
   overflow-y: scroll;
-  padding-bottom:20px;
+  padding-bottom: 20px;
 }
 </style>

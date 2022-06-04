@@ -24,6 +24,7 @@
             :track="track"
             :global="global"
             :note="note"
+            :enableEdit="enableEdit"
             :displayAreaTime="displayAreaTime"
           />
         </div>
@@ -102,6 +103,7 @@ export default {
     "scrollLeft",
     "displayAreaTime",
     "currentNoteType",
+    "enableEdit",
   ],
   components: { Note },
   data() {

@@ -350,7 +350,8 @@
           id="footer-resizer"
           @mousedown="canDrag = true"
         >
-          <span style="color:rgb(200,200,200)">{{ global.currentTime }}</span><span style="color:rgb(150,150,150)">/{{ chart.songLength }}</span>
+          <span style="color:rgb(200,200,200)">{{ global.currentTime }}</span
+          ><span style="color:rgb(150,150,150)">/{{ chart.songLength }}</span>
         </div>
         <div style="height:calc(100% - 20px);width:100%;">
           <Footer
@@ -501,6 +502,7 @@ export default {
       mouseMove: false,
       clientX: 0,
       clientY: 0,
+      timeSort: true,
     };
   },
   mounted() {
@@ -707,9 +709,16 @@ export default {
     },
     //给轨道排序
     sortTrack() {
-      this.chart.tracks.sort(function(a, b) {
-        return a.startTiming - b.startTiming;
-      });
+      if (this.global.timeSort) {
+        this.chart.tracks.sort(function(a, b) {
+          return a.startTiming - b.startTiming;
+        });
+      } else {
+        this.chart.tracks.sort(function(a, b) {
+          return a.positionX - b.positionX;
+        });
+      }
+
       this.setIndex();
     },
     //运行
