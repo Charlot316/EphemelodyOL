@@ -252,7 +252,14 @@ export default {
           parseInt(value) <
           parseInt(this.myNote.tempNote.timing) + 150
         ) {
-          callback(new Error("长键长度不得小于150"));
+          console.log(
+            parseInt(value) < parseInt(this.myNote.tempNote.timing) + 150
+          );
+          console.log(
+            parseInt(value),
+            parseInt(this.myNote.tempNote.timing) + 100
+          );
+          callback(new Error("长键长度不得小于100"));
         } else {
           callback();
         }
