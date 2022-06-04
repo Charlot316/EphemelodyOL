@@ -111,8 +111,9 @@
                           ? false
                           : track.notes[track.notes.length - 1].noteType == 1
                           ? global.currentTime >
-                              track.notes[track.notes.length - 1].endTiming ||
-                            global.currentTime < track.notes[0].timing
+                              track.notes[track.notes.length - 1].endTiming +
+                                1000 ||
+                            global.currentTime < track.notes[0].timing - 1000
                             ? false
                             : track.type == 1
                             ? this.showReal
@@ -122,8 +123,9 @@
                             ? true
                             : false
                           : global.currentTime >
-                              track.notes[track.notes.length - 1].timing ||
-                            global.currentTime < track.notes[0].timing
+                              track.notes[track.notes.length - 1].timing +
+                                1000 ||
+                            global.currentTime < track.notes[0].timing - 1000
                           ? false
                           : track.type == 1
                           ? this.showReal
@@ -180,8 +182,9 @@
                         ? false
                         : track.notes[track.notes.length - 1].noteType == 1
                         ? global.currentTime >
-                            track.notes[track.notes.length - 1].endTiming ||
-                          global.currentTime < track.notes[0].timing
+                            track.notes[track.notes.length - 1].endTiming +
+                              1000 ||
+                          global.currentTime < track.notes[0].timing - 1000
                           ? false
                           : track.type == 1
                           ? this.showReal
@@ -191,8 +194,8 @@
                           ? true
                           : false
                         : global.currentTime >
-                            track.notes[track.notes.length - 1].timing ||
-                          global.currentTime < track.notes[0].timing
+                            track.notes[track.notes.length - 1].timing + 1000 ||
+                          global.currentTime < track.notes[0].timing - 1000
                         ? false
                         : track.type == 1
                         ? this.showReal
