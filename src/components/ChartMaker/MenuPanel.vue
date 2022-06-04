@@ -182,24 +182,7 @@ export default {
   background: rgb(32, 32, 32);
   border-right-width: 1px;
 }
-.plus-button {
-  color: #67c23a;
-}
-.plus-button:hover {
-  color: #95d475;
-}
-.plus-button:active {
-  color: #529b2e;
-}
-.show-button {
-  color: #c1c1c1;
-}
-.show-button:hover {
-  color: #d0d0d0;
-}
-.show-button:active {
-  color: #656565;
-}
+
 .flip-list-move {
   transition: transform 1s;
 }
