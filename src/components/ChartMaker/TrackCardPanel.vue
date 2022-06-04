@@ -23,6 +23,7 @@
             :currentNoteType="currentNoteType"
             :track="track"
             :global="global"
+            :chart="chart"
             :note="note"
             :enableEdit="enableEdit"
             :displayAreaTime="displayAreaTime"

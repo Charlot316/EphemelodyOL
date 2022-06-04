@@ -201,6 +201,7 @@ export default {
     "displayAreaTime",
     "currentNoteType",
     "enableEdit",
+    "chart",
   ],
   data() {
     var checkKey = (rule, value, callback) => {
@@ -250,15 +251,8 @@ export default {
           callback(new Error("不能大于轨道结束时机"));
         } else if (
           parseInt(value) <
-          parseInt(this.myNote.tempNote.timing) + 150
+          parseInt(this.myNote.tempNote.timing) + 100
         ) {
-          console.log(
-            parseInt(value) < parseInt(this.myNote.tempNote.timing) + 150
-          );
-          console.log(
-            parseInt(value),
-            parseInt(this.myNote.tempNote.timing) + 100
-          );
           callback(new Error("长键长度不得小于100"));
         } else {
           callback();
@@ -309,43 +303,37 @@ export default {
         ) {
           if (this.myNote.noteType == 1) {
             this.duration = this.note.endTiming - this.note.timing;
-            this.myNote.timing = Math.ceil(
+
+            this.myNote.timing = this.roundTime(
               this.global.currentTime - this.passedTime
             );
-            this.myNote.endTiming = this.myNote.timing + this.duration;
-            this.$forceUpdate();
           } else {
-            this.myNote.timing = Math.ceil(this.global.currentTime);
+            this.myNote.timing = this.roundTime(this.global.currentTime);
           }
-          this.myNote.tempNote = JSON.parse(JSON.stringify(this.myNote));
-          this.myNote.tempNote.key = this.myNote.tempNote.key.toUpperCase();
+
           if (this.myNote.noteType != 1) {
             this.myNote.endTiming = parseInt(this.myNote.timing) + 150;
+          } else {
+            this.myNote.endTiming = this.myNote.timing + this.duration;
           }
+          this.updateTemp();
         }
       } else if (this.leftMove) {
         if (
           this.global.currentTime > this.track.startTiming &&
           this.global.currentTime < this.myNote.endTiming - 150
         ) {
-          this.myNote.timing = Math.ceil(this.global.currentTime);
-          this.myNote.tempNote = JSON.parse(JSON.stringify(this.myNote));
-          this.myNote.tempNote.key = this.myNote.tempNote.key.toUpperCase();
-          if (this.myNote.noteType != 1) {
-            this.myNote.endTiming = parseInt(this.myNote.timing) + 150;
-          }
+          this.myNote.timing = this.roundTime(this.global.currentTime);
+
+          this.updateTemp();
         }
       } else if (this.rightMove) {
         if (
           this.global.currentTime > this.myNote.timing + 150 &&
           this.global.currentTime < this.track.endTiming
         ) {
-          this.myNote.endTiming = Math.ceil(this.global.currentTime);
-          this.myNote.tempNote = JSON.parse(JSON.stringify(this.myNote));
-          this.myNote.tempNote.key = this.myNote.tempNote.key.toUpperCase();
-          if (this.myNote.noteType != 1) {
-            this.myNote.endTiming = parseInt(this.myNote.timing) + 150;
-          }
+          this.myNote.endTiming = this.roundTime(this.global.currentTime);
+          this.updateTemp();
         }
       }
     },
@@ -359,6 +347,22 @@ export default {
     },
   },
   methods: {
+    roundTime(timing) {
+      if (this.global.beatLine) {
+        var bpm = this.chart.BPM / 16;
+        var mod = (timing - this.chart.firstBeatDelay) % bpm;
+        if (mod > bpm / 2) {
+          timing += Math.ceil(bpm - mod);
+        } else {
+          timing -= mod;
+        }
+      }
+      return timing;
+    },
+    updateTemp() {
+      this.myNote.tempNote = JSON.parse(JSON.stringify(this.myNote));
+      this.myNote.tempNote.key = this.myNote.tempNote.key.toUpperCase();
+    },
     selfClicked() {
       if (this.currentNoteType == 3) this.deleteSelf();
       else if (this.enableEdit) this.startEdit();

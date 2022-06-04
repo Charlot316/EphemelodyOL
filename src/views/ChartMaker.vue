@@ -284,22 +284,6 @@
               <i class="el-icon-question" />
             </el-tooltip>
           </el-form-item>
-          <el-form-item label="末拍偏移">
-            <el-input-number
-              v-model="chart.lastBeatDelay"
-              :min="0"
-              :max="chart.songLength"
-            />
-            <el-tooltip
-              class="item"
-              effect="dark"
-              content="最后一拍的偏移，在一拍间隔部分可以顺带测量，请务必确认最后一拍偏移时间的准确性"
-              placement="top-start"
-              style="margin-left:10px;"
-            >
-              <i class="el-icon-question" />
-            </el-tooltip>
-          </el-form-item>
           <el-form-item label="一拍间隔">
             <el-input-number
               v-model="chart.BPM"
@@ -507,6 +491,7 @@ export default {
       canRun: false,
     };
     this.global = {
+      beatLine: true,
       screenWidth: 0,
       screenHeight: 0,
       remainingTime: 700,
@@ -692,19 +677,7 @@ export default {
           this.chart.firstBeatDelay = Math.round(
             this.startTotal / (this.BPMcount - 3)
           );
-          var bpm = Math.round(this.chart.BPM);
-          var mod = (now - this.chart.firstBeatDelay) % bpm;
-          if (mod > bpm / 2) {
-            this.chart.lastBeatDelay = now + (bpm - mod);
-          } else {
-            this.chart.lastBeatDelay = now - mod;
-          }
-          console.log(
-            (now - this.chart.firstBeatDelay) %
-              Math.round(this.chart.BPM)
-          );
         }
-
         this.BPMcount++;
       }
     },

@@ -163,28 +163,56 @@
           rightClicked = true;
         "
       >
-        <transition-group
-          name="flip-list"
-          enter-active-class="animate__animated animate__fadeInUp"
-          leave-active-class="animate__animated animate__fadeOutUp"
+        <div
+          :style="{
+            position: 'absolute',
+            left: 0,
+            top: scrollTop + 'px',
+            height: '20px',
+            width: '100%',
+          }"
         >
-          <div v-for="track in chart.tracks" :key="track">
-            <transition
-              name="flip-list"
-              enter-active-class="animate__animated animate__fadeInUp"
-              leave-active-class="animate__animated animate__fadeOutUp"
-            >
-              <TrackCardPanel
-                v-if="
-                  track.showInTimeline
-                    ? !this.showNoRemain
-                      ? track.notes.length == 0
-                        ? false
-                        : track.notes[track.notes.length - 1].noteType == 1
-                        ? global.currentTime >
-                            track.notes[track.notes.length - 1].endTiming +
-                              1000 ||
-                          global.currentTime < track.notes[0].timing - 1000
+          <BeatLine
+            :chart="chart"
+            :global="global"
+            :displayAreaTime="displayAreaTime"
+          />
+        </div>
+        <div style="position:absolute;left:0;top:0;">
+          <transition-group
+            name="flip-list"
+            enter-active-class="animate__animated animate__fadeInUp"
+            leave-active-class="animate__animated animate__fadeOutUp"
+          >
+            <div v-for="track in chart.tracks" :key="track">
+              <transition
+                name="flip-list"
+                enter-active-class="animate__animated animate__fadeInUp"
+                leave-active-class="animate__animated animate__fadeOutUp"
+              >
+                <TrackCardPanel
+                  v-if="
+                    track.showInTimeline
+                      ? !this.showNoRemain
+                        ? track.notes.length == 0
+                          ? false
+                          : track.notes[track.notes.length - 1].noteType == 1
+                          ? global.currentTime >
+                              track.notes[track.notes.length - 1].endTiming +
+                                1000 ||
+                            global.currentTime < track.notes[0].timing - 1000
+                            ? false
+                            : track.type == 1
+                            ? this.showReal
+                              ? true
+                              : false
+                            : this.showFake
+                            ? true
+                            : false
+                          : global.currentTime >
+                              track.notes[track.notes.length - 1].timing +
+                                1000 ||
+                            global.currentTime < track.notes[0].timing - 1000
                           ? false
                           : track.type == 1
                           ? this.showReal
@@ -193,10 +221,6 @@
                           : this.showFake
                           ? true
                           : false
-                        : global.currentTime >
-                            track.notes[track.notes.length - 1].timing + 1000 ||
-                          global.currentTime < track.notes[0].timing - 1000
-                        ? false
                         : track.type == 1
                         ? this.showReal
                           ? true
@@ -204,28 +228,22 @@
                         : this.showFake
                         ? true
                         : false
-                      : track.type == 1
-                      ? this.showReal
-                        ? true
-                        : false
-                      : this.showFake
-                      ? true
                       : false
-                    : false
-                "
-                :currentNoteType="currentNoteType"
-                :id="'trackCardPanel' + track.index"
-                :chart="chart"
-                :track="track"
-                :global="global"
-                :scrollLeft="scrollLeft"
-                :displayAreaTime="displayAreaTime"
-                :enableEdit="enableEdit"
-                @currentTrack="currentTrack"
-              />
-            </transition>
-          </div>
-        </transition-group>
+                  "
+                  :currentNoteType="currentNoteType"
+                  :id="'trackCardPanel' + track.index"
+                  :chart="chart"
+                  :track="track"
+                  :global="global"
+                  :scrollLeft="scrollLeft"
+                  :displayAreaTime="displayAreaTime"
+                  :enableEdit="enableEdit"
+                  @currentTrack="currentTrack"
+                />
+              </transition>
+            </div>
+          </transition-group>
+        </div>
 
         <div
           class="time-indicater"
@@ -264,10 +282,12 @@
 <script>
 import TrackCard from "./TrackCard";
 import TrackCardPanel from "./TrackCardPanel";
+import BeatLine from "./BeatLine";
 export default {
   components: {
     TrackCard,
     TrackCardPanel,
+    BeatLine,
   },
   props: ["chart", "global"],
   data() {
