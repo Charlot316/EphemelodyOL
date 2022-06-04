@@ -1,6 +1,44 @@
 <template>
   <div class="footer-container">
-    <div class="footer-header"></div>
+    <div class="footer-header">
+      <div class="footer-header-left">
+        <el-button
+          type="text"
+          class="show-button"
+          style="margin-right:5px;"
+          @click="autoScroll = !autoScroll"
+          >{{ autoScroll ? "关闭滚动" : "开启滚动" }}</el-button
+        >
+        <el-button
+          type="text"
+          class="show-button"
+          style="margin-right:5px;"
+          @click="showReal = !showReal"
+          >{{ showReal ? "关闭实轨" : "显示实轨" }}</el-button
+        >
+        <el-button
+          type="text"
+          class="show-button"
+          style="margin-right:5px;"
+          @click="showFake = !showFake"
+          >{{ showFake ? "关闭虚轨" : "显示虚轨" }}</el-button
+        >
+        <el-button
+          type="text"
+          class="show-button"
+          style="margin-right:5px;"
+          @click="showNoRemain = !showNoRemain"
+          >{{ showNoRemain ? "关闭无音符轨道" : "显示无音符轨道" }}</el-button
+        >
+      </div>
+      <div class="footer-header-right">
+        <el-slider
+          :min="1000"
+          :max="chart.songLength"
+          v-model="displayAreaTime"
+        ></el-slider>
+      </div>
+    </div>
     <div v-if="chart.tracks">
       <div class="footer-left">
         <div
@@ -20,7 +58,41 @@
                 leave-active-class="animate__animated animate__fadeOutUp"
               >
                 <TrackCard
-                  v-if="track.showInTimeline"
+                  v-if="
+                    track.showInTimeline
+                      ? !this.showNoRemain
+                        ? track.notes.length == 0
+                          ? false
+                          : track.notes[track.notes.length - 1] == 1
+                          ? global.currentTime >
+                            track.notes[track.notes.length - 1].endTiming
+                            ? false
+                            : track.type == 1
+                            ? this.showReal
+                              ? true
+                              : false
+                            : this.showFake
+                            ? true
+                            : false
+                          : global.currentTime >
+                            track.notes[track.notes.length - 1].timing
+                          ? false
+                          : track.type == 1
+                          ? this.showReal
+                            ? true
+                            : false
+                          : this.showFake
+                          ? true
+                          : false
+                        : track.type == 1
+                        ? this.showReal
+                          ? true
+                          : false
+                        : this.showFake
+                        ? true
+                        : false
+                      : false
+                  "
                   :chart="chart"
                   :track="track"
                   :global="global"
@@ -53,7 +125,41 @@
               leave-active-class="animate__animated animate__fadeOutUp"
             >
               <TrackCardPanel
-                v-if="track.showInTimeline"
+                v-if="
+                  track.showInTimeline
+                    ? !this.showNoRemain
+                      ? track.notes.length == 0
+                        ? false
+                        : track.notes[track.notes.length - 1] == 1
+                        ? global.currentTime >
+                          track.notes[track.notes.length - 1].endTiming
+                          ? false
+                          : track.type == 1
+                          ? this.showReal
+                            ? true
+                            : false
+                          : this.showFake
+                          ? true
+                          : false
+                        : global.currentTime >
+                          track.notes[track.notes.length - 1].timing
+                        ? false
+                        : track.type == 1
+                        ? this.showReal
+                          ? true
+                          : false
+                        : this.showFake
+                        ? true
+                        : false
+                      : track.type == 1
+                      ? this.showReal
+                        ? true
+                        : false
+                      : this.showFake
+                      ? true
+                      : false
+                    : false
+                "
                 :id="'trackCardPanel' + track.index"
                 :chart="chart"
                 :track="track"
@@ -120,6 +226,10 @@ export default {
       indicatorLeft: 0,
       rightScrollElement: null,
       rightClicked: false,
+      autoScroll: false,
+      showReal: true,
+      showFake: true,
+      showNoRemain: true,
     };
   },
   mounted() {
@@ -145,19 +255,20 @@ export default {
         this.rightScrollElement.scrollLeft = scrollLeft;
         this.scrollLeft = this.rightScrollElement.scrollLeft;
       }
+      if (this.autoScroll) {
+        for (var i = 0; i < this.chart.tracks.length; i++) {
+          if (
+            this.global.currentTime > this.chart.tracks[i].startTiming &&
+            this.global.currentTime < this.chart.tracks[i].endTiming
+          ) {
+            setTimeout(() => {
+              document
+                .querySelector("#trackCardPanel" + this.chart.tracks[i].index)
+                .scrollIntoView(true);
+            }, 200);
 
-      for (var i = 0; i < this.chart.tracks.length; i++) {
-        if (
-          this.global.currentTime > this.chart.tracks[i].startTiming &&
-          this.global.currentTime < this.chart.tracks[i].endTiming
-        ) {
-          setTimeout(() => {
-            document
-              .querySelector("#trackCardPanel" + this.chart.tracks[i].index)
-              .scrollIntoView(true);
-          }, 200);
-
-          break;
+            break;
+          }
         }
       }
     },
@@ -165,6 +276,7 @@ export default {
       this.myChart = this.chart;
     },
   },
+  computed: {},
   methods: {
     rightClick(e) {
       let x = e.clientX - 300 + this.scrollLeft;
@@ -254,17 +366,21 @@ export default {
   position: relative;
 }
 .footer-header {
-  height: 50px;
+  height: 35px;
+  padding-bottom: 5px;
   width: 100vw;
   position: absolute;
   top: 0px;
   left: 0px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 .footer-left {
-  height: calc(100% - 50px);
+  height: calc(100% - 35px);
   width: 300px;
   position: absolute;
-  top: 50px;
+  top: 35px;
   left: 0px;
 }
 .footer-track-container {
@@ -277,11 +393,11 @@ export default {
   overflow: auto;
 }
 .footer-right {
-  height: calc(100% - 55px);
+  height: calc(100% - 40px);
   width: calc(100vw - 300px);
   background: rgb(32, 32, 32);
   position: absolute;
-  top: 50px;
+  top: 35px;
   left: 300px;
   padding-top: 5px;
   overflow: auto;
@@ -289,5 +405,12 @@ export default {
 
 .footer-track-container::-webkit-scrollbar {
   width: 0 !important;
+}
+.footer-header-left {
+  padding-left: 25px;
+}
+.footer-header-right {
+  padding-right: 25px;
+  width: 200px;
 }
 </style>

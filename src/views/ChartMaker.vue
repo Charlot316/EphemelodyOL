@@ -346,11 +346,13 @@
         }"
       >
         <div
-          style="height:5px;width:100%;cursor:ns-resize"
+          style="height:15px;width:100%;cursor:ns-resize;text-align: center;padding-top:5px;font-size: 15px;"
           id="footer-resizer"
           @mousedown="canDrag = true"
-        ></div>
-        <div style="height:calc(100% - 5px);width:100%;">
+        >
+          <span style="color:rgb(200,200,200)">{{ global.currentTime }}</span><span style="color:rgb(150,150,150)">/{{ chart.songLength }}</span>
+        </div>
+        <div style="height:calc(100% - 20px);width:100%;">
           <Footer
             :chart="chart"
             :global="global"
@@ -434,7 +436,7 @@ export default {
       displayStart: 0,
       displayEnd: 0,
       form: {},
-      footerHeight: 416,
+      footerHeight: 426,
     };
   },
   computed: {
