@@ -56,8 +56,7 @@
             >
               <el-button
                 type="text"
-
-              class="hide-button"
+                class="hide-button"
                 :icon="
                   myTrack.showInTimeline ? 'el-icon-minus' : 'el-icon-view'
                 "
@@ -111,10 +110,11 @@
           @submit.prevent="saveTrack"
         >
           <el-form-item label="轨道类别" label-width="80px" prop="type">
-            <el-radio-group v-model="myTrack.tempTrack.type">
+            <el-radio-group v-model="myTrack.tempTrack.type"  style="width:130px;line-height: 20px;">
               <el-radio :label="0">虚轨</el-radio>
               <el-radio :label="1">实轨</el-radio>
             </el-radio-group>
+            
             <el-tooltip
               class="item"
               effect="dark"
@@ -368,7 +368,6 @@ export default {
           setTimeout(() => {
             this.updateTrack();
           }, 500);
-          console.l;
           for (var key in this.myTrack.tempTrack) {
             if (key != "tempTrack")
               this.myTrack[key] = this.myTrack.tempTrack[key];
@@ -450,13 +449,13 @@ export default {
   transition: 0.5s;
 }
 .hide-button {
-  color: rgb(254,188,46);
+  color: rgb(218, 218, 218);
 }
 .hide-button:hover {
-  color:  rgb(255, 210, 114);
+  color: rgb(239, 239, 239);
 }
 .hide-button:active {
-  color:  rgb(227, 166, 33);
+  color: rgb(183, 183, 183);
 }
 .delete-button {
   color: #f56c6c;

@@ -407,6 +407,7 @@ export default {
       if (this.chart.changeBackgroundOperations) {
         this.generateImagePath();
         this.sortTrack();
+        this.resetTrack();
       }
     },
   },

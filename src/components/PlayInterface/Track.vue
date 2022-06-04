@@ -89,6 +89,9 @@ export default {
       this.myTrack.notes.sort(function(a, b) {
         return a.timing - b.timing;
       });
+      for (var i = 0; i < this.myTrack.notes.length; i++) {
+        this.myTrack.notes[i].index = i;
+      }
       this.paintTrack();
     },
   },
@@ -479,6 +482,9 @@ export default {
       this.myTrack.notes.sort(function(a, b) {
         return a.timing - b.timing;
       });
+      for (var i = 0; i < this.myTrack.notes.length; i++) {
+        this.myTrack.notes[i].index = i;
+      }
       var track = this.myTrack;
       var index = 0;
       var last = track.notes.length;
