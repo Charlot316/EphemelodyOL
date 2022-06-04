@@ -220,7 +220,6 @@
             v-model="global.currentTime"
             :min="displayStart"
             :max="displayEnd"
-            :step="minStep"
             @change="changeTime"
             @mousedown="SlideMouseDown"
             @mouseup="SlideMouseUp"
@@ -231,28 +230,11 @@
       </div>
       <el-dialog
         v-model="globalSetting"
+        @close="checkBPM"
         @closed="globalSetting = false"
         width="650px"
       >
         <el-form :model="form" label-width="120px" style="padding: 20px;">
-          <el-form-item label="时间">
-            <el-input-number
-              v-model="global.currentTime"
-              :min="0"
-              :max="chart.songLength"
-              @change="changeTime"
-              :step="keyStep"
-            />
-            <el-tooltip
-              class="item"
-              effect="dark"
-              content="可以在此输入精确的时间，以毫秒为单位"
-              placement="top-start"
-              style="margin-left:10px;"
-            >
-              <i class="el-icon-question" />
-            </el-tooltip>
-          </el-form-item>
           <el-form-item label="音量">
             <el-input-number
               v-model="volume"
@@ -286,21 +268,62 @@
               <i class="el-icon-question" />
             </el-tooltip>
           </el-form-item>
-          <el-form-item label="音符最小间隔">
+          <el-form-item label="首拍偏移">
             <el-input-number
-              v-model="minStep"
-              :min="10"
+              v-model="chart.firstBeatDelay"
+              :min="0"
               :max="chart.songLength"
             />
             <el-tooltip
               class="item"
               effect="dark"
-              content="以毫秒为单位。当您使用播放敲谱模式键入音符的时候，音符会吸附到最近的断点上。您可以根据音乐的最小节拍时长设置本项，让音符的时机更加贴合音乐的节奏。"
+              content="第一拍的偏移，在一拍间隔部分可以顺带测量"
               placement="top-start"
               style="margin-left:10px;"
             >
               <i class="el-icon-question" />
             </el-tooltip>
+          </el-form-item>
+          <el-form-item label="末拍偏移">
+            <el-input-number
+              v-model="chart.lastBeatDelay"
+              :min="0"
+              :max="chart.songLength"
+            />
+            <el-tooltip
+              class="item"
+              effect="dark"
+              content="最后一拍的偏移，在一拍间隔部分可以顺带测量，请务必确认最后一拍偏移时间的准确性"
+              placement="top-start"
+              style="margin-left:10px;"
+            >
+              <i class="el-icon-question" />
+            </el-tooltip>
+          </el-form-item>
+          <el-form-item label="一拍间隔">
+            <el-input-number
+              v-model="chart.BPM"
+              :min="0"
+              :max="chart.songLength"
+            />
+            <el-tooltip
+              class="item"
+              effect="dark"
+              content="一个节拍的长度，拖动音符时，音符将会依附到最近的1/16节拍时间点上，轻点下方按钮即可大致估算出一拍的长度"
+              placement="top-start"
+              style="margin-left:10px;"
+            >
+              <i class="el-icon-question" />
+            </el-tooltip>
+            <br />
+            <div style="margin-top:15px;">
+              <el-button @mousedown="calculateBPM">{{
+                !BPMStart ? "开始测量" : "请在节奏点处按下"
+              }}</el-button>
+              <el-button @click="endBPM" v-if="BPMStart">
+                结束或重新测量
+              </el-button>
+            </div>
           </el-form-item>
           <el-form-item label="显示时间区域">
             <el-col :span="12">
@@ -405,6 +428,9 @@ export default {
           this.global.judgeCanvas.height
         );
       }
+      if (this.sliding) {
+        document.querySelector("#time-indicater").scrollIntoView(true);
+      }
     },
     "global.reCalculateChartMaker"() {
       if (this.chart.changeBackgroundOperations) {
@@ -420,7 +446,13 @@ export default {
       chart: {
         songLength: 0,
       },
-      global: {},
+      BPMStart: false,
+      BPMcount: 0,
+      BPMtotal: 0,
+      startTotal: 0,
+      lastTime: 0,
+      startTime: 0,
+      global: { currentTime: 0 },
       imagePath: [],
       pauseVisible: false,
       audio: null,
@@ -429,7 +461,6 @@ export default {
       sliding: false,
       menuOpened: true,
       volume: 100,
-      minStep: 10,
       keyStep: 10,
       currentSelectTrack: null,
       currentTracks: [],
@@ -631,6 +662,76 @@ export default {
   },
 
   methods: {
+    calculateBPM() {
+      if (this.BPMStart == false) {
+        this.global.currentTime = 0;
+        this.audio.currentTime = 0;
+        this.BPMcount = 0;
+        this.BPMStart = false;
+        this.lastTime = 0;
+        this.BPMtotal = 0;
+        this.startTotal = 0;
+        this.resetTrack();
+        this.lastTime = this.global.currentTime;
+        this.BPMStart = true;
+        this.audio.play();
+      } else {
+        if (this.BPMcount <= 3) {
+          this.lastTime = this.global.currentTime;
+        } else if (this.BPMcount < 10) {
+          var now = this.global.currentTime;
+          this.BPMtotal += now - this.lastTime;
+          this.startTotal += now - (now - this.lastTime) * this.BPMcount;
+          this.lastTime = now;
+        } else {
+          now = this.global.currentTime;
+          this.BPMtotal += now - this.lastTime;
+          this.startTotal += now - (now - this.lastTime) * this.BPMcount;
+          this.lastTime = now;
+          this.chart.BPM = this.BPMtotal / (this.BPMcount - 3);
+          this.chart.firstBeatDelay = Math.round(
+            this.startTotal / (this.BPMcount - 3)
+          );
+          var bpm = Math.round(this.chart.BPM);
+          var mod = (now - this.chart.firstBeatDelay) % bpm;
+          if (mod > bpm / 2) {
+            this.chart.lastBeatDelay = now + (bpm - mod);
+          } else {
+            this.chart.lastBeatDelay = now - mod;
+          }
+          console.log(
+            (now - this.chart.firstBeatDelay) %
+              Math.round(this.chart.BPM)
+          );
+        }
+
+        this.BPMcount++;
+      }
+    },
+    endBPM() {
+      this.audio.pause();
+      this.global.currentTime = 0;
+      this.audio.currentTime = 0;
+      this.startTotal = 0;
+      this.BPMcount = 0;
+      this.BPMStart = false;
+      this.lastTime = 0;
+      this.BPMtotal = 0;
+      this.resetTrack();
+    },
+    checkBPM() {
+      this.endBPM();
+      if (this.chart.BPM == 0 || !this.chart.BPM) {
+        setTimeout(() => {
+          this.$notify({
+            title: "提示",
+            message: "请设置节拍",
+            type: "warning",
+          });
+          this.globalSetting = true;
+        }, 1000);
+      }
+    },
     currentTrack(param) {
       if (this.currentSelectTrack != null) this.currentSelectTrack.edit = false;
       this.currentSelectTrack = param;
@@ -757,6 +858,21 @@ export default {
       this.volume = this.$store.state.volume;
       this.audio.volume = this.$store.state.volume / 100;
       this.run();
+      if (!this.chart.BPM || this.chart.BPM == 0) {
+        this.globalSetting = true; //请设置节拍
+        this.$notify({
+          type: "warning",
+          title: "提示",
+          message: "请设置节拍",
+        });
+      }
+      if (!this.chart.BPM) {
+        this.chart.BPM = 0;
+      }
+      if (!this.chart.firstBeatDelay) {
+        this.chart.firstBeatDelay = 0;
+      }
+
       setTimeout(() => {
         this.resize();
       }, 1000);

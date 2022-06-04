@@ -317,19 +317,36 @@ export default {
           } else {
             this.myNote.timing = Math.ceil(this.global.currentTime);
           }
+          this.myNote.tempNote = JSON.parse(JSON.stringify(this.myNote));
+          this.myNote.tempNote.key = this.myNote.tempNote.key.toUpperCase();
+          if (this.myNote.noteType != 1) {
+            this.myNote.endTiming = parseInt(this.myNote.timing) + 150;
+          }
         }
       } else if (this.leftMove) {
         if (
           this.global.currentTime > this.track.startTiming &&
           this.global.currentTime < this.myNote.endTiming - 150
-        )
+        ) {
           this.myNote.timing = Math.ceil(this.global.currentTime);
+          this.myNote.tempNote = JSON.parse(JSON.stringify(this.myNote));
+          this.myNote.tempNote.key = this.myNote.tempNote.key.toUpperCase();
+          if (this.myNote.noteType != 1) {
+            this.myNote.endTiming = parseInt(this.myNote.timing) + 150;
+          }
+        }
       } else if (this.rightMove) {
         if (
           this.global.currentTime > this.myNote.timing + 150 &&
           this.global.currentTime < this.track.endTiming
-        )
+        ) {
           this.myNote.endTiming = Math.ceil(this.global.currentTime);
+          this.myNote.tempNote = JSON.parse(JSON.stringify(this.myNote));
+          this.myNote.tempNote.key = this.myNote.tempNote.key.toUpperCase();
+          if (this.myNote.noteType != 1) {
+            this.myNote.endTiming = parseInt(this.myNote.timing) + 150;
+          }
+        }
       }
     },
   },

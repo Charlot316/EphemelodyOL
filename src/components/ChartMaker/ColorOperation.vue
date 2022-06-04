@@ -25,24 +25,24 @@
           type="text"
           class="ok-button"
           icon="el-icon-success"
-          @click="saveNote"
+          @click="saveOperation"
         />
         <el-button
           type="text"
           class="delete-button"
           icon="el-icon-remove"
-          @click="deleteNote"
+          @click="deleteOperation"
         />
       </div>
       <el-form
-        :model="myNote.tempNote"
+        :model="myOperation.tempOperation"
         :rules="rules"
         ref="form"
-        @submit.prevent="saveNote"
+        @submit.prevent="saveOperation"
       >
-        <el-form-item label="音符类别" label-width="80px" prop="noteType">
+        <el-form-item label="音符类别" label-width="80px" prop="operationType">
           <el-radio-group
-            v-model="myNote.tempNote.noteType"
+            v-model="myOperation.tempOperation.operationType"
             size="small"
             style="width:130px;line-height: 20px;"
           >
@@ -63,8 +63,8 @@
         <el-form-item label="按键" label-width="80px" prop="key">
           <el-input
             :disabled="track.type == 1"
-            @keydown.enter="saveNote"
-            v-model="myNote.tempNote.key"
+            @keydown.enter="saveOperation"
+            v-model="myOperation.tempOperation.key"
             style="width:130px"
           />
           <el-tooltip
@@ -79,8 +79,8 @@
         </el-form-item>
         <el-form-item label="时机" label-width="80px" prop="timing">
           <el-input
-            @keydown.enter="saveNote"
-            v-model="myNote.tempNote.timing"
+            @keydown.enter="saveOperation"
+            v-model="myOperation.tempOperation.timing"
             style="width:130px"
           />
           <el-tooltip
@@ -97,11 +97,11 @@
           label="结束时机"
           label-width="80px"
           prop="endTiming"
-          v-if="myNote.tempNote.noteType == 1"
+          v-if="myOperation.tempOperation.operationType == 1"
         >
           <el-input
-            @keydown.enter="saveNote"
-            v-model="myNote.tempNote.endTiming"
+            @keydown.enter="saveOperation"
+            v-model="myOperation.tempOperation.endTiming"
             style="width:130px"
           />
           <el-tooltip
@@ -117,20 +117,10 @@
       </el-form>
       <template #reference>
         <div>
-          <div v-if="note.noteType == 0">
-            <el-image
-              @dragstart.prevent
-              @mousedown="
-                canMove = true;
-                zIndex = 10;
-              "
-              style="width:40px;height:40px;user-select:none;cursor: move;"
-              src="http://pic.mcatk.com/charlot-pictures/EpheHitNote.png"
-            />
-          </div>
-          <div v-if="note.noteType == 1">
+          
+        
             <div
-              @mousedown="longNoteCanMove"
+              @mousedown="longOperationCanMove"
               :style="{
                 userSelect: 'none',
                 height: '38px',
@@ -138,7 +128,7 @@
                 background: 'rgb(22, 22, 14)',
                 cursor: 'move',
                 width:
-                  ((myNote.endTiming - myNote.timing) / this.displayAreaTime) *
+                  ((myOperation.endTiming - myOperation.timing) / this.displayAreaTime) *
                     (this.global.documentWidth - 300) +
                   'px',
                 left: '20px',
@@ -152,7 +142,7 @@
                 zIndex = 10;
               "
               style="width:40px;height:40px;position:absolute;left:0;top:0;user-select: none;cursor:w-resize;"
-              src="http://pic.mcatk.com/charlot-pictures/EpheHitNote.png"
+              src="http://pic.mcatk.com/charlot-pictures/EpheHitOperation.png"
             />
             <el-image
               @dragstart.prevent
@@ -167,25 +157,14 @@
                 position: 'absolute',
                 cursor: 'e-resize',
                 left:
-                  ((myNote.endTiming - myNote.timing) / this.displayAreaTime) *
+                  ((myOperation.endTiming - myOperation.timing) / this.displayAreaTime) *
                     (this.global.documentWidth - 300) +
                   'px',
                 top: '0px',
               }"
-              src="http://pic.mcatk.com/charlot-pictures/EpheHitNote.png"
+              src="http://pic.mcatk.com/charlot-pictures/EpheHitOperation.png"
             />
-          </div>
-          <div v-if="note.noteType == 2">
-            <el-image
-              @mousedown="
-                canMove = true;
-                zIndex = 10;
-              "
-              @dragstart.prevent
-              style="width:40px;height:40px;cursor: move;"
-              src="http://pic.mcatk.com/charlot-pictures/EpheSlideNote.png"
-            />
-          </div>
+          
         </div>
       </template>
     </el-popover>
@@ -195,7 +174,7 @@
 <script>
 export default {
   props: [
-    "note",
+    "operation",
     "global",
     "track",
     "displayAreaTime",
@@ -250,14 +229,14 @@ export default {
           callback(new Error("不能大于轨道结束时机"));
         } else if (
           parseInt(value) <
-          parseInt(this.myNote.tempNote.timing) + 150
+          parseInt(this.myOperation.tempOperation.timing) + 150
         ) {
           console.log(
-            parseInt(value) < parseInt(this.myNote.tempNote.timing) + 150
+            parseInt(value) < parseInt(this.myOperation.tempOperation.timing) + 150
           );
           console.log(
             parseInt(value),
-            parseInt(this.myNote.tempNote.timing) + 100
+            parseInt(this.myOperation.tempOperation.timing) + 100
           );
           callback(new Error("长键长度不得小于100"));
         } else {
@@ -266,7 +245,7 @@ export default {
       }
     };
     return {
-      myNote: this.note,
+      myOperation: this.operation,
       myTrack: this.track,
       myGlobal: this.global,
       canMove: false,
@@ -288,11 +267,11 @@ export default {
     };
   },
   created() {
-    if (this.myNote.noteType != 1) {
-      this.myNote.endTiming = parseInt(this.myNote.timing) + 150;
+    if (this.myOperation.operationType != 1) {
+      this.myOperation.endTiming = parseInt(this.myOperation.timing) + 150;
     }
 
-    this.myNote.tempNote = JSON.parse(JSON.stringify(this.myNote));
+    this.myOperation.tempOperation = JSON.parse(JSON.stringify(this.myOperation));
   },
   watch: {
     "global.mouseUp"() {
@@ -307,43 +286,43 @@ export default {
           this.global.currentTime > this.track.startTiming &&
           this.global.currentTime < this.track.endTiming
         ) {
-          if (this.myNote.noteType == 1) {
-            this.duration = this.note.endTiming - this.note.timing;
-            this.myNote.timing = Math.ceil(
+          if (this.myOperation.operationType == 1) {
+            this.duration = this.operation.endTiming - this.operation.timing;
+            this.myOperation.timing = Math.ceil(
               this.global.currentTime - this.passedTime
             );
-            this.myNote.endTiming = this.myNote.timing + this.duration;
+            this.myOperation.endTiming = this.myOperation.timing + this.duration;
             this.$forceUpdate();
           } else {
-            this.myNote.timing = Math.ceil(this.global.currentTime);
+            this.myOperation.timing = Math.ceil(this.global.currentTime);
           }
         }
       } else if (this.leftMove) {
         if (
           this.global.currentTime > this.track.startTiming &&
-          this.global.currentTime < this.myNote.endTiming - 150
+          this.global.currentTime < this.myOperation.endTiming - 150
         )
-          this.myNote.timing = Math.ceil(this.global.currentTime);
+          this.myOperation.timing = Math.ceil(this.global.currentTime);
       } else if (this.rightMove) {
         if (
-          this.global.currentTime > this.myNote.timing + 150 &&
+          this.global.currentTime > this.myOperation.timing + 150 &&
           this.global.currentTime < this.track.endTiming
         )
-          this.myNote.endTiming = Math.ceil(this.global.currentTime);
+          this.myOperation.endTiming = Math.ceil(this.global.currentTime);
       }
     },
   },
   computed: {
     left() {
       return (
-        (this.myNote.timing / this.displayAreaTime) *
+        (this.myOperation.timing / this.displayAreaTime) *
         (this.global.documentWidth - 300)
       );
     },
   },
   methods: {
     selfClicked() {
-      if (this.currentNoteType == 3) this.deleteSelf();
+      if (this.currentOperationType == 3) this.deleteSelf();
       else if (this.enableEdit) this.startEdit();
     },
     updateTrack() {
@@ -351,36 +330,36 @@ export default {
       this.myGlobal.reCalculateChartMaker = !this.myGlobal
         .reCalculateChartMaker;
     },
-    longNoteCanMove() {
+    longOperationCanMove() {
       setTimeout(() => {
-        this.passedTime = Math.ceil(this.global.currentTime - this.note.timing);
+        this.passedTime = Math.ceil(this.global.currentTime - this.operation.timing);
       }, 10);
       this.canMove = true;
       this.zIndex = 10;
     },
     startEdit() {
       this.edit = true;
-      this.myNote.tempNote = JSON.parse(JSON.stringify(this.myNote));
-      this.myNote.tempNote.key = this.myNote.tempNote.key.toUpperCase();
-      if (this.myNote.noteType != 1) {
-        this.myNote.endTiming = parseInt(this.myNote.timing) + 150;
+      this.myOperation.tempOperation = JSON.parse(JSON.stringify(this.myOperation));
+      this.myOperation.tempOperation.key = this.myOperation.tempOperation.key.toUpperCase();
+      if (this.myOperation.operationType != 1) {
+        this.myOperation.endTiming = parseInt(this.myOperation.timing) + 150;
       }
     },
-    saveNote() {
+    saveOperation() {
       this.$refs["form"].validate((valid) => {
         if (valid) {
-          for (var key in this.myNote.tempNote) {
-            if (key != "tempNote") this.myNote[key] = this.myNote.tempNote[key];
+          for (var key in this.myOperation.tempOperation) {
+            if (key != "tempOperation") this.myOperation[key] = this.myOperation.tempOperation[key];
           }
-          this.myNote.key = this.myNote.key.toUpperCase();
+          this.myOperation.key = this.myOperation.key.toUpperCase();
           this.edit = false;
-          this.myNote.tempNote = {};
+          this.myOperation.tempOperation = {};
         } else {
           return false;
         }
       });
     },
-    deleteNote() {
+    deleteOperation() {
       this.$confirm("您确定删除该音符?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -395,7 +374,7 @@ export default {
       });
     },
     deleteSelf() {
-      this.myTrack.notes.splice(this.myNote.index, 1);
+      this.myTrack.operations.splice(this.myOperation.index, 1);
       this.updateTrack();
     },
   },
