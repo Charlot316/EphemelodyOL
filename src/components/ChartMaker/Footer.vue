@@ -63,7 +63,7 @@
                       ? !this.showNoRemain
                         ? track.notes.length == 0
                           ? false
-                          : track.notes[track.notes.length - 1] == 1
+                          : track.notes[track.notes.length - 1].noteType == 1
                           ? global.currentTime >
                             track.notes[track.notes.length - 1].endTiming
                             ? false
@@ -130,7 +130,7 @@
                     ? !this.showNoRemain
                       ? track.notes.length == 0
                         ? false
-                        : track.notes[track.notes.length - 1] == 1
+                        : track.notes[track.notes.length - 1].noteType == 1
                         ? global.currentTime >
                           track.notes[track.notes.length - 1].endTiming
                           ? false
