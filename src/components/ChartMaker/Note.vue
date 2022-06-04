@@ -62,6 +62,7 @@
         </el-form-item>
         <el-form-item label="按键" label-width="80px" prop="key">
           <el-input
+            :disabled="track.type == 1"
             @keydown.enter="saveNote"
             v-model="myNote.tempNote.key"
             style="width:130px"

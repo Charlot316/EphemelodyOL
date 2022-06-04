@@ -30,12 +30,40 @@
           @click="showNoRemain = !showNoRemain"
           >{{ showNoRemain ? "关闭无音符轨道" : "显示无音符轨道" }}</el-button
         >
+        <el-button
+          type="text"
+          :class="currentNoteType == 0 ? 'show-button-selected' : 'show-button'"
+          style="margin-right:5px;"
+          @click="currentNoteType = 0"
+          >双击短键</el-button
+        >
+        <el-button
+          type="text"
+          :class="currentNoteType == 1 ? 'show-button-selected' : 'show-button'"
+          style="margin-right:5px;"
+          @click="currentNoteType = 1"
+          >双击长键</el-button
+        >
+        <el-button
+          type="text"
+          :class="currentNoteType == 2 ? 'show-button-selected' : 'show-button'"
+          style="margin-right:5px;"
+          @click="currentNoteType = 2"
+          >双击滑键</el-button
+        >
+        <el-button
+          type="text"
+          :class="currentNoteType == 3 ? 'delete-button' : 'show-button'"
+          style="margin-right:5px;"
+          @click="currentNoteType = 3"
+          >单击删除</el-button
+        >
       </div>
       <div class="footer-header-right">
         <el-slider
+          v-model="displayAreaTime"
           :min="1000"
           :max="chart.songLength"
-          v-model="displayAreaTime"
         ></el-slider>
       </div>
     </div>
@@ -160,6 +188,7 @@
                       : false
                     : false
                 "
+                :currentNoteType="currentNoteType"
                 :id="'trackCardPanel' + track.index"
                 :chart="chart"
                 :track="track"
@@ -230,10 +259,14 @@ export default {
       showReal: true,
       showFake: true,
       showNoRemain: true,
+      currentNoteType: 0,
     };
   },
   mounted() {
     this.audio = document.getElementById("audioSong");
+    setTimeout(() => {
+      this.displayAreaTime = 10000;
+    }, 100);
   },
   watch: {
     "global.mouseUp"() {
@@ -332,6 +365,7 @@ export default {
         var last = track.notes.length;
         for (var j = track.notes.length - 1; j >= 0; j--) {
           track.notes[j].judged = false;
+          track.notes[j].index = j;
           if (
             track.notes[j].timing + this.global.lostTime >
             this.global.currentTime
@@ -412,5 +446,14 @@ export default {
 .footer-header-right {
   padding-right: 25px;
   width: 200px;
+}
+.show-button-selected {
+  color: #67c23a;
+}
+.show-button-selected:hover {
+  color: #95d475;
+}
+.show-button-selected:active {
+  color: #529b2e;
 }
 </style>

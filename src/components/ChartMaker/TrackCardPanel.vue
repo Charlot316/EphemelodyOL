@@ -9,6 +9,7 @@
   >
     <div class="track-tracks">
       <div
+        @dblclick="newNote"
         :class="track.edit ? 'note-track-edit' : 'note-track'"
         :style="{
           width:
@@ -19,6 +20,7 @@
       >
         <div v-for="note in track.notes" :key="note">
           <note
+            :currentNoteType="currentNoteType"
             :track="track"
             :global="global"
             :note="note"
@@ -93,8 +95,50 @@
 import "animate.css";
 import Note from "./Note";
 export default {
-  props: ["track", "global", "chart", "scrollLeft", "displayAreaTime"],
+  props: [
+    "track",
+    "global",
+    "chart",
+    "scrollLeft",
+    "displayAreaTime",
+    "currentNoteType",
+  ],
   components: { Note },
+  data() {
+    return {
+      myTrack: this.track,
+      myGlobal: this.global,
+    };
+  },
+  methods: {
+    updateTrack() {
+      this.myGlobal.reCalculateTrack = !this.myGlobal.reCalculateTrack;
+      this.myGlobal.reCalculateChartMaker = !this.myGlobal
+        .reCalculateChartMaker;
+    },
+    newNote() {
+      if (this.currentNoteType != 3) {
+        if (
+          this.global.currentTime > this.track.startTiming &&
+          this.global.currentTime < this.track.endTiming
+        ) {
+          this.myTrack.notes.push({
+            noteType: this.currentNoteType,
+            key: this.track.key,
+            timing: this.global.currentTime,
+            endTiming: this.global.currentTime + 150,
+          });
+          this.updateTrack();
+        } else {
+          this.$notify({
+            title: "错误",
+            message: "请在轨道范围内添加音符",
+            type: "error",
+          });
+        }
+      }
+    },
+  },
 };
 </script>
 
