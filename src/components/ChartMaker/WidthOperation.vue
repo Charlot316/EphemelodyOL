@@ -72,32 +72,32 @@
             <i class="el-icon-question" />
           </el-tooltip>
         </el-form-item>
-        <el-form-item label="开始坐标" label-width="80px" prop="startX">
+        <el-form-item label="开始宽度" label-width="80px" prop="startWidth">
           <el-input
             @keydown.enter="saveOperation"
-            v-model="myOperation.tempOperation.startX"
+            v-model="myOperation.tempOperation.startWidth"
             style="width:130px"
           />
           <el-tooltip
             class="item"
             effect="dark"
-            content="设置操作开始的横坐标，请输入一个小数，代表轨道横坐标占画面全宽的比例"
+            content="设置操作开始的宽度，请输入一个小数，代表轨道宽度占画面全宽的比例"
             placement="top-start"
             style="margin-left:10px;"
           >
             <i class="el-icon-question" />
           </el-tooltip>
         </el-form-item>
-        <el-form-item label="结束坐标" label-width="80px" prop="endX">
+        <el-form-item label="结束宽度" label-width="80px" prop="endWidth">
           <el-input
             @keydown.enter="saveOperation"
-            v-model="myOperation.tempOperation.endX"
+            v-model="myOperation.tempOperation.endWidth"
             style="width:130px"
           />
           <el-tooltip
             class="item"
             effect="dark"
-            content="设置操作结束的横坐标，请输入一个小数，代表轨道横坐标占画面全宽的比例"
+            content="设置操作结束的宽度，请输入一个小数，代表轨道宽度占画面全宽的比例"
             placement="top-start"
             style="margin-left:10px;"
           >
@@ -113,7 +113,7 @@
               userSelect: 'none',
               height: '40px',
               position: 'absolute',
-              background: 'rgb(70, 70, 70)',
+              background: 'rgb(184, 223, 107)',
               cursor: 'move',
               width:
                 ((myOperation.endTime - myOperation.startTime) /
@@ -131,8 +131,8 @@
             }"
           >
             <div style="text-align:center;color:rgb(255,255,255)">
-              从{{ myOperation.startX.toFixed(2) }}到{{
-                myOperation.endX.toFixed(2)
+              从{{ myOperation.startWidth.toFixed(2) }}到{{
+                myOperation.endWidth.toFixed(2)
               }}
             </div>
           </div>
@@ -199,7 +199,7 @@ export default {
     "chart",
   ],
   data() {
-    var checkStartX = (rule, value, callback) => {
+    var checkStartWidth = (rule, value, callback) => {
       if (!value) {
         rule;
         return callback(new Error("起始坐标不能为空"));
@@ -210,7 +210,7 @@ export default {
         callback();
       }
     };
-    var checkEndX = (rule, value, callback) => {
+    var checkEndWidth = (rule, value, callback) => {
       if (!value) {
         rule;
         return callback(new Error("终止坐标不能为空"));
@@ -254,7 +254,7 @@ export default {
           callback(new Error("不能小于轨道开始时机"));
         } else if (value > this.myTrack.endTime) {
           callback(new Error("不能大于轨道结束时机"));
-        }  else {
+        } else {
           callback();
         }
       }
@@ -274,8 +274,12 @@ export default {
           { required: true, validator: checkStartTime, trigger: "blur" },
         ],
         endTime: [{ required: true, validator: checkEndTime, trigger: "blur" }],
-        startX: [{ required: true, validator: checkStartX, trigger: "blur" }],
-        endX: [{ required: true, validator: checkEndX, trigger: "blur" }],
+        startWidth: [
+          { required: true, validator: checkStartWidth, trigger: "blur" },
+        ],
+        endWidth: [
+          { required: true, validator: checkEndWidth, trigger: "blur" },
+        ],
       },
     };
   },
@@ -316,12 +320,11 @@ export default {
           this.updateTemp();
         }
       } else if (this.rightMove) {
-        delta =
-          (20 * this.displayAreaTime) / (this.global.documentWidth - 300);
-      
+        delta = (20 * this.displayAreaTime) / (this.global.documentWidth - 300);
+
         currentTime = this.global.currentTime;
-        if (this.roundTime(currentTime-delta)> this.myOperation.startTime) {
-          this.myOperation.endTime = this.roundTime(currentTime-delta);
+        if (this.roundTime(currentTime - delta) > this.myOperation.startTime) {
+          this.myOperation.endTime = this.roundTime(currentTime - delta);
           this.updateTemp();
         }
       }
@@ -406,7 +409,7 @@ export default {
       });
     },
     deleteSelf() {
-      this.myTrack.moveOperations.splice(this.myOperation.index, 1);
+      this.myTrack.changeWidthOperations.splice(this.myOperation.index, 1);
       this.updateTrack();
     },
   },

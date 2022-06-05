@@ -113,7 +113,7 @@
               userSelect: 'none',
               height: '40px',
               position: 'absolute',
-              background: 'rgb(70, 70, 70)',
+              background: 'rgb(83, 195, 208)',
               cursor: 'move',
               width:
                 ((myOperation.endTime - myOperation.startTime) /
