@@ -140,8 +140,7 @@
                     ')',
                 }"
                 >█</span
-              >到
-              <span
+              >到<span
                 :style="{
                   color:
                     'rgb(' +
