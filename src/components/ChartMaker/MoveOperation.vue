@@ -5,6 +5,7 @@
       position: 'absolute',
       top: '20px',
       left: left + 'px',
+      zIndex: operation.zIndex,
     }"
   >
     <el-popover
@@ -139,9 +140,7 @@
                 }"
               >
                 <div style="text-align:center;color:rgb(255,255,255)">
-                  {{ myOperation.startX }}→{{
-                    myOperation.endX
-                  }}
+                  {{ myOperation.startX }}→{{ myOperation.endX }}
                 </div>
               </div>
               <div
@@ -267,6 +266,7 @@ export default {
     };
   },
   created() {
+    this.myOperation.zIndex = 1;
     this.myOperation.tempOperation = JSON.parse(
       JSON.stringify(this.myOperation)
     );
@@ -337,6 +337,11 @@ export default {
     selfClicked() {
       if (this.currentNoteType == 3) this.deleteSelf();
       else if (this.enableEdit) this.startEdit();
+      if (this.global.currentOperation) {
+        this.myGlobal.currentOperation.zIndex = 0;
+        this.myGlobal.currentOperation = this.operation;
+        this.myOperation.zIndex = 10;
+      }
     },
     updateTrack() {
       this.myGlobal.reCalculateTrack = !this.myGlobal.reCalculateTrack;

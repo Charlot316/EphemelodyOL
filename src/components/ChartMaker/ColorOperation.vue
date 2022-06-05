@@ -5,6 +5,7 @@
       position: 'absolute',
       top: '20px',
       left: left + 'px',
+      zIndex: operation.zIndex,
     }"
   >
     <el-popover
@@ -137,80 +138,80 @@
               </div>
             </template>
             <div>
-            <div
-              @mousedown="longOperationCanMove"
-              :style="{
-                userSelect: 'none',
-                height: '40px',
-                position: 'absolute',
-                background: 'rgb(70, 70, 70)',
-                cursor: 'move',
-                width:
-                  ((myOperation.endTime - myOperation.startTime) /
-                    displayAreaTime) *
-                    (global.documentWidth - 300) +
-                  'px',
-                left: '-1px',
-                top: '1px',
-                overflow: 'hidden',
-                lineHeight: '40px',
-                fontSize: '20px',
-                border: '0px solid #fff',
-                borderLeftWidth: '1px',
-                borderRightWidth: '1px',
-              }"
-            >
-              <div style="text-align:center;color:rgb(255,255,255)">
-                <span
-                  :style="{
-                    color:
-                      'rgb(' +
-                      myOperation.startR +
-                      ',' +
-                      myOperation.startG +
-                      ',' +
-                      myOperation.startB +
-                      ')',
-                  }"
-                  >█</span
-                >→<span
-                  :style="{
-                    color:
-                      'rgb(' +
-                      myOperation.endR +
-                      ',' +
-                      myOperation.endG +
-                      ',' +
-                      myOperation.endB +
-                      ')',
-                  }"
-                  >█</span
-                >
+              <div
+                @mousedown="longOperationCanMove"
+                :style="{
+                  userSelect: 'none',
+                  height: '40px',
+                  position: 'absolute',
+                  background: 'rgb(70, 70, 70)',
+                  cursor: 'move',
+                  width:
+                    ((myOperation.endTime - myOperation.startTime) /
+                      displayAreaTime) *
+                      (global.documentWidth - 300) +
+                    'px',
+                  left: '-1px',
+                  top: '1px',
+                  overflow: 'hidden',
+                  lineHeight: '40px',
+                  fontSize: '20px',
+                  border: '0px solid #fff',
+                  borderLeftWidth: '1px',
+                  borderRightWidth: '1px',
+                }"
+              >
+                <div style="text-align:center;color:rgb(255,255,255)">
+                  <span
+                    :style="{
+                      color:
+                        'rgb(' +
+                        myOperation.startR +
+                        ',' +
+                        myOperation.startG +
+                        ',' +
+                        myOperation.startB +
+                        ')',
+                    }"
+                    >█</span
+                  >→<span
+                    :style="{
+                      color:
+                        'rgb(' +
+                        myOperation.endR +
+                        ',' +
+                        myOperation.endG +
+                        ',' +
+                        myOperation.endB +
+                        ')',
+                    }"
+                    >█</span
+                  >
+                </div>
               </div>
-            </div>
-            <div
-              @mousedown="leftMove = true"
-              style="width:1px;height:40px;position:absolute;left:0px;top:0;cursor:w-resize;"
-              src="http://pic.mcatk.com/charlot-pictures/EpheHitOperation.png"
-            />
-            <div
-              @mousedown="rightMove = true"
-              :style="{
-                userSelect: 'none',
-                height: '40px',
-                width: '1px',
-                position: 'absolute',
-                cursor: 'e-resize',
-                left:
-                  ((myOperation.endTime - myOperation.startTime) /
-                    displayAreaTime) *
-                    (global.documentWidth - 300) +
-                  1 +
-                  'px',
-                top: '0px',
-              }"
-              src="http://pic.mcatk.com/charlot-pictures/EpheHitOperation.png"
-            />
+              <div
+                @mousedown="leftMove = true"
+                style="width:1px;height:40px;position:absolute;left:0px;top:0;cursor:w-resize;"
+                src="http://pic.mcatk.com/charlot-pictures/EpheHitOperation.png"
+              />
+              <div
+                @mousedown="rightMove = true"
+                :style="{
+                  userSelect: 'none',
+                  height: '40px',
+                  width: '1px',
+                  position: 'absolute',
+                  cursor: 'e-resize',
+                  left:
+                    ((myOperation.endTime - myOperation.startTime) /
+                      displayAreaTime) *
+                      (global.documentWidth - 300) +
+                    1 +
+                    'px',
+                  top: '0px',
+                }"
+                src="http://pic.mcatk.com/charlot-pictures/EpheHitOperation.png"
+              />
             </div>
           </el-tooltip>
         </div>
@@ -289,6 +290,7 @@ export default {
     };
   },
   created() {
+    this.myOperation.zIndex = 0;
     this.myOperation.tempOperation = JSON.parse(
       JSON.stringify(this.myOperation)
     );
@@ -391,6 +393,11 @@ export default {
     selfClicked() {
       if (this.currentNoteType == 3) this.deleteSelf();
       else if (this.enableEdit) this.startEdit();
+      if (this.global.currentOperation) {
+        this.myGlobal.currentOperation.zIndex = 0;
+        this.myGlobal.currentOperation = this.operation;
+        this.myOperation.zIndex = 10;
+      }
     },
     updateTrack() {
       this.myGlobal.reCalculateTrack = !this.myGlobal.reCalculateTrack;
