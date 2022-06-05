@@ -841,7 +841,7 @@ var chart = {
                 trackId: 2,
                 type: 1,
                 startTime: 14801,
-                endTime: 14081,
+                endTime: 14801,
                 startX: 0.6,
                 endX: 2,
                 endWidth: 0,
