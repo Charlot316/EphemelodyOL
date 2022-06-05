@@ -5,7 +5,6 @@
       position: 'absolute',
       top: '20px',
       left: left + 'px',
-      zIndex: zIndex,
     }"
   >
     <el-popover
@@ -157,51 +156,29 @@
               >
             </div>
           </div>
-          <el-tooltip
-            class="item"
-            effect="dark"
-            :content="myOperation.startTime"
-            placement="top-start"
-          >
-            <i
-              class="el-icon-arrow-left"
-              @mousedown="
-                leftMove = true;
-                zIndex = 10;
-              "
-              style="width:40px;height:40px;position:absolute;left:-40px;top:0;cursor:w-resize;color:rgb(255,255,255);
-              font-size:40px"
-              src="http://pic.mcatk.com/charlot-pictures/EpheHitOperation.png"
-          /></el-tooltip>
-          <el-tooltip
-            class="item"
-            effect="dark"
-            :content="myOperation.endTime"
-            placement="top-start"
-          >
-            <i
-              class="el-icon-arrow-right"
-              @mousedown="
-                rightMove = true;
-                zIndex = 10;
-              "
-              :style="{
-                userSelect: 'none',
-                height: '40px',
-                width: '40px',
-                position: 'absolute',
-                cursor: 'e-resize',
-                left:
-                  ((myOperation.endTime - myOperation.startTime) /
-                    displayAreaTime) *
-                    (global.documentWidth - 300) +
-                  'px',
-                top: '0px',
-                color: 'rgb(255,255,255)',
-                fontSize: '40px',
-              }"
-              src="http://pic.mcatk.com/charlot-pictures/EpheHitOperation.png"
-          /></el-tooltip>
+          <i
+            @mousedown="leftMove = true"
+            style="width:1px;height:40px;position:absolute;left:0px;top:0;cursor:w-resize;"
+            src="http://pic.mcatk.com/charlot-pictures/EpheHitOperation.png"
+          />
+          <i
+            @mousedown="rightMove = true"
+            :style="{
+              userSelect: 'none',
+              height: '40px',
+              width: '1px',
+              position: 'absolute',
+              cursor: 'e-resize',
+              left:
+                ((myOperation.endTime - myOperation.startTime) /
+                  displayAreaTime) *
+                  (global.documentWidth - 300) +
+                1 +
+                'px',
+              top: '0px',
+            }"
+            src="http://pic.mcatk.com/charlot-pictures/EpheHitOperation.png"
+          />
         </div>
       </template>
     </el-popover>
@@ -266,7 +243,6 @@ export default {
       leftMove: false,
       rightMove: false,
       passedTime: 0,
-      zIndex: 0,
       edit: false,
       rules: {
         startTime: [
@@ -304,7 +280,6 @@ export default {
       this.canMove = false;
       this.leftMove = false;
       this.rightMove = false;
-      this.zIndex = 0;
     },
     "global.mouseMove"() {
       if (this.canMove) {
@@ -323,19 +298,15 @@ export default {
           this.updateTemp();
         }
       } else if (this.leftMove) {
-        var delta =
-          (20 * this.displayAreaTime) / (this.global.documentWidth - 300);
         var currentTime = this.global.currentTime;
-        if (this.roundTime(currentTime + delta) < this.myOperation.endTime) {
-          this.myOperation.startTime = this.roundTime(currentTime + delta);
+        if (this.roundTime(currentTime) <= this.myOperation.endTime) {
+          this.myOperation.startTime = this.roundTime(currentTime);
           this.updateTemp();
         }
       } else if (this.rightMove) {
-        delta = (20 * this.displayAreaTime) / (this.global.documentWidth - 300);
-
         currentTime = this.global.currentTime;
-        if (this.roundTime(currentTime - delta) > this.myOperation.startTime) {
-          this.myOperation.endTime = this.roundTime(currentTime - delta);
+        if (this.roundTime(currentTime) >= this.myOperation.startTime) {
+          this.myOperation.endTime = this.roundTime(currentTime);
           this.updateTemp();
         }
       }
@@ -383,7 +354,6 @@ export default {
         );
       }, 10);
       this.canMove = true;
-      this.zIndex = 10;
     },
     startEdit() {
       this.edit = true;
