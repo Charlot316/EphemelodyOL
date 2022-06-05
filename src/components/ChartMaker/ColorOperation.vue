@@ -103,82 +103,108 @@
         </el-form-item>
       </el-form>
       <template #reference>
-        <div>
-          <div
-            @mousedown="longOperationCanMove"
-            :style="{
-              userSelect: 'none',
-              height: '40px',
-              position: 'absolute',
-              background: 'rgb(70, 70, 70)',
-              cursor: 'move',
-              width:
-                ((myOperation.endTime - myOperation.startTime) /
-                  displayAreaTime) *
-                  (global.documentWidth - 300) +
-                'px',
-              left: '-1px',
-              top: '1px',
-              overflow: 'hidden',
-              lineHeight: '40px',
-              fontSize: '20px',
-              border: '0px solid #fff',
-              borderLeftWidth: '1px',
-              borderRightWidth: '1px',
-            }"
-          >
-            <div style="text-align:center;color:rgb(255,255,255)">
-              从<span
-                :style="{
-                  color:
-                    'rgb(' +
-                    myOperation.startR +
-                    ',' +
-                    myOperation.startG +
-                    ',' +
-                    myOperation.startB +
-                    ')',
-                }"
-                >█</span
-              >到<span
-                :style="{
-                  color:
-                    'rgb(' +
-                    myOperation.endR +
-                    ',' +
-                    myOperation.endG +
-                    ',' +
-                    myOperation.endB +
-                    ')',
-                }"
-                >█</span
-              >
+        <el-tooltip
+          class="item"
+          effect="dark"
+          :content="
+            myOperation.startTime +
+              '→' +
+              myOperation.endTime +
+              '\n' +
+              'rgb(' +
+              myOperation.startR +
+              ',' +
+              myOperation.startG +
+              ',' +
+              myOperation.startB +
+              ')→' +
+              'rgb(' +
+              myOperation.endR +
+              ',' +
+              myOperation.endG +
+              ',' +
+              myOperation.endB +
+              ')'
+          "
+          placement="top-start"
+        >
+          <div>
+            <div
+              @mousedown="longOperationCanMove"
+              :style="{
+                userSelect: 'none',
+                height: '40px',
+                position: 'absolute',
+                background: 'rgb(70, 70, 70)',
+                cursor: 'move',
+                width:
+                  ((myOperation.endTime - myOperation.startTime) /
+                    displayAreaTime) *
+                    (global.documentWidth - 300) +
+                  'px',
+                left: '-1px',
+                top: '1px',
+                overflow: 'hidden',
+                lineHeight: '40px',
+                fontSize: '20px',
+                border: '0px solid #fff',
+                borderLeftWidth: '1px',
+                borderRightWidth: '1px',
+              }"
+            >
+              <div style="text-align:center;color:rgb(255,255,255)">
+                <span
+                  :style="{
+                    color:
+                      'rgb(' +
+                      myOperation.startR +
+                      ',' +
+                      myOperation.startG +
+                      ',' +
+                      myOperation.startB +
+                      ')',
+                  }"
+                  >█</span
+                >→<span
+                  :style="{
+                    color:
+                      'rgb(' +
+                      myOperation.endR +
+                      ',' +
+                      myOperation.endG +
+                      ',' +
+                      myOperation.endB +
+                      ')',
+                  }"
+                  >█</span
+                >
+              </div>
             </div>
+            <i
+              @mousedown="leftMove = true"
+              style="width:1px;height:40px;position:absolute;left:0px;top:0;cursor:w-resize;"
+              src="http://pic.mcatk.com/charlot-pictures/EpheHitOperation.png"
+            />
+            <i
+              @mousedown="rightMove = true"
+              :style="{
+                userSelect: 'none',
+                height: '40px',
+                width: '1px',
+                position: 'absolute',
+                cursor: 'e-resize',
+                left:
+                  ((myOperation.endTime - myOperation.startTime) /
+                    displayAreaTime) *
+                    (global.documentWidth - 300) +
+                  1 +
+                  'px',
+                top: '0px',
+              }"
+              src="http://pic.mcatk.com/charlot-pictures/EpheHitOperation.png"
+            />
           </div>
-          <i
-            @mousedown="leftMove = true"
-            style="width:1px;height:40px;position:absolute;left:0px;top:0;cursor:w-resize;"
-            src="http://pic.mcatk.com/charlot-pictures/EpheHitOperation.png"
-          />
-          <i
-            @mousedown="rightMove = true"
-            :style="{
-              userSelect: 'none',
-              height: '40px',
-              width: '1px',
-              position: 'absolute',
-              cursor: 'e-resize',
-              left:
-                ((myOperation.endTime - myOperation.startTime) /
-                  displayAreaTime) *
-                  (global.documentWidth - 300) +
-                1 +
-                'px',
-              top: '0px',
-            }"
-            src="http://pic.mcatk.com/charlot-pictures/EpheHitOperation.png"
-          />
-        </div>
+        </el-tooltip>
       </template>
     </el-popover>
   </div>

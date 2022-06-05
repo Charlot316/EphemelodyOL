@@ -105,6 +105,20 @@
         </el-form-item>
       </el-form>
       <template #reference>
+        <el-tooltip
+          class="item"
+          effect="dark"
+          :content="
+            myOperation.startTime +
+              '→' +
+              myOperation.endTime +
+              '\n' +
+              myOperation.startWidth +
+              '→' +
+              myOperation.endWidth
+          "
+          placement="top-start"
+        >
         <div>
           <div
             @mousedown="longOperationCanMove"
@@ -130,7 +144,7 @@
             }"
           >
             <div style="text-align:center;color:rgb(255,255,255)">
-              从{{ myOperation.startWidth.toFixed(2) }}到{{
+              {{ myOperation.startWidth.toFixed(2) }}→{{
                 myOperation.endWidth.toFixed(2)
               }}
             </div>
@@ -159,6 +173,7 @@
             src="http://pic.mcatk.com/charlot-pictures/EpheHitOperation.png"
           />
         </div>
+        </el-tooltip>
       </template>
     </el-popover>
   </div>
