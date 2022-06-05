@@ -268,7 +268,7 @@
               <i class="el-icon-question" />
             </el-tooltip>
           </el-form-item>
-          <el-form-item label="首拍偏移">
+          <el-form-item label="首拍偏移(单位：ms）">
             <el-input-number
               v-model="chart.firstBeatDelay"
               :min="0"
@@ -277,14 +277,58 @@
             <el-tooltip
               class="item"
               effect="dark"
-              content="第一拍的偏移，在一拍间隔部分可以顺带测量"
+              content="第一拍的偏移，在一拍间隔部分可以顺带测量，你也可以选择使用音频软件观察声波自行填写"
               placement="top-start"
               style="margin-left:10px;"
             >
               <i class="el-icon-question" />
             </el-tooltip>
           </el-form-item>
-          <el-form-item label="一拍间隔">
+          <el-form-item label="末拍偏移(单位：ms）">
+            <el-input-number
+              v-model="chart.lastBeatDelay"
+              :min="0"
+              :max="chart.songLength"
+            />
+            <el-tooltip
+              class="item"
+              effect="dark"
+              content="最后一拍的偏移，你可以填写好精确的第一拍和最后一拍的偏移和节拍数，然后直接计算出一拍间隔"
+              placement="top-start"
+              style="margin-left:10px;"
+            >
+              <i class="el-icon-question" />
+            </el-tooltip>
+          </el-form-item>
+          <el-form-item label="节拍数">
+            <el-input-number
+              v-model="chart.beatsCount"
+              :min="0"
+              :max="chart.songLength"
+            />
+            <el-tooltip
+              class="item"
+              effect="dark"
+              content="用以计算一拍间隔,注意填写的是拍与拍的间隔数（线段），而不是节奏点数（端点）"
+              placement="top-start"
+              style="margin-left:10px;"
+            >
+              <i class="el-icon-question" />
+            </el-tooltip>
+            <div style="margin-top:15px;">
+              <el-tooltip
+                class="item"
+                effect="dark"
+                content="计算公式为（末拍偏移-首拍偏移）/节拍数"
+                placement="top-start"
+              >
+                <el-button @click="ManualCalculateBPM">
+                  精确计算一拍间隔
+                </el-button>
+              </el-tooltip>
+            </div>
+          </el-form-item>
+          <el-form-item label="一拍间隔(单位：ms）">
             <el-input-number
               v-model="chart.BPM"
               :min="0"
@@ -293,7 +337,7 @@
             <el-tooltip
               class="item"
               effect="dark"
-              content="一个节拍的长度，拖动音符时，音符将会依附到最近的1/16节拍时间点上，轻点下方按钮即可大致估算出一拍的长度"
+              content="一个节拍的长度，拖动音符时，音符将会依附到最近的1/16节拍时间点上，轻点下方按钮即可大致估算出一拍的长度，但仍然建议自己精确填写首拍和末拍偏移计算"
               placement="top-start"
               style="margin-left:10px;"
             >
@@ -302,7 +346,7 @@
             <br />
             <div style="margin-top:15px;">
               <el-button @mousedown="calculateBPM">{{
-                !BPMStart ? "开始测量" : "请在节奏点处按下"
+                !BPMStart ? "粗略估算一拍间隔" : "请在节奏点处按下"
               }}</el-button>
               <el-button @click="endBPM" v-if="BPMStart">
                 结束或重新测量
@@ -647,6 +691,23 @@ export default {
   },
 
   methods: {
+    ManualCalculateBPM() {
+      if (
+        this.chart.beatsCount &&
+        this.chart.lastBeatDelay &&
+        this.chart.firstBeatDelay
+      ) {
+        this.chart.BPM =
+          (this.chart.lastBeatDelay - this.chart.firstBeatDelay) /
+          this.chart.beatsCount;
+      } else {
+        this.$notify({
+          title: "错误",
+          message: "请先输入首拍、末拍偏移和节拍数",
+          type: "error",
+        });
+      }
+    },
     calculateBPM() {
       if (this.BPMStart == false) {
         this.global.currentTime = 0;
