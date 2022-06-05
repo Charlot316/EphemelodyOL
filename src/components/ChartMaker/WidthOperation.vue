@@ -4,7 +4,7 @@
     :style="{
       position: 'absolute',
       top: '20px',
-      left: left - 20 + 'px',
+      left: left + 'px',
       zIndex: zIndex,
     }"
   >
@@ -40,74 +40,64 @@
         ref="form"
         @submit.prevent="saveOperation"
       >
-        <el-form-item label="音符类别" label-width="80px" prop="operationType">
-          <el-radio-group
-            v-model="myOperation.tempOperation.operationType"
-            size="small"
-            style="width:130px;line-height: 20px;"
-          >
-            <el-radio :label="0">短键</el-radio>
-            <el-radio :label="1">长键</el-radio>
-            <el-radio :label="2">滑键</el-radio>
-          </el-radio-group>
+        <el-form-item label="开始时机" label-width="80px" prop="startTime">
+          <el-input
+            @keydown.enter="saveOperation"
+            v-model="myOperation.tempOperation.startTime"
+            style="width:130px"
+          />
           <el-tooltip
             class="item"
             effect="dark"
-            content="设置音符的类别"
+            content="设置操作的起始时机"
             placement="top-start"
             style="margin-left:10px;"
           >
             <i class="el-icon-question" />
           </el-tooltip>
         </el-form-item>
-        <el-form-item label="按键" label-width="80px" prop="key">
+        <el-form-item label="结束时机" label-width="80px" prop="endTime">
           <el-input
-            :disabled="track.type == 1"
             @keydown.enter="saveOperation"
-            v-model="myOperation.tempOperation.key"
+            v-model="myOperation.tempOperation.endTime"
             style="width:130px"
           />
           <el-tooltip
             class="item"
             effect="dark"
-            content="设置音符的按键，当轨道是实轨时，音符按键必须等于实轨按键，虚轨的音符需要每一个设置自己的按键。请输入单个字母，不区分大小写"
+            content="设置操作的结束时机"
             placement="top-start"
             style="margin-left:10px;"
           >
             <i class="el-icon-question" />
           </el-tooltip>
         </el-form-item>
-        <el-form-item label="时机" label-width="80px" prop="timing">
+        <el-form-item label="开始坐标" label-width="80px" prop="startX">
           <el-input
             @keydown.enter="saveOperation"
-            v-model="myOperation.tempOperation.timing"
+            v-model="myOperation.tempOperation.startX"
             style="width:130px"
           />
           <el-tooltip
             class="item"
             effect="dark"
-            content="设置音符的时机"
+            content="设置操作开始的横坐标，请输入一个小数，代表轨道横坐标占画面全宽的比例"
             placement="top-start"
             style="margin-left:10px;"
           >
             <i class="el-icon-question" />
           </el-tooltip>
         </el-form-item>
-        <el-form-item
-          label="结束时机"
-          label-width="80px"
-          prop="endTiming"
-          v-if="myOperation.tempOperation.operationType == 1"
-        >
+        <el-form-item label="结束坐标" label-width="80px" prop="endX">
           <el-input
             @keydown.enter="saveOperation"
-            v-model="myOperation.tempOperation.endTiming"
+            v-model="myOperation.tempOperation.endX"
             style="width:130px"
           />
           <el-tooltip
             class="item"
             effect="dark"
-            content="设置长键的结束时机"
+            content="设置操作结束的横坐标，请输入一个小数，代表轨道横坐标占画面全宽的比例"
             placement="top-start"
             style="margin-left:10px;"
           >
@@ -117,45 +107,59 @@
       </el-form>
       <template #reference>
         <div>
-          <div v-if="operation.operationType == 0">
-            <el-image
-              @dragstart.prevent
-              @mousedown="
-                canMove = true;
-                zIndex = 10;
-              "
-              style="width:40px;height:40px;user-select:none;cursor: move;"
-              src="http://pic.mcatk.com/charlot-pictures/EpheHitOperation.png"
-            />
+          <div
+            @mousedown="longOperationCanMove"
+            :style="{
+              userSelect: 'none',
+              height: '40px',
+              position: 'absolute',
+              background: 'rgb(70, 70, 70)',
+              cursor: 'move',
+              width:
+                ((myOperation.endTime - myOperation.startTime) /
+                  this.displayAreaTime) *
+                  (this.global.documentWidth - 300) +
+                'px',
+              left: '-1px',
+              top: '1px',
+              overflow: 'hidden',
+              lineHeight: '40px',
+              fontSize: '20px',
+              border: '0px solid #fff',
+              borderLeftWidth: '1px',
+              borderRightWidth: '1px',
+            }"
+          >
+            <div style="text-align:center;color:rgb(255,255,255)">
+              从{{ myOperation.startX.toFixed(2) }}到{{
+                myOperation.endX.toFixed(2)
+              }}
+            </div>
           </div>
-          <div v-if="operation.operationType == 1">
-            <div
-              @mousedown="longOperationCanMove"
-              :style="{
-                userSelect: 'none',
-                height: '38px',
-                position: 'absolute',
-                background: 'rgb(22, 22, 14)',
-                cursor: 'move',
-                width:
-                  ((myOperation.endTiming - myOperation.timing) / this.displayAreaTime) *
-                    (this.global.documentWidth - 300) +
-                  'px',
-                left: '20px',
-                top: '1px',
-              }"
-            ></div>
-            <el-image
-              @dragstart.prevent
+          <el-tooltip
+            class="item"
+            effect="dark"
+            :content="myOperation.startTime"
+            placement="top-start"
+          >
+            <i
+              class="el-icon-arrow-left"
               @mousedown="
                 leftMove = true;
                 zIndex = 10;
               "
-              style="width:40px;height:40px;position:absolute;left:0;top:0;user-select: none;cursor:w-resize;"
+              style="width:40px;height:40px;position:absolute;left:-40px;top:0;cursor:w-resize;color:rgb(255,255,255);
+              font-size:40px"
               src="http://pic.mcatk.com/charlot-pictures/EpheHitOperation.png"
-            />
-            <el-image
-              @dragstart.prevent
+          /></el-tooltip>
+          <el-tooltip
+            class="item"
+            effect="dark"
+            :content="myOperation.endTime"
+            placement="top-start"
+          >
+            <i
+              class="el-icon-arrow-right"
               @mousedown="
                 rightMove = true;
                 zIndex = 10;
@@ -167,25 +171,16 @@
                 position: 'absolute',
                 cursor: 'e-resize',
                 left:
-                  ((myOperation.endTiming - myOperation.timing) / this.displayAreaTime) *
+                  ((myOperation.endTime - myOperation.startTime) /
+                    this.displayAreaTime) *
                     (this.global.documentWidth - 300) +
                   'px',
                 top: '0px',
+                color: 'rgb(255,255,255)',
+                fontSize: '40px',
               }"
               src="http://pic.mcatk.com/charlot-pictures/EpheHitOperation.png"
-            />
-          </div>
-          <div v-if="operation.operationType == 2">
-            <el-image
-              @mousedown="
-                canMove = true;
-                zIndex = 10;
-              "
-              @dragstart.prevent
-              style="width:40px;height:40px;cursor: move;"
-              src="http://pic.mcatk.com/charlot-pictures/EpheSlideOperation.png"
-            />
-          </div>
+          /></el-tooltip>
         </div>
       </template>
     </el-popover>
@@ -199,21 +194,31 @@ export default {
     "global",
     "track",
     "displayAreaTime",
-    "currentOperationType",
+    "currentNoteType",
     "enableEdit",
     "chart",
   ],
   data() {
-    var checkKey = (rule, value, callback) => {
+    var checkStartX = (rule, value, callback) => {
       if (!value) {
         rule;
-        return callback(new Error("按键不能为空"));
+        return callback(new Error("起始坐标不能为空"));
       }
-      var reg = /^[A-Za-z]$/;
-      if (reg.test(value)) {
-        callback();
+      if (parseFloat(value).toString() == "NaN") {
+        callback(new Error("请输入数字值"));
       } else {
-        callback(new Error("按键必须是单个字母"));
+        callback();
+      }
+    };
+    var checkEndX = (rule, value, callback) => {
+      if (!value) {
+        rule;
+        return callback(new Error("终止坐标不能为空"));
+      }
+      if (parseFloat(value).toString() == "NaN") {
+        callback(new Error("请输入数字值"));
+      } else {
+        callback();
       }
     };
     var checkStartTime = (rule, value, callback) => {
@@ -228,7 +233,7 @@ export default {
           callback(new Error("不能小于0"));
         } else if (value < this.myTrack.startTiming) {
           callback(new Error("不能小于轨道开始时机"));
-        } else if (value > this.myTrack.endTiming) {
+        } else if (value > this.myTrack.endTime) {
           callback(new Error("不能大于轨道结束时机"));
         } else {
           callback();
@@ -247,14 +252,9 @@ export default {
           callback(new Error("不能小于0"));
         } else if (value < this.myTrack.startTiming) {
           callback(new Error("不能小于轨道开始时机"));
-        } else if (value > this.myTrack.endTiming) {
+        } else if (value > this.myTrack.endTime) {
           callback(new Error("不能大于轨道结束时机"));
-        } else if (
-          parseInt(value) <
-          parseInt(this.myOperation.tempOperation.timing) + 100
-        ) {
-          callback(new Error("长键长度不得小于100"));
-        } else {
+        }  else {
           callback();
         }
       }
@@ -270,23 +270,19 @@ export default {
       zIndex: 0,
       edit: false,
       rules: {
-        type: [{ required: true, message: "请选择音符类别", trigger: "blur" }],
-        key: [{ required: true, validator: checkKey, trigger: "blur" }],
-        timing: [
+        startTime: [
           { required: true, validator: checkStartTime, trigger: "blur" },
         ],
-        endTiming: [
-          { required: true, validator: checkEndTime, trigger: "blur" },
-        ],
+        endTime: [{ required: true, validator: checkEndTime, trigger: "blur" }],
+        startX: [{ required: true, validator: checkStartX, trigger: "blur" }],
+        endX: [{ required: true, validator: checkEndX, trigger: "blur" }],
       },
     };
   },
   created() {
-    if (this.myOperation.operationType != 1) {
-      this.myOperation.endTiming = parseInt(this.myOperation.timing) + 150;
-    }
-
-    this.myOperation.tempOperation = JSON.parse(JSON.stringify(this.myOperation));
+    this.myOperation.tempOperation = JSON.parse(
+      JSON.stringify(this.myOperation)
+    );
   },
   watch: {
     "global.mouseUp"() {
@@ -301,38 +297,31 @@ export default {
           this.global.currentTime > this.track.startTiming &&
           this.global.currentTime < this.track.endTiming
         ) {
-          if (this.myOperation.operationType == 1) {
-            this.duration = this.operation.endTiming - this.operation.timing;
+          this.duration = this.operation.endTime - this.operation.startTime;
 
-            this.myOperation.timing = this.roundTime(
-              this.global.currentTime - this.passedTime
-            );
-          } else {
-            this.myOperation.timing = this.roundTime(this.global.currentTime);
-          }
+          this.myOperation.startTime = this.roundTime(
+            this.global.currentTime - this.passedTime
+          );
 
-          if (this.myOperation.operationType != 1) {
-            this.myOperation.endTiming = parseInt(this.myOperation.timing) + 150;
-          } else {
-            this.myOperation.endTiming = this.myOperation.timing + this.duration;
-          }
+          this.myOperation.endTime = this.myOperation.startTime + this.duration;
+
           this.updateTemp();
         }
       } else if (this.leftMove) {
-        if (
-          this.global.currentTime > this.track.startTiming &&
-          this.global.currentTime < this.myOperation.endTiming - 150
-        ) {
-          this.myOperation.timing = this.roundTime(this.global.currentTime);
-
+        var delta =
+          (20 * this.displayAreaTime) / (this.global.documentWidth - 300);
+        var currentTime = this.global.currentTime;
+        if (this.roundTime(currentTime + delta) < this.myOperation.endTime) {
+          this.myOperation.startTime = this.roundTime(currentTime + delta);
           this.updateTemp();
         }
       } else if (this.rightMove) {
-        if (
-          this.global.currentTime > this.myOperation.timing + 150 &&
-          this.global.currentTime < this.track.endTiming
-        ) {
-          this.myOperation.endTiming = this.roundTime(this.global.currentTime);
+        delta =
+          (20 * this.displayAreaTime) / (this.global.documentWidth - 300);
+      
+        currentTime = this.global.currentTime;
+        if (this.roundTime(currentTime-delta)> this.myOperation.startTime) {
+          this.myOperation.endTime = this.roundTime(currentTime-delta);
           this.updateTemp();
         }
       }
@@ -341,7 +330,7 @@ export default {
   computed: {
     left() {
       return (
-        (this.myOperation.timing / this.displayAreaTime) *
+        (this.myOperation.startTime / this.displayAreaTime) *
         (this.global.documentWidth - 300)
       );
     },
@@ -360,11 +349,12 @@ export default {
       return Math.ceil(timing);
     },
     updateTemp() {
-      this.myOperation.tempOperation = JSON.parse(JSON.stringify(this.myOperation));
-      this.myOperation.tempOperation.key = this.myOperation.tempOperation.key.toUpperCase();
+      this.myOperation.tempOperation = JSON.parse(
+        JSON.stringify(this.myOperation)
+      );
     },
     selfClicked() {
-      if (this.currentOperationType == 3) this.deleteSelf();
+      if (this.currentNoteType == 3) this.deleteSelf();
       else if (this.enableEdit) this.startEdit();
     },
     updateTrack() {
@@ -374,26 +364,26 @@ export default {
     },
     longOperationCanMove() {
       setTimeout(() => {
-        this.passedTime = Math.ceil(this.global.currentTime - this.operation.timing);
+        this.passedTime = Math.ceil(
+          this.global.currentTime - this.operation.startTime
+        );
       }, 10);
       this.canMove = true;
       this.zIndex = 10;
     },
     startEdit() {
       this.edit = true;
-      this.myOperation.tempOperation = JSON.parse(JSON.stringify(this.myOperation));
-      this.myOperation.tempOperation.key = this.myOperation.tempOperation.key.toUpperCase();
-      if (this.myOperation.operationType != 1) {
-        this.myOperation.endTiming = parseInt(this.myOperation.timing) + 150;
-      }
+      this.myOperation.tempOperation = JSON.parse(
+        JSON.stringify(this.myOperation)
+      );
     },
     saveOperation() {
       this.$refs["form"].validate((valid) => {
         if (valid) {
           for (var key in this.myOperation.tempOperation) {
-            if (key != "tempOperation") this.myOperation[key] = this.myOperation.tempOperation[key];
+            if (key != "tempOperation")
+              this.myOperation[key] = this.myOperation.tempOperation[key];
           }
-          this.myOperation.key = this.myOperation.key.toUpperCase();
           this.edit = false;
           this.myOperation.tempOperation = {};
         } else {
@@ -402,7 +392,7 @@ export default {
       });
     },
     deleteOperation() {
-      this.$confirm("您确定删除该音符?", "提示", {
+      this.$confirm("您确定删除该操作?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning",
@@ -416,7 +406,7 @@ export default {
       });
     },
     deleteSelf() {
-      this.myTrack.operations.splice(this.myOperation.index, 1);
+      this.myTrack.moveOperations.splice(this.myOperation.index, 1);
       this.updateTrack();
     },
   },

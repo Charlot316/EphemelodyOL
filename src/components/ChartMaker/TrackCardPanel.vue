@@ -37,6 +37,7 @@
       >
         <div v-if="track.edit">
           <div
+            @dblclick="newMoveOperations"
             class="positionX-track"
             :style="{
               width:
@@ -132,11 +133,33 @@ export default {
       this.myGlobal.reCalculateChartMaker = !this.myGlobal
         .reCalculateChartMaker;
     },
+    newMoveOperations() {
+      if (this.currentNoteType != 3) {
+        if (
+          this.global.currentTime > this.track.startTiming &&
+          this.global.currentTime < this.track.endTiming - 150
+        ) {
+          this.myTrack.moveOperations.push({
+            startX: this.track.tempPositionX,
+            endX: this.track.tempPositionX,
+            startTime: this.global.currentTime,
+            endTime: this.global.currentTime + 150,
+          });
+          this.updateTrack();
+        } else {
+          this.$notify({
+            title: "错误",
+            message: "请在轨道范围内添加操作",
+            type: "error",
+          });
+        }
+      }
+    },
     newNote() {
       if (this.currentNoteType != 3) {
         if (
           this.global.currentTime > this.track.startTiming &&
-          this.global.currentTime < this.track.endTiming
+          this.global.currentTime < this.track.endTiming - 150
         ) {
           this.myTrack.notes.push({
             noteType: this.currentNoteType,
