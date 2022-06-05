@@ -72,32 +72,30 @@
             <i class="el-icon-question" />
           </el-tooltip>
         </el-form-item>
-        <el-form-item label="开始宽度" label-width="80px" prop="startWidth">
-          <el-input
-            @keydown.enter="saveOperation"
-            v-model="myOperation.tempOperation.startWidth"
-            style="width:130px"
+        <el-form-item label="开始颜色" label-width="80px" prop="startColor">
+          <el-color-picker
+            v-model="myOperation.tempOperation.startColor"
+            color-format="rgb"
           />
           <el-tooltip
             class="item"
             effect="dark"
-            content="设置操作开始的宽度，请输入一个小数，代表轨道宽度占画面全宽的比例"
+            content="设置操作的开始颜色"
             placement="top-start"
             style="margin-left:10px;"
           >
             <i class="el-icon-question" />
           </el-tooltip>
         </el-form-item>
-        <el-form-item label="结束宽度" label-width="80px" prop="endWidth">
-          <el-input
-            @keydown.enter="saveOperation"
-            v-model="myOperation.tempOperation.endWidth"
-            style="width:130px"
+        <el-form-item label="结束颜色" label-width="80px" prop="endColor">
+          <el-color-picker
+            v-model="myOperation.tempOperation.endColor"
+            color-format="rgb"
           />
           <el-tooltip
             class="item"
             effect="dark"
-            content="设置操作结束的宽度，请输入一个小数，代表轨道宽度占画面全宽的比例"
+            content="设置操作的结束颜色"
             placement="top-start"
             style="margin-left:10px;"
           >
@@ -131,9 +129,32 @@
             }"
           >
             <div style="text-align:center;color:rgb(255,255,255)">
-              从{{ myOperation.startWidth.toFixed(2) }}到{{
-                myOperation.endWidth.toFixed(2)
-              }}
+              从<span
+                :style="{
+                  color:
+                    'rgb(' +
+                    myOperation.startR +
+                    ',' +
+                    myOperation.startG +
+                    ',' +
+                    myOperation.startB +
+                    ')',
+                }"
+                >█▉</span
+              >到
+              <span
+                :style="{
+                  color:
+                    'rgb(' +
+                    myOperation.endR +
+                    ',' +
+                    myOperation.endG +
+                    ',' +
+                    myOperation.endB +
+                    ')',
+                }"
+                >█▉</span
+              >
             </div>
           </div>
           <el-tooltip
@@ -199,28 +220,6 @@ export default {
     "chart",
   ],
   data() {
-    var checkStartWidth = (rule, value, callback) => {
-      if (!value) {
-        rule;
-        return callback(new Error("起始坐标不能为空"));
-      }
-      if (parseFloat(value).toString() == "NaN") {
-        callback(new Error("请输入数字值"));
-      } else {
-        callback();
-      }
-    };
-    var checkEndWidth = (rule, value, callback) => {
-      if (!value) {
-        rule;
-        return callback(new Error("终止坐标不能为空"));
-      }
-      if (parseFloat(value).toString() == "NaN") {
-        callback(new Error("请输入数字值"));
-      } else {
-        callback();
-      }
-    };
     var checkStartTime = (rule, value, callback) => {
       if (value != 0 && !value) {
         rule;
@@ -274,12 +273,8 @@ export default {
           { required: true, validator: checkStartTime, trigger: "blur" },
         ],
         endTime: [{ required: true, validator: checkEndTime, trigger: "blur" }],
-        startWidth: [
-          { required: true, validator: checkStartWidth, trigger: "blur" },
-        ],
-        endWidth: [
-          { required: true, validator: checkEndWidth, trigger: "blur" },
-        ],
+        startColor: [{ required: true, message: "请选择颜色", rigger: "blur" }],
+        endColor: [{ required: true, message: "请选择颜色", trigger: "blur" }],
       },
     };
   },
@@ -287,6 +282,22 @@ export default {
     this.myOperation.tempOperation = JSON.parse(
       JSON.stringify(this.myOperation)
     );
+    this.myOperation.tempOperation.startColor =
+      "rgb(" +
+      this.myOperation.tempOperation.startR +
+      "," +
+      this.myOperation.tempOperation.startG +
+      "," +
+      this.myOperation.tempOperation.startB +
+      ")";
+    this.myOperation.tempOperation.endColor =
+      "rgb(" +
+      this.myOperation.tempOperation.endR +
+      "," +
+      this.myOperation.tempOperation.endG +
+      "," +
+      this.myOperation.tempOperation.endB +
+      ")";
   },
   watch: {
     "global.mouseUp"() {
@@ -379,10 +390,38 @@ export default {
       this.myOperation.tempOperation = JSON.parse(
         JSON.stringify(this.myOperation)
       );
+      this.myOperation.tempOperation.startColor =
+        "rgb(" +
+        this.myOperation.tempOperation.startR +
+        "," +
+        this.myOperation.tempOperation.startG +
+        "," +
+        this.myOperation.tempOperation.startB +
+        ")";
+      this.myOperation.tempOperation.endColor =
+        "rgb(" +
+        this.myOperation.tempOperation.endR +
+        "," +
+        this.myOperation.tempOperation.endG +
+        "," +
+        this.myOperation.tempOperation.endB +
+        ")";
     },
     saveOperation() {
       this.$refs["form"].validate((valid) => {
         if (valid) {
+          var rgb = this.myOperation.tempOperation.startColor
+            .substring(4, this.myOperation.tempOperation.startColor.length - 1)
+            .split(",");
+          this.myOperation.tempOperation.startR = rgb[0];
+          this.myOperation.tempOperation.startG = rgb[1];
+          this.myOperation.tempOperation.startB = rgb[2];
+          rgb = this.myOperation.tempOperation.endColor
+            .substring(4, this.myOperation.tempOperation.endColor.length - 1)
+            .split(",");
+          this.myOperation.tempOperation.endR = rgb[0];
+          this.myOperation.tempOperation.endG = rgb[1];
+          this.myOperation.tempOperation.endB = rgb[2];
           for (var key in this.myOperation.tempOperation) {
             if (key != "tempOperation")
               this.myOperation[key] = this.myOperation.tempOperation[key];
@@ -409,7 +448,7 @@ export default {
       });
     },
     deleteSelf() {
-      this.myTrack.changeWidthOperations.splice(this.myOperation.index, 1);
+      this.myTrack.changeColorOperations.splice(this.myOperation.index, 1);
       this.updateTrack();
     },
   },

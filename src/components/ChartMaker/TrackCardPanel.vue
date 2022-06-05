@@ -59,6 +59,7 @@
             </div>
           </div>
           <div
+            @dblclick="newWidthOperations"
             class="width-track"
             :style="{
               width:
@@ -83,6 +84,7 @@
             </div>
           </div>
           <div
+            @dblclick="newColorOperations"
             class="color-track"
             :style="{
               width:
@@ -90,7 +92,22 @@
                   (global.documentWidth - 300) +
                 'px',
             }"
-          ></div>
+          >
+            <div
+              v-for="operation in track.changeColorOperations"
+              :key="operation"
+            >
+              <ColorOperation
+                :currentNoteType="currentNoteType"
+                :track="track"
+                :global="global"
+                :chart="chart"
+                :operation="operation"
+                :enableEdit="enableEdit"
+                :displayAreaTime="displayAreaTime"
+              />
+            </div>
+          </div>
         </div>
       </transition>
     </div>
@@ -126,6 +143,7 @@ import "animate.css";
 import Note from "./Note";
 import MoveOperation from "./MoveOperation";
 import WidthOperation from "./WidthOperation";
+import ColorOperation from "./ColorOperation";
 export default {
   props: [
     "track",
@@ -136,7 +154,7 @@ export default {
     "currentNoteType",
     "enableEdit",
   ],
-  components: { Note, MoveOperation, WidthOperation },
+  components: { Note, MoveOperation, WidthOperation, ColorOperation },
   data() {
     return {
       myTrack: this.track,
@@ -158,6 +176,54 @@ export default {
           this.myTrack.moveOperations.push({
             startX: this.track.tempPositionX,
             endX: this.track.tempPositionX,
+            startTime: this.global.currentTime,
+            endTime: this.global.currentTime + 150,
+          });
+          this.updateTrack();
+        } else {
+          this.$notify({
+            title: "错误",
+            message: "请在轨道范围内添加操作",
+            type: "error",
+          });
+        }
+      }
+    },
+    newWidthOperations() {
+      if (this.currentNoteType != 3) {
+        if (
+          this.global.currentTime > this.track.startTiming &&
+          this.global.currentTime < this.track.endTiming - 150
+        ) {
+          this.myTrack.changeWidthOperations.push({
+            startWidth: this.track.tempWidth,
+            endWidth: this.track.tempWidth,
+            startTime: this.global.currentTime,
+            endTime: this.global.currentTime + 150,
+          });
+          this.updateTrack();
+        } else {
+          this.$notify({
+            title: "错误",
+            message: "请在轨道范围内添加操作",
+            type: "error",
+          });
+        }
+      }
+    },
+    newColorOperations() {
+      if (this.currentNoteType != 3) {
+        if (
+          this.global.currentTime > this.track.startTiming &&
+          this.global.currentTime < this.track.endTiming - 150
+        ) {
+          this.myTrack.changeColorOperations.push({
+            startR:this.track.tempR,
+            startG:this.track.tempG,
+            startB:this.track.tempB,
+            endR:this.track.tempR,
+            endG:this.track.tempG,
+            endB:this.track.tempB,
             startTime: this.global.currentTime,
             endTime: this.global.currentTime + 150,
           });

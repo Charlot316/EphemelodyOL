@@ -234,7 +234,7 @@
         @closed="globalSetting = false"
         width="650px"
       >
-        <el-form :model="form" label-width="120px" style="padding: 20px;">
+        <el-form :model="form" label-width="200px" style="padding: 20px;">
           <el-form-item label="音量">
             <el-input-number
               v-model="volume"
@@ -268,7 +268,7 @@
               <i class="el-icon-question" />
             </el-tooltip>
           </el-form-item>
-          <el-form-item label="首拍偏移(单位：ms）">
+          <el-form-item label="首拍偏移(单位:ms)">
             <el-input-number
               v-model="chart.firstBeatDelay"
               :min="0"
@@ -284,7 +284,7 @@
               <i class="el-icon-question" />
             </el-tooltip>
           </el-form-item>
-          <el-form-item label="末拍偏移(单位：ms）">
+          <el-form-item label="末拍偏移(单位:ms)">
             <el-input-number
               v-model="chart.lastBeatDelay"
               :min="0"
@@ -309,7 +309,7 @@
             <el-tooltip
               class="item"
               effect="dark"
-              content="用以计算一拍间隔,注意填写的是拍与拍的间隔数（线段），而不是节奏点数（端点）"
+              content="用以计算一拍间隔,注意填写的是拍与拍的间隔数（线段)，而不是节奏点数（端点)"
               placement="top-start"
               style="margin-left:10px;"
             >
@@ -319,7 +319,7 @@
               <el-tooltip
                 class="item"
                 effect="dark"
-                content="计算公式为（末拍偏移-首拍偏移）/节拍数"
+                content="计算公式为（末拍偏移-首拍偏移)/节拍数"
                 placement="top-start"
               >
                 <el-button @click="ManualCalculateBPM">
@@ -328,7 +328,7 @@
               </el-tooltip>
             </div>
           </el-form-item>
-          <el-form-item label="一拍间隔(单位：ms）">
+          <el-form-item label="一拍间隔(单位:ms)">
             <el-input-number
               v-model="chart.BPM"
               :min="0"
