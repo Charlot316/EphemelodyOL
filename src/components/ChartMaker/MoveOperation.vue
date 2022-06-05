@@ -105,21 +105,15 @@
         </el-form-item>
       </el-form>
       <template #reference>
-        <el-tooltip
-          class="item"
-          effect="dark"
-          :content="
-            myOperation.startTime +
-              '→' +
-              myOperation.endTime +
-              '\n' +
-              myOperation.startX +
-              '→' +
-              myOperation.endX
-          "
-          placement="top-start"
-        >
-          <div>
+        <div>
+          <el-tooltip class="item" effect="dark" placement="top-start">
+            <template #content>
+              <div style="text-align:center">
+                {{ myOperation.startTime + "→" + myOperation.endTime }}
+                <br />
+                {{ myOperation.startX + "→" + myOperation.endX }}
+              </div>
+            </template>
             <div
               @mousedown="longOperationCanMove"
               :style="{
@@ -172,8 +166,8 @@
               }"
               src="http://pic.mcatk.com/charlot-pictures/EpheHitOperation.png"
             />
-          </div>
-        </el-tooltip>
+          </el-tooltip>
+        </div>
       </template>
     </el-popover>
   </div>
