@@ -117,24 +117,37 @@
       </el-form>
       <template #reference>
         <div>
-          
-        
+          <div v-if="operation.operationType == 0">
+            <el-image
+              @dragstart.prevent
+              @mousedown="
+                canMove = true;
+                zIndex = 10;
+              "
+              style="width:40px;height:40px;user-select:none;cursor: move;"
+              src="http://pic.mcatk.com/charlot-pictures/EpheHitOperation.png"
+            />
+          </div>
+          <div v-if="operation.operationType == 1">
             <div
               @mousedown="longOperationCanMove"
               :style="{
                 userSelect: 'none',
                 height: '38px',
                 position: 'absolute',
-                background: 'rgb(22, 22, 14)',
+                background: 'rgb(255, 165, 165)',
                 cursor: 'move',
                 width:
-                  ((myOperation.endTiming - myOperation.timing) / this.displayAreaTime) *
+                  ((myOperation.endTiming - myOperation.startTime) / this.displayAreaTime) *
                     (this.global.documentWidth - 300) +
                   'px',
                 left: '20px',
                 top: '1px',
+                overflow:'hidden',
               }"
-            ></div>
+            >
+           
+            </div>
             <el-image
               @dragstart.prevent
               @mousedown="
@@ -164,7 +177,18 @@
               }"
               src="http://pic.mcatk.com/charlot-pictures/EpheHitOperation.png"
             />
-          
+          </div>
+          <div v-if="operation.operationType == 2">
+            <el-image
+              @mousedown="
+                canMove = true;
+                zIndex = 10;
+              "
+              @dragstart.prevent
+              style="width:40px;height:40px;cursor: move;"
+              src="http://pic.mcatk.com/charlot-pictures/EpheSlideOperation.png"
+            />
+          </div>
         </div>
       </template>
     </el-popover>
@@ -178,8 +202,9 @@ export default {
     "global",
     "track",
     "displayAreaTime",
-    "currentNoteType",
+    "currentOperationType",
     "enableEdit",
+    "chart",
   ],
   data() {
     var checkKey = (rule, value, callback) => {
@@ -229,15 +254,8 @@ export default {
           callback(new Error("不能大于轨道结束时机"));
         } else if (
           parseInt(value) <
-          parseInt(this.myOperation.tempOperation.timing) + 150
+          parseInt(this.myOperation.tempOperation.startTime) + 100
         ) {
-          console.log(
-            parseInt(value) < parseInt(this.myOperation.tempOperation.timing) + 150
-          );
-          console.log(
-            parseInt(value),
-            parseInt(this.myOperation.tempOperation.timing) + 100
-          );
           callback(new Error("长键长度不得小于100"));
         } else {
           callback();
@@ -257,7 +275,7 @@ export default {
       rules: {
         type: [{ required: true, message: "请选择音符类别", trigger: "blur" }],
         key: [{ required: true, validator: checkKey, trigger: "blur" }],
-        timing: [
+        startTime: [
           { required: true, validator: checkStartTime, trigger: "blur" },
         ],
         endTiming: [
@@ -288,27 +306,38 @@ export default {
         ) {
           if (this.myOperation.operationType == 1) {
             this.duration = this.operation.endTiming - this.operation.timing;
-            this.myOperation.timing = Math.ceil(
+
+            this.myOperation.timing = this.roundTime(
               this.global.currentTime - this.passedTime
             );
-            this.myOperation.endTiming = this.myOperation.timing + this.duration;
-            this.$forceUpdate();
           } else {
-            this.myOperation.timing = Math.ceil(this.global.currentTime);
+            this.myOperation.timing = this.roundTime(this.global.currentTime);
           }
+
+          if (this.myOperation.operationType != 1) {
+            this.myOperation.endTiming = parseInt(this.myOperation.timing) + 150;
+          } else {
+            this.myOperation.endTiming = this.myOperation.timing + this.duration;
+          }
+          this.updateTemp();
         }
       } else if (this.leftMove) {
         if (
           this.global.currentTime > this.track.startTiming &&
           this.global.currentTime < this.myOperation.endTiming - 150
-        )
-          this.myOperation.timing = Math.ceil(this.global.currentTime);
+        ) {
+          this.myOperation.timing = this.roundTime(this.global.currentTime);
+
+          this.updateTemp();
+        }
       } else if (this.rightMove) {
         if (
           this.global.currentTime > this.myOperation.timing + 150 &&
           this.global.currentTime < this.track.endTiming
-        )
-          this.myOperation.endTiming = Math.ceil(this.global.currentTime);
+        ) {
+          this.myOperation.endTiming = this.roundTime(this.global.currentTime);
+          this.updateTemp();
+        }
       }
     },
   },
@@ -321,6 +350,22 @@ export default {
     },
   },
   methods: {
+    roundTime(timing) {
+      if (this.global.beatLine) {
+        var bpm = this.chart.BPM / 16;
+        var mod = (timing - this.chart.firstBeatDelay) % bpm;
+        if (mod > bpm / 2) {
+          timing += bpm - mod;
+        } else {
+          timing -= mod;
+        }
+      }
+      return Math.ceil(timing);
+    },
+    updateTemp() {
+      this.myOperation.tempOperation = JSON.parse(JSON.stringify(this.myOperation));
+      this.myOperation.tempOperation.key = this.myOperation.tempOperation.key.toUpperCase();
+    },
     selfClicked() {
       if (this.currentOperationType == 3) this.deleteSelf();
       else if (this.enableEdit) this.startEdit();

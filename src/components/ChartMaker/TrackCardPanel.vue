@@ -44,7 +44,19 @@
                   (global.documentWidth - 300) +
                 'px',
             }"
-          ></div>
+          >
+            <div v-for="operation in track.moveOperations" :key="operation">
+              <MoveOperation
+                :currentNoteType="currentNoteType"
+                :track="track"
+                :global="global"
+                :chart="chart"
+                :operation="operation"
+                :enableEdit="enableEdit"
+                :displayAreaTime="displayAreaTime"
+              />
+            </div>
+          </div>
           <div
             class="width-track"
             :style="{
@@ -96,6 +108,7 @@
 <script>
 import "animate.css";
 import Note from "./Note";
+import MoveOperation from "./MoveOperation";
 export default {
   props: [
     "track",
@@ -106,7 +119,7 @@ export default {
     "currentNoteType",
     "enableEdit",
   ],
-  components: { Note },
+  components: { Note, MoveOperation },
   data() {
     return {
       myTrack: this.track,
@@ -191,7 +204,6 @@ export default {
   width: 100%;
 }
 .positionX-track {
-  background: rgb(255, 165, 165);
   position: absolute;
   left: 0px;
   top: 160px;
