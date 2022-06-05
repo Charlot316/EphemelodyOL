@@ -78,11 +78,17 @@
         >
       </div>
       <div class="footer-header-right">
-        <el-slider
-          v-model="displayAreaTime"
-          :min="1000"
-          :max="chart.songLength"
-        ></el-slider>
+        <el-tooltip
+          class="item"
+          effect="dark"
+          content="设置时间轴部分显示的时间范围"
+          placement="top-start"
+          ><el-slider
+            v-model="displayAreaTime"
+            :min="1000"
+            :max="chart.songLength"
+          ></el-slider>
+        </el-tooltip>
       </div>
     </div>
     <div v-if="chart.tracks">
@@ -296,7 +302,7 @@ export default {
       myGlobal: this.global,
       scrollLeft: 0,
       scrollTop: 0,
-      displayAreaTime: 10000,
+      displayAreaTime: 3000,
       audio: null,
       indicatorLeft: 0,
       rightScrollElement: null,
@@ -312,7 +318,7 @@ export default {
   mounted() {
     this.audio = document.getElementById("audioSong");
     setTimeout(() => {
-      this.displayAreaTime = 10000;
+      this.displayAreaTime = 1000;
     }, 100);
   },
   watch: {
