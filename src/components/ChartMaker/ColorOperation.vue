@@ -136,6 +136,7 @@
                 >
               </div>
             </template>
+            <div>
             <div
               @mousedown="longOperationCanMove"
               :style="{
@@ -187,12 +188,12 @@
                 >
               </div>
             </div>
-            <i
+            <div
               @mousedown="leftMove = true"
               style="width:1px;height:40px;position:absolute;left:0px;top:0;cursor:w-resize;"
               src="http://pic.mcatk.com/charlot-pictures/EpheHitOperation.png"
             />
-            <i
+            <div
               @mousedown="rightMove = true"
               :style="{
                 userSelect: 'none',
@@ -210,6 +211,7 @@
               }"
               src="http://pic.mcatk.com/charlot-pictures/EpheHitOperation.png"
             />
+            </div>
           </el-tooltip>
         </div>
       </template>
