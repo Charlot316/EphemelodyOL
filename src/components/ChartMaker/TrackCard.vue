@@ -382,7 +382,6 @@ export default {
           this.myTrack.edit = false;
           if (this.myTrack.isNew) this.$emit("editStatus", true);
           this.myTrack.isNew = false;
-          this.myTrack.tempTrack = {};
         } else {
           return false;
         }

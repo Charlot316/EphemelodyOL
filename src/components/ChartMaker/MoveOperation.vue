@@ -365,7 +365,6 @@ export default {
               this.myOperation[key] = this.myOperation.tempOperation[key];
           }
           this.edit = false;
-          this.myOperation.tempOperation = {};
         } else {
           return false;
         }

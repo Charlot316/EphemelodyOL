@@ -395,7 +395,6 @@ export default {
           }
           this.myNote.key = this.myNote.key.toUpperCase();
           this.edit = false;
-          this.myNote.tempNote = {};
         } else {
           return false;
         }
