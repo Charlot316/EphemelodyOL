@@ -117,8 +117,8 @@
               cursor: 'move',
               width:
                 ((myOperation.endTime - myOperation.startTime) /
-                  this.displayAreaTime) *
-                  (this.global.documentWidth - 300) +
+                  displayAreaTime) *
+                  (global.documentWidth - 300) +
                 'px',
               left: '-1px',
               top: '1px',
@@ -172,8 +172,8 @@
                 cursor: 'e-resize',
                 left:
                   ((myOperation.endTime - myOperation.startTime) /
-                    this.displayAreaTime) *
-                    (this.global.documentWidth - 300) +
+                    displayAreaTime) *
+                    (global.documentWidth - 300) +
                   'px',
                 top: '0px',
                 color: 'rgb(255,255,255)',

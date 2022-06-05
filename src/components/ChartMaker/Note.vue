@@ -138,8 +138,8 @@
                 background: 'rgb(22, 22, 14)',
                 cursor: 'move',
                 width:
-                  ((myNote.endTiming - myNote.timing) / this.displayAreaTime) *
-                    (this.global.documentWidth - 300) +
+                  ((myNote.endTiming - myNote.timing) / displayAreaTime) *
+                    (global.documentWidth - 300) +
                   'px',
                 left: '20px',
                 top: '1px',
@@ -167,8 +167,8 @@
                 position: 'absolute',
                 cursor: 'e-resize',
                 left:
-                  ((myNote.endTiming - myNote.timing) / this.displayAreaTime) *
-                    (this.global.documentWidth - 300) +
+                  ((myNote.endTiming - myNote.timing) / displayAreaTime) *
+                    (global.documentWidth - 300) +
                   'px',
                 top: '0px',
               }"
