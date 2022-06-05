@@ -653,6 +653,10 @@ export default {
           document
             .querySelector("#trackCard" + track.index)
             .scrollIntoView(true);
+          document
+            .querySelector("#trackCardPanel" + track.index)
+            .scrollIntoView(true);
+
           setTimeout(() => {
             that.currentSelectTrack.edit = true;
           }, 10);

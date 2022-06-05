@@ -23,6 +23,13 @@
           type="text"
           class="show-button"
           style="margin-right:5px;"
+          @click="showCurrent = !showCurrent"
+          >{{ showCurrent ? "显示全部轨道" : "显示当前轨道" }}</el-button
+        >
+        <el-button
+          type="text"
+          class="show-button"
+          style="margin-right:5px;"
           @click="autoScroll = !autoScroll"
           >{{ autoScroll ? "关闭滚动" : "开启滚动" }}</el-button
         >
@@ -111,35 +118,11 @@
               >
                 <TrackCard
                   v-if="
-                    track.showInTimeline
-                      ? !this.showNoRemain
+                    (track.showInTimeline
+                      ? !showNoRemain
                         ? track.notes.length == 0
                           ? false
-                          : track.notes[track.notes.length - 1].noteType == 1
-                          ? global.currentTime >
-                              track.notes[track.notes.length - 1].endTiming +
-                                1000 ||
-                            global.currentTime < track.notes[0].timing - 1000
-                            ? false
-                            : track.type == 1
-                            ? this.showReal
-                              ? true
-                              : false
-                            : this.showFake
-                            ? true
-                            : false
-                          : global.currentTime >
-                              track.notes[track.notes.length - 1].timing +
-                                1000 ||
-                            global.currentTime < track.notes[0].timing - 1000
-                          ? false
-                          : track.type == 1
-                          ? this.showReal
-                            ? true
-                            : false
-                          : this.showFake
-                          ? true
-                          : false
+                          : true
                         : track.type == 1
                         ? this.showReal
                           ? true
@@ -147,7 +130,17 @@
                         : this.showFake
                         ? true
                         : false
-                      : false
+                      : track.type == 1
+                      ? this.showReal
+                        ? true
+                        : false
+                      : this.showFake
+                      ? true
+                      : false) &&
+                      (showCurrent
+                        ? global.currentTime >= track.startTiming &&
+                          global.currentTime <= track.endTiming
+                        : true)
                   "
                   :chart="chart"
                   :track="track"
@@ -198,35 +191,11 @@
               >
                 <TrackCardPanel
                   v-if="
-                    track.showInTimeline
-                      ? !this.showNoRemain
+                    (track.showInTimeline
+                      ? !showNoRemain
                         ? track.notes.length == 0
                           ? false
-                          : track.notes[track.notes.length - 1].noteType == 1
-                          ? global.currentTime >
-                              track.notes[track.notes.length - 1].endTiming +
-                                1000 ||
-                            global.currentTime < track.notes[0].timing - 1000
-                            ? false
-                            : track.type == 1
-                            ? this.showReal
-                              ? true
-                              : false
-                            : this.showFake
-                            ? true
-                            : false
-                          : global.currentTime >
-                              track.notes[track.notes.length - 1].timing +
-                                1000 ||
-                            global.currentTime < track.notes[0].timing - 1000
-                          ? false
-                          : track.type == 1
-                          ? this.showReal
-                            ? true
-                            : false
-                          : this.showFake
-                          ? true
-                          : false
+                          : true
                         : track.type == 1
                         ? this.showReal
                           ? true
@@ -234,7 +203,17 @@
                         : this.showFake
                         ? true
                         : false
-                      : false
+                      : track.type == 1
+                      ? this.showReal
+                        ? true
+                        : false
+                      : this.showFake
+                      ? true
+                      : false) &&
+                      (showCurrent
+                        ? global.currentTime >= track.startTiming &&
+                          global.currentTime <= track.endTiming
+                        : true)
                   "
                   :currentNoteType="currentNoteType"
                   :id="'trackCardPanel' + track.index"
@@ -313,6 +292,7 @@ export default {
       showNoRemain: true,
       currentNoteType: 0,
       enableEdit: true,
+      showCurrent: false,
     };
   },
   mounted() {
@@ -466,7 +446,7 @@ export default {
 }
 .footer-header-left {
   padding-left: 25px;
-  min-width: 860px;
+  min-width: 960px;
 }
 .footer-header-right {
   padding-right: 25px;

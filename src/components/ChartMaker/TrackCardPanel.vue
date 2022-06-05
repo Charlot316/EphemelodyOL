@@ -173,6 +173,7 @@ export default {
           this.global.currentTime > this.track.startTiming &&
           this.global.currentTime < this.track.endTiming - 150
         ) {
+          
           this.myTrack.moveOperations.push({
             startX: this.track.tempPositionX,
             endX: this.track.tempPositionX,
