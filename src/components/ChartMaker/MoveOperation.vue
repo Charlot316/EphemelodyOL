@@ -311,7 +311,7 @@ export default {
         var delta =
           (20 * this.displayAreaTime) / (this.global.documentWidth - 300);
         var currentTime = this.global.currentTime;
-        if (this.roundTime(currentTime + delta) < this.myOperation.endTime) {
+        if (this.roundTime(currentTime + delta) <=this.myOperation.endTime) {
           this.myOperation.startTime = this.roundTime(currentTime + delta);
           this.updateTemp();
         }
@@ -320,7 +320,7 @@ export default {
           (20 * this.displayAreaTime) / (this.global.documentWidth - 300);
       
         currentTime = this.global.currentTime;
-        if (this.roundTime(currentTime-delta)> this.myOperation.startTime) {
+        if (this.roundTime(currentTime-delta)>= this.myOperation.startTime) {
           this.myOperation.endTime = this.roundTime(currentTime-delta);
           this.updateTemp();
         }
