@@ -7,6 +7,7 @@
       left: left + 'px',
       zIndex: operation.zIndex,
     }"
+    @mousedown="setZIndex"
   >
     <el-popover
       v-model:visible="edit"
@@ -337,11 +338,13 @@ export default {
     selfClicked() {
       if (this.currentNoteType == 3) this.deleteSelf();
       else if (this.enableEdit) this.startEdit();
+    },
+    setZIndex() {
       if (this.global.currentOperation) {
         this.myGlobal.currentOperation.zIndex = 0;
-        this.myGlobal.currentOperation = this.operation;
-        this.myOperation.zIndex = 10;
       }
+      this.myGlobal.currentOperation = this.operation;
+      this.myOperation.zIndex = 10;
     },
     updateTrack() {
       this.myGlobal.reCalculateTrack = !this.myGlobal.reCalculateTrack;

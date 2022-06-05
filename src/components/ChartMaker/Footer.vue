@@ -298,7 +298,7 @@ export default {
   mounted() {
     this.audio = document.getElementById("audioSong");
     setTimeout(() => {
-      this.displayAreaTime = 1000;
+      this.displayAreaTime = 10000;
     }, 100);
   },
   watch: {
