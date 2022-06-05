@@ -103,32 +103,39 @@
         </el-form-item>
       </el-form>
       <template #reference>
-        <el-tooltip
-          class="item"
-          effect="dark"
-          :content="
-            myOperation.startTime +
-              '→' +
-              myOperation.endTime +
-              '\n' +
-              'rgb(' +
-              myOperation.startR +
-              ',' +
-              myOperation.startG +
-              ',' +
-              myOperation.startB +
-              ')→' +
-              'rgb(' +
-              myOperation.endR +
-              ',' +
-              myOperation.endG +
-              ',' +
-              myOperation.endB +
-              ')'
-          "
-          placement="top-start"
-        >
-          <div>
+        <div>
+          <el-tooltip class="item" effect="dark" placement="top-start">
+            <template #content>
+              <div style="text-align:center">
+                {{ myOperation.startTime + "→" + myOperation.endTime }}
+                <br />
+                <span
+                  :style="{
+                    color:
+                      'rgb(' +
+                      myOperation.startR +
+                      ',' +
+                      myOperation.startG +
+                      ',' +
+                      myOperation.startB +
+                      ')',
+                  }"
+                  >█</span
+                >→<span
+                  :style="{
+                    color:
+                      'rgb(' +
+                      myOperation.endR +
+                      ',' +
+                      myOperation.endG +
+                      ',' +
+                      myOperation.endB +
+                      ')',
+                  }"
+                  >█</span
+                >
+              </div>
+            </template>
             <div
               @mousedown="longOperationCanMove"
               :style="{
@@ -203,8 +210,8 @@
               }"
               src="http://pic.mcatk.com/charlot-pictures/EpheHitOperation.png"
             />
-          </div>
-        </el-tooltip>
+          </el-tooltip>
+        </div>
       </template>
     </el-popover>
   </div>
@@ -362,6 +369,22 @@ export default {
       this.myOperation.tempOperation = JSON.parse(
         JSON.stringify(this.myOperation)
       );
+      this.myOperation.tempOperation.startColor =
+        "rgb(" +
+        this.myOperation.tempOperation.startR +
+        "," +
+        this.myOperation.tempOperation.startG +
+        "," +
+        this.myOperation.tempOperation.startB +
+        ")";
+      this.myOperation.tempOperation.endColor =
+        "rgb(" +
+        this.myOperation.tempOperation.endR +
+        "," +
+        this.myOperation.tempOperation.endG +
+        "," +
+        this.myOperation.tempOperation.endB +
+        ")";
     },
     selfClicked() {
       if (this.currentNoteType == 3) this.deleteSelf();
