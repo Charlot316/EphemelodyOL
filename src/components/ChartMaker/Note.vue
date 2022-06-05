@@ -352,12 +352,12 @@ export default {
         var bpm = this.chart.BPM / 16;
         var mod = (timing - this.chart.firstBeatDelay) % bpm;
         if (mod > bpm / 2) {
-          timing += Math.ceil(bpm - mod);
+          timing += bpm - mod;
         } else {
           timing -= mod;
         }
       }
-      return timing;
+      return Math.ceil(timing);
     },
     updateTemp() {
       this.myNote.tempNote = JSON.parse(JSON.stringify(this.myNote));
