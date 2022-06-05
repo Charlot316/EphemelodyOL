@@ -5,8 +5,9 @@
       position: 'absolute',
       top: '20px',
       left: left - 20 + 'px',
-      zIndex: zIndex,
+      zIndex: note.zIndex,
     }"
+    @mousedown="setZIndex"
   >
     <el-popover
       v-model:visible="edit"
@@ -122,7 +123,6 @@
               @dragstart.prevent
               @mousedown="
                 canMove = true;
-                zIndex = 10;
               "
               style="width:40px;height:40px;user-select:none;cursor: move;"
               src="http://pic.mcatk.com/charlot-pictures/EpheHitNote.png"
@@ -149,7 +149,6 @@
               @dragstart.prevent
               @mousedown="
                 leftMove = true;
-                zIndex = 10;
               "
               style="width:40px;height:40px;position:absolute;left:0;top:0;user-select: none;cursor:w-resize;"
               src="http://pic.mcatk.com/charlot-pictures/EpheHitNote.png"
@@ -158,7 +157,6 @@
               @dragstart.prevent
               @mousedown="
                 rightMove = true;
-                zIndex = 10;
               "
               :style="{
                 userSelect: 'none',
@@ -179,7 +177,6 @@
             <el-image
               @mousedown="
                 canMove = true;
-                zIndex = 10;
               "
               @dragstart.prevent
               style="width:40px;height:40px;cursor: move;"
@@ -267,7 +264,6 @@ export default {
       leftMove: false,
       rightMove: false,
       passedTime: 0,
-      zIndex: 0,
       edit: false,
       rules: {
         type: [{ required: true, message: "请选择音符类别", trigger: "blur" }],
@@ -282,6 +278,7 @@ export default {
     };
   },
   created() {
+    this.myNote.zIndex=0;
     if (this.myNote.noteType != 1) {
       this.myNote.endTiming = parseInt(this.myNote.timing) + 150;
     }
@@ -293,7 +290,6 @@ export default {
       this.canMove = false;
       this.leftMove = false;
       this.rightMove = false;
-      this.zIndex = 0;
     },
     "global.mouseMove"() {
       if (this.canMove) {
@@ -367,6 +363,13 @@ export default {
       if (this.currentNoteType == 3) this.deleteSelf();
       else if (this.enableEdit) this.startEdit();
     },
+    setZIndex() {
+      if (this.global.currentNote) {
+        this.myGlobal.currentNote.zIndex = 0;
+      }
+      this.myGlobal.currentNote = this.note;
+      this.myNote.zIndex = 10;
+    },
     updateTrack() {
       this.myGlobal.reCalculateTrack = !this.myGlobal.reCalculateTrack;
       this.myGlobal.reCalculateChartMaker = !this.myGlobal
@@ -377,7 +380,6 @@ export default {
         this.passedTime = Math.ceil(this.global.currentTime - this.note.timing);
       }, 10);
       this.canMove = true;
-      this.zIndex = 10;
     },
     startEdit() {
       this.edit = true;
