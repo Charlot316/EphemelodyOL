@@ -842,6 +842,7 @@ var chart = {
                 type: 1,
                 startTime: 14801,
                 endTime: 14081,
+                startX: 0.6,
                 endX: 2,
                 endWidth: 0,
                 endR: 160,
