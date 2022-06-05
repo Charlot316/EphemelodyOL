@@ -111,7 +111,7 @@
               userSelect: 'none',
               height: '40px',
               position: 'absolute',
-              background: 'rgb(184, 223, 107)',
+              background: 'rgb(70, 70, 70)',
               cursor: 'move',
               width:
                 ((myOperation.endTime - myOperation.startTime) /
@@ -140,7 +140,7 @@
                     myOperation.startB +
                     ')',
                 }"
-                >█▉</span
+                >█</span
               >到
               <span
                 :style="{
@@ -153,7 +153,7 @@
                     myOperation.endB +
                     ')',
                 }"
-                >█▉</span
+                >█</span
               >
             </div>
           </div>
