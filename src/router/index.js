@@ -3,8 +3,8 @@ import Home from "../views/Home.vue";
 
 const routes = [{
         path: "/",
-        redirect: "/chart/maker",
-        // redirect: "/play",
+        //redirect: "/chart/maker",
+        redirect: "/play",
     },
     {
         path: "/play",
