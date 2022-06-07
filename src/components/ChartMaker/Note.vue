@@ -125,7 +125,7 @@
                 canMove = true;
               "
               style="width:40px;height:40px;user-select:none;cursor: move;"
-              src="http://pic.mcatk.com/charlot-pictures/EpheHitNote.png"
+              :src="require('@/assets/img/EpheHitNote.png')"
             />
           </div>
           <div v-if="note.noteType == 1">
@@ -151,7 +151,7 @@
                 leftMove = true;
               "
               style="width:40px;height:40px;position:absolute;left:0;top:0;user-select: none;cursor:w-resize;"
-              src="http://pic.mcatk.com/charlot-pictures/EpheHitNote.png"
+              :src="require('@/assets/img/EpheHitNoteLeft.png')"
             />
             <el-image
               @dragstart.prevent
@@ -170,7 +170,7 @@
                   'px',
                 top: '0px',
               }"
-              src="http://pic.mcatk.com/charlot-pictures/EpheHitNote.png"
+              :src="require('@/assets/img/EpheHitNoteRight.png')"
             />
           </div>
           <div v-if="note.noteType == 2">
@@ -180,7 +180,7 @@
               "
               @dragstart.prevent
               style="width:40px;height:40px;cursor: move;"
-              src="http://pic.mcatk.com/charlot-pictures/EpheSlideNote.png"
+              :src="require('@/assets/img/EpheSlideNote.png')"
             />
           </div>
         </div>

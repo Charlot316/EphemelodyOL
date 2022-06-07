@@ -8,7 +8,7 @@
       >
         <el-image
           style="position:absolute;top:0;left:0;width: 70px;height:70px;border-radius: 5px;"
-          src="http://pic.mcatk.com/charlot-pictures/8B0C2D47-6D1E-4916-BE4C-EFD5C6A5D998_1_201_a.jpeg"
+          :src="require('@/assets/img/EpheTrack.jpg')"
           fit="fit"
           class="image"
         />
