@@ -29,21 +29,19 @@
                   'px',
                 top: 0,
                 height: '80px',
-                width:
-                  '1px',
+                width: '1px',
                 background: 'rgb(255,255,255)',
               }"
             >
               <div
-                @mousedown="longOperationCanMove"
                 :style="{
                   userSelect: 'none',
                   height: '80px',
                   position: 'absolute',
                   background: 'rgb(70, 70, 70)',
-                  cursor: 'move',
                   width:
-                    ((myTrack.endTiming - myTrack.startTiming) / displayAreaTime) *
+                    ((myTrack.endTiming - myTrack.startTiming) /
+                      displayAreaTime) *
                       (global.documentWidth - 300) +
                     'px',
                   left: '-1px',
@@ -70,7 +68,8 @@
                   position: 'absolute',
                   cursor: 'e-resize',
                   left:
-                    ((myTrack.endTiming - myTrack.startTiming) / displayAreaTime) *
+                    ((myTrack.endTiming - myTrack.startTiming) /
+                      displayAreaTime) *
                       (global.documentWidth - 300) +
                     1 +
                     'px',
@@ -240,13 +239,30 @@ export default {
         }
       } else if (this.leftMove) {
         var currentTime = this.global.currentTime;
-        if (this.roundTime(currentTime) <= this.chart.songLength) {
-          this.myTrack.startTiming = this.roundTime(currentTime);
+        var roundTime = this.roundTime(currentTime);
+        if (roundTime <= this.myTrack.endTiming) {
+          if (this.myTrack.notes.length > 0) {
+            if (roundTime <= this.myTrack.notes[0].timing) {
+              this.myTrack.startTiming = roundTime;
+            }
+          } else {
+            this.myTrack.startTiming = roundTime;
+          }
         }
       } else if (this.rightMove) {
         currentTime = this.global.currentTime;
-        if (this.roundTime(currentTime) >= this.myTrack.startTiming) {
-          this.myTrack.endTiming = this.roundTime(currentTime);
+        roundTime = this.roundTime(currentTime);
+        if (roundTime <= this.myTrack.startTiming) {
+          if (this.myTrack.notes.length > 0) {
+            if (
+              roundTime >=
+              this.myTrack.notes[this.myTrack.notes.length - 1].timing
+            ) {
+              this.myTrack.startTiming = roundTime;
+            }
+          } else {
+            this.myTrack.startTiming = roundTime;
+          }
         }
       }
     },
