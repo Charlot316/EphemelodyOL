@@ -18,6 +18,69 @@
             'px',
         }"
       >
+        <div class="track-range">
+          <div>
+            <div
+              :style="{
+                position: 'absolute',
+                left:
+                  (myTrack.startTiming / displayAreaTime) *
+                    (global.documentWidth - 300) +
+                  'px',
+                top: 0,
+                height: '80px',
+                width:
+                  '1px',
+                background: 'rgb(255,255,255)',
+              }"
+            >
+              <div
+                @mousedown="longOperationCanMove"
+                :style="{
+                  userSelect: 'none',
+                  height: '80px',
+                  position: 'absolute',
+                  background: 'rgb(70, 70, 70)',
+                  cursor: 'move',
+                  width:
+                    ((myTrack.endTiming - myTrack.startTiming) / displayAreaTime) *
+                      (global.documentWidth - 300) +
+                    'px',
+                  left: '-1px',
+                  top: '1px',
+                  overflow: 'hidden',
+                  lineHeight: '40px',
+                  fontSize: '20px',
+                  border: '0px solid #fff',
+                  borderLeftWidth: '1px',
+                  borderRightWidth: '1px',
+                }"
+              ></div>
+              <div
+                @mousedown="leftMove = true"
+                style="width:1px;height:80px;position:absolute;left:0px;top:0;cursor:w-resize;"
+                src="http://pic.mcatk.com/charlot-pictures/EpheHitOperation.png"
+              />
+              <div
+                @mousedown="rightMove = true"
+                :style="{
+                  userSelect: 'none',
+                  height: '80px',
+                  width: '1px',
+                  position: 'absolute',
+                  cursor: 'e-resize',
+                  left:
+                    ((myTrack.endTiming - myTrack.startTiming) / displayAreaTime) *
+                      (global.documentWidth - 300) +
+                    1 +
+                    'px',
+                  top: '0px',
+                }"
+                src="http://pic.mcatk.com/charlot-pictures/EpheHitOperation.png"
+              />
+            </div>
+          </div>
+        </div>
         <div v-for="note in track.notes" :key="note">
           <note
             :currentNoteType="currentNoteType"
@@ -155,6 +218,39 @@ export default {
     "enableEdit",
   ],
   components: { Note, MoveOperation, WidthOperation, ColorOperation },
+  watch: {
+    "global.mouseUp"() {
+      this.canMove = false;
+      this.leftMove = false;
+      this.rightMove = false;
+    },
+    "global.mouseMove"() {
+      if (this.canMove) {
+        if (
+          this.global.currentTime > 0 &&
+          this.global.currentTime < this.chart.songLength
+        ) {
+          this.duration = this.myTrack.endTiming - this.myTrack.startTiming;
+
+          this.myTrack.startTiming = this.roundTime(
+            this.global.currentTime - this.passedTime
+          );
+
+          this.myTrack.endTiming = this.myTrack.startTiming + this.duration;
+        }
+      } else if (this.leftMove) {
+        var currentTime = this.global.currentTime;
+        if (this.roundTime(currentTime) <= this.chart.songLength) {
+          this.myTrack.startTiming = this.roundTime(currentTime);
+        }
+      } else if (this.rightMove) {
+        currentTime = this.global.currentTime;
+        if (this.roundTime(currentTime) >= this.myTrack.startTiming) {
+          this.myTrack.endTiming = this.roundTime(currentTime);
+        }
+      }
+    },
+  },
   data() {
     return {
       myTrack: this.track,
@@ -162,10 +258,30 @@ export default {
     };
   },
   methods: {
+    roundTime(timing) {
+      if (this.global.beatLine) {
+        var bpm = this.chart.BPM / 16;
+        var mod = (timing - this.chart.firstBeatDelay) % bpm;
+        if (mod > bpm / 2) {
+          timing += bpm - mod;
+        } else {
+          timing -= mod;
+        }
+      }
+      return Math.ceil(timing);
+    },
     updateTrack() {
       this.myGlobal.reCalculateTrack = !this.myGlobal.reCalculateTrack;
       this.myGlobal.reCalculateChartMaker = !this.myGlobal
         .reCalculateChartMaker;
+    },
+    longOperationCanMove() {
+      setTimeout(() => {
+        this.passedTime = Math.ceil(
+          this.global.currentTime - this.myTrack.startTiming
+        );
+      }, 10);
+      this.canMove = true;
     },
     newMoveOperations() {
       if (this.currentNoteType != 3) {
@@ -173,7 +289,6 @@ export default {
           this.global.currentTime > this.track.startTiming &&
           this.global.currentTime < this.track.endTiming - 150
         ) {
-          
           this.myTrack.moveOperations.push({
             startX: this.track.tempPositionX,
             endX: this.track.tempPositionX,
@@ -219,12 +334,12 @@ export default {
           this.global.currentTime < this.track.endTiming - 150
         ) {
           this.myTrack.changeColorOperations.push({
-            startR:this.track.tempR,
-            startG:this.track.tempG,
-            startB:this.track.tempB,
-            endR:this.track.tempR,
-            endG:this.track.tempG,
-            endB:this.track.tempB,
+            startR: this.track.tempR,
+            startG: this.track.tempG,
+            startB: this.track.tempB,
+            endR: this.track.tempR,
+            endG: this.track.tempG,
+            endB: this.track.tempB,
             startTime: this.global.currentTime,
             endTime: this.global.currentTime + 150,
           });
@@ -292,7 +407,6 @@ export default {
   left: 0;
 }
 .note-track {
-  background: rgb(70, 70, 70);
   position: absolute;
   top: 5px;
   left: 0px;
@@ -301,7 +415,6 @@ export default {
   width: 100%;
 }
 .note-track-edit {
-  background: rgb(70, 70, 70);
   position: absolute;
   left: 0px;
   top: 40px;
