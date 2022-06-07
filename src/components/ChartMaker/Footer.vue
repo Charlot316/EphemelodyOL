@@ -4,6 +4,52 @@
       <div class="footer-header-left">
         <el-button
           type="text"
+          class="show-button"
+          style="margin-right:5px;"
+          @click="
+            myGlobal.timeSort = !myGlobal.timeSort;
+            updateTrack();
+          "
+          >{{ myGlobal.timeSort ? "改为坐标排序" : "改为时间排序" }}</el-button
+        >
+        <el-button
+          type="text"
+          class="show-button"
+          style="margin-right:5px;"
+          @click="showNoRemain = !showNoRemain"
+          >{{ showNoRemain ? "关闭无音符轨道" : "显示无音符轨道" }}</el-button
+        >
+        <el-button
+          type="text"
+          class="show-button"
+          style="margin-right:5px;"
+          @click="showCurrent = !showCurrent"
+          >{{ showCurrent ? "显示全部轨道" : "显示当前轨道" }}</el-button
+        >
+        <el-button
+          type="text"
+          class="show-button"
+          style="margin-right:5px;"
+          @click="autoScroll = !autoScroll"
+          >{{ autoScroll ? "关闭滚动" : "开启滚动" }}</el-button
+        >
+        <el-button
+          type="text"
+          class="show-button"
+          style="margin-right:5px;"
+          @click="showReal = !showReal"
+          >{{ showReal ? "关闭实轨" : "显示实轨" }}</el-button
+        >
+        <el-button
+          type="text"
+          class="show-button"
+          style="margin-right:5px;"
+          @click="showFake = !showFake"
+          >{{ showFake ? "关闭虚轨" : "显示虚轨" }}</el-button
+        >
+
+        <el-button
+          type="text"
           :class="currentNoteType == 0 ? 'show-button-selected' : 'show-button'"
           style="margin-right:5px;"
           @click="currentNoteType = 0"
@@ -50,82 +96,6 @@
             :max="chart.songLength"
           ></el-slider>
         </el-tooltip>
-      </div>
-    </div>
-    <div style="background:rgb(32, 32, 32);height:70px;">
-    
-     <div
-        style="width:100%;height:20px;padding:5px;display: flex;
-          justify-content: space-between; align-items: center;"
-      > <el-button
-          type="text"
-          class="show-button"
-          style="margin-right:5px;"
-          @click="
-            myGlobal.timeSort = !myGlobal.timeSort;
-            updateTrack();
-          "
-          >{{ myGlobal.timeSort ? "改为坐标排序" : "改为时间排序" }}</el-button
-        >
-        <el-button
-          type="text"
-          class="show-button"
-          style="margin-right:5px;"
-          @click="showNoRemain = !showNoRemain"
-          >{{ showNoRemain ? "关闭无音符轨道" : "显示无音符轨道" }}</el-button
-        >
-        <el-button
-          type="text"
-          class="show-button"
-          style="margin-right:5px;"
-          @click="autoScroll = !autoScroll"
-          >{{ autoScroll ? "关闭滚动" : "开启滚动" }}</el-button
-        >
-        <el-button
-          type="text"
-          class="show-button"
-          style="margin-right:5px;"
-          @click="showReal = !showReal"
-          >{{ showReal ? "关闭实轨" : "显示实轨" }}</el-button
-        >
-        <el-button
-          type="text"
-          class="show-button"
-          style="margin-right:5px;"
-          @click="showFake = !showFake"
-          >{{ showFake ? "关闭虚轨" : "显示虚轨" }}</el-button
-        >
-</div>
-      <div
-        style="width:100%;height:20px;padding:5px;display: flex;
-          justify-content: space-between; align-items: center;"
-      >
-        <div>
-          <el-button
-            type="text"
-            style="margin-left:10px;"
-            class="plus-button"
-            icon="el-icon-circle-plus"
-            @click="newTrack"
-            >新增</el-button
-          >
-        </div>
-        <div>
-          <el-button
-            type="text"
-            class="show-button"
-            style="margin-right:5px;"
-            @click="autoScroll = !autoScroll"
-            >{{ autoScroll ? "关闭滚动" : "开启滚动" }}</el-button
-          >
-          <el-button
-            type="text"
-            class="show-button"
-            style="margin-right:5px;"
-            @click="showCurrent = !showCurrent"
-            >{{ showCurrent ? "显示全部" : "显示当前" }}</el-button
-          >
-        </div>
       </div>
     </div>
     <div v-if="chart.tracks">
