@@ -295,6 +295,7 @@ export default {
     this.myOperation.tempOperation = JSON.parse(
       JSON.stringify(this.myOperation)
     );
+    delete this.myOperation.tempOperation.tempOperation;
     this.myOperation.tempOperation.startColor =
       "rgb(" +
       this.myOperation.tempOperation.startR +
@@ -374,6 +375,7 @@ export default {
       this.myOperation.tempOperation = JSON.parse(
         JSON.stringify(this.myOperation)
       );
+      delete this.myOperation.tempOperation.tempOperation;
       this.myOperation.tempOperation.startColor =
         "rgb(" +
         this.myOperation.tempOperation.startR +
@@ -420,6 +422,7 @@ export default {
       this.myOperation.tempOperation = JSON.parse(
         JSON.stringify(this.myOperation)
       );
+      delete this.myOperation.tempOperation.tempOperation;
       this.myOperation.tempOperation.startColor =
         "rgb(" +
         this.myOperation.tempOperation.startR +

@@ -121,9 +121,7 @@
           <div v-if="note.noteType == 0">
             <el-image
               @dragstart.prevent
-              @mousedown="
-                canMove = true;
-              "
+              @mousedown="canMove = true"
               style="width:40px;height:40px;user-select:none;cursor: move;"
               :src="require('@/assets/img/EpheHitNote.png')"
             />
@@ -147,17 +145,13 @@
             ></div>
             <el-image
               @dragstart.prevent
-              @mousedown="
-                leftMove = true;
-              "
+              @mousedown="leftMove = true"
               style="width:40px;height:40px;position:absolute;left:0;top:0;user-select: none;cursor:w-resize;"
               :src="require('@/assets/img/EpheHitNoteLeft.png')"
             />
             <el-image
               @dragstart.prevent
-              @mousedown="
-                rightMove = true;
-              "
+              @mousedown="rightMove = true"
               :style="{
                 userSelect: 'none',
                 height: '40px',
@@ -175,9 +169,7 @@
           </div>
           <div v-if="note.noteType == 2">
             <el-image
-              @mousedown="
-                canMove = true;
-              "
+              @mousedown="canMove = true"
               @dragstart.prevent
               style="width:40px;height:40px;cursor: move;"
               :src="require('@/assets/img/EpheSlideNote.png')"
@@ -278,12 +270,13 @@ export default {
     };
   },
   created() {
-    this.myNote.zIndex=0;
+    this.myNote.zIndex = 0;
     if (this.myNote.noteType != 1) {
       this.myNote.endTiming = parseInt(this.myNote.timing) + 150;
     }
 
     this.myNote.tempNote = JSON.parse(JSON.stringify(this.myNote));
+    delete this.myNote.tempNote.tempNote;
   },
   watch: {
     "global.mouseUp"() {
@@ -358,6 +351,7 @@ export default {
     updateTemp() {
       this.myNote.tempNote = JSON.parse(JSON.stringify(this.myNote));
       this.myNote.tempNote.key = this.myNote.tempNote.key.toUpperCase();
+      delete this.myNote.tempNote.tempNote;
     },
     selfClicked() {
       if (this.currentNoteType == 3) this.deleteSelf();
@@ -385,6 +379,7 @@ export default {
       this.edit = true;
       this.myNote.tempNote = JSON.parse(JSON.stringify(this.myNote));
       this.myNote.tempNote.key = this.myNote.tempNote.key.toUpperCase();
+      delete this.myNote.tempNote.tempNote;
       if (this.myNote.noteType != 1) {
         this.myNote.endTiming = parseInt(this.myNote.timing) + 150;
       }

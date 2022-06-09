@@ -82,6 +82,7 @@ export default {
             message: '登录成功！',
             type: 'success',
           })
+          this.$store.commit("login", res.data);
           this.$router.push({ path: "/" });
         }
         catch (err) {

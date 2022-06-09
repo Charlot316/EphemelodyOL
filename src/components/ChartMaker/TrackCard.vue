@@ -110,11 +110,14 @@
           @submit.prevent="saveTrack"
         >
           <el-form-item label="轨道类别" label-width="80px" prop="type">
-            <el-radio-group v-model="myTrack.tempTrack.type"  style="width:130px;line-height: 20px;">
+            <el-radio-group
+              v-model="myTrack.tempTrack.type"
+              style="width:130px;line-height: 20px;"
+            >
               <el-radio :label="0">虚轨</el-radio>
               <el-radio :label="1">实轨</el-radio>
             </el-radio-group>
-            
+
             <el-tooltip
               class="item"
               effect="dark"
@@ -326,6 +329,7 @@ export default {
     this.myTrack.edit = false;
     this.myTrack.showInTimeline = true;
     this.myTrack.tempTrack = JSON.parse(JSON.stringify(this.myTrack));
+    delete this.myTrack.tempTrack.tempTrack;
     this.myTrack.tempTrack.key = this.myTrack.tempTrack.key.toUpperCase();
     this.myTrack.tempTrack.color =
       "rgb(" +
@@ -352,6 +356,7 @@ export default {
         .querySelector("#trackCard" + this.myTrack.index)
         .scrollIntoView(true);
       this.myTrack.tempTrack = JSON.parse(JSON.stringify(this.myTrack));
+      delete this.myTrack.tempTrack.tempTrack;
       this.myTrack.tempTrack.key = this.myTrack.tempTrack.key.toUpperCase();
       this.myTrack.tempTrack.color =
         "rgb(" +

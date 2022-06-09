@@ -271,6 +271,7 @@ export default {
     this.myOperation.tempOperation = JSON.parse(
       JSON.stringify(this.myOperation)
     );
+    delete this.myOperation.tempOperation.tempOperation;
   },
   watch: {
     "global.mouseUp"() {
@@ -334,6 +335,7 @@ export default {
       this.myOperation.tempOperation = JSON.parse(
         JSON.stringify(this.myOperation)
       );
+      delete this.myOperation.tempOperation.tempOperation;
     },
     selfClicked() {
       if (this.currentNoteType == 3) this.deleteSelf();
@@ -364,6 +366,7 @@ export default {
       this.myOperation.tempOperation = JSON.parse(
         JSON.stringify(this.myOperation)
       );
+      delete this.myOperation.tempOperation.tempOperation;
     },
     saveOperation() {
       this.$refs["form"].validate((valid) => {
