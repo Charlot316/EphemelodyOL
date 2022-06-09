@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from "vue-router";
-import Home from "../views/Home.vue";
 
 const routes = [{
         path: "/",
@@ -32,21 +31,12 @@ const routes = [{
     //     ),
     // },
     {
-        path: "/",
+        path: "/home",
         name: "Home", //Home组件里包括了初始的导航栏和侧边栏的样式，它的所有children都会共享Home里的导航栏、侧边栏
-        component: Home,
-        children: [
-            // {
-            //     path: "user",
-            //     name: "user",
-            //     meta: {
-            //         title: '个人中心',
-            //         requireAuth: true,
-            //         keepAlive: true
-            //     },
-            //     component: () => import("../views/User.vue")
-            // },
-        ],
+        component: () =>
+            import (
+                "../views/Home.vue"
+            ),
     },
 ];
 

@@ -1,11 +1,13 @@
 <template>
   <div v-if="!loadingStatus.runStart" class="show-info">
+  
     <img
       :src="chart.defaultBackground"
       class="loading-background"
       style="user-drag:none;"
     />
     <div style="position:absolute;width:100vw;height:100vh;"></div>
+    <Header/>
     <div
       :class="loadingStatus.runReady ? 'info-container-out' : 'info-container'"
       style="overflow: auto;"
@@ -72,18 +74,19 @@
 </template>
 
 <script>
+import Header from "../Header";
 export default {
   props: ["loadingStatus", "chart"],
-  watch(){
-
+  components: {
+    Header,
   },
-  created(){
+  watch() {},
+  created() {},
+  methods: {
+    startMusic() {
+      this.$emit("startMusic");
+    },
   },
-  methods:{
-      startMusic(){
-        this.$emit("startMusic");
-      }
-  }
 };
 </script>
 

@@ -7,7 +7,7 @@ export default createStore({
         islogin: false,
         isAdministrator: false,
         username: "未登录",
-        user_id: "",
+        icon: "",
         role: 2,
         refreshRate: 90,
         volume: 100,
