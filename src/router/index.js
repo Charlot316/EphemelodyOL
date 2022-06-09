@@ -32,10 +32,26 @@ const routes = [{
     // },
     {
         path: "/home",
-        name: "Home", //Home组件里包括了初始的导航栏和侧边栏的样式，它的所有children都会共享Home里的导航栏、侧边栏
+        name: "Home",
         component: () =>
             import (
                 "../views/Home.vue"
+            ),
+    },
+    {
+        path: "/register",
+        name: "register",
+        component: () =>
+            import (
+                "../views/Register.vue"
+            ),
+    },
+    {
+        path: "/login",
+        name: "login",
+        component: () =>
+            import (
+                "../views/Login.vue"
             ),
     },
 ];

@@ -8,7 +8,7 @@
           >
         </div>
         <div>
-          <el-button size="small" type="text" class="header-button"
+          <el-button size="small" type="text" class="header-button" @click="log(JSON.stringify(chart))"
             >保存</el-button
           >
           <el-button size="small" type="text" class="header-button"
