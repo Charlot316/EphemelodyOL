@@ -82,7 +82,7 @@ export default {
     };
   },
   created() {
-    var bpm16 = this.chart.BPM / 16;
+    var bpm16 = this.chart.bpm / 16;
     this.LineCount = Math.ceil(this.chart.songLength / bpm16) + 16;
     this.setDisplay();
   },
@@ -103,7 +103,7 @@ export default {
       this.rightScrollElement.scrollLeft = scrollLeft;
       this.scrollLeft = this.rightScrollElement.scrollLeft;
     },
-    "chart.BPM"() {
+    "chart.bpm"() {
       this.setDisplay();
     },
     "chart.firstBeatDelay"() {
@@ -112,10 +112,10 @@ export default {
   },
   methods: {
     setDisplay() {
-      var bpm16 = this.chart.BPM / 16;
-      var bpm8 = this.chart.BPM / 8;
-      var bpm4 = this.chart.BPM / 4;
-      var bpm = this.chart.BPM / 1;
+      var bpm16 = this.chart.bpm / 16;
+      var bpm8 = this.chart.bpm / 8;
+      var bpm4 = this.chart.bpm / 4;
+      var bpm = this.chart.bpm / 1;
       var wholeLength = this.global.documentWidth - 300;
       if ((wholeLength * bpm) / this.displayAreaTime > 100) {
         this.display = true;

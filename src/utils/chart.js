@@ -4,7 +4,7 @@ var record = {
 };
 
 var chart = {
-    BPM: 350,
+    bpm: 350,
     firstBeatDelay: 3530,
     songId: 1,
     tracks: [{

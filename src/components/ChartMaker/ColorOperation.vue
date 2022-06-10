@@ -361,7 +361,7 @@ export default {
   methods: {
     roundTime(timing) {
       if (this.global.beatLine) {
-        var bpm = this.chart.BPM / 16;
+        var bpm = this.chart.bpm / 16;
         var mod = (timing - this.chart.firstBeatDelay) % bpm;
         if (mod > bpm / 2) {
           timing += bpm - mod;

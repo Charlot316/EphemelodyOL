@@ -230,7 +230,7 @@
       </div>
       <el-dialog
         v-model="globalSetting"
-        @close="checkBPM"
+        @close="checkbpm"
         @closed="globalSetting = false"
         width="650px"
       >
@@ -322,7 +322,7 @@
                 content="计算公式为（末拍偏移-首拍偏移)/节拍数"
                 placement="top-start"
               >
-                <el-button @click="ManualCalculateBPM">
+                <el-button @click="ManualCalculatebpm">
                   精确计算一拍间隔
                 </el-button>
               </el-tooltip>
@@ -330,7 +330,7 @@
           </el-form-item>
           <el-form-item label="一拍间隔(单位:ms)">
             <el-input-number
-              v-model="chart.BPM"
+              v-model="chart.bpm"
               :min="0"
               :max="chart.songLength"
             />
@@ -345,10 +345,10 @@
             </el-tooltip>
             <br />
             <div style="margin-top:15px;">
-              <el-button @mousedown="calculateBPM">{{
-                !BPMStart ? "粗略估算一拍间隔" : "请在节奏点处按下"
+              <el-button @mousedown="calculatebpm">{{
+                !bpmStart ? "粗略估算一拍间隔" : "请在节奏点处按下"
               }}</el-button>
-              <el-button @click="endBPM" v-if="BPMStart">
+              <el-button @click="endbpm" v-if="bpmStart">
                 结束或重新测量
               </el-button>
             </div>
@@ -474,9 +474,9 @@ export default {
       chart: {
         songLength: 0,
       },
-      BPMStart: false,
-      BPMcount: 0,
-      BPMtotal: 0,
+      bpmStart: false,
+      bpmcount: 0,
+      bpmtotal: 0,
       startTotal: 0,
       lastTime: 0,
       startTime: 0,
@@ -695,13 +695,13 @@ export default {
   },
 
   methods: {
-    ManualCalculateBPM() {
+    ManualCalculatebpm() {
       if (
         this.chart.beatsCount &&
         this.chart.lastBeatDelay &&
         this.chart.firstBeatDelay
       ) {
-        this.chart.BPM =
+        this.chart.bpm =
           (this.chart.lastBeatDelay - this.chart.firstBeatDelay) /
           this.chart.beatsCount;
       } else {
@@ -712,54 +712,54 @@ export default {
         });
       }
     },
-    calculateBPM() {
-      if (this.BPMStart == false) {
+    calculatebpm() {
+      if (this.bpmStart == false) {
         this.global.currentTime = 0;
         this.audio.currentTime = 0;
-        this.BPMcount = 0;
-        this.BPMStart = false;
+        this.bpmcount = 0;
+        this.bpmStart = false;
         this.lastTime = 0;
-        this.BPMtotal = 0;
+        this.bpmtotal = 0;
         this.startTotal = 0;
         this.resetTrack();
         this.lastTime = this.global.currentTime;
-        this.BPMStart = true;
+        this.bpmStart = true;
         this.audio.play();
       } else {
-        if (this.BPMcount <= 3) {
+        if (this.bpmcount <= 3) {
           this.lastTime = this.global.currentTime;
-        } else if (this.BPMcount < 10) {
+        } else if (this.bpmcount < 10) {
           var now = this.global.currentTime;
-          this.BPMtotal += now - this.lastTime;
-          this.startTotal += now - (now - this.lastTime) * this.BPMcount;
+          this.bpmtotal += now - this.lastTime;
+          this.startTotal += now - (now - this.lastTime) * this.bpmcount;
           this.lastTime = now;
         } else {
           now = this.global.currentTime;
-          this.BPMtotal += now - this.lastTime;
-          this.startTotal += now - (now - this.lastTime) * this.BPMcount;
+          this.bpmtotal += now - this.lastTime;
+          this.startTotal += now - (now - this.lastTime) * this.bpmcount;
           this.lastTime = now;
-          this.chart.BPM = this.BPMtotal / (this.BPMcount - 3);
+          this.chart.bpm = this.bpmtotal / (this.bpmcount - 3);
           this.chart.firstBeatDelay = Math.round(
-            this.startTotal / (this.BPMcount - 3)
+            this.startTotal / (this.bpmcount - 3)
           );
         }
-        this.BPMcount++;
+        this.bpmcount++;
       }
     },
-    endBPM() {
+    endbpm() {
       this.audio.pause();
       this.global.currentTime = 0;
       this.audio.currentTime = 0;
       this.startTotal = 0;
-      this.BPMcount = 0;
-      this.BPMStart = false;
+      this.bpmcount = 0;
+      this.bpmStart = false;
       this.lastTime = 0;
-      this.BPMtotal = 0;
+      this.bpmtotal = 0;
       this.resetTrack();
     },
-    checkBPM() {
-      this.endBPM();
-      if (this.chart.BPM == 0 || !this.chart.BPM) {
+    checkbpm() {
+      this.endbpm();
+      if (this.chart.bpm == 0 || !this.chart.bpm) {
         setTimeout(() => {
           this.$notify({
             title: "提示",
@@ -896,7 +896,7 @@ export default {
       this.volume = this.$store.state.volume;
       this.audio.volume = this.$store.state.volume / 100;
       this.run();
-      if (!this.chart.BPM || this.chart.BPM == 0) {
+      if (!this.chart.bpm || this.chart.bpm == 0) {
         this.globalSetting = true; //请设置节拍
         this.$notify({
           type: "warning",
@@ -904,8 +904,8 @@ export default {
           message: "请设置节拍",
         });
       }
-      if (!this.chart.BPM) {
-        this.chart.BPM = 0;
+      if (!this.chart.bpm) {
+        this.chart.bpm = 0;
       }
       if (!this.chart.firstBeatDelay) {
         this.chart.firstBeatDelay = 0;

@@ -54,6 +54,22 @@ const routes = [{
                 "../views/Login.vue"
             ),
     },
+    {
+        path: "/select",
+        name: "Select",
+        component: () =>
+            import (
+                "../views/Select.vue"
+            ),
+    },
+    {
+        path: "/admin",
+        name: "Admin",
+        component: () =>
+            import (
+                "../views/Admin.vue"
+            ),
+    },
 ];
 
 const router = createRouter({
