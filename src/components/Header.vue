@@ -3,24 +3,19 @@
     <div class="left-logo">
       EphemelodyOL
     </div>
-    <div class="right-buttons">
-      <div>{{ $store.state.username }}</div>
-      <img
-        style="border-radius: 50%;"
-        :src="
-          $store.state.islogin
-            ? $store.state.icon
-            : require('@/assets/img/user.jpg')
-        "
-      />
+    <div class="right">
+      <Icon :user="$store.state.user"/>
+
     </div>
   </div>
 </template>
 <script>
+import Icon from "./Icon"
 export default {
   data() {
     return {};
   },
+  components:{Icon},
   computed: {},
   methods: {},
   mounted() {},
@@ -28,11 +23,10 @@ export default {
 </script>
 <style scoped>
 .header {
-  z-index:100;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 50px;
+  height: 80px;
   background-color: #fff;
   border-bottom: 1px solid #e5e5e5;
 }

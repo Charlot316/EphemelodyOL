@@ -1,30 +1,16 @@
 <template>
-  <router-link
-    target="_blank"
-    :to="{ path: '/home' }"
-  >
+  <router-link target="_blank" :to="{ path: '/home' }">
     <div class="icon-container" style="cursor:pointer;">
-      <img
-        style="width:70px;height:70px;border-radius:50%;object-fit:fill;"
-        :src="user.icon"
-        onerror="onerror=null;src='https://img0.baidu.com/it/u=3730772664,138405132&fm=26&fmt=auto'"
-      />
       <div class="icon-info">
-        <div>
-          <el-row>
-            <span class="user-name" :title="user.username">{{ user.username }}</span>
-          </el-row>
-          <el-row>
-            <span class="info" :title="user.isDoctor ? '医生' : '患者'">
-              {{ user.isDoctor ? "医生" : "患者" }}</span
-            >
-          </el-row>
-          <el-row>
-            <span class="info" :title="user.age + '岁'">
-              {{ user.age ? user.age + "岁" : "未填写年龄" }}</span
-            >
-          </el-row>
-        </div>
+        <div>{{ $store.state.user.username }}</div>
+        <div>{{ $store.state.user.potential }}</div>
+      </div>
+      <div>
+        <img
+          style="width:70px;height:70px;border-radius:50%;object-fit:fill;"
+          :src="user.icon ? user.icon : require('@/assets/img/user.jpg')"
+          onerror="onerror=null;src='https://img0.baidu.com/it/u=3730772664,138405132&fm=26&fmt=auto'"
+        />
       </div>
     </div>
   </router-link>
@@ -32,14 +18,16 @@
 
 <script>
 export default {
-  props: ["user"],
+  props: ["user", "plus", "minus"],
   data() {
     return {
       myUser: this.user,
     };
   },
 
-  created() {},
+  created() {
+    console.log(this.user);
+  },
   methods: {},
   watch: {
     user() {
