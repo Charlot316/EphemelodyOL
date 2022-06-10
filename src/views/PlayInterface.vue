@@ -334,6 +334,7 @@ export default {
     //audio加载完毕
     audioLoaded() {
       this.audio = document.getElementById("audioSong");
+      this.chart.songLength = Math.round(1000 * this.audio.duration);
       this.loadingStatus.audio = true;
       console.log("audio loaded");
       this.checkIfLoaded();

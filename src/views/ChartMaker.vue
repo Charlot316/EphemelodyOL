@@ -8,7 +8,11 @@
           >
         </div>
         <div>
-          <el-button size="small" type="text" class="header-button" @click="log(JSON.stringify(chart))"
+          <el-button
+            size="small"
+            type="text"
+            class="header-button"
+            @click="log(JSON.stringify(chart))"
             >保存</el-button
           >
           <el-button size="small" type="text" class="header-button"
@@ -844,7 +848,6 @@ export default {
     getChart() {
       this.chart = chart;
       this.displayStart = 0;
-      this.displayEnd = this.chart.songLength;
     },
     //给轨道排序
     sortTrack() {
@@ -894,6 +897,12 @@ export default {
       this.generateImagePath();
       this.audio = document.getElementById("audioSong");
       this.volume = this.$store.state.volume;
+      let that = this;
+      this.audio.oncanplay = function() {
+        that.chart.songLength = Math.round(1000 * that.audio.duration);
+        that.displayEnd = that.chart.songLength;
+      };
+
       this.audio.volume = this.$store.state.volume / 100;
       this.run();
       if (!this.chart.bpm || this.chart.bpm == 0) {
