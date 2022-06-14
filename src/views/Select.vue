@@ -142,13 +142,13 @@ export default {
       },
       {
         songInfo: {
-          songName: "熱愛発覚中",
+          songName: "world.execute(me);",
           uploader: "charlot",
-          songCover: "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
-          songWriter: "椎名林檎",
+          songCover: "http://pic.mcatk.com/charlot-pictures/world-execute-me-cover.jpg",
+          songWriter: "Mili",
           songDifficulty: "9",
           defaultBackground:
-            "http://pic.mcatk.com/charlot-pictures/netsuai-0.jpg",
+            "http://pic.mcatk.com/charlot-pictures/world-execute-me-0.PNG",
           songId: "4",
         },
         myRecord: {

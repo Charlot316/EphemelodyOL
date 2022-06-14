@@ -1,14 +1,21 @@
 <template>
-  <div class="song-card">
+  <div class="song-card" @mouseenter="mouseEnter=true" @mouseleave="mouseEnter=false">
     <img :src="song.songInfo.defaultBackground" class="default-background" />
     <div class="song-info">
       <img :src="song.songInfo.songCover" class="song-cover" />
       <div class="content">
-        {{ song.songInfo.uploader }}
-        {{ song.songInfo.songName }}
-        {{ song.songInfo.songWriter }}
-        LV.{{ song.songInfo.songDifficulty }}
+        <!-- <div style="font-size:15px;">{{ song.songInfo.uploader }}</div>  -->
+        <div>
+          {{ song.songInfo.songName }} LV.{{ song.songInfo.songDifficulty }}
+        </div>
+        <div style="font-size:15px;">{{ song.songInfo.songWriter }}</div>
       </div>
+    </div>
+    <div class="rank" v-if="mouseEnter">
+    
+    世界排名
+    <hr/>
+    我的排名
     </div>
   </div>
 </template>
@@ -18,7 +25,9 @@ export default {
   props: ["song"],
   components: [],
   data() {
-    return {};
+    return {
+      mouseEnter:false,
+    };
   },
   created() {},
   methods: {},
@@ -94,7 +103,18 @@ export default {
 .song-info .content {
   position: absolute;
   left: 100px;
-  top: 10px;
+  bottom: 10px;
   max-width: 200px;
+  font-size: 20px;
+  color: rgb(71, 71, 71);
+}
+.rank {
+  position: absolute;
+  left: 0px;
+  top: 200px;
+  height: 200px;
+  width: 280px;
+  padding:10px;
+  border-radius: 5px;
 }
 </style>
