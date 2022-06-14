@@ -242,7 +242,7 @@ export default {
 .home{
   width: 100%;
   height: 100%;
-  background-image: url(../assets/img/home.png);
+  background-image: url(../assets/img/login.jpg);
 }
 
 .div1{
