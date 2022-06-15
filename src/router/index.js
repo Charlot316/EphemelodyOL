@@ -87,6 +87,17 @@ const routes = [{
                 "../views/Admin.vue"
             ),
     },
+    {
+        path: "/manage",
+        name: "Manage",
+        meta: {
+            requireAuth: true,
+        },
+        component: () =>
+            import (
+                "../views/Manage.vue"
+            ),
+    },
 ];
 
 const router = createRouter({
