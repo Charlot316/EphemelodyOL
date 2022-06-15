@@ -66,26 +66,33 @@
     <!-- <div class="div2"> -->
     <div class="div3">
       <div class="div4" v-for="item in songs" :key="item">
-        <div class="div5">
+        <div class="div5" @click="next(item.songId)">
           <el-image :src="item.songCover" class="img1"></el-image>
         </div>
         <div class="div6">
-          <div class="div7">{{ item.songName }}</div>
-          <div class="div8">
-            <span
-              class="icon-active"
-              icon="el-icon-link"
-              style="margin-left: 10px;"
-              ><i class="el-icon-setting" @click="getEdit(item.songId)"></i
-            ></span>
-            <span
-              class="icon-active"
-              icon="el-icon-link"
-              style="margin-left: 10px;"
-              ><i class="el-icon-delete"></i
-            ></span>
+          <div>
+            <div class="div7">{{ item.songName }}</div>
+            <div class="div8">
+              <span
+                class="icon-active"
+                icon="el-icon-link"
+                style="margin-left: 10px;"
+                ><i class="el-icon-setting" @click="getEdit(item.songId)"></i
+              ></span>
+              <span
+                class="icon-active"
+                icon="el-icon-link"
+                style="margin-left: 10px;"
+                ><i class="el-icon-delete" @click="deleteSong(item.songId)"></i
+              ></span>
+            </div>
           </div>
-          <div class="div9">创作者：{{ item.songWriter }}</div>
+          <div class="div9">
+            <span>作者：{{ item.songWriter }}</span>
+          </div>
+          <div class="div9">谱面定数：{{ item.chartConstant }}</div>
+          <div class="div9">加载中文字：{{ item.loadingText }}</div>
+          <div class="div9">加载完成文字：{{ item.loadedText }}</div>
         </div>
       </div>
     </div>
@@ -99,6 +106,14 @@
       height="50%"
     >
       <el-form :model="form">
+        <el-form-item label="受否公开谱面" :label-width="formLabelWidth">
+          <el-switch
+            v-model="this.value"
+            active-color="#13ce66"
+            active-value="true"
+          >
+          </el-switch>
+        </el-form-item>
         <el-form-item label="歌曲名称" :label-width="formLabelWidth">
           <el-input v-model="form.songName" autocomplete="off"></el-input>
         </el-form-item>
@@ -106,13 +121,19 @@
           <el-input v-model="form.songWriter" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item :label-width="formLabelWidth">
-          <el-button type="primary" size="small">上传音频</el-button>
+          <el-button type="primary" size="small" @click="startUploadSong()"
+            >上传音频</el-button
+          >
         </el-form-item>
         <el-form-item :label-width="formLabelWidth">
-          <el-button type="primary" size="small">上传歌曲默认背景</el-button>
+          <el-button type="primary" size="small" @click="startUploadBack()"
+            >上传歌曲默认背景</el-button
+          >
         </el-form-item>
         <el-form-item :label-width="formLabelWidth">
-          <el-button type="primary" size="small">上传歌曲封面</el-button>
+          <el-button type="primary" size="small" @click="startUploadCover()"
+            >上传歌曲封面</el-button
+          >
         </el-form-item>
         <el-form-item label="设置加载文字" :label-width="formLabelWidth">
           <el-input v-model="form.loadingText" autocomplete="off"></el-input>
@@ -191,6 +212,58 @@
         </div>
       </template>
     </el-dialog>
+
+    <el-dialog title="上传音频" v-model="uploadSongVisible" width="20%">
+      <el-upload
+        class="avatar-uploader"
+        action="http://localhost:8090/chart/uploadSong"
+        with-credentials="true"
+        name="file"
+        accept=".wav,.mp4"
+        auto-upload="false"
+        :data="{ songId: this.selectedSongId }"
+        :show-file-list="false"
+        :on-success="handleAvatarSuccess1"
+        :before-upload="beforeAvatarUpload"
+      >
+        <img v-if="songUrl" :src="songUrl" class="avatar" />
+        <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+      </el-upload>
+    </el-dialog>
+
+    <el-dialog title="上传默认背景" v-model="uploadBackVisible" width="20%">
+      <el-upload
+        class="avatar-uploader"
+        action="http://localhost:8090/chart/uploadDefaultBackground"
+        with-credentials="true"
+        name="file"
+        accept=".jpg,.png"
+        auto-upload="false"
+        :data="{ songId: this.selectedSongId }"
+        :show-file-list="false"
+        :on-success="handleAvatarSuccess2"
+        :before-upload="beforeAvatarUpload"
+      >
+        <i class="el-icon-plus avatar-uploader-icon"></i>
+      </el-upload>
+    </el-dialog>
+
+    <el-dialog title="上传歌曲封面" v-model="uploadCoverVisible" width="20%">
+      <el-upload
+        class="avatar-uploader"
+        action="http://localhost:8090/chart/uploadSongCover"
+        with-credentials="true"
+        name="file"
+        accept=".jpg,.png"
+        auto-upload="false"
+        :data="{ songId: this.selectedSongId }"
+        :show-file-list="false"
+        :on-success="handleAvatarSuccess3"
+        :before-upload="beforeAvatarUpload"
+      >
+        <i class="el-icon-plus avatar-uploader-icon"></i>
+      </el-upload>
+    </el-dialog>
   </div>
 </template>
 
@@ -211,10 +284,9 @@ export default {
         songId: "",
         songName: "",
         songWriter: "",
-        songUrl: "http://192.168.2.169:8090/1.wav",
-        defaultBackground:
-          "http://pic.mcatk.com/charlot-pictures/netsuai-0.jpg",
-        songCover: "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
+        songUrl: "",
+        defaultBackground: "",
+        songCover: "",
         loadingText: "",
         chartConstant: "",
         loadedText: "",
@@ -235,10 +307,21 @@ export default {
         notesCount: "",
         uploaderId: "",
       },
+      deleteForm: {
+        songId: "",
+      },
       songs: [],
       editVisible: false,
       selectedSongId: "",
       addVisible: false,
+      value: false,
+      song: {
+        songId: "",
+      },
+      uploadSongVisible: false,
+      uploadBackVisible: false,
+      uploadCoverVisible: false,
+      songUrl: "",
     };
   },
   mounted() {},
@@ -276,6 +359,15 @@ export default {
     getAdd() {
       this.addVisible = true;
     },
+    startUploadSong() {
+      this.uploadSongVisible = true;
+    },
+    startUploadBack() {
+      this.uploadBackVisible = true;
+    },
+    startUploadCover() {
+      this.uploadCoverVisible = true;
+    },
     async addSong() {
       const { data: res } = await this.$http.post(
         "/chart/newChart",
@@ -290,10 +382,29 @@ export default {
       }
     },
     async editSongInfo() {
+      console.log(this.form);
+      this.song.songId = this.selectedSongId;
       this.form.songId = this.selectedSongId;
+      const { data: res1 } = await this.$http.post(
+        "/user/publiciseChart",
+        this.song
+      );
+      if (res1.code != 0) {
+        this.$message.error("公开化失败");
+      }
+      let formData = new FormData();
+      formData.append("songId", this.form.songId);
+      formData.append("songName", this.form.songName);
+      formData.append("songWriter", this.form.songWrite);
+      formData.append("songUrl", this.form.songUrl);
+      formData.append("defaultBackground", this.form.defaultBackground);
+      formData.append("songCover", this.form.songCover);
+      formData.append("loadingText", this.form.loadingText);
+      formData.append("chartConstant", this.form.chartConstant);
+      formData.append("loadedText", this.form.loadedText);
       const { data: res } = await this.$http.post(
         "/chart/editChartInfo",
-        this.form
+        this.formData
       );
       if (res.code == 0) {
         this.$message.success("修改成功");
@@ -302,11 +413,66 @@ export default {
         this.$message.error("编辑失败");
       }
     },
+    async delete(songId) {
+      this.deleteForm.songId = songId;
+      const { data: res } = await this.$http.post(
+        "/user/deleteChart",
+        this.deleteForm
+      );
+      if (res.code === 0) {
+        this.getMyAllCharts();
+        this.$message({
+          type: "success",
+          message: "删除成功!",
+        });
+      } else {
+        this.$message({
+          type: "error",
+          message: "删除失败!",
+        });
+      }
+    },
+    deleteSong(songId) {
+      this.$confirm("此操作删除该谱面, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      }).then(() => {
+        this.delete(songId);
+      });
+    },
+    next(songId) {
+      this.$router.push({
+        path: "/chart/maker",
+        query: {
+          songID: songId,
+        },
+      });
+    },
+    handleAvatarSuccess1(res, file) {
+      this.songUrl = URL.createObjectURL(file.raw);
+      this.$message.success("上传成功");
+      console.log(res);
+      this.form.songUrl = res.data;
+      this.uploadSongVisible = false;
+    },
+    handleAvatarSuccess2(res, file) {
+      this.songUrl = URL.createObjectURL(file.raw);
+      this.$message.success("上传成功");
+      this.form.defaultBackground = res.data.url;
+      this.uploadBackVisible = false;
+    },
+    handleAvatarSuccess3(res, file) {
+      this.songUrl = URL.createObjectURL(file.raw);
+      this.$message.success("上传成功");
+      this.form.songCover = res.data.url;
+      this.uploadCoverVisible = false;
+    },
   },
 };
 </script>
 
-<style scoped>
+<style>
 .divTop {
   /* border:1px solid black; */
   width: 70%;
@@ -381,9 +547,9 @@ export default {
   margin: 10px 20px;
   border-bottom: 1px solid #cccccc;
 }
-/* .div4:active{
-      transform: scale(0.98);
-  } */
+.div5:active {
+  transform: scale(0.98);
+}
 .div5 {
   margin: 20px 0;
   width: 200px;
@@ -395,17 +561,21 @@ export default {
   font-size: 18px;
   color: #000000;
   cursor: pointer;
+  /* float: left; */
 }
 .div8 {
-  display: flex;
+  /* display: flex; */
   color: #cccccc;
   line-height: 40px;
+  /* width: 100%; */
+  margin-left: auto;
 }
 .div9 {
   overflow: hidden;
   text-overflow: ellipsis;
-  line-height: 20px;
+  line-height: 15px;
   color: gray;
+  margin-top: 2px;
 }
 /* .icon-active{
       size: 20px;
