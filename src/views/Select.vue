@@ -1,5 +1,6 @@
 <template>
   <div class="select-container">
+    <Header/>
     <div class="divTop">
       <!-- <input type="text"> -->
       <div style="float:right;width:50%;">
@@ -77,9 +78,10 @@
 </template>
 
 <script>
+import Header from "../components/Header";
 import SongCard from "../components/Select/SongCard";
 export default {
-  components: { SongCard },
+  components: { SongCard,Header },
   data() {
     return {
       type: "",
@@ -133,7 +135,6 @@ export default {
   height: 100%;
   background-color: #eee;
   font-size: 14px;
-  padding: 20px 0;
   overflow: auto;
   background-image: url(../assets/img/login.png);
 }

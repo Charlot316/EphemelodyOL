@@ -4,7 +4,7 @@
     <div style="border: 1px solid black ;height:100%">
       <div class="leftDiv">
         <div style="margin-left:25%;width:50%;height:40%">
-          <img :src="user.iconUrl" class="img1" />
+          <img :src="user.iconUrl" class="img1" onerror="onerror=null;src='https://img0.baidu.com/it/u=3730772664,138405132&fm=26&fmt=auto'"/>
         </div>
         <div style="width:50%;margin-left:25%">
           <button

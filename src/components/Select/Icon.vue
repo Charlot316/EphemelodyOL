@@ -1,13 +1,17 @@
 <template>
   <div class="icon-container" style="cursor:pointer;">
     <div>
-      <img :src="user.playerIcon" class="img1" />
+      <img
+        :src="user.playerIcon"
+        class="img1"
+        onerror="onerror=null;src='https://img0.baidu.com/it/u=3730772664,138405132&fm=26&fmt=auto'"
+      />
     </div>
     <div class="icon-info">
       <div style="font-weight:600;">{{ user.ranking }} {{ user.player }}</div>
 
       <div style="font-weight:300;">
-        <span >{{ Status }} {{ user.bestScore }}</span> 
+        <span>{{ Status }} {{ user.bestScore }}</span>
       </div>
     </div>
   </div>
@@ -22,11 +26,7 @@ export default {
     };
   },
 
-  created() {
-   
-         
-       
-  },
+  created() {},
   computed: {
     Status() {
       if (this.user.recordStatus == 0) {

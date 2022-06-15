@@ -5,7 +5,6 @@
     </div>
     <div class="right">
       <Icon/>
-
     </div>
   </div>
 </template>
@@ -27,7 +26,6 @@ export default {
   justify-content: space-between;
   align-items: center;
   height: 80px;
-  background-color: #fff;
-  border-bottom: 1px solid #e5e5e5;
+  padding: 5px 20px;
 }
 </style>
