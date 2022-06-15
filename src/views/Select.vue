@@ -110,7 +110,6 @@ export default {
   },
   methods: {
     async getCharts() {
-      this.params.sortType = this.params.searchType;
       const { data: res } = await this.$http.post(
         "/user/getPublicCharts",
         this.params

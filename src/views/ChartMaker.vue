@@ -266,22 +266,6 @@
               <i class="el-icon-question" />
             </el-tooltip>
           </el-form-item>
-          <el-form-item label="快进最小间隔">
-            <el-input-number
-              v-model="keyStep"
-              :min="1"
-              :max="chart.songLength"
-            />
-            <el-tooltip
-              class="item"
-              effect="dark"
-              content="按键盘左右键可以调整时间轴，本项可以调整按一次左键或者右键快进的时间多少"
-              placement="top-start"
-              style="margin-left:10px;"
-            >
-              <i class="el-icon-question" />
-            </el-tooltip>
-          </el-form-item>
           <el-form-item label="首拍偏移(单位:ms)">
             <el-input-number
               v-model="chart.firstBeatDelay"
@@ -637,14 +621,15 @@ export default {
         if (that.volume >= 10) that.volume -= 10;
         else that.volume = 0;
         that.audio.volume = that.volume / 100;
-      } else if (e.key == "ArrowLeft") {
-        e.preventDefault();
-        that.minusTime(that.keyStep / 1000);
-      } else if (e.key == "ArrowRight") {
-        e.preventDefault();
-        that.audio.currentTime += that.keyStep / 1000;
-        that.plusTime(that.keyStep / 1000);
-      }
+      } 
+      // else if (e.key == "ArrowLeft") {
+      //   e.preventDefault();
+      //   that.minusTime(that.keyStep / 1000);
+      // } else if (e.key == "ArrowRight") {
+      //   e.preventDefault();
+      //   that.audio.currentTime += that.keyStep / 1000;
+      //   that.plusTime(that.keyStep / 1000);
+      // }
     };
 
     document.onkeyup = function(e) {

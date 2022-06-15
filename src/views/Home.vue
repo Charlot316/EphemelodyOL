@@ -42,7 +42,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .home {
   position: absolute;
   top: 0;
