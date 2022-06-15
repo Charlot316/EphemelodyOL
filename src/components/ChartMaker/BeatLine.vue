@@ -109,10 +109,14 @@ export default {
     "chart.firstBeatDelay"() {
       this.setDisplay();
     },
+    "chart.songLength"() {
+      this.setDisplay();
+    },
   },
   methods: {
     setDisplay() {
       var bpm16 = this.chart.bpm / 16;
+      this.LineCount = Math.ceil(this.chart.songLength / bpm16) + 16;
       var bpm8 = this.chart.bpm / 8;
       var bpm4 = this.chart.bpm / 4;
       var bpm = this.chart.bpm / 1;

@@ -164,6 +164,7 @@
       </div>
     </div>
     <div
+      v-if="chartGot"
       :class="menuOpened ? 'time-controller-small' : 'time-controller-big'"
       :style="{
         '--footerHeight': footerHeight + 'px',
@@ -393,7 +394,7 @@
       leave-active-class="animate__animated animate__fadeOutDown"
     >
       <div
-        v-if="menuOpened"
+        v-if="menuOpened && chartGot"
         :class="menuOpened ? 'footer-opened' : 'footer-closed'"
         :style="{
           '--footerHeight': footerHeight + 'px',
@@ -425,7 +426,6 @@ import Track from "@/components/PlayInterface/Track";
 import MenuPanel from "@/components/ChartMaker/MenuPanel";
 import TrackPanel from "@/components/ChartMaker/TrackPanel";
 import Footer from "@/components/ChartMaker/Footer";
-import { chart } from "@/utils/chart.js";
 import "animate.css";
 export default {
   components: {
@@ -478,6 +478,7 @@ export default {
       chart: {
         songLength: 0,
       },
+      chartGot: false,
       bpmStart: false,
       bpmcount: 0,
       bpmtotal: 0,
@@ -498,7 +499,7 @@ export default {
       currentTracks: [],
       globalSetting: false, //是否显示全局设置
       displayStart: 0,
-      displayEnd: 0,
+      displayEnd: 10,
       form: {},
       footerHeight: 426,
     };
@@ -845,9 +846,59 @@ export default {
       }, 520);
     },
     //获取谱面信息
-    getChart() {
-      this.chart = chart;
-      this.displayStart = 0;
+    async getChart() {
+      try {
+        const { data: res } = await this.$http.get(
+          `/user/getChart?songId=${this.$route.query.songId}`
+        );
+        if (res.code !== 0) {
+          this.$notify({
+            title: "失败",
+            message: "登录失败！",
+            type: "error",
+          });
+        }
+        this.chart = res.data;
+        this.loadingStatus.chart = true;
+        this.displayStart = 0;
+        this.sortTrack();
+        this.audio = document.getElementById("audioSong");
+        this.volume = this.$store.state.volume;
+        let that = this;
+        this.audio.oncanplay = function() {
+          that.chart.songLength = Math.round(1000 * that.audio.duration);
+          that.generateImagePath();
+          that.displayEnd = that.chart.songLength;
+        };
+        this.chartGot = true;
+        this.$forceUpdate();
+        this.audio.volume = this.$store.state.volume / 100;
+        this.run();
+        if (!this.chart.bpm || this.chart.bpm == 0) {
+          this.globalSetting = true; //请设置节拍
+          this.$notify({
+            type: "warning",
+            title: "提示",
+            message: "请设置节拍",
+          });
+        }
+        if (!this.chart.bpm) {
+          this.chart.bpm = 0;
+        }
+        if (!this.chart.firstBeatDelay) {
+          this.chart.firstBeatDelay = 0;
+        }
+
+        setTimeout(() => {
+          this.resize();
+        }, 1000);
+      } catch (err) {
+        return this.$notify({
+          title: "错误",
+          message: "网络异常",
+          type: "error",
+        });
+      }
     },
     //给轨道排序
     sortTrack() {
@@ -892,37 +943,6 @@ export default {
     //加载
     initiate() {
       this.getChart();
-      this.loadingStatus.chart = true;
-      this.sortTrack();
-      this.generateImagePath();
-      this.audio = document.getElementById("audioSong");
-      this.volume = this.$store.state.volume;
-      let that = this;
-      this.audio.oncanplay = function() {
-        that.chart.songLength = Math.round(1000 * that.audio.duration);
-        that.displayEnd = that.chart.songLength;
-      };
-
-      this.audio.volume = this.$store.state.volume / 100;
-      this.run();
-      if (!this.chart.bpm || this.chart.bpm == 0) {
-        this.globalSetting = true; //请设置节拍
-        this.$notify({
-          type: "warning",
-          title: "提示",
-          message: "请设置节拍",
-        });
-      }
-      if (!this.chart.bpm) {
-        this.chart.bpm = 0;
-      }
-      if (!this.chart.firstBeatDelay) {
-        this.chart.firstBeatDelay = 0;
-      }
-
-      setTimeout(() => {
-        this.resize();
-      }, 1000);
     },
 
     //生成图片路径

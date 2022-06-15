@@ -93,7 +93,7 @@
           ><el-slider
             v-model="displayAreaTime"
             :min="1000"
-            :max="chart.songLength"
+            :max="chart.songLength>1000?chart.songLength:1001"
           ></el-slider>
         </el-tooltip>
       </div>

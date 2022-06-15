@@ -83,6 +83,7 @@ export default {
   watch: {
     chart(){
       this.$forceUpdate();
+      console.log(this.chart.defaultBackground)
     }
   },
   created() {},

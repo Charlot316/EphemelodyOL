@@ -1,6 +1,6 @@
 <template>
   <div class="play-interface select" id="play-interface-container">
-    <Prepare
+    <Prepare 
       :loadingStatus="loadingStatus"
       :chart="chart"
       @startMusic="startMusic"
@@ -20,7 +20,7 @@
       @restart="reStart"
       @continuePlay="continuePlay"
     />
-    <Result :loadingStatus="loadingStatus" :chart="chart" :global="global" />
+    <Result  :loadingStatus="loadingStatus" :chart="chart" :global="global" />
     <el-dialog
       v-model="pauseVisible"
       title="暂停"
@@ -68,6 +68,7 @@ export default {
       pauseVisible: false,
       audio: null,
       playInterface: null,
+      chartGot:false,
       loadingStatus: {
         chart: false,
         audio: false,
@@ -265,6 +266,12 @@ export default {
       that.global.trackCanvas.width = that.playInterface.offsetWidth;
       that.global.judgeCanvas.width = that.playInterface.offsetWidth;
     },
+
+    //加载
+    initiate() {
+      this.getChart();
+    },
+
     //获取谱面信息
     async getChart() {
       try {
@@ -280,7 +287,6 @@ export default {
         }
         this.chart = res.data;
         this.loadingStatus.chart = true;
-        this.$forceUpdate();
         this.sortTrack();
         this.generateImagePath();
       } catch (err) {
@@ -353,6 +359,8 @@ export default {
     audioLoaded() {
       this.audio = document.getElementById("audioSong");
       this.chart.songLength = Math.round(1000 * this.audio.duration);
+      this.generateImagePath();
+      this.audio.muted = true;
       this.loadingStatus.audio = true;
       console.log("audio loaded");
       this.checkIfLoaded();
@@ -361,9 +369,7 @@ export default {
     //图片加载完毕
     imageLoaded() {
       this.loadingStatus.imageCurrentCount++;
-      console.log(this.loadingStatus.imageCurrentCount)
-      console.log(this.imagePath.length)
-      if (this.loadingStatus.imageCurrentCount+1 == this.imagePath.length) {
+      if (this.loadingStatus.imageCurrentCount == this.imagePath.length) {
         this.loadingStatus.image = true;
         console.log("image loaded");
         this.checkIfLoaded();
@@ -373,11 +379,6 @@ export default {
     //打印控制台信息
     log(message) {
       console.log(message);
-    },
-
-    //加载
-    initiate() {
-      this.getChart();
     },
 
     //开始播放音乐
@@ -437,6 +438,7 @@ export default {
           });
         }
       }
+      console.log(this.imagePath);
     },
 
     //父组件提供的方法
