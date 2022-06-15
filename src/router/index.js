@@ -8,6 +8,9 @@ const routes = [{
     {
         path: "/play",
         name: "Play",
+        meta: {
+            requireAuth: true,
+        },
         component: () =>
             import (
                 "../views/PlayInterface.vue"
@@ -16,6 +19,9 @@ const routes = [{
     {
         path: "/chart/maker",
         name: "chartMaker",
+        meta: {
+            requireAuth: true,
+        },
         component: () =>
             import (
                 "../views/ChartMaker.vue"
@@ -24,6 +30,9 @@ const routes = [{
     {
         path: "/home",
         name: "Home",
+        meta: {
+            requireAuth: true,
+        },
         component: () =>
             import (
                 "../views/Home.vue"
@@ -46,8 +55,22 @@ const routes = [{
             ),
     },
     {
-        path: "/select",
-        name: "Select",
+        path: "/public",
+        name: "Public",
+        meta: {
+            requireAuth: true,
+        },
+        component: () =>
+            import (
+                "../views/Select.vue"
+            ),
+    },
+    {
+        path: "/society",
+        name: "Society",
+        meta: {
+            requireAuth: true,
+        },
         component: () =>
             import (
                 "../views/Select.vue"
@@ -56,6 +79,9 @@ const routes = [{
     {
         path: "/admin",
         name: "Admin",
+        meta: {
+            requireAuth: true,
+        },
         component: () =>
             import (
                 "../views/Admin.vue"

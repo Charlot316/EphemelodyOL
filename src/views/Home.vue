@@ -24,13 +24,13 @@
         </div>
       </div>
       <div class="rightDiv">
-        <button class="btn btn1">开始游戏</button>
+        <button class="btn btn1" @click="$router.push({path:'/public'})">开始游戏</button>
         <div class="div1">
           <div class="div_btn21">
-            <button class="btn_2 btn2">社区</button>
+            <button class="btn_2 btn2"  @click="$router.push({path:'/society'})">社区</button>
           </div>
           <div class="div_btn22">
-            <button class="btn_2 btn2">管理</button>
+            <button class="btn_2 btn2"  @click="$router.push({path:'/admin'})">管理</button>
           </div>
         </div>
       </div>

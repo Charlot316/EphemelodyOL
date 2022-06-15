@@ -16,7 +16,6 @@
       @imageLoaded="imageLoaded"
       @addCount="addCount"
       @pause="pause"
-      @back="back"
       @restart="reStart"
       @continuePlay="continuePlay"
     />
@@ -31,7 +30,7 @@
       :close-on-click-modal="false"
     >
       <div style="text-align: center;">
-        <el-button icon="el-icon-caret-left" @click="back" circle></el-button>
+        <el-button icon="el-icon-caret-left" @click="$router.go(-1)" circle></el-button>
         <el-button
           icon="el-icon-refresh-left"
           circle
@@ -322,14 +321,14 @@ export default {
           lost: this.global.lostCount,
           combo: this.global.maxCombo,
         });
-        console.log(JSON.stringify({
-          score: this.global.score,
-          songId: this.$route.query.songId,
-          pure: this.global.pureCount,
-          far: this.global.farCount,
-          lost: this.global.lostCount,
-          combo: this.global.maxCombo,
-        }))
+        // console.log(JSON.stringify({
+        //   score: this.global.score,
+        //   songId: this.$route.query.songId,
+        //   pure: this.global.pureCount,
+        //   far: this.global.farCount,
+        //   lost: this.global.lostCount,
+        //   combo: this.global.maxCombo,
+        // }))
         if (res.code !== 0) {
           this.$notify({
             title: "失败",
@@ -338,6 +337,7 @@ export default {
           });
         }
         this.global.formerBestScore = res.data.formerBestScore;
+        this.$store.commit("changeParam", {key:'potential',value:res.data.formerBestScore});
       } catch (err) {
         return this.$notify({
           title: "错误",
@@ -571,7 +571,6 @@ export default {
         }
       }
     },
-    back() {},
   },
 };
 </script>

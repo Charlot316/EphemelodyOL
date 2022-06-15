@@ -59,7 +59,7 @@
 
       <div
         :class="'play-button'"
-        @click="back"
+        @click="$router.go(-1)"
         style="width:150px;height:150px;line-height:150px;position:absolute;bottom:50px;right:50px;border-radius:50%;text-align: center;"
       >
         继续

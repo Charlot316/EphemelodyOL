@@ -1,6 +1,5 @@
 <template
   ><router-link
-    target="_blank"
     :to="{ path: '/play', query: { songId: song.songInfo.songId } }"
   >
     <div
