@@ -69,7 +69,7 @@
         <el-upload
           class="avatar-uploader"
           action="http://localhost:8090/user/uploadIcon"
-          with-credentials="true"
+          :with-credentials="true"
           name="file"
           accept=".jpg,.png"
           auto-upload="false"

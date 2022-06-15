@@ -80,6 +80,44 @@
               <i class="el-icon-question" />
             </el-tooltip>
           </el-form-item>
+          <el-form-item label="背景" label-width="80px" prop="background">
+            <el-input
+              @keydown.enter="saveOperation"
+              v-model="tempOperation.background"
+              style="width:100px"
+            />
+            <el-tooltip
+              class="item"
+              effect="dark"
+              content="输入背景图片的url，您也可以点击下方按钮上传自己的图片至服务器"
+              placement="top-start"
+              style="margin-left:10px;"
+            >
+              <i class="el-icon-question" />
+            </el-tooltip>
+          </el-form-item>
+          <el-form-item label="手动上传" label-width="80px">
+            <el-upload
+              class="upload-demo"
+              action="http://localhost:8090/chart/uploadBackground"
+              :with-credentials="true"
+              name="background"
+              :data="{
+                songId: $route.query.songId,
+                startTime: tempOperation.startTime,
+              }" 
+              :on-success="handleUploadSuccess"
+              :disabled="tempOperation.startTime == ''"
+            >
+              <el-button
+                size="small"
+                :disabled="tempOperation.startTime == ''"
+                >{{
+                  tempOperation.startTime == "" ? "请先填写时机" : "点击上传"
+                }}</el-button
+              >
+            </el-upload>
+          </el-form-item>
         </el-form>
       </div>
     </transition>
@@ -132,6 +170,15 @@ export default {
     startEdit() {
       this.myOperation.edit = true;
       this.tempOperation = JSON.parse(JSON.stringify(this.myOperation));
+    },
+    handleUploadSuccess(response) {
+      this.tempOperation.background = response.data.background;
+      this.$notify({
+        title: "上传成功",
+        message: "图片已上传至服务器",
+        type: "success",
+      });
+      this.saveOperation();
     },
     saveOperation() {
       this.$refs["form"].validate((valid) => {
@@ -207,7 +254,7 @@ export default {
   transition: 0.5s;
 }
 .edit {
-  height: 170px;
+  height: 270px;
   width: calc(100% - 30px);
   margin: 10px;
   padding: 5px;
