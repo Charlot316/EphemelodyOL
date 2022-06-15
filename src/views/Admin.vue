@@ -558,7 +558,6 @@ export default {
   width: 100%;
   height: 100%;
   font-size: 14px;
-  padding: 20px 0;
   overflow: auto;
 }
 .div2 {
