@@ -3,7 +3,11 @@
     <div class="header">
       <div class="header-buttons">
         <div>
-          <el-button size="small" type="text" class="header-button"
+          <el-button
+            size="small"
+            type="text"
+            class="header-button"
+            @click="$router.go(-1)"
             >返回</el-button
           >
         </div>
@@ -12,10 +16,14 @@
             size="small"
             type="text"
             class="header-button"
-            @click="log(JSON.stringify(chart))"
+            @click="saveChart(false)"
             >保存</el-button
           >
-          <el-button size="small" type="text" class="header-button"
+          <el-button
+            size="small"
+            type="text"
+            class="header-button"
+            @click="saveChart(true)"
             >保存并返回</el-button
           >
         </div>
@@ -163,6 +171,8 @@
         ></div>
       </div>
     </div>
+
+    <!-- 进度条 -->
     <div
       v-if="chartGot"
       :class="menuOpened ? 'time-controller-small' : 'time-controller-big'"
@@ -387,6 +397,7 @@
         <div></div>
       </el-dialog>
     </div>
+
     <!-- 时间轴 -->
     <transition
       name="fade"
@@ -700,6 +711,32 @@ export default {
   },
 
   methods: {
+    async saveChart(back){
+       try {
+        const { data: res } = await this.$http.post("/chart/editChartInfo", this.chart);
+        if (res.code !== 0) {
+          this.$notify({
+            title: "失败",
+            message: "谱面上传失败！",
+            type: "error",
+          });
+        }this.$notify({
+            title: "成功",
+            message: "谱面上传成功！",
+            type: "success",
+          });
+        if(back){
+          this.$router.push("/admin");
+        }
+      } catch (err) {
+        return this.$notify({
+          title: "错误",
+          message: "网络异常",
+          type: "error",
+        });
+      }
+    }
+    ,
     ManualCalculatebpm() {
       if (
         this.chart.beatsCount &&
@@ -874,6 +911,7 @@ export default {
         this.$forceUpdate();
         this.audio.volume = this.$store.state.volume / 100;
         this.run();
+        console.log(this.chart);
         if (!this.chart.bpm || this.chart.bpm == 0) {
           this.globalSetting = true; //请设置节拍
           this.$notify({
