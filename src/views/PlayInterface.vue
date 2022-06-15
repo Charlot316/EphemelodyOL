@@ -473,7 +473,6 @@ export default {
           });
         }
       }
-      console.log(this.imagePath);
     },
 
     //父组件提供的方法

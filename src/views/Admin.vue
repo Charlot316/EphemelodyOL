@@ -1,9 +1,9 @@
 <template>
         <div class="div1">
             <div class="divTop">
-                <button class="btn btn1">新增</button>
+                <button class="btn btn1" @click="getAdd()">新增</button>
                 <!-- <input type="text"> -->
-                <div style="float:right;width:50%;">
+                <div style="float:right;width:70%;">
                     <el-row>
                         <el-col :span="6">
                             <el-select
@@ -40,8 +40,8 @@
                                 ></el-option>
                             </el-select>
                         </el-col>
-                        <el-col :span="2"></el-col>
-                        <el-col :span="12">
+                        <el-col :span="1"></el-col>
+                        <el-col :span="11">
                             <el-input
                                 placeholder="请输入关键词进行搜索"
                                 v-model="params.searchContent"
@@ -59,23 +59,64 @@
                             </el-input>
                         </el-col>
                         <el-col :span="1"></el-col>
-                        <el-col :span="3">
+                        <el-col :span="5">
                             <el-select
-                                v-model="params.sortWay" 
-                                placeholder="升"
+                                v-model="sort" 
+                                placeholder="按歌手名升序"
                                 size="medium"
                                 class="handle-select mr10"
                                 id="升/降"
+                                @change="getCharts()"
                             >
                             <el-option
                                 key="0"
-                                label="升"
-                                value="0"
+                                label="按歌曲名升序"
+                                value="00"
                             ></el-option>
                             <el-option
-                                key="0"
-                                label="降"
-                                value="1"
+                                key="1"
+                                label="按歌曲名降序"
+                                value="01"
+                            ></el-option>
+                            <el-option
+                                key="2"
+                                label="按歌手名升序"
+                                value="10"
+                            ></el-option>
+                            <el-option
+                                key="3"
+                                label="按歌手名降序"
+                                value="11"
+                            ></el-option>
+                            <el-option
+                                key="4"
+                                label="按上传者名升序"
+                                value="20"
+                            ></el-option>
+                            <el-option
+                                key="5"
+                                label="按歌手名降序"
+                                value="21"
+                            ></el-option>
+                            <el-option
+                                key="6"
+                                label="按难度升序"
+                                value="30"
+                            ></el-option>
+                            <el-option
+                                key="7"
+                                label="按难度降序"
+                                value="31"
+                            ></el-option>
+                            <el-option
+                                key="8"
+                                label="按热度升序"
+                                value="40"
+                            ></el-option>
+                            <el-option
+                                key="9"
+                                label="按热度降序"
+                                value="41"
                             ></el-option>
                             </el-select>
                         </el-col>
@@ -92,7 +133,7 @@
                         <div class="div6">
                             <div class="div7">{{item.songName}}</div>
                             <div class="div8">
-                            <span class="icon-active" icon="el-icon-link" style="margin-left: 10px;"><i class="el-icon-setting"></i></span>
+                            <span class="icon-active" icon="el-icon-link" style="margin-left: 10px;"><i class="el-icon-setting" @click="getEdit(item.songId)"></i></span>
                             <span class="icon-active" icon="el-icon-link" style="margin-left: 10px;"><i class="el-icon-delete"></i></span>
                             </div>
                             <div class="div9">
@@ -102,6 +143,97 @@
                     </div>
                 </div>
             <!-- </div> -->
+
+            <!--编辑基本信息的弹出框-->
+            <el-dialog title="修改谱面信息" v-model="editVisible" width="40%" height="50%">
+                <el-form :model="form">
+                    <el-form-item label="歌曲名称" :label-width="formLabelWidth">
+                        <el-input v-model="form.songName" autocomplete="off"></el-input>
+                    </el-form-item>
+                    <el-form-item label="歌手名称" :label-width="formLabelWidth">
+                        <el-input v-model="form.songWriter" autocomplete="off"></el-input>
+                    </el-form-item>
+                    <el-form-item :label-width="formLabelWidth">
+                        <el-button type="primary" size="small">上传音频</el-button>
+                    </el-form-item>
+                    <el-form-item :label-width="formLabelWidth">
+                        <el-button type="primary" size="small">上传歌曲默认背景</el-button>
+                    </el-form-item>
+                    <el-form-item :label-width="formLabelWidth">
+                        <el-button type="primary" size="small">上传歌曲封面</el-button>
+                    </el-form-item>
+                    <el-form-item label="设置加载文字" :label-width="formLabelWidth">
+                        <el-input v-model="form.loadingText" autocomplete="off"></el-input>
+                    </el-form-item>
+                    <el-form-item label="设置谱面定数" :label-width="formLabelWidth">
+                        <el-input v-model="form.chartConstant" autocomplete="off"></el-input>
+                    </el-form-item>
+                    <el-form-item label="设置加载完毕文字" :label-width="formLabelWidth">
+                        <el-input v-model="form.loadedText" autocomplete="off"></el-input>
+                    </el-form-item>
+                </el-form>
+                <template #footer>
+                    <div class="dialog-footer">
+                        <el-button @click="editVisible = false">取 消</el-button>
+                        <el-button type="primary" @click="editSongInfo()">确 定</el-button>
+                    </div>
+                </template>
+            </el-dialog>
+
+            <!--编辑新增谱面的弹出框-->
+            <el-dialog title="新增谱面" v-model="addVisible" width="40%" height="50%">
+                <el-form :model="newSong">
+                    <el-form-item label="BPM" :label-width="formLabelWidth">
+                        <el-input v-model="newSong.BPM" autocomplete="off"></el-input>
+                    </el-form-item>
+                    <el-form-item label="FirstBeatDelay" :label-width="formLabelWidth">
+                        <el-input v-model="newSong.firstBeatDelay" autocomplete="off"></el-input>
+                    </el-form-item>
+                    <el-form-item label="歌曲ID" :label-width="formLabelWidth">
+                        <el-input v-model="newSong.songId" autocomplete="off"></el-input>
+                    </el-form-item>
+                    <el-form-item label="歌曲长度" :label-width="formLabelWidth">
+                        <el-input v-model="newSong.songLength" autocomplete="off"></el-input>
+                    </el-form-item>
+                    <el-form-item label="默认背景" :label-width="formLabelWidth">
+                        <el-input v-model="newSong.defaultBackground" autocomplete="off"></el-input>
+                    </el-form-item>
+                    <el-form-item label="歌曲音频" :label-width="formLabelWidth">
+                        <el-input v-model="newSong.songUrl" autocomplete="off"></el-input>
+                    </el-form-item>
+                    <el-form-item label="上传者" :label-width="formLabelWidth">
+                        <el-input v-model="newSong.uploader" autocomplete="off"></el-input>
+                    </el-form-item>
+                    <el-form-item label="作者" :label-width="formLabelWidth">
+                        <el-input v-model="newSong.songWriter" autocomplete="off"></el-input>
+                    </el-form-item>
+                    <el-form-item label="封面" :label-width="formLabelWidth">
+                        <el-input v-model="newSong.songCover" autocomplete="off"></el-input>
+                    </el-form-item>
+                    <el-form-item label="加载文字" :label-width="formLabelWidth">
+                        <el-input v-model="newSong.loadingText" autocomplete="off"></el-input>
+                    </el-form-item>
+                    <el-form-item label="加载完成文字" :label-width="formLabelWidth">
+                        <el-input v-model="newSong.loadedText" autocomplete="off"></el-input>
+                    </el-form-item>
+                    <el-form-item label="歌曲名称" :label-width="formLabelWidth">
+                        <el-input v-model="newSong.songName" autocomplete="off"></el-input>
+                    </el-form-item>
+                    <el-form-item label="NotesCount" :label-width="formLabelWidth">
+                        <el-input v-model="newSong.notesCount" autocomplete="off"></el-input>
+                    </el-form-item>
+                    <el-form-item label="上传者ID" :label-width="formLabelWidth">
+                        <el-input v-model="newSong.uploaderId" autocomplete="off"></el-input>
+                    </el-form-item>
+                </el-form>
+                <template #footer>
+                    <div class="dialog-footer">
+                        <el-button @click="addVisible = false">取 消</el-button>
+                        <el-button type="primary" @click="addSong()">确 定</el-button>
+                    </div>
+                </template>
+            </el-dialog>
+
         </div>
 
   
@@ -113,6 +245,7 @@ export default {
     data() {
         return {
             type: "",
+            sort: "",
             params: {
                 status:"0",
                 searchType:"",
@@ -120,7 +253,37 @@ export default {
                 sortType:"",
                 sortWay:""
             },
+            form: {
+                songId:"",
+                songName:"",
+                songWriter:"",
+                songUrl:"http://192.168.2.169:8090/1.wav",
+                defaultBackground:"http://pic.mcatk.com/charlot-pictures/netsuai-0.jpg",
+                songCover:"http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
+                loadingText:"",
+                chartConstant:"",
+                loadedText:""
+            },
+            newSong: {
+                BPM:"",
+                firstBeatDelay:"",
+                songId:"",
+                songLength:"",
+                defaultBackground:"",
+                songUrl:"",
+                uploader:"",
+                songWriter:"",
+                songCover:"",
+                loadingText:"",
+                loadedText:"",
+                songName:"",
+                notesCount:"",
+                uploaderId:""
+            },
             songs:[],
+            editVisible:false,
+            selectedSongId:"",
+            addVisible:false
         };
     },
     mounted() {
@@ -141,18 +304,53 @@ export default {
             }
         },
         async getCharts(){
-            this.params.sortType = this.params.searchType
+            this.params.sortType = this.sort.substr(0,1);
+            this.params.sortWay = this.sort.substr(1,1);
+            console.log(this.params)
             const{data: res} = await this.$http.post(
                 '/user/getMyCharts',this.params
             );
+            console.log(res)
             if(res.code == 0){
                 this.songs = res.data.charts
             }
             else{
                 this.$message.error("获取异常")
             }
+        },
+        getEdit(songId){
+            this.editVisible = true;
+            this.selectedSongId = songId;
+        },
+        getAdd(){
+            this.addVisible = true;
+        },
+        async addSong(){
+            const{data: res} = await this.$http.post(
+                '/chart/newChart',this.newSong
+            );
+            if(res.code === 0){
+                this.$message.success("新增成功")
+                this.getMyAllCharts();
+                this.addVisible = false;
+            }
+            else{
+                this.$message.error("编辑失败")
+            }
+        },
+        async editSongInfo(){
+            this.form.songId = this.selectedSongId;
+            const{data: res} = await this.$http.post(
+                '/chart/editChartInfo',this.form
+            );
+            if(res.code == 0){
+                this.$message.success("修改成功")
+                this.editVisible = false;
+            }
+            else{
+                this.$message.error("编辑失败")
+            }
         }
-        
     }
 };
 </script>
