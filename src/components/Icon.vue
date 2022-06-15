@@ -3,7 +3,7 @@
     <div class="icon-container" style="cursor:pointer;">
       <div class="icon-info">
         <div class="user-name">{{ $store.state.user.username }}</div>
-        <div class="potential">{{ $store.state.user.potential }}</div>
+        <div class="potential">{{ potential }}</div>
       </div>
       <div>
         <img
@@ -23,7 +23,11 @@ export default {
     return {
     };
   },
-
+computed:{
+  potential(){
+    return parseFloat(this.$store.state.user.potential).toFixed(2);
+  }
+},
   created() {
   },
   methods: {},

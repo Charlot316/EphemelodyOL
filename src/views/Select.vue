@@ -122,7 +122,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .divTop {
   /* border:1px solid black; */
   width: 70%;

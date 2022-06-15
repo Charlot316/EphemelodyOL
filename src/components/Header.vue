@@ -1,10 +1,11 @@
 <template>
   <div class="header">
-    <div class="left-logo">
+    <div class="left-logo" @click="$router.push({path:'/home'})">
       EphemelodyOL
     </div>
     <div class="right">
       <Icon/>
+      
     </div>
   </div>
 </template>
@@ -33,5 +34,7 @@ export default {
   font-weight: 300;
   color: #ffffff;
   text-shadow: 0 0 2px rgb(64, 64, 64);
+  letter-spacing:3px;
+  cursor: pointer;
 }
 </style>

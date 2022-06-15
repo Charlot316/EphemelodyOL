@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <Header />
-    <div style="border: 1px solid black ;height:100%">
+    <div style="height:100%">
       <div class="leftDiv">
         <div style="margin-left:25%;width:50%;height:40%">
           <img :src="user.iconUrl" class="img1" onerror="onerror=null;src='https://img0.baidu.com/it/u=3730772664,138405132&fm=26&fmt=auto'"/>
@@ -229,13 +229,6 @@ export default {
   margin-top: 5%;
   margin-right: 18%;
 }
-/* .img1{
-  margin-left: 20%;
-  height: 50%;
-  width: 60%;
-  object-fit: cover;
-  cursor: pointer;
-} */
 .img1 {
   width: 100%;
   height: 100%;
