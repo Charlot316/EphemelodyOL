@@ -1,6 +1,6 @@
 <template>
   <div class="play-interface select" id="play-interface-container">
-    <Prepare 
+    <Prepare
       :loadingStatus="loadingStatus"
       :chart="chart"
       @startMusic="startMusic"
@@ -20,7 +20,7 @@
       @restart="reStart"
       @continuePlay="continuePlay"
     />
-    <Result  :loadingStatus="loadingStatus" :chart="chart" :global="global" />
+    <Result :loadingStatus="loadingStatus" :chart="chart" :global="global" />
     <el-dialog
       v-model="pauseVisible"
       title="暂停"
@@ -68,7 +68,7 @@ export default {
       pauseVisible: false,
       audio: null,
       playInterface: null,
-      chartGot:false,
+      chartGot: false,
       loadingStatus: {
         chart: false,
         audio: false,
@@ -312,7 +312,40 @@ export default {
         return a.startTiming - b.startTiming;
       });
     },
-
+    async finish() {
+      try {
+        const { data: res } = await this.$http.post("/play/uploadRecord", {
+          score: this.global.score,
+          songId: this.$route.query.songId,
+          pure: this.global.pureCount,
+          far: this.global.farCount,
+          lost: this.global.lostCount,
+          combo: this.global.maxCombo,
+        });
+        console.log(JSON.stringify({
+          score: this.global.score,
+          songId: this.$route.query.songId,
+          pure: this.global.pureCount,
+          far: this.global.farCount,
+          lost: this.global.lostCount,
+          combo: this.global.maxCombo,
+        }))
+        if (res.code !== 0) {
+          this.$notify({
+            title: "失败",
+            message: "成绩上传失败！",
+            type: "error",
+          });
+        }
+        this.global.formerBestScore = res.data.formerBestScore;
+      } catch (err) {
+        return this.$notify({
+          title: "错误",
+          message: "网络异常",
+          type: "error",
+        });
+      }
+    },
     //运行
     run() {
       if (
@@ -345,7 +378,9 @@ export default {
       } else {
         this.global.currentTime = this.chart.songLength;
         this.loadingStatus.beforeFinished = true;
+
         this.calculateScore();
+        this.finish();
         this.$forceUpdate();
 
         setTimeout(() => {
@@ -454,11 +489,11 @@ export default {
       if (param.type == "lost") {
         this.global.combo = 0;
       } else {
+        this.global.combo++;
         this.global.maxCombo = Math.max(
           this.global.maxCombo,
           this.global.combo
         );
-        this.global.combo++;
       }
     },
 
