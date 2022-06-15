@@ -28,4 +28,10 @@ export default {
   height: 80px;
   padding: 5px 20px;
 }
+.left-logo{
+  font-size: 50px;
+  font-weight: 300;
+  color: #ffffff;
+  text-shadow: 0 0 2px rgb(64, 64, 64);
+}
 </style>

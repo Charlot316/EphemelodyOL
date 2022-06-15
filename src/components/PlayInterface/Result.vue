@@ -44,7 +44,9 @@
             <div
               style="min-width:400px;text-align:left;text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:20px;color:rgb(255,255,255);padding:0px 10px;"
             >
-              最大连击:{{ global.maxCombo + "\u3000" }}历史最佳成绩:{{ chart.formerBestScore }}
+              最大连击:{{ global.maxCombo + "\u3000" }}历史最佳成绩:{{
+                global.formerBestScore
+              }}
             </div>
             <div
               style="min-width:400px;text-align:left;text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:20px;color:rgb(255,255,255);padding:0px 10px;"

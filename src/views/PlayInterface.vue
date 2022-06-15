@@ -337,7 +337,7 @@ export default {
           });
         }
         this.global.formerBestScore = res.data.formerBestScore;
-        this.$store.commit("changeParam", {key:'potential',value:res.data.formerBestScore});
+        this.$store.commit("changeParam", {key:'potential',value:res.data.potential});
       } catch (err) {
         return this.$notify({
           title: "错误",

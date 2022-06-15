@@ -11,7 +11,7 @@
       <div style="font-weight:600;">{{ user.ranking }} {{ user.player }}</div>
 
       <div style="font-weight:300;">
-        <span>{{ Status }} {{ user.bestScore }}</span>
+        <span>{{ user.bestScore }}</span>
       </div>
     </div>
   </div>
