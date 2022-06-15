@@ -480,9 +480,12 @@ export default {
       this.$router.push({
         path: "/chart/maker",
         query: {
-          songID: songId,
+          songId: songId,
         },
       });
+      setTimeout(() => {
+        location.reload() 
+      }, 100);
     },
     handleAvatarSuccess1(res, file) {
       this.songUrl = URL.createObjectURL(file.raw);

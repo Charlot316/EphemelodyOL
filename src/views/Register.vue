@@ -1,63 +1,68 @@
 <template>
-  <div class="loginbody">
-    <div class="logindata">
-      <div class="logintext">
-        <h2>EphemelodyOL</h2>
-      </div>
-      <div class="formdata">
-        <el-form ref="register" :model="form" :rules="rules">
-          <el-form-item prop="username">
-            <el-input
-              v-model="form.username"
-              clearable
-              placeholder="请输入账号"
-            ></el-input>
-          </el-form-item>
-          <el-form-item prop="password">
-            <el-input
-              v-model="form.password"
-              clearable
-              placeholder="请输入密码"
-              show-password
-            ></el-input>
-          </el-form-item>
-          <el-form-item prop="password">
-            <el-input
-              v-model="form.password1"
-              clearable
-              placeholder="请确认密码"
-              show-password
-              @keyup.enter="register()"
-            ></el-input>
-          </el-form-item>
-        </el-form>
-      </div>
-      <div class="tool">
-        <div>
+  <div style="width:100%;height:100%;">
+    <background-display />
+    <div class="loginbody">
+      <div class="logindata">
+        <div class="logintext">
+          <h2>EphemelodyOL</h2>
         </div>
-        <div>
-          <span class="shou">
-            <router-link to="/login">已有帐号，前往登录</router-link>
-          </span>
+        <div class="formdata">
+          <el-form ref="register" :model="form" :rules="rules">
+            <el-form-item prop="username">
+              <el-input
+                v-model="form.username"
+                clearable
+                placeholder="请输入账号"
+              ></el-input>
+            </el-form-item>
+            <el-form-item prop="password">
+              <el-input
+                v-model="form.password"
+                clearable
+                placeholder="请输入密码"
+                show-password
+              ></el-input>
+            </el-form-item>
+            <el-form-item prop="password">
+              <el-input
+                v-model="form.password1"
+                clearable
+                placeholder="请确认密码"
+                show-password
+                @keyup.enter="register()"
+              ></el-input>
+            </el-form-item>
+          </el-form>
         </div>
-      </div>
-      <div class="butt">
-        <el-button class="shou" type="primary" @click="register()">注册</el-button>
+        <div class="tool">
+          <div></div>
+          <div>
+            <span class="shou">
+              <router-link to="/login" style="color:white;">已有帐号，前往登录</router-link>
+            </span>
+          </div>
+        </div>
+        <div class="butt">
+          <el-button class="shou" style="color:white;" type="primary" @click="register()"
+            >注册</el-button
+          >
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-
+import BackgroundDisplay from "../components/BackgroundDisplay";
 export default {
+  components: { BackgroundDisplay },
   name: "login",
   data() {
     return {
       form: {
         password: "",
         username: "",
-        password1: ""
+        password1: "",
       },
       checked: false,
       rules: {
@@ -74,49 +79,51 @@ export default {
   },
   methods: {
     register() {
-      this.$refs.register.validate(async valid => {
+      this.$refs.register.validate(async (valid) => {
         if (!valid) {
           return;
         }
         if (this.form.password != this.form.password1) {
           return this.$notify({
-            title: '错误',
-            message: '两次密码不一致',
-            type: 'error',
-          })
-        }
-        else {
+            title: "错误",
+            message: "两次密码不一致",
+            type: "error",
+          });
+        } else {
           // this.param.type = 0;
           try {
-            const { data: res } = await this.$http.post('/user/register', this.form);
-            if (res.code !== 0) return this.$notify({
-              title: '错误',
-              message: res.data,
-              type: 'error',
-            })
+            const { data: res } = await this.$http.post(
+              "/user/register",
+              this.form
+            );
+            if (res.code !== 0)
+              return this.$notify({
+                title: "错误",
+                message: res.data,
+                type: "error",
+              });
             this.$notify({
-              title: '成功',
-              message: '注册成功！',
-              type: 'success',
-            })
-            this.$router.push({ path: "/login" })
-          }
-          catch (err) {
+              title: "成功",
+              message: "注册成功！",
+              type: "success",
+            });
+            this.$router.push({ path: "/login" });
+          } catch (err) {
             return this.$notify({
-              title: '错误',
-              message: '网络异常',
-              type: 'error',
-            })
+              title: "错误",
+              message: "网络异常",
+              type: "error",
+            });
           }
         }
-      })
-    }
+      });
+    },
   },
   mounted() {
-      if(localStorage.getItem("news")){
-        this.form=JSON.parse(localStorage.getItem("news"))
-        this.checked=true
-      }
+    if (localStorage.getItem("news")) {
+      this.form = JSON.parse(localStorage.getItem("news"));
+      this.checked = true;
+    }
   },
 };
 </script>
@@ -126,12 +133,13 @@ export default {
   width: 100%;
   height: 100%;
   min-width: 1000px;
-  background-image: url("../assets/img/login.png");
   background-size: 100% 100%;
   background-position: center center;
   overflow: auto;
   background-repeat: no-repeat;
-  position: fixed;
+  position: absolute;
+  top: 0;
+  left: 0;
   line-height: 100%;
   padding-top: 150px;
 }
@@ -169,4 +177,3 @@ export default {
   color: #606266;
 }
 </style>
-

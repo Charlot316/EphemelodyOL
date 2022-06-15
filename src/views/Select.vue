@@ -1,4 +1,5 @@
-<template>
+<template>  <div style="width:100%;height:100%;">
+ <background-display />
   <div class="select-container">
     <Header/>
     <div class="divTop">
@@ -74,14 +75,16 @@
       <div v-for="count in 10" :key="count" class="card-context"></div>
     </div>
     <!-- </div> -->
-  </div>
+  </div></div>
 </template>
 
 <script>
 import Header from "../components/Header";
 import SongCard from "../components/Select/SongCard";
+import BackgroundDisplay from "../components/BackgroundDisplay";
+
 export default {
-  components: { SongCard,Header },
+  components: { SongCard,Header ,BackgroundDisplay },
   data() {
     return {
       type: "",
@@ -131,12 +134,13 @@ export default {
   margin-bottom: 0.5%;
 }
 .select-container {
+  position:absolute;
+  top:0;
+  left:0;
   width: 100%;
   height: 100%;
-  background-color: #eee;
   font-size: 14px;
   overflow: auto;
-  background-image: url(../assets/img/login.png);
 }
 
 .songs-container {

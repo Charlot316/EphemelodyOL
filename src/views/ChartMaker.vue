@@ -89,7 +89,6 @@
           id="audioSong"
           preload="auto"
           controls
-          autoplay
           :src="chart.songUrl"
           style="display:none"
         />
