@@ -1,48 +1,53 @@
-<template>
-  <div
-    class="song-card"
-    @mouseenter="
-      mouseEnter = true;
-      zIndex = 10;
-    "
-    @mouseleave="
-      mouseEnter = false;
-      zIndex = 0;
-    "
-    :style="{ zIndex: zIndex }"
+<template
+  ><router-link
+    target="_blank"
+    :to="{ path: '/play', query: { songId: song.songInfo.songId } }"
   >
-    <img :src="song.songInfo.defaultBackground" class="default-background" />
-    <div class="song-info">
-      <img :src="song.songInfo.songCover" class="song-cover" />
-      <div class="content">
-        <!-- <div style="font-size:15px;">{{ song.songInfo.uploader }}</div>  -->
-        <div>
-          {{ song.songInfo.songName }} LV.{{ song.songInfo.songDifficulty }}
+    <div
+      class="song-card"
+      @mouseenter="
+        mouseEnter = true;
+        zIndex = 10;
+      "
+      @mouseleave="
+        mouseEnter = false;
+        zIndex = 0;
+      "
+      :style="{ zIndex: zIndex }"
+    >
+      <img :src="song.songInfo.defaultBackground" class="default-background" />
+      <div class="song-info">
+        <img :src="song.songInfo.songCover" class="song-cover" />
+        <div class="content">
+          <!-- <div style="font-size:15px;">{{ song.songInfo.uploader }}</div>  -->
+          <div>
+            {{ song.songInfo.songName }} LV.{{ song.songInfo.songDifficulty }}
+          </div>
+          <div style="font-size:15px;">{{ song.songInfo.songWriter }}</div>
         </div>
-        <div style="font-size:15px;">{{ song.songInfo.songWriter }}</div>
+      </div>
+      <div :class="mouseEnter ? 'rank' : 'rank-notopen'">
+        <div style="height:120px;overflow: auto;padding:10px;">
+          世界排名
+          <div v-for="record in song.tenBestRecords" :key="record">
+            <Icon :user="record" />
+          </div>
+        </div>
+        <div style="height:50px;padding:10px;padding-top: 0px;">
+          <hr />
+          我的排名
+          <Icon
+            :user="
+              Object.assign(song.myRecord, {
+                player: $store.state.user.username,
+                playerIcon: $store.state.user.icon,
+              })
+            "
+          />
+        </div>
       </div>
     </div>
-    <div :class="mouseEnter ? 'rank' : 'rank-notopen'">
-      <div style="height:120px;overflow: auto;padding:10px;">
-        世界排名
-        <div v-for="record in song.tenBestRecords" :key="record">
-          <Icon :user="record" />
-        </div>
-      </div>
-      <div style="height:50px;padding:10px;padding-top: 0px;">
-        <hr />
-        我的排名
-        <Icon
-          :user="
-            Object.assign(song.myRecord, {
-              player: $store.state.user.username,
-              playerIcon: $store.state.user.icon,
-            })
-          "
-        />
-      </div>
-    </div>
-  </div>
+  </router-link>
 </template>
 
 <script>
@@ -72,8 +77,8 @@ export default {
   height: 200px;
   background-color: #fff;
   color: rgb(32, 32, 32);
-  -webkit-box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.5);
-  box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.5);
+  -webkit-box-shadow: 0 0 2px 0 rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 2px 0 rgba(255, 255, 255, 0.8);
   transition: 0.5s;
   transform: scale(1);
   -webkit-user-select: none;
@@ -84,8 +89,8 @@ export default {
 .song-card:hover {
   background: white;
   color: #303133;
-  -webkit-box-shadow: 0 0 9px 4px rgba(76, 76, 76, 0.8);
-  box-shadow: 0 0 9px 4px rgba(76, 76, 76, 0.8);
+  -webkit-box-shadow: 0 0 9px 4px rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 9px 4px rgba(255, 255, 255, 0.8);
   transition: 0.5s;
   transform: scale(1.05);
   height: 400px;
@@ -95,8 +100,8 @@ export default {
 .song-card:active {
   background: rgb(210, 210, 210);
   color: #303133;
-  -webkit-box-shadow: 0 0 9px 4px rgba(127, 127, 127, 0.5);
-  box-shadow: 0 0 9px 4px rgba(127, 127, 127, 0.5);
+  -webkit-box-shadow: 0 0 9px 4px rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 9px 4px rgba(255, 255, 255, 0.8);
   transition: 0.1s;
   transform: scale(1.04);
   cursor: pointer;

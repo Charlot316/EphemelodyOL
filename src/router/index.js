@@ -21,15 +21,6 @@ const routes = [{
                 "../views/ChartMaker.vue"
             ),
     },
-    // {
-    //   path: "/register",
-    //   name: "Register",
-    //   component: () =>
-    //     import(
-    //       /* webpackChunkName: "login" */
-    //       "../views/Register.vue"
-    //     ),
-    // },
     {
         path: "/home",
         name: "Home",

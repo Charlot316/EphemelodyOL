@@ -49,7 +49,6 @@
 
 <script>
 import "animate.css";
-import { chart } from "@/utils/chart.js";
 import Play from "@/components/PlayInterface/Play";
 import Prepare from "@/components/PlayInterface/Prepare";
 import Result from "@/components/PlayInterface/Result";
@@ -267,8 +266,30 @@ export default {
       that.global.judgeCanvas.width = that.playInterface.offsetWidth;
     },
     //获取谱面信息
-    getChart() {
-      this.chart = chart;
+    async getChart() {
+      try {
+        const { data: res } = await this.$http.get(
+          `/user/getChart?songId=${this.$route.query.songId}`
+        );
+        if (res.code !== 0) {
+          this.$notify({
+            title: "失败",
+            message: "登录失败！",
+            type: "error",
+          });
+        }
+        this.chart = res.data;
+        this.loadingStatus.chart = true;
+        this.$forceUpdate();
+        this.sortTrack();
+        this.generateImagePath();
+      } catch (err) {
+        return this.$notify({
+          title: "错误",
+          message: "网络异常",
+          type: "error",
+        });
+      }
     },
 
     calculateScore() {
@@ -313,7 +334,7 @@ export default {
         this.global.judgeCanvas.height
       );
       this.global.currentTime = Math.floor(this.audio.currentTime * 1000);
-      if (this.global.currentTime < this.chart.songLength-150) {
+      if (this.global.currentTime < this.chart.songLength - 150) {
         requestAnimationFrame(this.run);
       } else {
         this.global.currentTime = this.chart.songLength;
@@ -326,7 +347,6 @@ export default {
           this.$forceUpdate();
         }, 2000);
       }
-      
     },
 
     //audio加载完毕
@@ -341,7 +361,9 @@ export default {
     //图片加载完毕
     imageLoaded() {
       this.loadingStatus.imageCurrentCount++;
-      if (this.loadingStatus.imageCurrentCount == this.imagePath.length) {
+      console.log(this.loadingStatus.imageCurrentCount)
+      console.log(this.imagePath.length)
+      if (this.loadingStatus.imageCurrentCount+1 == this.imagePath.length) {
         this.loadingStatus.image = true;
         console.log("image loaded");
         this.checkIfLoaded();
@@ -356,9 +378,6 @@ export default {
     //加载
     initiate() {
       this.getChart();
-      this.loadingStatus.chart = true;
-      this.sortTrack();
-      this.generateImagePath();
     },
 
     //开始播放音乐

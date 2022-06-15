@@ -209,7 +209,7 @@ export default {
       font-size: 14px;
       padding: 20px 0;
       overflow:auto;
-      background-image: url(../assets/img/login.jpg);
+      background-image: url(../assets/img/login.png);
   }
   .div2{
       display: flex;

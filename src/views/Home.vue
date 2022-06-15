@@ -256,7 +256,7 @@ export default {
 .home {
   width: 100%;
   height: 100%;
-  background-image: url(../assets/img/login.jpg);
+  background-image: url(../assets/img/login.png);
 }
 
 .div1 {

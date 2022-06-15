@@ -80,7 +80,11 @@ export default {
   components: {
     Header,
   },
-  watch() {},
+  watch: {
+    chart(){
+      this.$forceUpdate();
+    }
+  },
   created() {},
   methods: {
     startMusic() {

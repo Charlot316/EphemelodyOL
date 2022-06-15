@@ -4,10 +4,10 @@
       <img :src="user.playerIcon" class="img1" />
     </div>
     <div class="icon-info">
-      <div>{{ user.ranking }} {{ user.player }}</div>
+      <div style="font-weight:600;">{{ user.ranking }} {{ user.player }}</div>
 
-      <div>
-        <span :style="style">{{ Status }} </span> {{ user.bestScore }}
+      <div style="font-weight:300;">
+        <span >{{ Status }} {{ user.bestScore }}</span> 
       </div>
     </div>
   </div>

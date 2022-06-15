@@ -4,7 +4,7 @@
       <!-- <input type="text"> -->
       <div style="float:right;width:50%;">
         <el-row :gutter="20">
-          <el-col :span="6">
+             <el-col :span="6">
             <el-select
               v-model="params.searchType"
               placeholder="搜索类别"
@@ -84,7 +84,7 @@ export default {
     return {
       type: "",
       params: {
-        status: "0",
+        status: "2",
         searchType: "",
         searchContent: "",
         sortType: "",
@@ -97,6 +97,414 @@ export default {
   created() {
     // this.getCharts();
     this.songs = [
+      {
+        songInfo: {
+          songName: "熱愛発覚中",
+          uploader: "charlot",
+          songCover: "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
+          songWriter: "椎名林檎",
+          songDifficulty: "9",
+          defaultBackground:
+            "http://pic.mcatk.com/charlot-pictures/netsuai-0.jpg",
+          songId: "4",
+        },
+        myRecord: {
+          bestScore: "0",
+          recordStatus: "0",
+          ranking: "0",
+        },
+        tenBestRecords: [
+          {
+            player: "lalala",
+            playerIcon:
+              "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
+            bestScore: "9102920",
+            recordStatus: "0",
+            ranking: "1",
+          },
+          {
+            player: "lalala",
+            playerIcon:
+              "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
+            bestScore: "9102920",
+            recordStatus: "1",
+            ranking: "2",
+          },
+          {
+            player: "lalala",
+            playerIcon:
+              "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
+            bestScore: "9102920",
+            recordStatus: "2",
+            ranking: "3",
+          },
+          {
+            player: "lalala",
+            playerIcon:
+              "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
+            bestScore: "9102920",
+            recordStatus: "3",
+            ranking: "4",
+          },
+        ],
+      },
+      {
+        songInfo: {
+          songName: "熱愛発覚中",
+          uploader: "charlot",
+          songCover: "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
+          songWriter: "椎名林檎",
+          songDifficulty: "9",
+          defaultBackground:
+            "http://pic.mcatk.com/charlot-pictures/netsuai-0.jpg",
+          songId: "4",
+        },
+        myRecord: {
+          bestScore: "0",
+          recordStatus: "0",
+          ranking: "0",
+        },
+        tenBestRecords: [
+          {
+            player: "lalala",
+            playerIcon:
+              "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
+            bestScore: "9102920",
+            recordStatus: "0",
+            ranking: "1",
+          },
+          {
+            player: "lalala",
+            playerIcon:
+              "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
+            bestScore: "9102920",
+            recordStatus: "1",
+            ranking: "2",
+          },
+          {
+            player: "lalala",
+            playerIcon:
+              "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
+            bestScore: "9102920",
+            recordStatus: "2",
+            ranking: "3",
+          },
+          {
+            player: "lalala",
+            playerIcon:
+              "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
+            bestScore: "9102920",
+            recordStatus: "3",
+            ranking: "4",
+          },
+        ],
+      },
+      {
+        songInfo: {
+          songName: "熱愛発覚中",
+          uploader: "charlot",
+          songCover: "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
+          songWriter: "椎名林檎",
+          songDifficulty: "9",
+          defaultBackground:
+            "http://pic.mcatk.com/charlot-pictures/netsuai-0.jpg",
+          songId: "4",
+        },
+        myRecord: {
+          bestScore: "0",
+          recordStatus: "0",
+          ranking: "0",
+        },
+        tenBestRecords: [
+          {
+            player: "lalala",
+            playerIcon:
+              "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
+            bestScore: "9102920",
+            recordStatus: "0",
+            ranking: "1",
+          },
+          {
+            player: "lalala",
+            playerIcon:
+              "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
+            bestScore: "9102920",
+            recordStatus: "1",
+            ranking: "2",
+          },
+          {
+            player: "lalala",
+            playerIcon:
+              "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
+            bestScore: "9102920",
+            recordStatus: "2",
+            ranking: "3",
+          },
+          {
+            player: "lalala",
+            playerIcon:
+              "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
+            bestScore: "9102920",
+            recordStatus: "3",
+            ranking: "4",
+          },
+        ],
+      },
+      {
+        songInfo: {
+          songName: "熱愛発覚中",
+          uploader: "charlot",
+          songCover: "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
+          songWriter: "椎名林檎",
+          songDifficulty: "9",
+          defaultBackground:
+            "http://pic.mcatk.com/charlot-pictures/netsuai-0.jpg",
+          songId: "4",
+        },
+        myRecord: {
+          bestScore: "0",
+          recordStatus: "0",
+          ranking: "0",
+        },
+        tenBestRecords: [
+          {
+            player: "lalala",
+            playerIcon:
+              "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
+            bestScore: "9102920",
+            recordStatus: "0",
+            ranking: "1",
+          },
+          {
+            player: "lalala",
+            playerIcon:
+              "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
+            bestScore: "9102920",
+            recordStatus: "1",
+            ranking: "2",
+          },
+          {
+            player: "lalala",
+            playerIcon:
+              "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
+            bestScore: "9102920",
+            recordStatus: "2",
+            ranking: "3",
+          },
+          {
+            player: "lalala",
+            playerIcon:
+              "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
+            bestScore: "9102920",
+            recordStatus: "3",
+            ranking: "4",
+          },
+        ],
+      },
+      {
+        songInfo: {
+          songName: "熱愛発覚中",
+          uploader: "charlot",
+          songCover: "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
+          songWriter: "椎名林檎",
+          songDifficulty: "9",
+          defaultBackground:
+            "http://pic.mcatk.com/charlot-pictures/netsuai-0.jpg",
+          songId: "4",
+        },
+        myRecord: {
+          bestScore: "0",
+          recordStatus: "0",
+          ranking: "0",
+        },
+        tenBestRecords: [
+          {
+            player: "lalala",
+            playerIcon:
+              "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
+            bestScore: "9102920",
+            recordStatus: "0",
+            ranking: "1",
+          },
+          {
+            player: "lalala",
+            playerIcon:
+              "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
+            bestScore: "9102920",
+            recordStatus: "1",
+            ranking: "2",
+          },
+          {
+            player: "lalala",
+            playerIcon:
+              "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
+            bestScore: "9102920",
+            recordStatus: "2",
+            ranking: "3",
+          },
+          {
+            player: "lalala",
+            playerIcon:
+              "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
+            bestScore: "9102920",
+            recordStatus: "3",
+            ranking: "4",
+          },
+        ],
+      },
+      {
+        songInfo: {
+          songName: "熱愛発覚中",
+          uploader: "charlot",
+          songCover: "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
+          songWriter: "椎名林檎",
+          songDifficulty: "9",
+          defaultBackground:
+            "http://pic.mcatk.com/charlot-pictures/netsuai-0.jpg",
+          songId: "4",
+        },
+        myRecord: {
+          bestScore: "0",
+          recordStatus: "0",
+          ranking: "0",
+        },
+        tenBestRecords: [
+          {
+            player: "lalala",
+            playerIcon:
+              "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
+            bestScore: "9102920",
+            recordStatus: "0",
+            ranking: "1",
+          },
+          {
+            player: "lalala",
+            playerIcon:
+              "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
+            bestScore: "9102920",
+            recordStatus: "1",
+            ranking: "2",
+          },
+          {
+            player: "lalala",
+            playerIcon:
+              "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
+            bestScore: "9102920",
+            recordStatus: "2",
+            ranking: "3",
+          },
+          {
+            player: "lalala",
+            playerIcon:
+              "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
+            bestScore: "9102920",
+            recordStatus: "3",
+            ranking: "4",
+          },
+        ],
+      },
+      {
+        songInfo: {
+          songName: "熱愛発覚中",
+          uploader: "charlot",
+          songCover: "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
+          songWriter: "椎名林檎",
+          songDifficulty: "9",
+          defaultBackground:
+            "http://pic.mcatk.com/charlot-pictures/netsuai-0.jpg",
+          songId: "4",
+        },
+        myRecord: {
+          bestScore: "0",
+          recordStatus: "0",
+          ranking: "0",
+        },
+        tenBestRecords: [
+          {
+            player: "lalala",
+            playerIcon:
+              "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
+            bestScore: "9102920",
+            recordStatus: "0",
+            ranking: "1",
+          },
+          {
+            player: "lalala",
+            playerIcon:
+              "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
+            bestScore: "9102920",
+            recordStatus: "1",
+            ranking: "2",
+          },
+          {
+            player: "lalala",
+            playerIcon:
+              "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
+            bestScore: "9102920",
+            recordStatus: "2",
+            ranking: "3",
+          },
+          {
+            player: "lalala",
+            playerIcon:
+              "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
+            bestScore: "9102920",
+            recordStatus: "3",
+            ranking: "4",
+          },
+        ],
+      },
+      {
+        songInfo: {
+          songName: "熱愛発覚中",
+          uploader: "charlot",
+          songCover: "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
+          songWriter: "椎名林檎",
+          songDifficulty: "9",
+          defaultBackground:
+            "http://pic.mcatk.com/charlot-pictures/netsuai-0.jpg",
+          songId: "4",
+        },
+        myRecord: {
+          bestScore: "0",
+          recordStatus: "0",
+          ranking: "0",
+        },
+        tenBestRecords: [
+          {
+            player: "lalala",
+            playerIcon:
+              "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
+            bestScore: "9102920",
+            recordStatus: "0",
+            ranking: "1",
+          },
+          {
+            player: "lalala",
+            playerIcon:
+              "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
+            bestScore: "9102920",
+            recordStatus: "1",
+            ranking: "2",
+          },
+          {
+            player: "lalala",
+            playerIcon:
+              "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
+            bestScore: "9102920",
+            recordStatus: "2",
+            ranking: "3",
+          },
+          {
+            player: "lalala",
+            playerIcon:
+              "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
+            bestScore: "9102920",
+            recordStatus: "3",
+            ranking: "4",
+          },
+        ],
+      },
       {
         songInfo: {
           songName: "熱愛発覚中",
@@ -209,7 +617,7 @@ export default {
   font-size: 14px;
   padding: 20px 0;
   overflow: auto;
-  background-image: url(../assets/img/login.jpg);
+  background-image: url(../assets/img/login.png);
 }
 
 .songs-container {
