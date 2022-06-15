@@ -4,7 +4,7 @@
       EphemelodyOL
     </div>
     <div class="right">
-      <Icon :user="$store.state.user"/>
+      <Icon/>
 
     </div>
   </div>

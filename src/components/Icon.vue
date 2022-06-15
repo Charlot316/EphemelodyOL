@@ -8,7 +8,7 @@
       <div>
         <img
           style="width:70px;height:70px;border-radius:50%;object-fit:fill;"
-          :src="user.icon ? user.icon : require('@/assets/img/user.jpg')"
+          :src="$store.state.user.icon ? $store.state.user.icon : require('@/assets/img/user.jpg')"
           onerror="onerror=null;src='https://img0.baidu.com/it/u=3730772664,138405132&fm=26&fmt=auto'"
         />
       </div>
@@ -18,21 +18,16 @@
 
 <script>
 export default {
-  props: ["user", "plus", "minus"],
+  props: ["plus", "minus"],
   data() {
     return {
-      myUser: this.user,
     };
   },
 
   created() {
-    console.log(this.user);
   },
   methods: {},
   watch: {
-    user() {
-      this.myUser = this.user;
-    },
   },
 };
 </script>

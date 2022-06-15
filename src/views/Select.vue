@@ -3,7 +3,7 @@
     <div class="divTop">
       <!-- <input type="text"> -->
       <div style="float:right;width:50%;">
-        <el-row>
+        <el-row :gutter="20">
           <el-col :span="6">
             <el-select
               v-model="params.searchType"
@@ -16,11 +16,9 @@
               <el-option key="1" label="歌手名称" value="1"></el-option>
               <el-option key="2" label="上传者名称" value="2"></el-option>
               <el-option key="3" label="难度" value="3"></el-option>
-              <el-option key="4" label="热度" value="4"></el-option>
             </el-select>
           </el-col>
-          <el-col :span="2"></el-col>
-          <el-col :span="12">
+          <el-col :span="9">
             <el-input
               placeholder="请输入关键词进行搜索"
               v-model="params.searchContent"
@@ -37,7 +35,21 @@
               </template>
             </el-input>
           </el-col>
-          <el-col :span="1"></el-col>
+          <el-col :span="6">
+            <el-select
+              v-model="params.sortType"
+              placeholder="排序类别"
+              size="medium"
+              class="handle-select mr10"
+              id="排序类别"
+            >
+              <el-option key="0" label="歌曲名称" value="0"></el-option>
+              <el-option key="1" label="歌手名称" value="1"></el-option>
+              <el-option key="2" label="上传者名称" value="2"></el-option>
+              <el-option key="3" label="难度" value="3"></el-option>
+              <el-option key="4" label="热度" value="4"></el-option>
+            </el-select>
+          </el-col>
           <el-col :span="3">
             <el-select
               v-model="params.sortWay"
@@ -55,13 +67,10 @@
     </div>
     <!-- <div class="div2"> -->
     <div class="songs-container">
-      <div
-        v-for="song in songs"
-        :key="song"
-        style="margin:0px;float:left;margin-bottom:10px;"
-      >
+      <div v-for="song in songs" :key="song" class="card-context">
         <song-card :song="song" />
       </div>
+      <div v-for="count in 10" :key="count" class="card-context"></div>
     </div>
     <!-- </div> -->
   </div>
@@ -106,37 +115,36 @@ export default {
         },
         tenBestRecords: [
           {
-            player: "",
-            playerIcon: "",
-            bestScore: "",
-            recordStatus: "",
-            ranking: "",
+            player: "lalala",
+            playerIcon:
+              "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
+            bestScore: "9102920",
+            recordStatus: "0",
+            ranking: "1",
           },
-        ],
-      },
-      {
-        songInfo: {
-          songName: "熱愛発覚中",
-          uploader: "charlot",
-          songCover: "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
-          songWriter: "椎名林檎",
-          songDifficulty: "9",
-          defaultBackground:
-            "http://pic.mcatk.com/charlot-pictures/netsuai-0.jpg",
-          songId: "4",
-        },
-        myRecord: {
-          bestScore: "0",
-          recordStatus: "0",
-          ranking: "0",
-        },
-        tenBestRecords: [
           {
-            player: "",
-            playerIcon: "",
-            bestScore: "",
-            recordStatus: "",
-            ranking: "",
+            player: "lalala",
+            playerIcon:
+              "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
+            bestScore: "9102920",
+            recordStatus: "1",
+            ranking: "2",
+          },
+          {
+            player: "lalala",
+            playerIcon:
+              "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
+            bestScore: "9102920",
+            recordStatus: "2",
+            ranking: "3",
+          },
+          {
+            player: "lalala",
+            playerIcon:
+              "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
+            bestScore: "9102920",
+            recordStatus: "3",
+            ranking: "4",
           },
         ],
       },
@@ -144,193 +152,12 @@ export default {
         songInfo: {
           songName: "world.execute(me);",
           uploader: "charlot",
-          songCover: "http://pic.mcatk.com/charlot-pictures/world-execute-me-cover.jpg",
+          songCover:
+            "http://pic.mcatk.com/charlot-pictures/world-execute-me-cover.jpg",
           songWriter: "Mili",
           songDifficulty: "9",
           defaultBackground:
             "http://pic.mcatk.com/charlot-pictures/world-execute-me-0.PNG",
-          songId: "4",
-        },
-        myRecord: {
-          bestScore: "0",
-          recordStatus: "0",
-          ranking: "0",
-        },
-        tenBestRecords: [
-          {
-            player: "",
-            playerIcon: "",
-            bestScore: "",
-            recordStatus: "",
-            ranking: "",
-          },
-        ],
-      },
-      {
-        songInfo: {
-          songName: "熱愛発覚中",
-          uploader: "charlot",
-          songCover: "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
-          songWriter: "椎名林檎",
-          songDifficulty: "9",
-          defaultBackground:
-            "http://pic.mcatk.com/charlot-pictures/netsuai-0.jpg",
-          songId: "4",
-        },
-        myRecord: {
-          bestScore: "0",
-          recordStatus: "0",
-          ranking: "0",
-        },
-        tenBestRecords: [
-          {
-            player: "",
-            playerIcon: "",
-            bestScore: "",
-            recordStatus: "",
-            ranking: "",
-          },
-        ],
-      },
-      {
-        songInfo: {
-          songName: "熱愛発覚中",
-          uploader: "charlot",
-          songCover: "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
-          songWriter: "椎名林檎",
-          songDifficulty: "9",
-          defaultBackground:
-            "http://pic.mcatk.com/charlot-pictures/netsuai-0.jpg",
-          songId: "4",
-        },
-        myRecord: {
-          bestScore: "0",
-          recordStatus: "0",
-          ranking: "0",
-        },
-        tenBestRecords: [
-          {
-            player: "",
-            playerIcon: "",
-            bestScore: "",
-            recordStatus: "",
-            ranking: "",
-          },
-        ],
-      },
-      {
-        songInfo: {
-          songName: "熱愛発覚中",
-          uploader: "charlot",
-          songCover: "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
-          songWriter: "椎名林檎",
-          songDifficulty: "9",
-          defaultBackground:
-            "http://pic.mcatk.com/charlot-pictures/netsuai-0.jpg",
-          songId: "4",
-        },
-        myRecord: {
-          bestScore: "0",
-          recordStatus: "0",
-          ranking: "0",
-        },
-        tenBestRecords: [
-          {
-            player: "",
-            playerIcon: "",
-            bestScore: "",
-            recordStatus: "",
-            ranking: "",
-          },
-        ],
-      },
-      {
-        songInfo: {
-          songName: "熱愛発覚中",
-          uploader: "charlot",
-          songCover: "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
-          songWriter: "椎名林檎",
-          songDifficulty: "9",
-          defaultBackground:
-            "http://pic.mcatk.com/charlot-pictures/netsuai-0.jpg",
-          songId: "4",
-        },
-        myRecord: {
-          bestScore: "0",
-          recordStatus: "0",
-          ranking: "0",
-        },
-        tenBestRecords: [
-          {
-            player: "",
-            playerIcon: "",
-            bestScore: "",
-            recordStatus: "",
-            ranking: "",
-          },
-        ],
-      },
-      {
-        songInfo: {
-          songName: "熱愛発覚中",
-          uploader: "charlot",
-          songCover: "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
-          songWriter: "椎名林檎",
-          songDifficulty: "9",
-          defaultBackground:
-            "http://pic.mcatk.com/charlot-pictures/netsuai-0.jpg",
-          songId: "4",
-        },
-        myRecord: {
-          bestScore: "0",
-          recordStatus: "0",
-          ranking: "0",
-        },
-        tenBestRecords: [
-          {
-            player: "",
-            playerIcon: "",
-            bestScore: "",
-            recordStatus: "",
-            ranking: "",
-          },
-        ],
-      },
-      {
-        songInfo: {
-          songName: "熱愛発覚中",
-          uploader: "charlot",
-          songCover: "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
-          songWriter: "椎名林檎",
-          songDifficulty: "9",
-          defaultBackground:
-            "http://pic.mcatk.com/charlot-pictures/netsuai-0.jpg",
-          songId: "4",
-        },
-        myRecord: {
-          bestScore: "0",
-          recordStatus: "0",
-          ranking: "0",
-        },
-        tenBestRecords: [
-          {
-            player: "",
-            playerIcon: "",
-            bestScore: "",
-            recordStatus: "",
-            ranking: "",
-          },
-        ],
-      },
-      {
-        songInfo: {
-          songName: "熱愛発覚中",
-          uploader: "charlot",
-          songCover: "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
-          songWriter: "椎名林檎",
-          songDifficulty: "9",
-          defaultBackground:
-            "http://pic.mcatk.com/charlot-pictures/netsuai-0.jpg",
           songId: "4",
         },
         myRecord: {
@@ -386,14 +213,22 @@ export default {
 }
 
 .songs-container {
-  flex: 1;
-  /* border-right: 1px solid #cccccc; */
-  width: 70%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  width: 90%;
   height: 95%;
   margin: 0 auto;
-  margin-bottom:200px;
+  margin-bottom: 200px;
   border-radius: 5px;
   /* height: 100%; */
   /* overflow:auto; */
+}
+.card-context {
+  flex: 1;
+  width: 300px;
+  min-width: 300px;
+  height: 200px;
+  margin: 10px;
 }
 </style>

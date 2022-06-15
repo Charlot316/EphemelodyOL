@@ -313,10 +313,8 @@ export default {
         this.global.judgeCanvas.height
       );
       this.global.currentTime = Math.floor(this.audio.currentTime * 1000);
-      if (this.global.currentTime < this.chart.songLength) {
-        // setTimeout(() => {
-        //   this.run();
-        // }, 1000 / this.$store.state.refreshRate);
+      if (this.global.currentTime < this.chart.songLength-150) {
+        requestAnimationFrame(this.run);
       } else {
         this.global.currentTime = this.chart.songLength;
         this.loadingStatus.beforeFinished = true;
@@ -328,7 +326,7 @@ export default {
           this.$forceUpdate();
         }, 2000);
       }
-      requestAnimationFrame(this.run);
+      
     },
 
     //audio加载完毕

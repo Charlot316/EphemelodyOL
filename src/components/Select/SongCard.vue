@@ -1,5 +1,16 @@
 <template>
-  <div class="song-card" @mouseenter="mouseEnter=true" @mouseleave="mouseEnter=false">
+  <div
+    class="song-card"
+    @mouseenter="
+      mouseEnter = true;
+      zIndex = 10;
+    "
+    @mouseleave="
+      mouseEnter = false;
+      zIndex = 0;
+    "
+    :style="{ zIndex: zIndex }"
+  >
     <img :src="song.songInfo.defaultBackground" class="default-background" />
     <div class="song-info">
       <img :src="song.songInfo.songCover" class="song-cover" />
@@ -11,22 +22,38 @@
         <div style="font-size:15px;">{{ song.songInfo.songWriter }}</div>
       </div>
     </div>
-    <div class="rank" v-if="mouseEnter">
-    
-    世界排名
-    <hr/>
-    我的排名
+    <div :class="mouseEnter ? 'rank' : 'rank-notopen'">
+      <div style="height:120px;overflow: auto;padding:10px;">
+        世界排名
+        <div v-for="record in song.tenBestRecords" :key="record">
+          <Icon :user="record" />
+        </div>
+      </div>
+      <div style="height:50px;padding:10px;padding-top: 0px;">
+        <hr />
+        我的排名
+        <Icon
+          :user="
+            Object.assign(song.myRecord, {
+              player: $store.state.user.username,
+              playerIcon: $store.state.user.icon,
+            })
+          "
+        />
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import Icon from "./Icon";
 export default {
   props: ["song"],
-  components: [],
+  components: { Icon },
   data() {
     return {
-      mouseEnter:false,
+      mouseEnter: false,
+      zIndex: 0,
     };
   },
   created() {},
@@ -91,6 +118,7 @@ export default {
   width: 300px;
   border-radius: 5px;
   background: rgba(255, 255, 255, 0.5);
+  overflow: hidden;
 }
 .song-cover {
   position: absolute;
@@ -113,8 +141,19 @@ export default {
   left: 0px;
   top: 200px;
   height: 200px;
-  width: 280px;
-  padding:10px;
+  width: 300px;
   border-radius: 5px;
+  transition: 0.5s;
+  overflow: hidden;
+}
+.rank-notopen {
+  position: absolute;
+  left: 0px;
+  top: 200px;
+  height: 0px;
+  width: 300px;
+  border-radius: 5px;
+  transition: 0.5s;
+  overflow: hidden;
 }
 </style>
