@@ -3,18 +3,17 @@
     <div class="container">
       <div class="bubbles">
         <span
-          v-for="count in 100"
+          v-for="count in 50"
           :key="count"
           :style="{
             '--i': Math.floor(Math.random() * 20 + 10),
-            '--duration': Math.floor(Math.random() * 20 + 120)+'s',
-            minWidth: '30px',
-            height: '30px',
+            '--duration': Math.floor(Math.random() * 20 + 120) + 's',
+            minWidth: '100px',
+            height: '100px',
           }"
-        >
+          >
         </span>
       </div>
-
     </div>
   </div>
 </template>
@@ -29,12 +28,12 @@
   min-height: 100vh;
   width: 100vw;
   background: #0c192c;
+  color: white;
 }
 .container {
   position: relative;
   width: 100vw;
   height: 100vh;
-  overflow: hidden;
 }
 .bubbles {
   position: relative;
@@ -61,7 +60,7 @@
     transform: translateY(100vh) scale(0);
   }
   100% {
-    transform: translateY(-10vh) scale(1);
+    transform: translateY(-10vh) scale(0.9);
   }
 }
 </style>

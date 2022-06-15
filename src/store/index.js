@@ -15,6 +15,10 @@ export default createStore({
             state.islogin = true
             state.user = user
         },
+        loginout(state) {
+            state.islogin = false
+            state.user = {}
+        },
         changeParam(state, param) {
             state.user[param.key] = param.value
         }
