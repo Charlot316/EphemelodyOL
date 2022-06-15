@@ -2,9 +2,9 @@
  <background-display />
   <div class="select-container">
     <Header/>
-    <div class="divTop">
+    <div class="select-search-container">
       <!-- <input type="text"> -->
-      <div style="float:right;width:50%;">
+      <div style="float:right;width:70%;">
         <el-row :gutter="20">
              <el-col :span="6">
             <el-select
@@ -125,12 +125,12 @@ export default {
 </script>
 
 <style scoped>
-.divTop {
+.select-search-container {
   /* border:1px solid black; */
-  width: 70%;
+  width: 100%;
   height: 5%;
-  margin-left: 15%;
-  margin-bottom: 0.5%;
+  padding:20px;
+  margin-bottom: 50px;
 }
 .select-container {
   position:absolute;

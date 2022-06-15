@@ -72,11 +72,11 @@
       <!-- <div class="div2"> -->
       <div class="div3">
         <div class="div4" v-for="item in songs" :key="item">
-          <div class="div5" @click="next(item.songId)">
+          <div class="div5">
             <el-image :src="item.songCover" class="img1"></el-image>
           </div>
           <div class="div6">
-            <div>
+            <div  style="display: flex;justify-content: space-between;align-items: center;">
               <div class="div7">{{ item.songName }}</div>
               <div class="div8">
                 <div style="float:right">
@@ -112,7 +112,7 @@
         <el-form>
           <el-form-item label="是否调整谱面状态" :label-width="formLabelWidth">
             <el-switch
-              v-model="this.value"
+              v-model="value"
               active-color="#13ce66"
               active-value="true"
             >
@@ -325,7 +325,6 @@ export default {
   height: 100%;
   width: 100%;
   object-fit: cover;
-  cursor: pointer;
 }
 .div1 {
   position: absolute;
@@ -370,6 +369,7 @@ export default {
 }
 .div6 {
   margin: 30px 20px;
+  width:calc(100% - 200px);
 }
 .div7 {
   font-size: 18px;

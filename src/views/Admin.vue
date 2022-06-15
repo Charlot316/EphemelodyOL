@@ -72,12 +72,14 @@
       </div>
       <!-- <div class="div2"> -->
       <div class="div3">
-        <div class="div4" v-for="item in songs" :key="item">
+        <div class="div4" v-for="item in songs" :key="item" >
           <div class="div5" @click="next(item.songId)">
             <el-image :src="item.songCover" class="img1"></el-image>
           </div>
           <div class="div6">
-            <div>
+            <div
+              style="display: flex;justify-content: space-between;align-items: center;"
+            >
               <div class="div7">{{ item.songName }}</div>
               <div class="div8">
                 <span
@@ -118,7 +120,7 @@
         <el-form :model="form">
           <el-form-item label="受否公开谱面" :label-width="formLabelWidth">
             <el-switch
-              v-model="this.value"
+              v-model="value"
               active-color="#13ce66"
               active-value="true"
             >
@@ -169,24 +171,6 @@
       <!--编辑新增谱面的弹出框-->
       <el-dialog title="新增谱面" v-model="addVisible" width="40%" height="50%">
         <el-form :model="newSong">
-          <el-form-item label="BPM" :label-width="formLabelWidth">
-            <el-input v-model="newSong.BPM" autocomplete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="FirstBeatDelay" :label-width="formLabelWidth">
-            <el-input
-              v-model="newSong.firstBeatDelay"
-              autocomplete="off"
-            ></el-input>
-          </el-form-item>
-          <el-form-item label="歌曲ID" :label-width="formLabelWidth">
-            <el-input v-model="newSong.songId" autocomplete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="歌曲长度" :label-width="formLabelWidth">
-            <el-input
-              v-model="newSong.songLength"
-              autocomplete="off"
-            ></el-input>
-          </el-form-item>
           <el-form-item label="默认背景" :label-width="formLabelWidth">
             <el-input
               v-model="newSong.defaultBackground"
@@ -195,9 +179,6 @@
           </el-form-item>
           <el-form-item label="歌曲音频" :label-width="formLabelWidth">
             <el-input v-model="newSong.songUrl" autocomplete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="上传者" :label-width="formLabelWidth">
-            <el-input v-model="newSong.uploader" autocomplete="off"></el-input>
           </el-form-item>
           <el-form-item label="作者" :label-width="formLabelWidth">
             <el-input
@@ -223,18 +204,6 @@
           <el-form-item label="歌曲名称" :label-width="formLabelWidth">
             <el-input v-model="newSong.songName" autocomplete="off"></el-input>
           </el-form-item>
-          <el-form-item label="NotesCount" :label-width="formLabelWidth">
-            <el-input
-              v-model="newSong.notesCount"
-              autocomplete="off"
-            ></el-input>
-          </el-form-item>
-          <el-form-item label="上传者ID" :label-width="formLabelWidth">
-            <el-input
-              v-model="newSong.uploaderId"
-              autocomplete="off"
-            ></el-input>
-          </el-form-item>
         </el-form>
         <template #footer>
           <div class="dialog-footer">
@@ -252,7 +221,7 @@
           name="file"
           accept=".wav,.mp4"
           auto-upload="false"
-          :data="{ songId: this.selectedSongId }"
+          :data="{ songId: selectedSongId }"
           :show-file-list="false"
           :on-success="handleAvatarSuccess1"
           :before-upload="beforeAvatarUpload"
@@ -270,7 +239,7 @@
           name="file"
           accept=".jpg,.png"
           auto-upload="false"
-          :data="{ songId: this.selectedSongId }"
+          :data="{ songId: selectedSongId }"
           :show-file-list="false"
           :on-success="handleAvatarSuccess2"
           :before-upload="beforeAvatarUpload"
@@ -287,7 +256,7 @@
           name="file"
           accept=".jpg,.png"
           auto-upload="false"
-          :data="{ songId: this.selectedSongId }"
+          :data="{ songId: selectedSongId }"
           :show-file-list="false"
           :on-success="handleAvatarSuccess3"
           :before-upload="beforeAvatarUpload"
@@ -484,7 +453,7 @@ export default {
         },
       });
       setTimeout(() => {
-        location.reload() 
+        location.reload();
       }, 100);
     },
     handleAvatarSuccess1(res, file) {
@@ -594,6 +563,7 @@ export default {
 }
 .div6 {
   margin: 30px 20px;
+  width:calc(100% - 200px);
 }
 .div7 {
   font-size: 18px;

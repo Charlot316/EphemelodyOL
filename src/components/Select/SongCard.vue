@@ -76,8 +76,6 @@ export default {
   height: 200px;
   background-color: #fff;
   color: rgb(32, 32, 32);
-  -webkit-box-shadow: 0 0 2px 0 rgba(255, 255, 255, 0.8);
-  box-shadow: 0 0 2px 0 rgba(255, 255, 255, 0.8);
   transition: 0.5s;
   transform: scale(1);
   -webkit-user-select: none;
@@ -88,8 +86,6 @@ export default {
 .song-card:hover {
   background: white;
   color: #303133;
-  -webkit-box-shadow: 0 0 9px 4px rgba(255, 255, 255, 0.8);
-  box-shadow: 0 0 9px 4px rgba(255, 255, 255, 0.8);
   transition: 0.5s;
   transform: scale(1.05);
   height: 400px;
@@ -99,8 +95,6 @@ export default {
 .song-card:active {
   background: rgb(210, 210, 210);
   color: #303133;
-  -webkit-box-shadow: 0 0 9px 4px rgba(255, 255, 255, 0.8);
-  box-shadow: 0 0 9px 4px rgba(255, 255, 255, 0.8);
   transition: 0.1s;
   transform: scale(1.04);
   cursor: pointer;
@@ -121,7 +115,8 @@ export default {
   height: 100px;
   width: 300px;
   border-radius: 5px;
-  background: rgba(255, 255, 255, 0.5);
+  
+  background: rgba(10, 113, 148, 0.642);
   overflow: hidden;
 }
 .song-cover {
@@ -134,11 +129,13 @@ export default {
 }
 .song-info .content {
   position: absolute;
+    color: #ffffff;
+  text-shadow: 0 0 2px rgb(64, 64, 64);
   left: 100px;
   bottom: 10px;
   max-width: 200px;
+  font-weight: 200;
   font-size: 20px;
-  color: rgb(71, 71, 71);
 }
 .rank {
   position: absolute;
