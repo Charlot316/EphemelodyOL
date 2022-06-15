@@ -5,7 +5,6 @@
     </div>
     <div class="right">
       <Icon/>
-      
     </div>
   </div>
 </template>

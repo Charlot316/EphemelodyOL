@@ -1,91 +1,117 @@
-<template>
-  <div class="home">
-    <Header />
-    <div style="height:100%">
-      <div class="leftDiv">
-        <div style="margin-left:25%;width:50%;height:40%">
-          <img :src="user.iconUrl" class="img1" onerror="onerror=null;src='https://img0.baidu.com/it/u=3730772664,138405132&fm=26&fmt=auto'"/>
-        </div>
-        <div style="width:50%;margin-left:25%">
-          <button
-            class="btn_2 btn2"
-            style="margin-top:5%"
-            @click="startUploadIcon()"
-          >
-            上传头像
-          </button>
-          <button
-            class="btn_2 btn2"
-            style="margin-top:7%"
-            @click="startChangePassword()"
-          >
-            修改密码
-          </button>
-        </div>
-      </div>
-      <div class="rightDiv">
-        <button class="btn btn1" @click="$router.push({path:'/public'})">开始游戏</button>
-        <div class="div1">
-          <div class="div_btn21">
-            <button class="btn_2 btn2"  @click="$router.push({path:'/society'})">社区</button>
+<template
+  ><div>
+    <BackgroundDisplay />
+    <div class="home">
+      <Header />
+      <div style="height:100%">
+        <div class="leftDiv">
+          <div style="margin-left:25%;width:50%;height:40%">
+            <img
+              :src="user.iconUrl"
+              class="img1"
+              onerror="onerror=null;src='https://img0.baidu.com/it/u=3730772664,138405132&fm=26&fmt=auto'"
+            />
           </div>
-          <div class="div_btn22">
-            <button class="btn_2 btn2"  @click="$router.push({path:'/admin'})">管理</button>
+          <div style="width:50%;margin-left:25%">
+            <button
+              class="btn_2 btn2"
+              style="margin-top:5%"
+              @click="startUploadIcon()"
+            >
+              上传头像
+            </button>
+            <button
+              class="btn_2 btn2"
+              style="margin-top:7%"
+              @click="startChangePassword()"
+            >
+              修改密码
+            </button>
           </div>
         </div>
-      </div>
+        <div class="rightDiv">
+          <button class="btn btn1" @click="$router.push({ path: '/public' })">
+            开始游戏
+          </button>
+          <div class="div1">
+            <div class="div_btn21">
+              <button
+                class="btn_2 btn2"
+                @click="$router.push({ path: '/society' })"
+              >
+                社区
+              </button>
+            </div>
+            <div class="div_btn22">
+              <button
+                class="btn_2 btn2"
+                @click="$router.push({ path: '/admin' })"
+              >
+                管理
+              </button>
+            </div>
+          </div>
+        </div>
 
-      <!--编辑用户修改密码的弹出框-->
-      <el-dialog
-        title="修改密码"
-        v-model="editVisible_changepassword"
-        width="30%"
-      >
-        <el-form label-width="100px" :model="param">
-          <el-form-item label="原密码" prop="oldpassword">
-            <el-input
-              type="password"
-              autocomplete="off"
-              v-model="param.oldPassword"
-            ></el-input>
-          </el-form-item>
-          <el-form-item label="新密码" prop="newpassword">
-            <el-input
-              type="password"
-              autocomplete="off"
-              v-model="param.newPassword"
-              @keyup.enter="changePassword()"
-            ></el-input>
-          </el-form-item>
-          <el-form-item>
-            <el-button type="primary" @click="changePassword()">确定</el-button>
-            <el-button @click="quitChangePassword">取消</el-button>
-          </el-form-item>
-        </el-form>
-      </el-dialog>
-
-      <!--编辑用户上传头像的弹出框-->
-      <el-dialog title="上传头像" v-model="editVisible_uploadIcon" width="20%">
-        <el-upload
-          class="avatar-uploader"
-          action="http://localhost:8090/user/uploadIcon"
-          :with-credentials="true"
-          name="file"
-          accept=".jpg,.png"
-          auto-upload="false"
-          :show-file-list="false"
-          :on-success="handleAvatarSuccess"
-          :before-upload="beforeAvatarUpload"
+        <!--编辑用户修改密码的弹出框-->
+        <el-dialog
+          title="修改密码"
+          v-model="editVisible_changepassword"
+          width="30%"
         >
-          <img v-if="imgUrl" :src="imgUrl" class="avatar" />
-          <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-        </el-upload>
-      </el-dialog>
+          <el-form label-width="100px" :model="param">
+            <el-form-item label="原密码" prop="oldpassword">
+              <el-input
+                type="password"
+                autocomplete="off"
+                v-model="param.oldPassword"
+              ></el-input>
+            </el-form-item>
+            <el-form-item label="新密码" prop="newpassword">
+              <el-input
+                type="password"
+                autocomplete="off"
+                v-model="param.newPassword"
+                @keyup.enter="changePassword()"
+              ></el-input>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="changePassword()"
+                >确定</el-button
+              >
+              <el-button @click="quitChangePassword">取消</el-button>
+            </el-form-item>
+          </el-form>
+        </el-dialog>
+
+        <!--编辑用户上传头像的弹出框-->
+        <el-dialog
+          title="上传头像"
+          v-model="editVisible_uploadIcon"
+          width="20%"
+        >
+          <el-upload
+            class="avatar-uploader"
+            action="http://localhost:8090/user/uploadIcon"
+            :with-credentials="true"
+            name="file"
+            accept=".jpg,.png"
+            auto-upload="false"
+            :show-file-list="false"
+            :on-success="handleAvatarSuccess"
+            :before-upload="beforeAvatarUpload"
+          >
+            <img v-if="imgUrl" :src="imgUrl" class="avatar" />
+            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+          </el-upload>
+        </el-dialog>
+      </div>
     </div>
   </div>
 </template>
 <script>
 import Header from "../components/Header";
+import BackgroundDisplay from "@/components/BackgroundDisplay";
 export default {
   data() {
     return {
@@ -109,6 +135,7 @@ export default {
   },
   components: {
     Header,
+    BackgroundDisplay,
   },
   computed: {},
   methods: {
@@ -247,9 +274,11 @@ export default {
   width: 30%;
 }
 .home {
-  width: 100%;
-  height: 100%;
-  background-image: url(../assets/img/login.png);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
 }
 
 .div1 {

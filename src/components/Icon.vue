@@ -1,5 +1,5 @@
 <template>
-  <router-link  :to="{ path: '/home' }">
+  <router-link :to="{ path: '/home' }">
     <div class="icon-container" style="cursor:pointer;">
       <div class="icon-info">
         <div class="user-name">{{ $store.state.user.username }}</div>
@@ -7,8 +7,12 @@
       </div>
       <div>
         <img
-        class="img1"
-          :src="$store.state.user.icon ? $store.state.user.icon : require('@/assets/img/user.jpg')"
+          class="img1"
+          :src="
+            $store.state.user.icon
+              ? $store.state.user.icon
+              : require('@/assets/img/user.jpg')
+          "
           onerror="onerror=null;src='https://img0.baidu.com/it/u=3730772664,138405132&fm=26&fmt=auto'"
         />
       </div>
@@ -20,19 +24,16 @@
 export default {
   props: ["plus", "minus"],
   data() {
-    return {
-    };
+    return {};
   },
-computed:{
-  potential(){
-    return parseFloat(this.$store.state.user.potential).toFixed(2);
-  }
-},
-  created() {
+  computed: {
+    potential() {
+      return parseFloat(this.$store.state.user.potential).toFixed(2);
+    },
   },
+  created() {},
   methods: {},
-  watch: {
-  },
+  watch: {},
 };
 </script>
 
@@ -68,23 +69,23 @@ computed:{
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.user-name{
+.user-name {
   font-size: 30px;
   font-weight: 700;
   color: #ffffff;
   text-shadow: 0 0 2px rgb(64, 64, 64);
 }
-.potential{
+.potential {
   font-size: 20px;
   text-align: center;
   color: #ffffff;
   text-shadow: 0 0 2px rgb(64, 64, 64);
-  background:rgba(180,238,180,0.5)
+  background: rgba(180, 238, 180, 0.5);
 }
-.img1{
-  width:70px;
-  height:70px;
-  object-fit:fill;
+.img1 {
+  width: 70px;
+  height: 70px;
+  object-fit: fill;
   clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
   transition: 1s clip-path;
 }
