@@ -86,7 +86,6 @@ export default {
             "login",
             Object.assign(res.data, { username: this.form.username })
           );
-          document.cookie="userId="+res.data.userId;
           this.$router.push({ path: "/" });
         } catch (err) {
           return this.$notify({

@@ -30,7 +30,11 @@
       :close-on-click-modal="false"
     >
       <div style="text-align: center;">
-        <el-button icon="el-icon-caret-left" @click="$router.go(-1)" circle></el-button>
+        <el-button
+          icon="el-icon-caret-left"
+          @click="$router.go(-1)"
+          circle
+        ></el-button>
         <el-button
           icon="el-icon-refresh-left"
           circle
@@ -217,11 +221,13 @@ export default {
             track = currentTracks[k];
             var touch = e.touches[j];
             var left =
-              (track.tempPositionX - track.tempWidth) * that.global.screenWidth;
+              (parseFloat(track.tempPositionX) - parseFloat(track.tempWidth)) *
+              that.global.screenWidth;
             var right =
-              (track.tempPositionX + track.tempWidth) * that.global.screenWidth;
+              (parseFloat(track.tempPositionX) + parseFloat(track.tempWidth)) *
+              that.global.screenWidth;
 
-            if (touch.clientX > left && touch.clientX < right) {
+            if (touch.pageX > left && touch.pageX < right) {
               var key = track.key.toUpperCase();
               that.global.keyPressTime[key] = currentTime;
               that.global.keyIsHold[key] = true;
@@ -337,7 +343,10 @@ export default {
           });
         }
         this.global.formerBestScore = res.data.formerBestScore;
-        this.$store.commit("changeParam", {key:'potential',value:res.data.potential});
+        this.$store.commit("changeParam", {
+          key: "potential",
+          value: res.data.potential,
+        });
       } catch (err) {
         return this.$notify({
           title: "错误",
@@ -374,7 +383,9 @@ export default {
       );
       this.global.currentTime = Math.floor(this.audio.currentTime * 1000);
       if (this.global.currentTime < this.chart.songLength - 150) {
-        requestAnimationFrame(this.run);
+        setTimeout(() => {
+          this.run();
+        }, 10);
       } else {
         this.global.currentTime = this.chart.songLength;
         this.loadingStatus.beforeFinished = true;
@@ -395,7 +406,6 @@ export default {
       this.audio = document.getElementById("audioSong");
       this.chart.songLength = Math.round(1000 * this.audio.duration);
       this.generateImagePath();
-      this.audio.muted = true;
       this.loadingStatus.audio = true;
       console.log("audio loaded");
       this.checkIfLoaded();

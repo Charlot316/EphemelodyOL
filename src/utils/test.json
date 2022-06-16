@@ -10434,7 +10434,7 @@
     ],
     "songLength": 42500,
     "defaultBackground": "http://pic.mcatk.com/charlot-pictures/netsuai-0.jpg",
-    "songUrl": "http://192.168.2.169:8090/1.wav",
+    "songUrl": "http://47.113.89.104:8090/1.wav",
     "changeBackgroundOperations": [{
             "startTime": 17576,
             "background": "http://pic.mcatk.com/charlot-pictures/netsuai-black.jpg",

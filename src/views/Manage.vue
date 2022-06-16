@@ -150,7 +150,7 @@ export default {
         songId: "",
         songName: "",
         songWriter: "",
-        songUrl: "http://192.168.2.169:8090/1.wav",
+        songUrl: "http://47.113.89.104:8090/1.wav",
         defaultBackground:
           "http://pic.mcatk.com/charlot-pictures/netsuai-0.jpg",
         songCover: "http://pic.mcatk.com/charlot-pictures/netsuai-cover.jpg",
