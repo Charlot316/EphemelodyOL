@@ -99,7 +99,7 @@
           <el-form-item label="手动上传" label-width="80px">
             <el-upload
               class="upload-demo"
-              action="http://localhost:8090/chart/uploadBackground"
+              action="http://47.113.89.104:8090/chart/uploadBackground"
               :with-credentials="true"
               name="background"
               :data="{

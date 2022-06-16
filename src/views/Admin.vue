@@ -216,7 +216,7 @@
       <el-dialog title="上传音频" v-model="uploadSongVisible" width="20%">
         <el-upload
           class="avatar-uploader"
-          action="http://localhost:8090/chart/uploadSong"
+          action="http://47.113.89.104:8090/chart/uploadSong"
           with-credentials="true"
           name="file"
           accept=".wav,.mp4"
@@ -234,7 +234,7 @@
       <el-dialog title="上传默认背景" v-model="uploadBackVisible" width="20%">
         <el-upload
           class="avatar-uploader"
-          action="http://localhost:8090/chart/uploadDefaultBackground"
+          action="http://47.113.89.104:8090/chart/uploadDefaultBackground"
           with-credentials="true"
           name="file"
           accept=".jpg,.png"
@@ -251,7 +251,7 @@
       <el-dialog title="上传歌曲封面" v-model="uploadCoverVisible" width="20%">
         <el-upload
           class="avatar-uploader"
-          action="http://localhost:8090/chart/uploadSongCover"
+          action="http://47.113.89.104:8090/chart/uploadSongCover"
           with-credentials="true"
           name="file"
           accept=".jpg,.png"
