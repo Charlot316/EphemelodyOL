@@ -86,7 +86,7 @@
                   class="icon-active"
                   icon="el-icon-link"
                   style="margin-left: 10px;cursor:pointer"
-                  ><i class="el-icon-setting" @click="getEdit(item.songId)"></i
+                  ><i class="el-icon-setting" @click="getEdit(item.songId,item)"></i
                 ></span>
                 <span
                   class="icon-active"
@@ -117,11 +117,12 @@
         width="40%"
       >
         <el-form :model="form">
-          <el-form-item label="受否公开谱面" :label-width="formLabelWidth">
+          <el-form-item label="是否公开谱面" :label-width="formLabelWidth">
             <el-switch
               v-model="value"
               active-color="#13ce66"
-              active-value="true"
+              :active-value="true"
+              :disabled=getStatus()
             >
             </el-switch>
           </el-form-item>
@@ -316,8 +317,9 @@ export default {
       songs: [],
       editVisible: false,
       selectedSongId: "",
+      selectedSong:"",
       addVisible: false,
-      value: false,
+      value: true,
       song: {
         songId: "",
       },
@@ -354,11 +356,30 @@ export default {
         this.$message.error("获取异常");
       }
     },
-    getEdit(songId) {
+    getEdit(songId, item) {
       this.selectedSongId = songId;
+      this.selectedSong = item;
+      this.getValue();
+      console.log(this.value)
       this.form=JSON.parse(JSON.stringify(this.songs.find(item=>item.songId==songId)));
       console.log(JSON.stringify(this.form));
       this.editVisible = true;
+    },
+    getStatus(){
+      if(this.selectedSong.status == 0 || this.selectedSong.status == 1){
+        return false;
+      }
+      else{
+        return true;
+      }
+    },
+    getValue(){
+      if(this.selectedSong.status == 0){
+        this.value = false;
+      }
+      else{
+        this.value = true;
+      }
     },
     getAdd() {
       this.addVisible = true;
@@ -389,29 +410,31 @@ export default {
       console.log(this.form);
       this.song.songId = this.selectedSongId;
       this.form.songId = this.selectedSongId;
-      const { data: res1 } = await this.$http.post(
-        "/user/publiciseChart",
-        this.song
-      );
-      if (res1.code != 0) {
-        this.$message.error("公开化失败");
+      if(this.value && !this.getStatus()){
+        const { data: res1 } = await this.$http.post(
+          "/user/publiciseChart",
+          this.song
+        );
+        if (res1.code != 0) {
+          this.$message.error("公开化失败");
+        }
       }
-      let formData = new FormData();
-      formData.append("songId", this.form.songId);
-      formData.append("songName", this.form.songName);
-      formData.append("songWriter", this.form.songWrite);
-      formData.append("songUrl", this.form.songUrl);
-      formData.append("defaultBackground", this.form.defaultBackground);
-      formData.append("songCover", this.form.songCover);
-      formData.append("loadingText", this.form.loadingText);
-      formData.append("chartConstant", this.form.chartConstant);
-      formData.append("loadedText", this.form.loadedText);
+      if(!this.value && !this.getStatus()){
+        const { data: res1 } = await this.$http.post(
+          "/user/privatizeChart",
+          this.song
+        );
+        if (res1.code != 0) {
+          this.$message.error("取消公开化失败");
+        }
+      }
       const { data: res } = await this.$http.post(
         "/chart/editChartInfo",
-        this.formData
+        this.form
       );
       if (res.code == 0) {
         this.$message.success("修改成功");
+        this.getMyAllCharts();
         this.editVisible = false;
       } else {
         this.$message.error("编辑失败");

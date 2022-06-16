@@ -33,7 +33,9 @@ export default {
       imgUrl: "",
     };
   },
-  created() {},
+  created() {
+
+  },
   components: {
     Header,
     BackgroundDisplay,

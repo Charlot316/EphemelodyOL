@@ -63,7 +63,7 @@
     <el-dialog title="上传头像" v-model="editVisible_uploadIcon" width="20%">
       <el-upload
         class="avatar-uploader"
-        action="http://localhost:8090/user/uploadIcon"
+        action="http://47.113.89.104:8090/user/uploadIcon"
         :with-credentials="true"
         name="file"
         accept=".jpg,.png"
