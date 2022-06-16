@@ -18,7 +18,9 @@
             <router-link to="/home">
               <el-dropdown-item>主页</el-dropdown-item>
             </router-link>
-
+            <router-link to="/manage" v-if="$store.state.user.isAdmin">
+              <el-dropdown-item>管理员界面</el-dropdown-item>
+            </router-link>
             <el-dropdown-item command="changepassword"
               >修改密码</el-dropdown-item
             >
@@ -41,10 +43,7 @@
     >
       <el-form label-width="100px" :model="param">
         <el-form-item label="原密码" prop="oldpassword">
-          <el-input
-            type="password"
-            v-model="param.oldPassword"
-          ></el-input>
+          <el-input type="password" v-model="param.oldPassword"></el-input>
         </el-form-item>
         <el-form-item label="新密码" prop="newpassword">
           <el-input

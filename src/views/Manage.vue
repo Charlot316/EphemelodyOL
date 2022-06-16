@@ -186,10 +186,14 @@ export default {
       song: {
         songId: "",
       },
+      formLabelWidth:'100',
     };
   },
   mounted() {},
   created() {
+    if(!this.$store.state.user.isAdmin){
+      this.$router.push("/home");
+    }
     this.getAllCharts();
   },
   methods: {
