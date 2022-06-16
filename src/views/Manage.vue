@@ -83,13 +83,13 @@
                   <span
                     class="icon-active"
                     icon="el-icon-link"
-                    style="margin-left: 10px;"
+                    style="margin-left: 10px;cursor:pointer"
                     ><i class="el-icon-setting" @click="getEdit(item)"></i
                   ></span>
                   <span
                     class="icon-active"
                     icon="el-icon-link"
-                    style="margin-left: 10px;"
+                    style="margin-left: 10px;cursor:pointer"
                     ><i
                       class="el-icon-delete"
                       @click="deleteSong(item.songId)"

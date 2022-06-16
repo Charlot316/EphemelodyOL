@@ -85,13 +85,13 @@
                 <span
                   class="icon-active"
                   icon="el-icon-link"
-                  style="margin-left: 10px;"
+                  style="margin-left: 10px;cursor:pointer"
                   ><i class="el-icon-setting" @click="getEdit(item.songId)"></i
                 ></span>
                 <span
                   class="icon-active"
                   icon="el-icon-link"
-                  style="margin-left: 10px;"
+                  style="margin-left: 10px;cursor:pointer"
                   ><i
                     class="el-icon-delete"
                     @click="deleteSong(item.songId)"
@@ -337,6 +337,7 @@ export default {
       const { data: res } = await this.$http.post("/user/getAllMyCharts");
       if (res.code == 0) {
         this.songs = res.data.charts;
+        console.log(this.songs);
       } else {
         this.$message.error("获取异常");
       }
@@ -344,7 +345,6 @@ export default {
     async getCharts() {
       this.params.sortType = this.sort.substr(0, 1);
       this.params.sortWay = this.sort.substr(1, 1);
-      console.log(this.params);
       const { data: res } = await this.$http.post(
         "/user/getMyCharts",
         this.params
@@ -352,13 +352,16 @@ export default {
       console.log(res);
       if (res.code == 0) {
         this.songs = res.data.charts;
+        console.log(this.songs);
       } else {
         this.$message.error("获取异常");
       }
     },
     getEdit(songId) {
-      this.editVisible = true;
       this.selectedSongId = songId;
+      this.form=JSON.parse(JSON.stringify(this.songs.find(item=>item.songId==songId)));
+      console.log(this.form);
+      this.editVisible = true;
     },
     getAdd() {
       this.addVisible = true;
