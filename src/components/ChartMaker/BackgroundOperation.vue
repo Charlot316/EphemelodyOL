@@ -186,7 +186,7 @@ export default {
           setTimeout(() => {
             this.updateOperation();
           }, 500);
-
+          this.$emit("editStatus", true);
           for (var key in this.tempOperation) {
             this.myOperation[key] = this.tempOperation[key];
           }
