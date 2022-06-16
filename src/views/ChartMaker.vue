@@ -16,13 +16,6 @@
             size="small"
             type="text"
             class="header-button"
-            @click="log(chart)"
-            >log
-          </el-button>
-          <el-button
-            size="small"
-            type="text"
-            class="header-button"
             @click="saveChart(false)"
             >保存</el-button
           >
@@ -705,7 +698,7 @@ export default {
     async saveChart(back) {
       try {
         const { data: res } = await this.$http.post(
-          "/chart/editChartInfo",
+          "/chart/editChartContent",
           this.chart
         );
         if (res.code !== 0) {
@@ -720,20 +713,6 @@ export default {
           message: "谱面上传成功！",
           type: "success",
         });
-        const { data: res2 } = await this.$http.get(
-          `/user/getChart?songId=${this.$route.query.songId}`
-        );
-        if (res2.code !== 0) {
-          this.$notify({
-            title: "失败",
-            message: "登录失败！",
-            type: "error",
-          });
-        }
-        else{
-
-        console.log(res2.data);
-        }
         if (back) {
           this.$router.push("/admin");
         }
