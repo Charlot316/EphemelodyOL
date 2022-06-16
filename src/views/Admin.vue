@@ -115,7 +115,6 @@
         title="修改谱面信息"
         v-model="editVisible"
         width="40%"
-        height="50%"
       >
         <el-form :model="form">
           <el-form-item label="受否公开谱面" :label-width="formLabelWidth">
@@ -169,7 +168,7 @@
       </el-dialog>
 
       <!--编辑新增谱面的弹出框-->
-      <el-dialog title="新增谱面" v-model="addVisible" width="40%" height="50%">
+      <el-dialog title="新增谱面" v-model="addVisible" width="40%">
         <el-form :model="newSong">
           <el-form-item label="默认背景" :label-width="formLabelWidth">
             <el-input
@@ -326,6 +325,7 @@ export default {
       uploadBackVisible: false,
       uploadCoverVisible: false,
       songUrl: "",
+      formLabelWidth:'100',
     };
   },
   mounted() {},
@@ -337,7 +337,6 @@ export default {
       const { data: res } = await this.$http.post("/user/getAllMyCharts");
       if (res.code == 0) {
         this.songs = res.data.charts;
-        console.log(this.songs);
       } else {
         this.$message.error("获取异常");
       }
@@ -349,10 +348,8 @@ export default {
         "/user/getMyCharts",
         this.params
       );
-      console.log(res);
       if (res.code == 0) {
         this.songs = res.data.charts;
-        console.log(this.songs);
       } else {
         this.$message.error("获取异常");
       }
@@ -360,7 +357,7 @@ export default {
     getEdit(songId) {
       this.selectedSongId = songId;
       this.form=JSON.parse(JSON.stringify(this.songs.find(item=>item.songId==songId)));
-      console.log(this.form);
+      console.log(JSON.stringify(this.form));
       this.editVisible = true;
     },
     getAdd() {
