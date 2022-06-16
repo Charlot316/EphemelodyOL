@@ -67,7 +67,6 @@
         :with-credentials="true"
         name="file"
         accept=".jpg,.png"
-        auto-upload="false"
         :show-file-list="false"
         :on-success="handleAvatarSuccess"
         :before-upload="beforeAvatarUpload"

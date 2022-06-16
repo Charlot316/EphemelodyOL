@@ -110,11 +110,11 @@
       <!-- </div> -->
       <el-dialog title="调整" v-model="editVisible" width="40%" height="50%">
         <el-form>
-          <el-form-item label="是否调整谱面状态" :label-width="formLabelWidth">
+          <el-form-item label="是否认定谱面" :label-width="formLabelWidth">
             <el-switch
               v-model="value"
               active-color="#13ce66"
-              active-value="true"
+              :active-value="true"
             >
             </el-switch>
           </el-form-item>
@@ -225,10 +225,19 @@ export default {
         this.$message.error("获取异常");
       }
     },
+    getValue(){
+      if(this.selectedSong.status == 1){
+        this.value = false;
+      }
+      else{
+        this.value = true;
+      }
+    },
     getEdit(item) {
-      this.editVisible = true;
       this.selectedSongId = item.songId;
       this.selectedSong = item;
+      this.getValue();
+      this.editVisible = true;
     },
     getAdd() {
       this.addVisible = true;
@@ -265,26 +274,26 @@ export default {
     },
     async editStatus() {
       this.song.songId = this.selectedSongId;
-      if (this.value) {
-        if (this.selectedSong.status == 1) {
-          const { data: res } = await this.$http.post(
-            "/admin/accreditChart",
-            this.song
-          );
-          if (res.code == 0) {
-            this.$message.success("调整成功");
-          }
-        } else {
-          const { data: res } = await this.$http.post(
-            "/admin/disaccreditChart",
-            this.song
-          );
-          if (res.code == 0) {
-            this.$message.success("调整成功");
-          }
+      if (this.selectedSong.status == 1 && this.value) {
+        const { data: res } = await this.$http.post(
+          "/admin/accreditChart",
+          this.song
+        );
+        if (res.code == 0) {
+          this.$message.success("调整成功");
         }
-        this.editVisible = false;
+      } 
+      if(this.selectedSong.status == 2 && !this.value){
+        const { data: res } = await this.$http.post(
+          "/admin/disaccreditChart",
+          this.song
+        );
+        if (res.code == 0) {
+          this.$message.success("调整成功");
+        }
       }
+      this.getAllCharts();
+      this.editVisible = false;
     },
   },
 };
