@@ -253,11 +253,12 @@ export default {
       if (parseFloat(value).toString() == "NaN") {
         callback(new Error("请输入数字值"));
       } else {
-        if (value < 0) {
+        if (value <= 0) {
           callback(new Error("开始时机不能小于0"));
         } else if (value > this.chart.songLength) {
           callback(new Error("开始时机不能超过歌曲长度"));
         } else if (value > this.myTrack.tempTrack.endTiming) {
+          console.log(this.myTrack.tempTrack.endTiming)
           callback(new Error("开始时机不能超过结束时机"));
         } else {
           callback();

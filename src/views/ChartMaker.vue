@@ -16,6 +16,13 @@
             size="small"
             type="text"
             class="header-button"
+            @click="log(chart)"
+            >log
+          </el-button>
+          <el-button
+            size="small"
+            type="text"
+            class="header-button"
             @click="saveChart(false)"
             >保存</el-button
           >
@@ -621,7 +628,7 @@ export default {
         if (that.volume >= 10) that.volume -= 10;
         else that.volume = 0;
         that.audio.volume = that.volume / 100;
-      } 
+      }
       // else if (e.key == "ArrowLeft") {
       //   e.preventDefault();
       //   that.minusTime(that.keyStep / 1000);
@@ -695,21 +702,39 @@ export default {
   },
 
   methods: {
-    async saveChart(back){
-       try {
-        const { data: res } = await this.$http.post("/chart/editChartInfo", this.chart);
+    async saveChart(back) {
+      try {
+        const { data: res } = await this.$http.post(
+          "/chart/editChartInfo",
+          this.chart
+        );
         if (res.code !== 0) {
           this.$notify({
             title: "失败",
             message: "谱面上传失败！",
             type: "error",
           });
-        }this.$notify({
-            title: "成功",
-            message: "谱面上传成功！",
-            type: "success",
+        }
+        this.$notify({
+          title: "成功",
+          message: "谱面上传成功！",
+          type: "success",
+        });
+        const { data: res2 } = await this.$http.get(
+          `/user/getChart?songId=${this.$route.query.songId}`
+        );
+        if (res2.code !== 0) {
+          this.$notify({
+            title: "失败",
+            message: "登录失败！",
+            type: "error",
           });
-        if(back){
+        }
+        else{
+
+        console.log(res2.data);
+        }
+        if (back) {
           this.$router.push("/admin");
         }
       } catch (err) {
@@ -719,8 +744,7 @@ export default {
           type: "error",
         });
       }
-    }
-    ,
+    },
     ManualCalculatebpm() {
       if (
         this.chart.beatsCount &&

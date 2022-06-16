@@ -12558,7 +12558,7 @@ var chart3 = {
     ],
     songLength: 55000,
     defaultBackground: "http://pic.mcatk.com/charlot-pictures/aegle-0.JPG",
-    songUrl: "http://47.113.89.104:8090/media/4.wav",
+    songUrl: "http://localhost:8090/media/4.wav",
     changeBackgroundOperations: [{
             trackId: 0,
             type: 4,
@@ -17507,7 +17507,7 @@ var chart4 = {
     ],
     songLength: 55000,
     defaultBackground: "http://pic.mcatk.com/charlot-pictures/koinouta-0.JPG",
-    songUrl: "http://47.113.89.104:8090/media/3.wav",
+    songUrl: "http://localhost:8090/media/3.wav",
     changeBackgroundOperations: [{
         trackId: 0,
         type: 4,

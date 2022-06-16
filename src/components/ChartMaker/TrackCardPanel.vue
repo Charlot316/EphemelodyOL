@@ -252,16 +252,16 @@ export default {
       } else if (this.rightMove) {
         currentTime = this.global.currentTime;
         roundTime = this.roundTime(currentTime);
-        if (roundTime <= this.myTrack.startTiming) {
+        if (roundTime >= this.myTrack.startTiming) {
           if (this.myTrack.notes.length > 0) {
             if (
               roundTime >=
               this.myTrack.notes[this.myTrack.notes.length - 1].timing
             ) {
-              this.myTrack.startTiming = roundTime;
+              this.myTrack.endTiming = roundTime;
             }
           } else {
-            this.myTrack.startTiming = roundTime;
+            this.myTrack.endTiming = roundTime;
           }
         }
       }
