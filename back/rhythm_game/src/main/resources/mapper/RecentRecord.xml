@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="team.javaee.mapper.RecentRecordMapper">
+    <select id="getMyBestRecord" resultType="team.javaee.entity.domain.RecentRecord">
+        select * from recent_record WHERE score = (select max(score) from recent_record) AND song_id = #{songId} AND user_id = #{userId}
+    </select>
+</mapper>
