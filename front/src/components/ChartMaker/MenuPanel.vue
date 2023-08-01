@@ -112,7 +112,7 @@ export default {
                     "#backgroundOperation" +
                       this.chart.changeBackgroundOperations[i - 1].index
                   )
-                  .scrollIntoView(true);
+                  .scrollIntoView({ behavior: "smooth"});
               }, 200);
             else
               setTimeout(() => {
@@ -121,7 +121,7 @@ export default {
                     "#backgroundOperation" +
                       this.chart.changeBackgroundOperations[0].index
                   )
-                  .scrollIntoView(true);
+                  .scrollIntoView({ behavior: "smooth"});
               }, 200);
             break;
           }
@@ -147,7 +147,7 @@ export default {
         };
         this.myChart.changeBackgroundOperations.push(operation);
         this.updateOperation();
-        document.querySelector("#backgroundOperation0").scrollIntoView(true);
+        document.querySelector("#backgroundOperation0").scrollIntoView({ behavior: "smooth"});
         setTimeout(() => {
           this.myChart.changeBackgroundOperations[0].edit = true;
         }, 10);
@@ -165,7 +165,7 @@ export default {
           if (this.myChart.changeBackgroundOperations[i].edit) {
             document
               .querySelector("#backgroundOperation" + i)
-              .scrollIntoView(true);
+              .scrollIntoView({ behavior: "smooth"});
             break;
           }
         }

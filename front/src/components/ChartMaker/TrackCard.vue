@@ -355,7 +355,7 @@ export default {
       this.myTrack.edit = true;
       document
         .querySelector("#trackCard" + this.myTrack.index)
-        .scrollIntoView(true);
+        .scrollIntoView({ behavior: "smooth"});
       this.myTrack.tempTrack = JSON.parse(JSON.stringify(this.myTrack));
       delete this.myTrack.tempTrack.tempTrack;
       this.myTrack.tempTrack.key = this.myTrack.tempTrack.key.toUpperCase();

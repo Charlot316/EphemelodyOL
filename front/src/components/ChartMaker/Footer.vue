@@ -330,7 +330,7 @@ export default {
             setTimeout(() => {
               document
                 .querySelector("#trackCardPanel" + this.chart.tracks[i].index)
-                .scrollIntoView(true);
+                .scrollIntoView({ behavior: "smooth"});
             }, 200);
 
             break;

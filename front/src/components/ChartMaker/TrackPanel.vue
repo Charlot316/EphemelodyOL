@@ -103,13 +103,13 @@ export default {
               setTimeout(() => {
                 document
                   .querySelector("#trackCard" + this.chart.tracks[i - 2].index)
-                  .scrollIntoView(true);
+                  .scrollIntoView({ behavior: "smooth"});
               }, 200);
             else
               setTimeout(() => {
                 document
                   .querySelector("#trackCard" + this.chart.tracks[0].index)
-                  .scrollIntoView(true);
+                  .scrollIntoView({ behavior: "smooth"});
               }, 200);
             break;
           }
@@ -152,7 +152,7 @@ export default {
         this.myChart.tracks.push(track);
         this.myGlobal.timeSort = true;
         this.updateOperation();
-        document.querySelector("#trackCard0").scrollIntoView(true);
+        document.querySelector("#trackCard0").scrollIntoView({ behavior: "smooth"});
         setTimeout(() => {
           this.myChart.tracks[0].edit = true;
         }, 10);
@@ -164,7 +164,7 @@ export default {
         });
         for (var i = 0; i < this.myChart.tracks.length; i++) {
           if (this.myChart.tracks[i].edit) {
-            document.querySelector("#trackCard" + i).scrollIntoView(true);
+            document.querySelector("#trackCard" + i).scrollIntoView({ behavior: "smooth"});
             break;
           }
         }

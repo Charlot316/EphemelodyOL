@@ -455,7 +455,7 @@ export default {
         );
       }
       if (this.sliding) {
-        document.querySelector("#time-indicater").scrollIntoView(true);
+        document.querySelector("#time-indicater").scrollIntoView({ behavior: "smooth"});
       }
     },
     "global.reCalculateChartMaker"() {
@@ -652,10 +652,10 @@ export default {
 
           document
             .querySelector("#trackCard" + track.index)
-            .scrollIntoView(true);
+            .scrollIntoView({ behavior: "smooth"});
           document
             .querySelector("#trackCardPanel" + track.index)
-            .scrollIntoView(true);
+            .scrollIntoView({ behavior: "smooth"});
 
           setTimeout(() => {
             that.currentSelectTrack.edit = true;
@@ -1018,7 +1018,7 @@ export default {
       this.global.currentTime = this.global.currentTime + 1;
       this.global.currentTime = this.global.currentTime - 1;
       this.audio.currentTime = this.global.currentTime / 1000;
-      document.querySelector("#time-indicater").scrollIntoView(true);
+      document.querySelector("#time-indicater").scrollIntoView({ behavior: "smooth"});
     },
 
     //鼠标按下时间轴
