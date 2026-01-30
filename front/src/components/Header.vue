@@ -63,7 +63,7 @@
     <el-dialog title="上传头像" v-model="editVisible_uploadIcon" width="20%">
       <el-upload
         class="avatar-uploader"
-        action="http://47.113.89.104:8090/user/uploadIcon"
+        :action="$http.defaults.baseURL + '/user/uploadIcon'"
         with-credentials
         name="file"
         accept=".jpg,.png"
@@ -143,7 +143,6 @@ export default {
         this.user.username = res.data.username;
         this.user.userId = res.data.userId;
         this.user.iconUrl = res.data.iconUrl;
-        this.user.password = res.data.password;
         this.$store.commit("changeParam", {
           key: "icon",
           value: res.data.iconUrl,
@@ -159,22 +158,29 @@ export default {
     },
     async changePassword() {
       try {
-        if (this.param.oldPassword !== this.user.password) {
-          return this.$notify({
-            title: "请重新输入",
-            message: "旧密码输入错误",
-            type: "error",
-          });
-        } else if (this.param.oldPassword === this.param.newPassword) {
+        if (!this.param.oldPassword || !this.param.newPassword) {
+            return this.$message.warning("请输入完整信息");
+        }
+        if (this.param.oldPassword === this.param.newPassword) {
           return this.$notify({
             title: "请重新输入",
             message: "新密码和旧密码不能一样",
             type: "error",
           });
         }
+        
+        const { hashPassword } = await import("../utils/crypto");
+        const hashedOld = await hashPassword(this.param.oldPassword);
+        const hashedNew = await hashPassword(this.param.newPassword);
+        
+        const passwordPayload = {
+            oldPassword: hashedOld,
+            newPassword: hashedNew
+        };
+
         const { data: res } = await this.$http.post(
           "/user/changePassword",
-          this.param
+          passwordPayload
         );
         if (res.code !== 0)
           return this.$notify({
@@ -188,7 +194,10 @@ export default {
           type: "success",
         });
         this.editVisible_changepassword = false;
+        this.param.oldPassword = "";
+        this.param.newPassword = "";
       } catch (err) {
+        console.error(err);
         return this.$notify({
           title: "错误",
           message: "网络异常",

@@ -19,12 +19,16 @@ import team.javaee.service.UserService;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.mindrot.jbcrypt.BCrypt;
 import java.io.File;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * <p>
- *  服务实现类
+ * 服务实现类
  * </p>
  *
  * @author nwh
@@ -63,23 +67,48 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Autowired
     private RecentRecordMapper recentRecordMapper;
 
+    @Value("${web.upload-path}")
+    private String uploadPath;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @Override
     public ReturnResponse<Object> login(HttpServletRequest request, HttpServletResponse response, LoginDTO loginDTO) {
-        try{
+        try {
             LoginVO loginVO = new LoginVO();
             String username = loginDTO.getUsername();
             String password = loginDTO.getPassword();
             QueryWrapper<User> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("username", username);
             User user = userMapper.selectOne(queryWrapper);
-            if(user == null){
+            if (user == null) {
                 return ReturnResponse.packageObject("用户名不存在", ReturnStatus.FAILURE);
-            }
-            else{
-                if(!user.getPassword().equals(password)){
-                    return ReturnResponse.packageObject("密码错误", ReturnStatus.FAILURE);
+            } else {
+                // 判断是否是旧版明文密码或不合法的 BCrypt 哈希
+                boolean pwMatched = false;
+                String storedPassword = user.getPassword();
+
+                try {
+                    if (storedPassword.startsWith("$2a$")) { // BCrypt 哈希通常以 $2a$ 开头
+                        pwMatched = BCrypt.checkpw(password, storedPassword);
+                    }
+                } catch (Exception e) {
+                    // 忽略哈希校验异常
                 }
-                else{
+
+                // 如果哈希校验失败，尝试明文匹配（用于迁移旧数据）
+                if (!pwMatched && storedPassword.equals(password)) {
+                    pwMatched = true;
+                    // 登录成功，顺便把密码自动升级为 BCrypt
+                    String newHashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+                    user.setPassword(newHashedPassword);
+                    userMapper.updateById(user);
+                }
+
+                if (!pwMatched) {
+                    return ReturnResponse.packageObject("密码错误", ReturnStatus.FAILURE);
+                } else {
                     Cookie cookie = new Cookie("userId", user.getUserId() + "");
                     cookie.setPath("/");
                     response.addCookie(cookie);
@@ -90,31 +119,32 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                     return ReturnResponse.OK(loginVO);
                 }
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             return ReturnResponse.systemException(ReturnStatus.BUSINESS_EXCEPTION);
         }
     }
 
     @Override
     public ReturnResponse<String> register(UserDTO userDTO) {
-        try{
+        try {
             String username = userDTO.getUsername();
             QueryWrapper<User> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("username", username);
-            if(userMapper.selectOne(queryWrapper) != null){
+            if (userMapper.selectOne(queryWrapper) != null) {
                 return ReturnResponse.packageObject("用户名已存在", ReturnStatus.FAILURE);
-            }
-            else{
+            } else {
                 User user = new User();
                 user.setUserId(UUID.randomUUID().toString());
                 user.setUsername(username);
-                user.setPassword(userDTO.getPassword());
+                // 对密码进行哈希处理
+                String hashedPassword = BCrypt.hashpw(userDTO.getPassword(), BCrypt.gensalt());
+                user.setPassword(hashedPassword);
                 user.setIsAdmin(0);
                 user.setPotential((float) 0);
                 userMapper.insert(user);
                 return ReturnResponse.OK("注册成功");
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return ReturnResponse.systemException(ReturnStatus.BUSINESS_EXCEPTION);
         }
@@ -122,18 +152,32 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public ReturnResponse<String> password(String userId, PasswordDTO passwordDTO) {
-        try{
+        try {
             UpdateWrapper<User> userUpdateWrapper = new UpdateWrapper<>();
             String newPassword = passwordDTO.getNewPassword();
             String oldPassword = passwordDTO.getOldPassword();
-            userUpdateWrapper.eq("user_id",userId);
+            userUpdateWrapper.eq("user_id", userId);
             User user = userMapper.selectOne(userUpdateWrapper);
-            if(user.getPassword().equals(oldPassword)){
-                user.setPassword(newPassword);
+
+            boolean oldPwMatched = false;
+            String storedPassword = user.getPassword();
+            try {
+                if (storedPassword.startsWith("$2a$")) {
+                    oldPwMatched = BCrypt.checkpw(oldPassword, storedPassword);
+                }
+            } catch (Exception e) {
+            }
+
+            if (!oldPwMatched && storedPassword.equals(oldPassword)) {
+                oldPwMatched = true;
+            }
+
+            if (oldPwMatched) {
+                String hashedNewPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
+                user.setPassword(hashedNewPassword);
                 userMapper.update(user, userUpdateWrapper);
                 return ReturnResponse.OK("成功修改个人密码");
-            }
-            else{
+            } else {
                 return ReturnResponse.packageObject("旧密码错误", ReturnStatus.FAILURE);
             }
         } catch (Exception e) {
@@ -144,7 +188,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public ReturnResponse<UserVO> getUserInformation(String userId) {
-        try{
+        try {
             QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
             userQueryWrapper.eq("user_id", userId);
             User user = userMapper.selectOne(userQueryWrapper);
@@ -152,9 +196,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             userVO.setUserId(userId);
             userVO.setIconUrl(user.getIcon());
             userVO.setUsername(user.getUsername());
-            userVO.setPassword(user.getPassword());
             return ReturnResponse.OK(userVO);
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return ReturnResponse.systemException(ReturnStatus.BUSINESS_EXCEPTION);
         }
@@ -165,9 +208,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         try {
             String userId = Objects.requireNonNull(Normal.getUserIdByCookie(req));
             ImageVO imageVO = new ImageVO();
-            String realPath = "/data/image/user/";
-//            String realPath = "E:\\新建文件夹\\j2ee_springboot\\rhythm_game\\src\\main\\resources\\static\\files\\";
-//            String realPath = "D:\\资料\\3 大三下\\j2ee架构\\大作业\\j2ee_springboot\\rhythm_game\\src\\main\\resources\\static\\files\\";
+            String realPath = uploadPath + "image/user/";
+            // String realPath =
+            // "E:\\新建文件夹\\j2ee_springboot\\rhythm_game\\src\\main\\resources\\static\\files\\";
+            // String realPath = "D:\\资料\\3
+            // 大三下\\j2ee架构\\大作业\\j2ee_springboot\\rhythm_game\\src\\main\\resources\\static\\files\\";
             File folder = new File(realPath);
             if (!folder.exists()) {
                 folder.mkdirs();
@@ -176,13 +221,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             User user = userMapper.selectById(userId);
             String newName = UUID.randomUUID().toString() + oldName.substring(oldName.lastIndexOf("."));
             file.transferTo(new File(folder, newName));
-            String url = req.getScheme() + "://47.113.89.104:8090/image/user/" + newName;
-            System.out.println("用户名为"+userId);
+            String url = req.getScheme() + "://" + req.getServerName() + ":" + req.getServerPort() + "/image/user/"
+                    + newName;
+            System.out.println("用户名为" + userId);
             user.setIcon(url);
             System.out.println(url);
             QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
-            userQueryWrapper.eq("user_id",user.getUserId());
-            userMapper.update(user,userQueryWrapper);
+            userQueryWrapper.eq("user_id", user.getUserId());
+            userMapper.update(user, userQueryWrapper);
             imageVO.setUrl(url);
             return ReturnResponse.OK(imageVO);
         } catch (Exception e) {
@@ -193,20 +239,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public ReturnResponse<String> chartPublicise(String userId, ChartChangeDTO chartChangeDTO) {
-        try{
+        try {
             String songId = chartChangeDTO.getSongId();
             UpdateWrapper<Song> songUpdateWrapper = new UpdateWrapper<>();
-            songUpdateWrapper.eq("id",songId);
+            songUpdateWrapper.eq("id", songId);
             Song song = songMapper.selectOne(songUpdateWrapper);
-            if(song.getUploaderId().equals(userId)){
+            if (song.getUploaderId().equals(userId)) {
                 song.setStatus(1);
                 songMapper.update(song, songUpdateWrapper);
                 return ReturnResponse.OK("公开谱面成功");
-            }
-            else{
+            } else {
                 return ReturnResponse.packageObject("不是对应上传者", ReturnStatus.FAILURE);
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return ReturnResponse.systemException(ReturnStatus.BUSINESS_EXCEPTION);
         }
@@ -214,20 +259,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public ReturnResponse<String> privatizeChart(String userId, ChartChangeDTO chartChangeDTO) {
-        try{
+        try {
             String songId = chartChangeDTO.getSongId();
             UpdateWrapper<Song> songUpdateWrapper = new UpdateWrapper<>();
-            songUpdateWrapper.eq("id",songId);
+            songUpdateWrapper.eq("id", songId);
             Song song = songMapper.selectOne(songUpdateWrapper);
-            if(song.getUploaderId().equals(userId)){
+            if (song.getUploaderId().equals(userId)) {
                 song.setStatus(0);
                 songMapper.update(song, songUpdateWrapper);
                 return ReturnResponse.OK("私有化谱面成功");
-            }
-            else{
+            } else {
                 return ReturnResponse.packageObject("不是对应上传者", ReturnStatus.FAILURE);
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return ReturnResponse.systemException(ReturnStatus.BUSINESS_EXCEPTION);
         }
@@ -235,28 +279,26 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public ReturnResponse<SelfSongsListVO> getMyCharts(String userId, PublicChartsDTO publicChartsDTO) {
-        try{
+        try {
             int status = publicChartsDTO.getStatus();
             String searchType = publicChartsDTO.getSearchType();
             String searchContent = publicChartsDTO.getSearchContent();
             String sortType = publicChartsDTO.getSortType();
             String sortWay = publicChartsDTO.getSortWay();
             QueryWrapper<Song> songQueryWrapper = new QueryWrapper<>();
-            songQueryWrapper.eq("uploader_id",userId);
+            songQueryWrapper.eq("uploader_id", userId);
             songQueryWrapper.eq("status", status);
-            if(searchType.equals("0")){
+            if (searchType.equals("0")) {
                 songQueryWrapper.eq("song_name", searchContent);
-            }
-            else if(searchType.equals("1")){
+            } else if (searchType.equals("1")) {
                 songQueryWrapper.eq("song_writer", searchContent);
-            }
-            else if(searchType.equals("3")){
+            } else if (searchType.equals("3")) {
                 songQueryWrapper.eq("chart_constant", searchContent);
             }
             List<Song> songs = songMapper.selectList(songQueryWrapper);
             List<SongVO> songsReturn = new ArrayList<>();
             SelfSongsListVO selfSongsListVO = new SelfSongsListVO();
-            for(Song song : songs){
+            for (Song song : songs) {
                 SongVO songVO = new SongVO();
                 songVO.setSongId(song.getId());
                 songVO.setSongName(song.getSongName());
@@ -271,25 +313,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 songVO.setStatus(String.valueOf(song.getStatus()));
                 songsReturn.add(songVO);
             }
-            if(sortType.equals("0")){
-                if(sortWay.equals("0")){
-                    songsReturn.sort((a,b)->a.getSongName().compareTo(b.getSongName()));
+            if (sortType.equals("0")) {
+                if (sortWay.equals("0")) {
+                    songsReturn.sort((a, b) -> a.getSongName().compareTo(b.getSongName()));
+                } else {
+                    songsReturn.sort((b, a) -> a.getSongName().compareTo(b.getSongName()));
                 }
-                else{
-                    songsReturn.sort((b,a)->a.getSongName().compareTo(b.getSongName()));
-                }
-            }
-            else if(sortType.equals("1")){
-                if(sortWay.equals("0")){
-                    songsReturn.sort((a,b)->a.getSongWriter().compareTo(b.getSongWriter()));
-                }
-                else{
-                    songsReturn.sort((b,a)->a.getSongWriter().compareTo(b.getSongWriter()));
+            } else if (sortType.equals("1")) {
+                if (sortWay.equals("0")) {
+                    songsReturn.sort((a, b) -> a.getSongWriter().compareTo(b.getSongWriter()));
+                } else {
+                    songsReturn.sort((b, a) -> a.getSongWriter().compareTo(b.getSongWriter()));
                 }
             }
             selfSongsListVO.setCharts(songsReturn);
             return ReturnResponse.OK(selfSongsListVO);
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return ReturnResponse.systemException(ReturnStatus.BUSINESS_EXCEPTION);
         }
@@ -297,13 +336,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public ReturnResponse<SelfSongsListVO> getAllMyCharts(String userId) {
-        try{
+        try {
             UpdateWrapper<Song> songWrapper = new UpdateWrapper<>();
-            songWrapper.eq("uploader_id",userId);
+            songWrapper.eq("uploader_id", userId);
             List<Song> songs = songMapper.selectList(songWrapper);
             List<SongVO> songsReturn = new ArrayList<>();
             SelfSongsListVO selfSongsListVO = new SelfSongsListVO();
-            for(Song song : songs){
+            for (Song song : songs) {
                 SongVO songVO = new SongVO();
                 songVO.setSongId(song.getId());
                 songVO.setSongName(song.getSongName());
@@ -322,7 +361,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             }
             selfSongsListVO.setCharts(songsReturn);
             return ReturnResponse.OK(selfSongsListVO);
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return ReturnResponse.systemException(ReturnStatus.BUSINESS_EXCEPTION);
         }
@@ -330,17 +369,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public ReturnResponse<SelfSongsListVO> getAllCharts() {
-        try{
+        try {
             UpdateWrapper<Song> songWrapper = new UpdateWrapper<>();
-            songWrapper.eq("status","1");
+            songWrapper.eq("status", "1");
             UpdateWrapper<Song> songWrapper1 = new UpdateWrapper<>();
-            songWrapper1.eq("status","2");
+            songWrapper1.eq("status", "2");
             List<Song> songs = songMapper.selectList(songWrapper);
             List<Song> songs1 = songMapper.selectList(songWrapper1);
             songs.addAll(songs1);
             List<SongVO> songsReturn = new ArrayList<>();
             SelfSongsListVO selfSongsListVO = new SelfSongsListVO();
-            for(Song song : songs){
+            for (Song song : songs) {
                 SongVO songVO = new SongVO();
                 songVO.setSongId(song.getId());
                 songVO.setSongName(song.getSongName());
@@ -359,7 +398,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             }
             selfSongsListVO.setCharts(songsReturn);
             return ReturnResponse.OK(selfSongsListVO);
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return ReturnResponse.systemException(ReturnStatus.BUSINESS_EXCEPTION);
         }
@@ -367,16 +406,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public ReturnResponse<SingleSongVO> getChart(SongDTO songDTO) {
-        try{
+        try {
             String songId = songDTO.getSongId();
             QueryWrapper<Song> songWrapper = new QueryWrapper<>();
-            songWrapper.eq("id",Integer.valueOf(songId));
+            songWrapper.eq("id", Integer.valueOf(songId));
             Song song = songMapper.selectOne(songWrapper);
             SingleSongVO singleSongVO = new SingleSongVO();
             singleSongVO.setSongName(song.getSongName());
             singleSongVO.setSongId(song.getId());
             QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
-            userQueryWrapper.eq("user_id",song.getUploaderId());
+            userQueryWrapper.eq("user_id", song.getUploaderId());
             User user = userMapper.selectOne(userQueryWrapper);
             singleSongVO.setUploader(user.getUsername());
             singleSongVO.setSongWriter(song.getSongWriter());
@@ -389,12 +428,100 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             singleSongVO.setSongUrl(song.getSongUrl());
             singleSongVO.setBPM(song.getBPM());
             singleSongVO.setFirstBeatDelay(song.getFirstBeatDelay());
+
+            // 优先尝试从 JSON 文件加载
+            String jsonPath = uploadPath + "charts/" + songId + ".json";
+            File jsonFile = new File(jsonPath);
+            if (jsonFile.exists()) {
+                try {
+                    ChartContentDTO content = objectMapper.readValue(jsonFile, ChartContentDTO.class);
+
+                    // 映射 ChangeBackgroundOperations
+                    List<ChangeBackgroundOperationsVO> backgroundOps = content.getChangeBackgroundOperations().stream()
+                            .map(dto -> {
+                                ChangeBackgroundOperationsVO vo = new ChangeBackgroundOperationsVO();
+                                vo.setStartTime(dto.getStartTime());
+                                vo.setBackground(dto.getBackground());
+                                return vo;
+                            }).collect(Collectors.toList());
+                    singleSongVO.setChangeBackgroundOperations(backgroundOps);
+
+                    // 映射 Tracks
+                    List<TracksVO> tracksVOList = content.getTracks().stream().map(trackDto -> {
+                        TracksVO tracksVO = new TracksVO();
+                        tracksVO.setType(trackDto.getType());
+                        tracksVO.setKey(trackDto.getKey());
+                        tracksVO.setStartTiming(trackDto.getStartTiming());
+                        tracksVO.setEndTiming(trackDto.getEndTiming());
+                        tracksVO.setPositionX(String.valueOf(trackDto.getPositionX()));
+                        tracksVO.setWidth(String.valueOf(trackDto.getWidth()));
+                        tracksVO.setR(trackDto.getR());
+                        tracksVO.setG(trackDto.getG());
+                        tracksVO.setB(trackDto.getB());
+
+                        // Notes
+                        tracksVO.setNotes(trackDto.getNotes().stream().map(noteDto -> {
+                            NotesVO notesVO = new NotesVO();
+                            notesVO.setNoteType(noteDto.getNoteType());
+                            notesVO.setKey(noteDto.getKey());
+                            notesVO.setTiming(noteDto.getTiming());
+                            notesVO.setEndTiming(noteDto.getEndTiming());
+                            return notesVO;
+                        }).collect(Collectors.toList()));
+
+                        // MoveOperations
+                        tracksVO.setMoveOperations(trackDto.getMoveOperations().stream().map(moveDto -> {
+                            MoveOperationsVO moveVO = new MoveOperationsVO();
+                            moveVO.setStartTime(moveDto.getStartTime());
+                            moveVO.setEndTime(moveDto.getEndTime());
+                            moveVO.setStartX(String.valueOf(moveDto.getStartX()));
+                            moveVO.setEndX(String.valueOf(moveDto.getEndX()));
+                            return moveVO;
+                        }).collect(Collectors.toList()));
+
+                        // WidthOperations
+                        tracksVO.setChangeWidthOperations(trackDto.getChangeWidthOperations().stream().map(widthDto -> {
+                            ChangeWidthOperationsVO widthVO = new ChangeWidthOperationsVO();
+                            widthVO.setStartTime(widthDto.getStartTime());
+                            widthVO.setEndTime(widthDto.getEndTime());
+                            widthVO.setStartWidth(String.valueOf(widthDto.getStartWidth()));
+                            widthVO.setEndWidth(String.valueOf(widthDto.getEndWidth()));
+                            return widthVO;
+                        }).collect(Collectors.toList()));
+
+                        // ColorOperations
+                        tracksVO.setChangeColorOperations(trackDto.getChangeColorOperations().stream().map(colorDto -> {
+                            ChangeColorOperationsVO colorVO = new ChangeColorOperationsVO();
+                            colorVO.setStartTime(colorDto.getStartTime());
+                            colorVO.setEndTime(colorDto.getEndTime());
+                            colorVO.setStartR(colorDto.getStartR());
+                            colorVO.setStartG(colorDto.getStartG());
+                            colorVO.setStartB(colorDto.getStartB());
+                            colorVO.setEndR(colorDto.getEndR());
+                            colorVO.setEndG(colorDto.getEndG());
+                            colorVO.setEndB(colorDto.getEndB());
+                            return colorVO;
+                        }).collect(Collectors.toList()));
+
+                        return tracksVO;
+                    }).collect(Collectors.toList());
+
+                    singleSongVO.setTracks(tracksVOList);
+                    return ReturnResponse.OK(singleSongVO);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    // 如果 JSON 解析失败，回退到数据库逻辑
+                }
+            }
+
+            // 数据库回退逻辑 (Legacy)
             List<ChangeBackgroundOperation> changeBackgroundOperationList = new ArrayList<>();
             QueryWrapper<ChangeBackgroundOperation> changeBackgroundOperationQueryWrapper = new QueryWrapper<>();
             changeBackgroundOperationQueryWrapper.eq("song_id", songId);
-            changeBackgroundOperationList = changeBackgroundOperationMapper.selectList(changeBackgroundOperationQueryWrapper);
+            changeBackgroundOperationList = changeBackgroundOperationMapper
+                    .selectList(changeBackgroundOperationQueryWrapper);
             List<ChangeBackgroundOperationsVO> changeBackgroundOperations = new ArrayList<>();
-            for(ChangeBackgroundOperation item : changeBackgroundOperationList){
+            for (ChangeBackgroundOperation item : changeBackgroundOperationList) {
                 ChangeBackgroundOperationsVO changeBackgroundOperation = new ChangeBackgroundOperationsVO();
                 changeBackgroundOperation.setId(item.getId());
                 changeBackgroundOperation.setStartTime(item.getStartTime());
@@ -407,7 +534,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             QueryWrapper<Track> trackQueryWrapper = new QueryWrapper<>();
             trackQueryWrapper.eq("song_id", songId);
             trackList = trackMapper.selectList(trackQueryWrapper);
-            for(Track item : trackList){
+            for (Track item : trackList) {
                 TracksVO tracksVO = new TracksVO();
                 tracksVO.setId(item.getId());
                 tracksVO.setType(item.getType());
@@ -425,7 +552,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 noteQueryWrapper.eq("song_id", songId);
                 noteQueryWrapper.eq("based_track", item.getId());
                 noteList = noteMapper.selectList(noteQueryWrapper);
-                for(Note it : noteList){
+                for (Note it : noteList) {
                     NotesVO notesVO = new NotesVO();
                     notesVO.setId(it.getId());
                     notesVO.setNoteType(it.getNoteType());
@@ -440,7 +567,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 moveOperationQueryWrapper.eq("song_id", songId);
                 moveOperationQueryWrapper.eq("based_track", item.getId());
                 List<MoveOperation> moveOperationList = moveOperationMapper.selectList(moveOperationQueryWrapper);
-                for(MoveOperation x : moveOperationList){
+                for (MoveOperation x : moveOperationList) {
                     MoveOperationsVO moveOperationsVO = new MoveOperationsVO();
                     moveOperationsVO.setId(x.getId());
                     moveOperationsVO.setStartTime(x.getStartTime());
@@ -454,8 +581,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 QueryWrapper<ChangeWidthOperation> changeWidthOperationQueryWrapper = new QueryWrapper<>();
                 changeWidthOperationQueryWrapper.eq("song_id", songId);
                 changeWidthOperationQueryWrapper.eq("based_track", item.getId());
-                List<ChangeWidthOperation> changeWidthOperationList = changeWidthOperationMapper.selectList(changeWidthOperationQueryWrapper);
-                for(ChangeWidthOperation y : changeWidthOperationList){
+                List<ChangeWidthOperation> changeWidthOperationList = changeWidthOperationMapper
+                        .selectList(changeWidthOperationQueryWrapper);
+                for (ChangeWidthOperation y : changeWidthOperationList) {
                     ChangeWidthOperationsVO changeWidthOperationsVO = new ChangeWidthOperationsVO();
                     changeWidthOperationsVO.setId(y.getId());
                     changeWidthOperationsVO.setStartTime(y.getStartTime());
@@ -469,8 +597,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 QueryWrapper<ChangeColorOperation> changeColorOperationQueryWrapper = new QueryWrapper<>();
                 changeColorOperationQueryWrapper.eq("song_id", songId);
                 changeColorOperationQueryWrapper.eq("based_track", item.getId());
-                List<ChangeColorOperation> changeColorOperationList = changeColorOperationMapper.selectList(changeColorOperationQueryWrapper);
-                for(ChangeColorOperation z : changeColorOperationList){
+                List<ChangeColorOperation> changeColorOperationList = changeColorOperationMapper
+                        .selectList(changeColorOperationQueryWrapper);
+                for (ChangeColorOperation z : changeColorOperationList) {
                     ChangeColorOperationsVO changeColorOperationsVO = new ChangeColorOperationsVO();
                     changeColorOperationsVO.setId(z.getId());
                     changeColorOperationsVO.setStartTime(z.getStartTime());
@@ -480,7 +609,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                     changeColorOperationsVO.setEndB(z.getEndB());
                     changeColorOperationsVO.setStartR(z.getStartR());
                     changeColorOperationsVO.setStartG(z.getStartG());
-                    changeColorOperationsVO.setStartB(z.getStartB());;
+                    changeColorOperationsVO.setStartB(z.getStartB());
+                    ;
                     changeColorOperationsVOList.add(changeColorOperationsVO);
                 }
                 tracksVO.setChangeColorOperations(changeColorOperationsVOList);
@@ -488,7 +618,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             }
             singleSongVO.setTracks(tracksVOList);
             return ReturnResponse.OK(singleSongVO);
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return ReturnResponse.systemException(ReturnStatus.BUSINESS_EXCEPTION);
         }
@@ -496,15 +626,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public ReturnResponse<String> deleteChart(String userId, SongDTO songDTO) {
-        try{
+        try {
             String songId = songDTO.getSongId();
             QueryWrapper<Song> songQueryWrapper = new QueryWrapper<>();
             songQueryWrapper.eq("id", songId);
             Song song = songMapper.selectOne(songQueryWrapper);
-            if(!song.getUploaderId().equals(userId)){
+            if (!song.getUploaderId().equals(userId)) {
                 return ReturnResponse.packageObject("不是对应上传者", ReturnStatus.FAILURE);
-            }
-            else{
+            } else {
                 QueryWrapper<BestRecord> bestRecordQueryWrapper = new QueryWrapper<>();
                 bestRecordQueryWrapper.eq("song_id", songId);
                 bestRecordMapper.delete(bestRecordQueryWrapper);
@@ -534,7 +663,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 trackMapper.delete(trackQueryWrapper);
                 return ReturnResponse.OK("删除谱面");
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return ReturnResponse.systemException(ReturnStatus.BUSINESS_EXCEPTION);
         }
@@ -542,7 +671,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public ReturnResponse<PublicChartsVO> getPublicCharts(String userId, PublicChartsDTO publicChartsDTO) {
-        try{
+        try {
             PublicChartsVO publicChartsVO = new PublicChartsVO();
             int status = publicChartsDTO.getStatus();
             String searchType = publicChartsDTO.getSearchType();
@@ -551,24 +680,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             String sortWay = publicChartsDTO.getSortWay();
             QueryWrapper<Song> songQueryWrapper = new QueryWrapper<>();
             songQueryWrapper.eq("status", String.valueOf(status));
-            if(searchType.equals("0")){
+            if (searchType.equals("0")) {
                 songQueryWrapper.eq("song_name", searchContent);
-            }
-            else if(searchType.equals("1")){
+            } else if (searchType.equals("1")) {
                 songQueryWrapper.eq("song_writer", searchContent);
-            }
-            else if(searchType.equals("2")){
+            } else if (searchType.equals("2")) {
                 QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
                 userQueryWrapper.eq("username", searchContent);
                 User user = userMapper.selectOne(userQueryWrapper);
                 songQueryWrapper.eq("uploader_id", user.getUserId());
-            }
-            else if(searchType.equals("3")){
+            } else if (searchType.equals("3")) {
                 songQueryWrapper.eq("chart_constant", searchContent);
             }
             List<Song> songList = songMapper.selectList(songQueryWrapper);
             List<SongsVO> songsVOList = new ArrayList<>();
-            for(Song song : songList){
+            for (Song song : songList) {
                 SongsVO songsVO = new SongsVO();
                 SongInfoVO songInfoVO = new SongInfoVO();
                 songInfoVO.setSongName(song.getSongName());
@@ -590,32 +716,29 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 bestRecordQueryWrapper.eq("song_id", song.getId());
                 bestRecordQueryWrapper.eq("user_id", userId);
                 bestRecord = bestRecordMapper.selectOne(bestRecordQueryWrapper);
-                if(bestRecord == null){
+                if (bestRecord == null) {
                     myRecordVO1.setBestScore("0");
                     myRecordVO1.setRecordStatus("0");
-                }
-                else{
+                } else {
                     myRecordVO1.setBestScore(String.valueOf(bestRecord.getScore()));
-                    if(bestRecord.getCombo() == song.getNotesCount()){
+                    if (bestRecord.getCombo() == song.getNotesCount()) {
                         myRecordVO1.setRecordStatus("2");
-                    }
-                    else if(bestRecord.getPure() == song.getNotesCount()){
+                    } else if (bestRecord.getPure() == song.getNotesCount()) {
                         myRecordVO1.setRecordStatus("3");
-                    }
-                    else{
+                    } else {
                         myRecordVO1.setRecordStatus("1");
                     }
                 }
                 QueryWrapper<BestRecord> wrapper1 = new QueryWrapper<>();
                 wrapper1.eq("song_id", song.getId());
                 List<BestRecord> bestRecordList = bestRecordMapper.selectList(wrapper1);
-                Collections.sort(bestRecordList, (a,b)->{
+                Collections.sort(bestRecordList, (a, b) -> {
                     return b.getScore() - a.getScore();
                 });
                 int ranking = 0;
-                for(BestRecord item : bestRecordList){
+                for (BestRecord item : bestRecordList) {
                     ranking++;
-                    if(item.getUserId().equals(userId)){
+                    if (item.getUserId().equals(userId)) {
                         break;
                     }
                 }
@@ -623,10 +746,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 songsVO.setMyRecord(myRecordVO1);
                 List<TenBestRecordsVO> tenBestRecordsVOList = new ArrayList<>();
                 int maxLen = 10;
-                if(bestRecordList.size() <= 10){
+                if (bestRecordList.size() <= 10) {
                     maxLen = bestRecordList.size();
                 }
-                for(int i = 0; i < maxLen; i++){
+                for (int i = 0; i < maxLen; i++) {
                     TenBestRecordsVO tenBestRecordsVO = new TenBestRecordsVO();
                     tenBestRecordsVO.setBestScore(bestRecordList.get(i).getScore());
                     tenBestRecordsVO.setRanking(i + 1);
@@ -635,13 +758,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                     User u = userMapper.selectOne(q);
                     tenBestRecordsVO.setPlayerIcon(u.getIcon());
                     tenBestRecordsVO.setPlayer(u.getUsername());
-                    if(bestRecordList.get(i).getCombo() == song.getNotesCount()){
+                    if (bestRecordList.get(i).getCombo() == song.getNotesCount()) {
                         tenBestRecordsVO.setRecordStatus(2);
-                    }
-                    else if(bestRecordList.get(i).getPure() == song.getNotesCount()){
+                    } else if (bestRecordList.get(i).getPure() == song.getNotesCount()) {
                         tenBestRecordsVO.setRecordStatus(3);
-                    }
-                    else{
+                    } else {
                         tenBestRecordsVO.setRecordStatus(1);
                     }
                     tenBestRecordsVOList.add(tenBestRecordsVO);
@@ -649,41 +770,38 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 songsVO.setTenBestRecords(tenBestRecordsVOList);
                 songsVOList.add(songsVO);
             }
-            if(sortType.equals("0")){
-                if(sortWay.equals("0")){
-                    songsVOList.sort((a,b)->a.getSongInfo().getSongName().compareTo(b.getSongInfo().getSongName()));
+            if (sortType.equals("0")) {
+                if (sortWay.equals("0")) {
+                    songsVOList.sort((a, b) -> a.getSongInfo().getSongName().compareTo(b.getSongInfo().getSongName()));
+                } else {
+                    songsVOList.sort((b, a) -> a.getSongInfo().getSongName().compareTo(b.getSongInfo().getSongName()));
                 }
-                else{
-                    songsVOList.sort((b,a)->a.getSongInfo().getSongName().compareTo(b.getSongInfo().getSongName()));
+            } else if (sortType.equals("1")) {
+                if (sortWay.equals("0")) {
+                    songsVOList
+                            .sort((a, b) -> a.getSongInfo().getSongWriter().compareTo(b.getSongInfo().getSongWriter()));
+                } else {
+                    songsVOList
+                            .sort((b, a) -> a.getSongInfo().getSongWriter().compareTo(b.getSongInfo().getSongWriter()));
                 }
-            }
-            else if(sortType.equals("1")){
-                if(sortWay.equals("0")){
-                    songsVOList.sort((a,b)->a.getSongInfo().getSongWriter().compareTo(b.getSongInfo().getSongWriter()));
+            } else if (sortType.equals("2")) {
+                if (sortWay.equals("0")) {
+                    songsVOList.sort((a, b) -> a.getSongInfo().getUploader().compareTo(b.getSongInfo().getUploader()));
+                } else {
+                    songsVOList.sort((b, a) -> a.getSongInfo().getUploader().compareTo(b.getSongInfo().getUploader()));
                 }
-                else{
-                    songsVOList.sort((b,a)->a.getSongInfo().getSongWriter().compareTo(b.getSongInfo().getSongWriter()));
-                }
-            }
-            else if(sortType.equals("2")){
-                if(sortWay.equals("0")){
-                    songsVOList.sort((a,b)->a.getSongInfo().getUploader().compareTo(b.getSongInfo().getUploader()));
-                }
-                else{
-                    songsVOList.sort((b,a)->a.getSongInfo().getUploader().compareTo(b.getSongInfo().getUploader()));
-                }
-            }
-            else if(sortType.equals("3")){
-                if(sortWay.equals("0")){
-                    songsVOList.sort((a,b)->a.getSongInfo().getSongDifficulty().compareTo(b.getSongInfo().getSongDifficulty()));
-                }
-                else{
-                    songsVOList.sort((b,a)->a.getSongInfo().getSongDifficulty().compareTo(b.getSongInfo().getSongDifficulty()));
+            } else if (sortType.equals("3")) {
+                if (sortWay.equals("0")) {
+                    songsVOList.sort((a, b) -> a.getSongInfo().getSongDifficulty()
+                            .compareTo(b.getSongInfo().getSongDifficulty()));
+                } else {
+                    songsVOList.sort((b, a) -> a.getSongInfo().getSongDifficulty()
+                            .compareTo(b.getSongInfo().getSongDifficulty()));
                 }
             }
             publicChartsVO.setSongs(songsVOList);
             return ReturnResponse.OK(publicChartsVO);
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return ReturnResponse.systemException(ReturnStatus.BUSINESS_EXCEPTION);
         }

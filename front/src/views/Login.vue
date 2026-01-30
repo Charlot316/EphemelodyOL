@@ -69,11 +69,17 @@ export default {
           return;
         }
         try {
-          const { data: res } = await this.$http.post("/user/login", this.form);
+          const { hashPassword } = await import("../utils/crypto");
+          const hashedPassword = await hashPassword(this.form.password);
+          const loginForm = {
+            username: this.form.username,
+            password: hashedPassword,
+          };
+          const { data: res } = await this.$http.post("/user/login", loginForm);
           if (res.code !== 0) {
-            this.$notify({
+            return this.$notify({
               title: "失败",
-              message: "登录失败！",
+              message: res.data || "登录失败！",
               type: "error",
             });
           }
@@ -88,6 +94,7 @@ export default {
           );
           this.$router.push({ path: "/" });
         } catch (err) {
+          console.error(err);
           return this.$notify({
             title: "错误",
             message: "网络异常",

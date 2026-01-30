@@ -1,11 +1,9 @@
 package team.javaee.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.api.R;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
-import team.javaee.common.Normal;
 import team.javaee.common.config.ReturnResponse;
 import team.javaee.common.enums.ReturnStatus;
 import team.javaee.entity.domain.*;
@@ -16,16 +14,16 @@ import team.javaee.mapper.*;
 import team.javaee.service.SongService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
-
 import javax.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Value;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.util.Date;
-import java.util.Objects;
 import java.util.UUID;
 
 /**
  * <p>
- *  服务实现类
+ * 服务实现类
  * </p>
  *
  * @author nwh
@@ -60,6 +58,13 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
 
     @Autowired
     private RecentRecordMapper recentRecordMapper;
+
+    @Value("${web.upload-path}")
+    private String uploadPath;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @Override
     public ReturnResponse<Integer> newChart(NewChartDTO newChartDTO) {
         try {
@@ -114,12 +119,11 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
     }
 
     @Override
-    public ReturnResponse<ImageVO> uploadSongCover(@Param("file") MultipartFile file, @Param("songId") Integer songId, HttpServletRequest request) {
+    public ReturnResponse<ImageVO> uploadSongCover(@Param("file") MultipartFile file, @Param("songId") Integer songId,
+            HttpServletRequest request) {
         try {
             ImageVO imageVO = new ImageVO();
-            String realPath = "/data/image/song/";
-//            String realPath = "F:\\IdeaProjects\\j2ee_springboot\\rhythm_game\\src\\main\\resources\\static\\files\\";
-//            String realPath = "E:\\新建文件夹\\j2ee_springboot\\rhythm_game\\src\\main\\resources\\static\\files\\";
+            String realPath = uploadPath + "image/song/";
 
             File folder = new File(realPath);
             if (!folder.exists()) {
@@ -128,7 +132,8 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
             String oldName = file.getOriginalFilename();
             String newName = UUID.randomUUID().toString() + oldName.substring(oldName.lastIndexOf("."));
             file.transferTo(new File(folder, newName));
-            String url = request.getScheme() + "://47.113.89.104:8090/image/song/" + newName;
+            String url = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
+                    + "/image/song/" + newName;
 
             Song song = songMapper.selectById(songId);
             song.setSongCover(url);
@@ -143,12 +148,11 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
     }
 
     @Override
-    public ReturnResponse<ImageVO> uploadDefaultBackground(@Param("file") MultipartFile file, @Param("songId") Integer songId, HttpServletRequest request) {
+    public ReturnResponse<ImageVO> uploadDefaultBackground(@Param("file") MultipartFile file,
+            @Param("songId") Integer songId, HttpServletRequest request) {
         try {
             ImageVO imageVO = new ImageVO();
-            String realPath = "/data/image/song/";
-//            String realPath = "F:\\IdeaProjects\\j2ee_springboot\\rhythm_game\\src\\main\\resources\\static\\files\\";
-//            String realPath = "E:\\新建文件夹\\j2ee_springboot\\rhythm_game\\src\\main\\resources\\static\\files\\";
+            String realPath = uploadPath + "image/song/";
 
             File folder = new File(realPath);
             if (!folder.exists()) {
@@ -157,7 +161,8 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
             String oldName = file.getOriginalFilename();
             String newName = UUID.randomUUID().toString() + oldName.substring(oldName.lastIndexOf("."));
             file.transferTo(new File(folder, newName));
-            String url = request.getScheme() + "://47.113.89.104:8090/image/song/" + newName;
+            String url = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
+                    + "/image/song/" + newName;
 
             Song song = songMapper.selectById(songId);
             song.setDefaultBackground(url);
@@ -172,11 +177,10 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
     }
 
     @Override
-    public ReturnResponse<String> uploadSong(@Param("file") MultipartFile file, @Param("songId") Integer songId, HttpServletRequest request) {
+    public ReturnResponse<String> uploadSong(@Param("file") MultipartFile file, @Param("songId") Integer songId,
+            HttpServletRequest request) {
         try {
-            String realPath = "/data/mp3/";
-//            String realPath = "F:\\IdeaProjects\\j2ee_springboot\\rhythm_game\\src\\main\\resources\\static\\files\\";
-//            String realPath = "E:\\新建文件夹\\j2ee_springboot\\rhythm_game\\src\\main\\resources\\static\\files\\";
+            String realPath = uploadPath + "mp3/";
 
             File folder = new File(realPath);
             if (!folder.exists()) {
@@ -186,7 +190,8 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
             String oldName = file.getOriginalFilename();
             String newName = UUID.randomUUID().toString() + oldName.substring(oldName.lastIndexOf("."));
             file.transferTo(new File(folder, newName)); // 上传文件
-            String url = request.getScheme() + "://47.113.89.104:8090/mp3/" + newName;
+            String url = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + "/mp3/"
+                    + newName;
 
             Song song = songMapper.selectById(songId);
             song.setSongUrl(url);
@@ -204,12 +209,29 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
         try {
             Integer songId = chartContentDTO.getSongId();
 
-            // 更新 song
+            // 1. 保存详情到 JSON 文件
+            String chartsFolder = uploadPath + "charts/";
+            File folder = new File(chartsFolder);
+            if (!folder.exists()) {
+                folder.mkdirs();
+            }
+            File jsonFile = new File(folder, songId + ".json");
+            objectMapper.writeValue(jsonFile, chartContentDTO);
+
+            // 2. 更新数据库中的元数据
             Song song = songMapper.selectById(songId);
             song.setBPM(chartContentDTO.getBPM());
             song.setFirstBeatDelay(chartContentDTO.getFirstBeatDelay());
 
-            // 根据 songId 删除对应行
+            int notesCount = 0;
+            for (TrackDTO trackDTO : chartContentDTO.getTracks()) {
+                notesCount += trackDTO.getNotes().size();
+            }
+            song.setNotesCount(notesCount);
+            songMapper.update(song, new QueryWrapper<Song>().eq("id", songId));
+
+            // 3. (可选) 清理旧的数据库详情数据
+            // 以后迁移完成后可以彻底移除这些表
             trackMapper.delete(new QueryWrapper<Track>().eq("song_id", songId));
             noteMapper.delete(new QueryWrapper<Note>().eq("song_id", songId));
             changeBackgroundOperationMapper.delete(new QueryWrapper<ChangeBackgroundOperation>().eq("song_id", songId));
@@ -217,85 +239,7 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
             changeWidthOperationMapper.delete(new QueryWrapper<ChangeWidthOperation>().eq("song_id", songId));
             moveOperationMapper.delete(new QueryWrapper<MoveOperation>().eq("song_id", songId));
 
-            // 插入
-            for (ChangeBackgroundOperationDTO changeBackgroundOperationDTO : chartContentDTO.getChangeBackgroundOperations()) {
-                ChangeBackgroundOperation changeBackgroundOperation = new ChangeBackgroundOperation();
-                changeBackgroundOperation.setSongId(songId);
-                changeBackgroundOperation.setStartTime(changeBackgroundOperationDTO.getStartTime());
-                changeBackgroundOperation.setBackground(changeBackgroundOperationDTO.getBackground());
-                changeBackgroundOperationMapper.insert(changeBackgroundOperation);
-            }
-            
-            int notesCount = 0;
-            for (TrackDTO trackDTO : chartContentDTO.getTracks()) {
-                Track track = new Track();
-                track.setSongId(songId);
-                track.setType(trackDTO.getType());
-                track.setKeyX(trackDTO.getKey());
-                track.setStartTiming(trackDTO.getStartTiming());
-                track.setEndTiming(trackDTO.getEndTiming());
-                track.setPositionX(trackDTO.getPositionX());
-                track.setWidth(trackDTO.getWidth());
-                track.setR(trackDTO.getR());
-                track.setG(trackDTO.getG());
-                track.setB(trackDTO.getB());
-                trackMapper.insert(track);
-                Integer trackId = track.getId();
-                
-                notesCount += trackDTO.getNotes().size();
-                for (NoteDTO noteDTO : trackDTO.getNotes()) {
-                    Note note = new Note();
-                    note.setSongId(songId);
-                    note.setBasedTrack(trackId);
-                    note.setNoteType(noteDTO.getNoteType());
-                    note.setKeyX(noteDTO.getKey());
-                    note.setTiming(noteDTO.getTiming());
-                    note.setEndTiming(noteDTO.getEndTiming());
-                    noteMapper.insert(note);
-                }
-
-                for (MoveOperationDTO moveOperationDTO : trackDTO.getMoveOperations()) {
-                    MoveOperation moveOperation = new MoveOperation();
-                    moveOperation.setSongId(songId);
-                    moveOperation.setBasedTrack(trackId);
-                    moveOperation.setStartTime(moveOperationDTO.getStartTime());
-                    moveOperation.setEndTime(moveOperationDTO.getEndTime());
-                    moveOperation.setStartX(moveOperationDTO.getStartX());
-                    moveOperation.setEndX(moveOperationDTO.getEndX());
-                    moveOperationMapper.insert(moveOperation);
-                }
-
-                for (ChangeWidthOperationDTO changeWidthOperationDTO : trackDTO.getChangeWidthOperations()) {
-                    ChangeWidthOperation changeWidthOperation = new ChangeWidthOperation();
-                    changeWidthOperation.setSongId(songId);
-                    changeWidthOperation.setBasedTrack(trackId);
-                    changeWidthOperation.setStartTime(changeWidthOperationDTO.getStartTime());
-                    changeWidthOperation.setEndTime(changeWidthOperationDTO.getEndTime());
-                    changeWidthOperation.setStartWidth(changeWidthOperationDTO.getStartWidth());
-                    changeWidthOperation.setEndWidth(changeWidthOperationDTO.getEndWidth());
-                    changeWidthOperationMapper.insert(changeWidthOperation);
-                }
-
-                for (ChangeColorOperationDTO changeColorOperationDTO : trackDTO.getChangeColorOperations()) {
-                    ChangeColorOperation changeColorOperation = new ChangeColorOperation();
-                    changeColorOperation.setSongId(songId);
-                    changeColorOperation.setBasedTrack(trackId);
-                    changeColorOperation.setStartTime(changeColorOperationDTO.getStartTime());
-                    changeColorOperation.setEndTime(changeColorOperationDTO.getEndTime());
-                    changeColorOperation.setStartR(changeColorOperationDTO.getStartR());
-                    changeColorOperation.setStartG(changeColorOperationDTO.getStartG());
-                    changeColorOperation.setStartB(changeColorOperationDTO.getStartB());
-                    changeColorOperation.setEndR(changeColorOperationDTO.getEndR());
-                    changeColorOperation.setEndG(changeColorOperationDTO.getEndG());
-                    changeColorOperation.setEndB(changeColorOperationDTO.getEndB());
-                    changeColorOperationMapper.insert(changeColorOperation);
-                }
-            }
-
-            song.setNotesCount(notesCount);
-            songMapper.update(song, new QueryWrapper<Song>().eq("id", songId));
-
-            return ReturnResponse.OK("更新谱面成功！");
+            return ReturnResponse.OK("更新谱面成功（已保存至 JSON）！");
         } catch (Exception e) {
             e.printStackTrace();
             return ReturnResponse.systemException(ReturnStatus.BUSINESS_EXCEPTION);
@@ -303,11 +247,12 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
     }
 
     @Override
-    public ReturnResponse<BackgroundVO> uploadBackground(UploadBackgroundDTO uploadBackgroundDTO, HttpServletRequest request) {
+    public ReturnResponse<BackgroundVO> uploadBackground(UploadBackgroundDTO uploadBackgroundDTO,
+            HttpServletRequest request) {
         try {
             MultipartFile file = uploadBackgroundDTO.getBackground();
             BackgroundVO backgroundVO = new BackgroundVO();
-            String realPath = "/data/jpg";
+            String realPath = uploadPath + "jpg/";
 
             File folder = new File(realPath);
             if (!folder.exists()) {
@@ -316,7 +261,8 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
             String oldName = file.getOriginalFilename();
             String newName = UUID.randomUUID().toString() + oldName.substring(oldName.lastIndexOf("."));
             file.transferTo(new File(folder, newName));
-            String url = request.getScheme() + ":localhost/jpg/" + newName;
+            String url = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + "/jpg/"
+                    + newName;
 
             ChangeBackgroundOperation changeBackgroundOperation = new ChangeBackgroundOperation();
             changeBackgroundOperation.setSongId(uploadBackgroundDTO.getSongId());

@@ -22,3 +22,11 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+
+# Security and Local Data
+/back/rhythm_game/src/main/resources/application.yml
+/back/rhythm_game.sql
+/back/rhythm_game/data/
+/back/rhythm_game/target/
+.env
+.env.local

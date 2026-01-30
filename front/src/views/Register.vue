@@ -90,11 +90,16 @@ export default {
             type: "error",
           });
         } else {
-          // this.param.type = 0;
           try {
+            const { hashPassword } = await import("../utils/crypto");
+            const hashedPassword = await hashPassword(this.form.password);
+            const registerForm = {
+              username: this.form.username,
+              password: hashedPassword,
+            };
             const { data: res } = await this.$http.post(
               "/user/register",
-              this.form
+              registerForm
             );
             if (res.code !== 0)
               return this.$notify({
@@ -109,6 +114,7 @@ export default {
             });
             this.$router.push({ path: "/login" });
           } catch (err) {
+            console.error(err);
             return this.$notify({
               title: "错误",
               message: "网络异常",

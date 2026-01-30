@@ -14,8 +14,7 @@ let config = {
     withCredentials: true, // Check cross-site Access-Control
 };
 
-// 创建Axios对象
-const Axios = axios.create(config)
+export const Axios = axios.create(config)
 
 // 请求拦截器
 Axios.interceptors.request.use(
