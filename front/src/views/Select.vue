@@ -1,81 +1,57 @@
-<template>  <div style="width:100%;height:100%;">
- <background-display />
-  <div class="select-container">
-    <Header/>
-    <div class="select-search-container">
-      <!-- <input type="text"> -->
-      <div style="float:right;width:70%;">
-        <el-row :gutter="20">
-             <el-col :span="6">
-            <el-select
-              v-model="params.searchType"
-              placeholder="搜索类别"
-              size="medium"
-              class="handle-select mr10"
-              id="搜索类别"
-            >
-              <el-option key="0" label="歌曲名称" value="0"></el-option>
-              <el-option key="1" label="歌手名称" value="1"></el-option>
-              <el-option key="2" label="上传者名称" value="2"></el-option>
-              <el-option key="3" label="难度" value="3"></el-option>
+<template>
+  <div class="select-view">
+    <background-display />
+    <div class="view-content">
+      <Header />
+      
+      <div class="filter-header-wrapper">
+        <div class="filter-header glass">
+          <div class="search-section">
+            <el-select v-model="params.searchType" placeholder="Type" class="type-select">
+              <el-option label="Name" value="0"></el-option>
+              <el-option label="Artist" value="1"></el-option>
+              <el-option label="Uploader" value="2"></el-option>
+              <el-option label="Level" value="3"></el-option>
             </el-select>
-          </el-col>
-          <el-col :span="9">
             <el-input
-              placeholder="请输入关键词进行搜索"
+              placeholder="Search melodies..."
               v-model="params.searchContent"
-              size="medium"
+              class="search-input"
               @keyup.enter="getCharts()"
             >
               <template #append>
-                <el-button
-                  icon="el-icon-search"
-                  @click="getCharts()"
-                  type="primary"
-                >
-                </el-button>
+                <el-button icon="el-icon-search" @click="getCharts()"></el-button>
               </template>
             </el-input>
-          </el-col>
-          <el-col :span="6">
-            <el-select
-              v-model="params.sortType"
-              placeholder="排序类别"
-              size="medium"
-              class="handle-select mr10"
-              id="排序类别"
-            >
-              <el-option key="0" label="歌曲名称" value="0"></el-option>
-              <el-option key="1" label="歌手名称" value="1"></el-option>
-              <el-option key="2" label="上传者名称" value="2"></el-option>
-              <el-option key="3" label="难度" value="3"></el-option>
-              <el-option key="4" label="热度" value="4"></el-option>
+          </div>
+
+          <div class="sort-section">
+            <el-select v-model="params.sortType" placeholder="Sort By" class="sort-select">
+              <el-option label="Name" value="0"></el-option>
+              <el-option label="Artist" value="1"></el-option>
+              <el-option label="Popularity" value="4"></el-option>
             </el-select>
-          </el-col>
-          <el-col :span="3">
-            <el-select
-              v-model="params.sortWay"
-              placeholder="升"
-              size="medium"
-              class="handle-select mr10"
-              id="升/降"
-            >
-              <el-option key="0" label="升" value="0"></el-option>
-              <el-option key="0" label="降" value="1"></el-option>
+            <el-select v-model="params.sortWay" placeholder="Order" class="order-select">
+              <el-option label="ASC" value="0"></el-option>
+              <el-option label="DESC" value="1"></el-option>
             </el-select>
-          </el-col>
-        </el-row>
+          </div>
+        </div>
+      </div>
+
+      <div class="songs-grid-container">
+        <transition-group name="list" tag="div" class="songs-grid">
+          <div v-for="song in songs" :key="song.songInfo.songId" class="card-wrapper">
+            <song-card :song="song" />
+          </div>
+        </transition-group>
+        <div v-if="songs.length === 0" class="no-data">
+          <i class="el-icon-info"></i>
+          <p>No rhythms found. Try another search.</p>
+        </div>
       </div>
     </div>
-    <!-- <div class="div2"> -->
-    <div class="songs-container">
-      <div v-for="song in songs" :key="song" class="card-context">
-        <song-card :song="song" />
-      </div>
-      <div v-for="count in 10" :key="count" class="card-context"></div>
-    </div>
-    <!-- </div> -->
-  </div></div>
+  </div>
 </template>
 
 <script>
@@ -84,29 +60,26 @@ import SongCard from "../components/Select/SongCard";
 import BackgroundDisplay from "../components/BackgroundDisplay";
 
 export default {
-  components: { SongCard,Header ,BackgroundDisplay },
+  components: { SongCard, Header, BackgroundDisplay },
   data() {
     return {
-      type: "",
       params: {
         status: "0",
-        searchType: "",
+        searchType: "0",
         searchContent: "",
-        sortType: "",
-        sortWay: "",
+        sortType: "4",
+        sortWay: "1",
       },
       songs: [],
     };
   },
-  mounted() {},
   created() {
-    if(this.$route.path == "/public"){
-      this.params.status = "2"
+    if (this.$route.path == "/public") {
+      this.params.status = "2";
+    } else if (this.$route.path == "/society") {
+      this.params.status = "1";
     }
-    else if(this.$route.path == "/society"){
-      this.params.status = "1"
-    }
-     this.getCharts();
+    this.getCharts();
   },
   methods: {
     async getCharts() {
@@ -117,7 +90,7 @@ export default {
       if (res.code == 0) {
         this.songs = res.data.songs;
       } else {
-        this.$message.error("获取异常");
+        this.$message.error("Fetch failed");
       }
     },
   },
@@ -125,40 +98,88 @@ export default {
 </script>
 
 <style scoped>
-.select-search-container {
-  /* border:1px solid black; */
-  width: 100%;
-  height: 5%;
-  padding:20px;
-  margin-bottom: 50px;
-}
-.select-container {
-  position:absolute;
-  top:0;
-  left:0;
-  width: 100%;
-  height: 100%;
-  font-size: 14px;
-  overflow: auto;
+.select-view {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
 }
 
-.songs-container {
+.view-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
   display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  width: 90%;
-  height: 95%;
-  margin: 0 auto;
-  margin-bottom: 200px;
-  border-radius: 5px;
-  /* height: 100%; */
-  /* overflow:auto; */
+  flex-direction: column;
+  overflow: hidden;
 }
-.card-context {
+
+.filter-header-wrapper {
+  padding: 20px 40px;
+  display: flex;
+  justify-content: center;
+}
+
+.filter-header {
+  width: 100%;
+  max-width: 1200px;
+  padding: 15px 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.search-section {
+  display: flex;
   flex: 1;
-  width: 300px;
-  min-width: 300px;
-  height: 200px;
-  margin: 10px;
+  gap: 10px;
+}
+
+.sort-section {
+  display: flex;
+  gap: 10px;
+}
+
+.type-select { width: 120px; }
+.search-input { flex: 1; }
+.sort-select { width: 140px; }
+.order-select { width: 100px; }
+
+.songs-grid-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 40px 60px;
+}
+
+.songs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 30px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.no-data {
+  text-align: center;
+  padding: 100px;
+  color: var(--text-muted);
+}
+
+.no-data i {
+  font-size: 48px;
+  margin-bottom: 20px;
+}
+
+/* Animations */
+.list-enter-active, .list-leave-active {
+  transition: all 0.5s ease;
+}
+.list-enter-from, .list-leave-to {
+  opacity: 0;
+  transform: translateY(30px);
 }
 </style>
+

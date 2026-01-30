@@ -1,37 +1,41 @@
 <template>
-  <div style="width:100%;height:100%;">
+  <div class="login-page">
     <background-display />
-    <div class="loginbody">
-      <div class="logindata">
-        <div class="logintext">
-          <h2>Welcome</h2>
+    <div class="login-wrapper">
+      <div class="login-card glass">
+        <div class="login-header">
+          <h1 class="logo-text">EPHEMELODY</h1>
+          <p class="subtitle">Experience the melody in a new way</p>
         </div>
-        <div class="formdata">
+        
+        <div class="form-container">
           <el-form ref="login" :model="form" :rules="rules">
             <el-form-item prop="username">
+              <div class="input-label">Username</div>
               <el-input
                 v-model="form.username"
-                clearable
-                placeholder="请输入账号"
+                placeholder="Enter your account"
+                :prefix-icon="'el-icon-user'"
               ></el-input>
             </el-form-item>
             <el-form-item prop="password">
+              <div class="input-label">Password</div>
               <el-input
                 v-model="form.password"
-                clearable
-                placeholder="请输入密码"
+                placeholder="Enter your password"
                 show-password
+                :prefix-icon="'el-icon-lock'"
                 @keyup.enter="login()"
               ></el-input>
             </el-form-item>
           </el-form>
         </div>
-        <div class="tool"></div>
-        <div class="butt">
-          <el-button type="primary" @click="login()">登录</el-button>
-          <el-button class="shou">
-            <router-link to="/register">注册</router-link>
-          </el-button>
+
+        <div class="login-actions">
+          <el-button type="primary" class="login-btn" @click="login()">LOGIN NOW</el-button>
+          <div class="register-hint">
+            New here? <router-link to="/register" class="link-text">Create Account</router-link>
+          </div>
         </div>
       </div>
     </div>
@@ -49,15 +53,14 @@ export default {
         password: "",
         username: "",
       },
-      checked: false,
       rules: {
         username: [
-          { required: true, message: "请输入用户名", trigger: "blur" },
-          { max: 10, message: "不能大于10个字符", trigger: "blur" },
+          { required: true, message: "Please enter username", trigger: "blur" },
+          { max: 20, message: "Too long", trigger: "blur" },
         ],
         password: [
-          { required: true, message: "请输入密码", trigger: "blur" },
-          { max: 10, message: "不能大于10个字符", trigger: "blur" },
+          { required: true, message: "Please enter password", trigger: "blur" },
+          { min: 6, message: "Min 6 characters", trigger: "blur" },
         ],
       },
     };
@@ -65,9 +68,7 @@ export default {
   methods: {
     login() {
       this.$refs.login.validate(async (valid) => {
-        if (!valid) {
-          return;
-        }
+        if (!valid) return;
         try {
           const { hashPassword } = await import("../utils/crypto");
           const hashedPassword = await hashPassword(this.form.password);
@@ -78,14 +79,14 @@ export default {
           const { data: res } = await this.$http.post("/user/login", loginForm);
           if (res.code !== 0) {
             return this.$notify({
-              title: "失败",
-              message: res.data || "登录失败！",
+              title: "Failed",
+              message: res.data || "Login failed!",
               type: "error",
             });
           }
           this.$notify({
-            title: "成功",
-            message: "登录成功！",
+            title: "Success",
+            message: "Welcome back!",
             type: "success",
           });
           this.$store.commit(
@@ -96,8 +97,8 @@ export default {
         } catch (err) {
           console.error(err);
           return this.$notify({
-            title: "错误",
-            message: "网络异常",
+            title: "Error",
+            message: "Network Error",
             type: "error",
           });
         }
@@ -107,58 +108,114 @@ export default {
   mounted() {
     if (localStorage.getItem("news")) {
       this.form = JSON.parse(localStorage.getItem("news"));
-      this.checked = true;
     }
   },
 };
 </script>
 
 <style scoped>
-.loginbody {
-  width: 100%;
-  height: 100%;
-  min-width: 1000px;
-  background-size: 100% 100%;
-  background-position: center center;
-  overflow: auto;
-  background-repeat: no-repeat;
+.login-page {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.login-wrapper {
   position: absolute;
   top: 0;
   left: 0;
-  line-height: 100%;
-  padding-top: 150px;
-}
-
-.logintext {
-  margin-bottom: 20px;
-  line-height: 50px;
-  text-align: center;
-  font-size: 30px;
-  font-weight: bolder;
-  color: white;
-  text-shadow: 2px 2px 4px #000000;
-}
-
-.logindata {
-  width: 400px;
-  height: 300px;
-  transform: translate(-50%);
-  margin-left: 50%;
-}
-
-.tool {
+  width: 100%;
+  height: 100%;
   display: flex;
-  justify-content: space-between;
-  color: #606266;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  padding: 20px;
 }
 
-.butt {
-  margin-top: 10px;
+.login-card {
+  width: 100%;
+  max-width: 480px;
+  padding: 50px 40px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  animation: slideIn 0.8s ease-out;
+}
+
+.login-header {
   text-align: center;
+  margin-bottom: 40px;
 }
 
-.shou {
-  cursor: pointer;
-  color: #606266;
+.logo-text {
+  font-size: 42px;
+  font-weight: 800;
+  letter-spacing: 4px;
+  background: linear-gradient(to right, #00f3ff, #ff007f);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  color: var(--text-muted);
+  font-size: 14px;
+  letter-spacing: 1px;
+}
+
+.input-label {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.login-btn {
+  width: 100%;
+  height: 54px;
+  border-radius: 12px !important;
+  font-size: 16px !important;
+  letter-spacing: 2px !important;
+  margin-top: 20px;
+}
+
+.register-hint {
+  text-align: center;
+  margin-top: 25px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.link-text {
+  color: var(--accent-cyan);
+  font-weight: 600;
+  text-decoration: none;
+  margin-left: 5px;
+}
+
+.link-text:hover {
+  color: var(--accent-pink);
+  text-shadow: 0 0 10px rgba(255, 0, 127, 0.3);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+:deep(.el-input__inner) {
+  height: 50px !important;
+  font-size: 15px !important;
+  padding-left: 15px !important;
 }
 </style>
+

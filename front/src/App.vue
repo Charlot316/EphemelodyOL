@@ -9,4 +9,5 @@ export default {};
 <style scoped>
 @import "./assets/css/main.css";
 @import "./assets/css/color-dark.css";
+@import "./assets/css/theme.css";
 </style>

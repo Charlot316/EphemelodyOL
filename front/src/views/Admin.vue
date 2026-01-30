@@ -1,267 +1,176 @@
 <template>
-  <div style="width:100%;height:100%;">
+  <div class="admin-view">
     <background-display />
-    <div class="div1">
+    <div class="view-content">
       <Header />
-      <div class="divTop">
-        <button class="btn btn1" @click="getAdd()">新增</button>
-        <!-- <input type="text"> -->
-        <div style="float:right;width:70%;">
-          <el-row>
-            <el-col :span="6">
-              <el-select
-                v-model="params.searchType"
-                placeholder="搜索类别"
-                size="medium"
-                class="handle-select mr10"
-                id="搜索类别"
-              >
-                <el-option key="0" label="歌曲名称" value="0"></el-option>
-                <el-option key="1" label="歌手名称" value="1"></el-option>
-                <el-option key="2" label="上传者名称" value="2"></el-option>
-                <el-option key="3" label="难度" value="3"></el-option>
-                <el-option key="4" label="热度" value="4"></el-option>
-              </el-select>
-            </el-col>
-            <el-col :span="1"></el-col>
-            <el-col :span="11">
-              <el-input
-                placeholder="请输入关键词进行搜索"
-                v-model="params.searchContent"
-                size="medium"
-                @keyup.enter="getCharts()"
-              >
-                <template #append>
-                  <el-button
-                    icon="el-icon-search"
-                    @click="getCharts()"
-                    type="primary"
-                  >
-                  </el-button>
-                </template>
-              </el-input>
-            </el-col>
-            <el-col :span="1"></el-col>
-            <el-col :span="5">
-              <el-select
-                v-model="sort"
-                placeholder="按歌手名升序"
-                size="medium"
-                class="handle-select mr10"
-                id="升/降"
-                @change="getCharts()"
-              >
-                <el-option key="0" label="按歌曲名升序" value="00"></el-option>
-                <el-option key="1" label="按歌曲名降序" value="01"></el-option>
-                <el-option key="2" label="按歌手名升序" value="10"></el-option>
-                <el-option key="3" label="按歌手名降序" value="11"></el-option>
-                <el-option
-                  key="4"
-                  label="按上传者名升序"
-                  value="20"
-                ></el-option>
-                <el-option key="5" label="按歌手名降序" value="21"></el-option>
-                <el-option key="6" label="按难度升序" value="30"></el-option>
-                <el-option key="7" label="按难度降序" value="31"></el-option>
-                <el-option key="8" label="按热度升序" value="40"></el-option>
-                <el-option key="9" label="按热度降序" value="41"></el-option>
-              </el-select>
-            </el-col>
-          </el-row>
+      
+      <div class="filter-header-wrapper">
+        <div class="filter-header glass">
+          <div class="left-actions">
+            <el-button type="primary" icon="el-icon-plus" @click="getAdd()">NEW CHART</el-button>
+          </div>
+          
+          <div class="search-section">
+            <el-select v-model="params.searchType" placeholder="Type" class="type-select">
+              <el-option label="Name" value="0"></el-option>
+              <el-option label="Artist" value="1"></el-option>
+              <el-option label="Level" value="3"></el-option>
+            </el-select>
+            <el-input
+              placeholder="Search your rhythms..."
+              v-model="params.searchContent"
+              class="search-input"
+              @keyup.enter="getCharts()"
+            >
+              <template #append>
+                <el-button icon="el-icon-search" @click="getCharts()"></el-button>
+              </template>
+            </el-input>
+          </div>
+
+          <div class="sort-section">
+            <el-select v-model="sort" placeholder="Sort" class="sort-select" @change="getCharts()">
+              <el-option label="Name Asc" value="00"></el-option>
+              <el-option label="Name Desc" value="01"></el-option>
+              <el-option label="Level Asc" value="30"></el-option>
+              <el-option label="Level Desc" value="31"></el-option>
+            </el-select>
+          </div>
         </div>
       </div>
-      <!-- <div class="div2"> -->
-      <div class="div3">
-        <div class="div4" v-for="item in songs" :key="item" >
-          <div class="div5" @click="next(item.songId)">
-            <el-image :src="item.songCover" class="img1"></el-image>
-          </div>
-          <div class="div6">
-            <div
-              style="display: flex;justify-content: space-between;align-items: center;"
-            >
-              <div class="div7">{{ item.songName }}</div>
-              <div class="div8">
-                <span
-                  class="icon-active"
-                  icon="el-icon-link"
-                  style="margin-left: 10px;cursor:pointer"
-                  ><i class="el-icon-setting" @click="getEdit(item.songId,item)"></i
-                ></span>
-                <span
-                  class="icon-active"
-                  icon="el-icon-link"
-                  style="margin-left: 10px;cursor:pointer"
-                  ><i
-                    class="el-icon-delete"
-                    @click="deleteSong(item.songId)"
-                  ></i
-                ></span>
+
+      <div class="management-container">
+        <div class="management-list">
+          <div v-for="item in songs" :key="item.songId" class="manage-card glass">
+            <div class="card-left" @click="next(item.songId)">
+              <div class="cover-wrapper">
+                <el-image :src="item.songCover" class="manage-cover" fit="cover"></el-image>
+                <div class="hover-overlay"><i class="el-icon-edit-outline"></i> EDIT CHART</div>
+              </div>
+              <div class="meta-info">
+                <h4 class="song-title">{{ item.songName }}</h4>
+                <p class="song-artist">{{ item.songWriter }}</p>
+                <div class="status-tags">
+                  <el-tag size="mini" :type="getStatusType(item.status)" effect="dark">
+                    {{ getStatusLabel(item.status) }}
+                  </el-tag>
+                  <span class="constant">CONSTANT: {{ item.chartConstant }}</span>
+                </div>
               </div>
             </div>
-            <div class="div9">
-              <span>作者：{{ item.songWriter }}</span>
+
+            <div class="card-actions">
+              <el-button-group>
+                <el-button type="primary" icon="el-icon-setting" size="medium" @click="getEdit(item.songId, item)"></el-button>
+                <el-button type="danger" icon="el-icon-delete" size="medium" @click="deleteSong(item.songId)"></el-button>
+              </el-button-group>
             </div>
-            <div class="div9">谱面定数：{{ item.chartConstant }}</div>
-            <div class="div9">加载中文字：{{ item.loadingText }}</div>
-            <div class="div9">加载完成文字：{{ item.loadedText }}</div>
           </div>
         </div>
       </div>
-      <!-- </div> -->
 
-      <!--编辑基本信息的弹出框-->
-      <el-dialog
-        title="修改谱面信息"
-        v-model="editVisible"
-        width="40%"
-      >
-        <el-form :model="form">
-          <el-form-item label="是否公开谱面" :label-width="formLabelWidth">
-            <el-switch
-              v-model="value"
-              active-color="#13ce66"
-              :active-value="true"
-              :disabled=getStatus()
-            >
-            </el-switch>
+      <!-- Edit Info Dialog -->
+      <el-dialog title="CHART SETTINGS" v-model="editVisible" width="500px">
+        <el-form label-position="top" :model="form" class="settings-form">
+          <div class="switch-row">
+            <span>PUBLIC VISIBILITY</span>
+            <el-switch v-model="value" active-color="#00f3ff" :disabled="selectedSong.status === 2"></el-switch>
+          </div>
+          
+          <el-row :gutter="20">
+            <el-col :span="24">
+              <el-form-item label="MELODY NAME">
+                <el-input v-model="form.songName"></el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="24">
+              <el-form-item label="ARTIST / WRITER">
+                <el-input v-model="form.songWriter"></el-input>
+              </el-form-item>
+            </el-col>
+          </el-row>
+
+          <div class="upload-buttons">
+            <el-button type="info" plain size="small" icon="el-icon-headset" @click="uploadSongVisible = true">Audio</el-button>
+            <el-button type="info" plain size="small" icon="el-icon-picture" @click="uploadBackVisible = true">Background</el-button>
+            <el-button type="info" plain size="small" icon="el-icon-picture-outline" @click="uploadCoverVisible = true">Cover</el-button>
+          </div>
+
+          <el-form-item label="CHART CONSTANT">
+            <el-input v-model="form.chartConstant"></el-input>
           </el-form-item>
-          <el-form-item label="歌曲名称" :label-width="formLabelWidth">
-            <el-input v-model="form.songName" autocomplete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="歌手名称" :label-width="formLabelWidth">
-            <el-input v-model="form.songWriter" autocomplete="off"></el-input>
-          </el-form-item>
-          <el-form-item :label-width="formLabelWidth">
-            <el-button type="primary" size="small" @click="startUploadSong()"
-              >上传音频</el-button
-            >
-          </el-form-item>
-          <el-form-item :label-width="formLabelWidth">
-            <el-button type="primary" size="small" @click="startUploadBack()"
-              >上传歌曲默认背景</el-button
-            >
-          </el-form-item>
-          <el-form-item :label-width="formLabelWidth">
-            <el-button type="primary" size="small" @click="startUploadCover()"
-              >上传歌曲封面</el-button
-            >
-          </el-form-item>
-          <el-form-item label="设置加载文字" :label-width="formLabelWidth">
-            <el-input v-model="form.loadingText" autocomplete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="设置谱面定数" :label-width="formLabelWidth">
-            <el-input
-              v-model="form.chartConstant"
-              autocomplete="off"
-            ></el-input>
-          </el-form-item>
-          <el-form-item label="设置加载完毕文字" :label-width="formLabelWidth">
-            <el-input v-model="form.loadedText" autocomplete="off"></el-input>
-          </el-form-item>
+
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="LOADING TEXT">
+                <el-input v-model="form.loadingText"></el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="LOADED TEXT">
+                <el-input v-model="form.loadedText"></el-input>
+              </el-form-item>
+            </el-col>
+          </el-row>
         </el-form>
         <template #footer>
           <div class="dialog-footer">
-            <el-button @click="editVisible = false">取 消</el-button>
-            <el-button type="primary" @click="editSongInfo()">确 定</el-button>
+            <el-button @click="editVisible = false">CANCEL</el-button>
+            <el-button type="primary" @click="editSongInfo()">SAVE CHANGES</el-button>
           </div>
         </template>
       </el-dialog>
 
-      <!--编辑新增谱面的弹出框-->
-      <el-dialog title="新增谱面" v-model="addVisible" width="40%">
-        <el-form :model="newSong">
-          <el-form-item label="默认背景" :label-width="formLabelWidth">
-            <el-input
-              v-model="newSong.defaultBackground"
-              autocomplete="off"
-            ></el-input>
+      <!-- Add Dialog -->
+      <el-dialog title="CREATE NEW MELODY" v-model="addVisible" width="500px">
+        <el-form label-position="top" :model="newSong">
+          <el-form-item label="MELODY NAME">
+            <el-input v-model="newSong.songName" placeholder="Enter melody title"></el-input>
           </el-form-item>
-          <el-form-item label="歌曲音频" :label-width="formLabelWidth">
-            <el-input v-model="newSong.songUrl" autocomplete="off"></el-input>
+          <el-form-item label="ARTIST">
+            <el-input v-model="newSong.songWriter" placeholder="Artist name"></el-input>
           </el-form-item>
-          <el-form-item label="作者" :label-width="formLabelWidth">
-            <el-input
-              v-model="newSong.songWriter"
-              autocomplete="off"
-            ></el-input>
-          </el-form-item>
-          <el-form-item label="封面" :label-width="formLabelWidth">
-            <el-input v-model="newSong.songCover" autocomplete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="加载文字" :label-width="formLabelWidth">
-            <el-input
-              v-model="newSong.loadingText"
-              autocomplete="off"
-            ></el-input>
-          </el-form-item>
-          <el-form-item label="加载完成文字" :label-width="formLabelWidth">
-            <el-input
-              v-model="newSong.loadedText"
-              autocomplete="off"
-            ></el-input>
-          </el-form-item>
-          <el-form-item label="歌曲名称" :label-width="formLabelWidth">
-            <el-input v-model="newSong.songName" autocomplete="off"></el-input>
-          </el-form-item>
+          <p class="hint">You can upload assets later in the settings.</p>
         </el-form>
         <template #footer>
           <div class="dialog-footer">
-            <el-button @click="addVisible = false">取 消</el-button>
-            <el-button type="primary" @click="addSong()">确 定</el-button>
+            <el-button @click="addVisible = false">CANCEL</el-button>
+            <el-button type="primary" @click="addSong()">CREATE</el-button>
           </div>
         </template>
       </el-dialog>
 
-      <el-dialog title="上传音频" v-model="uploadSongVisible" width="20%">
+      <!-- Asset Upload Dialogs (Simpler) -->
+      <el-dialog :title="'UPLOAD ASSET'" v-model="assetVisible" width="400px">
         <el-upload
-          class="avatar-uploader"
-          action="http://47.113.89.104:8090/chart/uploadSong"
-          with-credentials="true"
+          class="asset-uploader"
+          :action="uploadUrl"
+          with-credentials
           name="file"
-          accept=".wav,.mp4"
-          auto-upload="false"
           :data="{ songId: selectedSongId }"
-          :show-file-list="false"
-          :on-success="handleAvatarSuccess1"
-          :before-upload="beforeAvatarUpload"
+          :on-success="handleUploadSuccess"
         >
-          <img v-if="songUrl" :src="songUrl" class="avatar" />
-          <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+          <div class="upload-box">
+            <i class="el-icon-upload"></i>
+            <p>Click or drag file here</p>
+          </div>
         </el-upload>
       </el-dialog>
-
-      <el-dialog title="上传默认背景" v-model="uploadBackVisible" width="20%">
-        <el-upload
-          class="avatar-uploader"
-          action="http://47.113.89.104:8090/chart/uploadDefaultBackground"
-          with-credentials="true"
-          name="file"
-          accept=".jpg,.png"
-          auto-upload="false"
-          :data="{ songId: selectedSongId }"
-          :show-file-list="false"
-          :on-success="handleAvatarSuccess2"
-          :before-upload="beforeAvatarUpload"
-        >
-          <i class="el-icon-plus avatar-uploader-icon"></i>
+      
+      <!-- Individual Upload Dialogs Rekept for Compatibility -->
+      <el-dialog title="UPLOAD AUDIO" v-model="uploadSongVisible" width="350px">
+        <el-upload :action="$http.defaults.baseURL + '/chart/uploadSong'" with-credentials name="file" :data="{ songId: selectedSongId }" :on-success="() => { uploadSongVisible = false; $message.success('Audio Uploaded'); }" drag>
+          <i class="el-icon-upload"></i> <div class="el-upload__text">Drop .wav/.mp3 here</div>
         </el-upload>
       </el-dialog>
-
-      <el-dialog title="上传歌曲封面" v-model="uploadCoverVisible" width="20%">
-        <el-upload
-          class="avatar-uploader"
-          action="http://47.113.89.104:8090/chart/uploadSongCover"
-          with-credentials="true"
-          name="file"
-          accept=".jpg,.png"
-          auto-upload="false"
-          :data="{ songId: selectedSongId }"
-          :show-file-list="false"
-          :on-success="handleAvatarSuccess3"
-          :before-upload="beforeAvatarUpload"
-        >
-          <i class="el-icon-plus avatar-uploader-icon"></i>
+      <el-dialog title="UPLOAD BACKGROUND" v-model="uploadBackVisible" width="350px">
+        <el-upload :action="$http.defaults.baseURL + '/chart/uploadDefaultBackground'" with-credentials name="file" :data="{ songId: selectedSongId }" :on-success="() => { uploadBackVisible = false; $message.success('Background Uploaded'); }" drag>
+          <i class="el-icon-upload"></i> <div class="el-upload__text">Drop Image here</div>
+        </el-upload>
+      </el-dialog>
+      <el-dialog title="UPLOAD COVER" v-model="uploadCoverVisible" width="350px">
+        <el-upload :action="$http.defaults.baseURL + '/chart/uploadSongCover'" with-credentials name="file" :data="{ songId: selectedSongId }" :on-success="() => { uploadCoverVisible = false; $message.success('Cover Uploaded'); }" drag>
+          <i class="el-icon-upload"></i> <div class="el-upload__text">Drop Image here</div>
         </el-upload>
       </el-dialog>
     </div>
@@ -275,361 +184,143 @@ export default {
   components: { BackgroundDisplay, Header },
   data() {
     return {
-      type: "",
-      sort: "",
+      sort: "00",
       params: {
         status: "0",
-        searchType: "",
+        searchType: "0",
         searchContent: "",
-        sortType: "",
-        sortWay: "",
+        sortType: "0",
+        sortWay: "0",
       },
       form: {
-        songId: "",
-        songName: "",
-        songWriter: "",
-        songUrl: "",
-        defaultBackground: "",
-        songCover: "",
-        loadingText: "",
-        chartConstant: "",
-        loadedText: "",
+        songId: "", songName: "", songWriter: "", chartConstant: "", loadingText: "", loadedText: ""
       },
       newSong: {
-        BPM: "",
-        firstBeatDelay: "",
-        songId: "",
-        songLength: "",
-        defaultBackground: "",
-        songUrl: "",
-        uploader: "",
-        songWriter: "",
-        songCover: "",
-        loadingText: "",
-        loadedText: "",
-        songName: "",
-        notesCount: "",
-        uploaderId: "",
-      },
-      deleteForm: {
-        songId: "",
+        songName: "", songWriter: "", defaultBackground: "", songUrl: "", songCover: "", loadingText: "", loadedText: ""
       },
       songs: [],
       editVisible: false,
-      selectedSongId: "",
-      selectedSong:"",
       addVisible: false,
-      value: true,
-      song: {
-        songId: "",
-      },
       uploadSongVisible: false,
       uploadBackVisible: false,
       uploadCoverVisible: false,
-      songUrl: "",
-      formLabelWidth:'100',
+      selectedSongId: "",
+      selectedSong: {},
+      value: false,
     };
   },
-  mounted() {},
   created() {
     this.getMyAllCharts();
   },
   methods: {
     async getMyAllCharts() {
       const { data: res } = await this.$http.post("/user/getAllMyCharts");
-      if (res.code == 0) {
-        this.songs = res.data.charts;
-      } else {
-        this.$message.error("获取异常");
-      }
+      if (res.code == 0) this.songs = res.data.charts;
     },
     async getCharts() {
       this.params.sortType = this.sort.substr(0, 1);
       this.params.sortWay = this.sort.substr(1, 1);
-      const { data: res } = await this.$http.post(
-        "/user/getMyCharts",
-        this.params
-      );
-      if (res.code == 0) {
-        this.songs = res.data.charts;
-      } else {
-        this.$message.error("获取异常");
-      }
+      const { data: res } = await this.$http.post("/user/getMyCharts", this.params);
+      if (res.code == 0) this.songs = res.data.charts;
     },
     getEdit(songId, item) {
       this.selectedSongId = songId;
       this.selectedSong = item;
-      this.getValue();
-      console.log(this.value)
-      this.form=JSON.parse(JSON.stringify(this.songs.find(item=>item.songId==songId)));
-      console.log(JSON.stringify(this.form));
+      this.value = item.status >= 1;
+      this.form = JSON.parse(JSON.stringify(item));
       this.editVisible = true;
     },
-    getStatus(){
-      if(this.selectedSong.status == 0 || this.selectedSong.status == 1){
-        return false;
-      }
-      else{
-        return true;
-      }
-    },
-    getValue(){
-      if(this.selectedSong.status == 0){
-        this.value = false;
-      }
-      else{
-        this.value = true;
-      }
-    },
-    getAdd() {
-      this.addVisible = true;
-    },
-    startUploadSong() {
-      this.uploadSongVisible = true;
-    },
-    startUploadBack() {
-      this.uploadBackVisible = true;
-    },
-    startUploadCover() {
-      this.uploadCoverVisible = true;
-    },
-    async addSong() {
-      const { data: res } = await this.$http.post(
-        "/chart/newChart",
-        this.newSong
-      );
-      if (res.code === 0) {
-        this.$message.success("新增成功");
-        this.getMyAllCharts();
-        this.addVisible = false;
-      } else {
-        this.$message.error("编辑失败");
-      }
-    },
     async editSongInfo() {
-      console.log(this.form);
-      this.song.songId = this.selectedSongId;
-      this.form.songId = this.selectedSongId;
-      if(this.value && !this.getStatus()){
-        const { data: res1 } = await this.$http.post(
-          "/user/publiciseChart",
-          this.song
-        );
-        if (res1.code != 0) {
-          this.$message.error("公开化失败");
-        }
+      const visibilityEndpoint = (this.value && this.selectedSong.status === 0) 
+          ? "/user/publiciseChart" 
+          : (!this.value && this.selectedSong.status === 1)
+          ? "/user/privatizeChart" : null;
+
+      if (visibilityEndpoint) {
+        await this.$http.post(visibilityEndpoint, { songId: this.selectedSongId });
       }
-      if(!this.value && !this.getStatus()){
-        const { data: res1 } = await this.$http.post(
-          "/user/privatizeChart",
-          this.song
-        );
-        if (res1.code != 0) {
-          this.$message.error("取消公开化失败");
-        }
-      }
-      const { data: res } = await this.$http.post(
-        "/chart/editChartInfo",
-        this.form
-      );
+
+      const { data: res } = await this.$http.post("/chart/editChartInfo", this.form);
       if (res.code == 0) {
-        this.$message.success("修改成功");
+        this.$message.success("Settings saved");
         this.getMyAllCharts();
         this.editVisible = false;
-      } else {
-        this.$message.error("编辑失败");
+      }
+    },
+    async addSong() {
+      const { data: res } = await this.$http.post("/chart/newChart", this.newSong);
+      if (res.code === 0) {
+        this.$message.success("Melody created");
+        this.getMyAllCharts();
+        this.addVisible = false;
       }
     },
     async delete(songId) {
-      this.deleteForm.songId = songId;
-      const { data: res } = await this.$http.post(
-        "/user/deleteChart",
-        this.deleteForm
-      );
+      const { data: res } = await this.$http.post("/user/deleteChart", { songId });
       if (res.code === 0) {
+        this.$message.success("Deleted");
         this.getMyAllCharts();
-        this.$message({
-          type: "success",
-          message: "删除成功!",
-        });
-      } else {
-        this.$message({
-          type: "error",
-          message: "删除失败!",
-        });
       }
     },
     deleteSong(songId) {
-      this.$confirm("此操作删除该谱面, 是否继续?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-      }).then(() => {
-        this.delete(songId);
-      });
+      this.$confirm("Delete this rhythm permanently?", "WARNING", {
+        confirmButtonText: "DELETE", cancelButtonText: "CANCEL", type: "warning"
+      }).then(() => this.delete(songId));
     },
     next(songId) {
-      this.$router.push({
-        path: "/chart/maker",
-        query: {
-          songId: songId,
-        },
-      });
-      setTimeout(() => {
-        location.reload();
-      }, 100);
+      this.$router.push({ path: "/chart/maker", query: { songId } });
+      setTimeout(() => location.reload(), 100);
     },
-    handleAvatarSuccess1(res, file) {
-      this.songUrl = URL.createObjectURL(file.raw);
-      this.$message.success("上传成功");
-      console.log(res);
-      this.form.songUrl = res.data;
-      this.uploadSongVisible = false;
+    getStatusType(status) {
+      if (status === 2) return 'success';
+      if (status === 1) return 'warning';
+      return 'info';
     },
-    handleAvatarSuccess2(res, file) {
-      this.songUrl = URL.createObjectURL(file.raw);
-      this.$message.success("上传成功");
-      this.form.defaultBackground = res.data.url;
-      this.uploadBackVisible = false;
+    getStatusLabel(status) {
+      if (status === 2) return 'CERTIFIED';
+      if (status === 1) return 'PUBLIC';
+      return 'PRIVATE';
     },
-    handleAvatarSuccess3(res, file) {
-      this.songUrl = URL.createObjectURL(file.raw);
-      this.$message.success("上传成功");
-      this.form.songCover = res.data.url;
-      this.uploadCoverVisible = false;
-    },
+    getAdd() { this.addVisible = true; }
   },
 };
 </script>
 
 <style scoped>
-.divTop {
-  /* border:1px solid black; */
-  width: 70%;
-  height: 5%;
-  margin-left: 15%;
-  margin-bottom: 0.5%;
-}
-.btn {
-  /* width: 30%;
-        height: 20%; */
-  color: #fff;
-  border-radius: 5px;
-  padding: 10px 25px;
-  font-family: "Lato", sans-serif;
-  font-weight: 50;
-  background: transparent;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  position: relative;
-  display: inline-block;
-  box-shadow: inset 2px 2px 2px 0px rgba(255, 255, 255, 0.5),
-    7px 7px 20px 0px rgba(0, 0, 0, 0.1), 4px 4px 5px 0px rgba(0, 0, 0, 0.1);
-}
+.admin-view { width: 100vw; height: 100vh; position: relative; }
+.view-content { position: absolute; inset: 0; z-index: 10; display: flex; flex-direction: column; overflow: hidden; }
 
-/* 1 */
-.btn1 {
-  background: rgb(44, 202, 75);
-  background: linear-gradient(0deg, rgb(58, 207, 73) 0%, rgb(31, 162, 75) 100%);
-  border: none;
-}
-.btn1:active {
-  transform: scale(0.98);
-  box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
-}
-.img1 {
-  height: 100%;
-  width: 100%;
-  object-fit: cover;
-  cursor: pointer;
-}
-.div1 {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  font-size: 14px;
-  overflow: auto;
-}
-.div2 {
-  display: flex;
-  width: 70%;
-  margin: 0 auto;
-  background-color: #ffffff;
-  border-radius: 5px;
-  height: 100%;
-  overflow: auto;
-}
-.div3 {
-  flex: 1;
-  /* border-right: 1px solid #cccccc; */
-  width: 70%;
-  margin: 0 auto;
-  background-color: #ffffff;
-  border-radius: 5px;
-  /* height: 100%; */
-  /* overflow:auto; */
-}
-.div4 {
-  height: 170px;
-  display: flex;
-  margin: 10px 20px;
-  border-bottom: 1px solid #cccccc;
-}
-.div5:active {
-  transform: scale(0.98);
-}
-.div5 {
-  margin: 20px 0;
-  width: 200px;
-}
-.div6 {
-  margin: 30px 20px;
-  width:calc(100% - 200px);
-}
-.div7 {
-  font-size: 18px;
-  color: #000000;
-  cursor: pointer;
-  /* float: left; */
-}
-.div8 {
-  /* display: flex; */
-  color: #cccccc;
-  line-height: 40px;
-  /* width: 100%; */
-  margin-left: auto;
-}
-.div9 {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 15px;
-  color: gray;
-  margin-top: 2px;
-}
-/* .icon-active{
-      size: 20px;
-  }
-  .icon-active:hover{
-    color: #585858;
-  } */
-.item img {
-  width: 100%;
-  height: auto;
-  transform: scale(1);
-  transition: transform 1s ease 0s;
-}
+.filter-header-wrapper { padding: 20px 40px; display: flex; justify-content: center; }
+.filter-header { width: 100%; max-width: 1200px; padding: 15px 25px; display: flex; gap: 20px; align-items: center; }
 
-.item:hover img {
-  transform: scale(1.1);
-}
-.face-pic:hover img {
-  transform: rotate(360deg);
-  -ms-transform: rotate(360deg); /* Internet Explorer */
-  -moz-transform: rotate(360deg); /* Firefox */
-  -webkit-transform: rotate(360deg); /* Safari 和 Chrome */
-  -o-transform: rotate(360deg); /* Opera */
-  transition: transform 0.6s ease 0s;
-}
+.search-section { flex: 1; display: flex; gap: 10px; }
+.type-select { width: 120px; }
+.search-input { flex: 1; }
+.sort-select { width: 160px; }
+
+.management-container { flex: 1; overflow-y: auto; padding: 0 40px 60px; }
+.management-list { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 15px; }
+
+.manage-card { padding: 20px 30px; display: flex; align-items: center; justify-content: space-between; gap: 40px; }
+.manage-card:hover { border-color: var(--accent-cyan); background: rgba(255, 255, 255, 0.08); }
+
+.card-left { display: flex; gap: 20px; align-items: center; flex: 1; cursor: pointer; }
+.cover-wrapper { position: relative; width: 120px; height: 120px; border-radius: 12px; overflow: hidden; }
+.manage-cover { width: 100%; height: 100%; }
+.hover-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.6); display: flex; flex-direction: column; justify-content: center; align-items: center; opacity: 0; transition: 0.3s; font-size: 10px; font-weight: 800; color: var(--accent-cyan); }
+.cover-wrapper:hover .hover-overlay { opacity: 1; }
+
+.song-title { font-size: 20px; margin: 0 0 5px; font-weight: 700; color: white; }
+.song-artist { color: var(--text-muted); font-size: 14px; margin-bottom: 12px; }
+.status-tags { display: flex; gap: 10px; align-items: center; }
+.constant { font-size: 11px; font-weight: 800; color: var(--accent-cyan); }
+
+.card-actions { width: 120px; text-align: right; }
+
+/* Settings Form */
+.switch-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 12px; font-weight: 700; }
+.upload-buttons { display: flex; gap: 10px; margin-bottom: 25px; }
+.hint { font-size: 12px; color: var(--text-muted); margin-top: 10px; }
+
+:deep(.el-upload-dragger) { background: rgba(255,255,255,0.02) !important; border: 1px dashed var(--glass-border) !important; }
 </style>

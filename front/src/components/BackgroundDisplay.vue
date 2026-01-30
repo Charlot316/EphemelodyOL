@@ -40,27 +40,34 @@
   display: flex;
 }
 .bubbles span {
-  position: relative;
-  width: 30px;
-  height: 30px;
-  background: #4fc3dc;
-  margin: 0 4px;
+  position: absolute;
+  bottom: -100px;
+  background: radial-gradient(circle, var(--accent-cyan) 0%, transparent 70%);
   border-radius: 50%;
-  box-shadow: 0 0 0 10px #4fc3dc44, 0 0 50px #4fc3dc, 0 0 100px #4fc3dc;
-  animation: animate 15s linear infinite;
-  animation-duration: calc(var(--duration) / var(--i));
-}
-.bubbles span:nth-child(even) {
-  background: #ff2d75;
-  box-shadow: 0 0 0 10px #ff2d7544, 0 0 50px #ff2d75, 0 0 100px #ff2d75;
+  filter: blur(40px);
+  opacity: 0.15;
+  animation: floatUp 20s infinite linear;
 }
 
-@keyframes animate {
+.bubbles span:nth-child(even) {
+  background: radial-gradient(circle, var(--accent-pink) 0%, transparent 70%);
+  opacity: 0.1;
+}
+
+@keyframes floatUp {
   0% {
-    transform: translateY(100vh) scale(0);
+    transform: translateY(0) scale(1);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.15;
+  }
+  80% {
+    opacity: 0.15;
   }
   100% {
-    transform: translateY(-10vh) scale(0.9);
+    transform: translateY(-120vh) scale(1.5);
+    opacity: 0;
   }
 }
 </style>

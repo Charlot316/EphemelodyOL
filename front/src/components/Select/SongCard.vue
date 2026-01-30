@@ -1,48 +1,47 @@
-<template
-  ><router-link
+<template>
+  <router-link
     :to="{ path: '/play', query: { songId: song.songInfo.songId } }"
+    class="card-link"
   >
-    <div
-      class="song-card"
-      @mouseenter="
-        mouseEnter = true;
-        zIndex = 10;
-      "
-      @mouseleave="
-        mouseEnter = false;
-        zIndex = 0;
-      "
-      :style="{ zIndex: zIndex }"
-    >
-      <img :src="song.songInfo.defaultBackground" class="default-background" />
-      <div class="song-info">
-        <img :src="song.songInfo.songCover" class="song-cover" />
-        <div class="content">
-          <!-- <div style="font-size:15px;">{{ song.songInfo.uploader }}</div>  -->
-          <div>
-            {{ song.songInfo.songName }} LV.{{ song.songInfo.songDifficulty }}
-          </div>
-          <div style="font-size:15px;">{{ song.songInfo.songWriter }}</div>
+    <div class="song-card glass" @mouseenter="mouseEnter = true" @mouseleave="mouseEnter = false">
+      <div class="image-container">
+        <img :src="song.songInfo.defaultBackground" class="card-bg" />
+        <div class="difficulty-badge" :class="getDifficultyClass(song.songInfo.songDifficulty)">
+          {{ song.songInfo.songDifficulty }}
         </div>
       </div>
-      <div :class="mouseEnter ? 'rank' : 'rank-notopen'">
-        <div style="height:120px;overflow: auto;padding:10px;">
-          世界排名
-          <div v-for="record in song.tenBestRecords" :key="record">
-            <Icon :user="record" />
+      
+      <div class="song-info">
+        <div class="main-info">
+          <img :src="song.songInfo.songCover" class="mini-cover" />
+          <div class="title-area">
+            <h4 class="song-title">{{ song.songInfo.songName }}</h4>
+            <span class="artist">{{ song.songInfo.songWriter }}</span>
           </div>
         </div>
-        <div style="height:50px;padding:10px;padding-top: 0px;">
-          <hr />
-          我的排名
-          <Icon
-            :user="
-              Object.assign(song.myRecord, {
-                player: $store.state.user.username,
-                playerIcon: $store.state.user.icon,
-              })
-            "
-          />
+        
+        <div class="stats-row">
+          <span class="uploader"><i class="el-icon-user"></i> {{ song.songInfo.uploader }}</span>
+        </div>
+      </div>
+
+      <div class="rank-overlay" :class="{ 'is-active': mouseEnter }">
+        <div class="rank-content">
+          <div class="rank-header">TOP RANKING</div>
+          <div class="rank-list">
+            <div v-for="(record, index) in song.tenBestRecords" :key="index" class="rank-item">
+              <span class="rank-num">#{{ index + 1 }}</span>
+              <span class="rank-name">{{ record.player }}</span>
+              <span class="rank-score">{{ record.score }}</span>
+            </div>
+          </div>
+          <div class="my-rank-section">
+            <div class="rank-header">MY BEST</div>
+            <div class="rank-item mine">
+              <span class="rank-name">{{ $store.state.user.username }}</span>
+              <span class="rank-score">{{ song.myRecord.score || 'NO DATA' }}</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -50,111 +49,173 @@
 </template>
 
 <script>
-import Icon from "./Icon";
 export default {
   props: ["song"],
-  components: { Icon },
   data() {
     return {
       mouseEnter: false,
-      zIndex: 0,
     };
   },
-  created() {},
-  methods: {},
+  methods: {
+    getDifficultyClass(diff) {
+      if (diff < 5) return 'diff-easy';
+      if (diff < 10) return 'diff-normal';
+      if (diff < 14) return 'diff-hard';
+      return 'diff-insane';
+    }
+  }
 };
 </script>
 
 <style scoped>
+.card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
 .song-card {
+  height: 280px;
   position: relative;
-  width: 300px;
-  margin: 10px;
-  -webkit-border-radius: 5px;
-  border-radius: 5px;
-  transition: 0.5s;
-  height: 200px;
-  background-color: #fff;
-  color: rgb(32, 32, 32);
-  transition: 0.5s;
-  transform: scale(1);
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
+
 .song-card:hover {
-  background: white;
-  color: #303133;
-  transition: 0.5s;
-  transform: scale(1.05);
-  height: 400px;
-  cursor: pointer;
+  transform: translateY(-8px);
+  border-color: var(--accent-cyan);
 }
 
-.song-card:active {
-  background: rgb(210, 210, 210);
-  color: #303133;
-  transition: 0.1s;
-  transform: scale(1.04);
-  cursor: pointer;
+.image-container {
+  height: 160px;
+  position: relative;
 }
 
-.default-background {
+.card-bg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.song-card:hover .card-bg {
+  transform: scale(1.1);
+}
+
+.difficulty-badge {
   position: absolute;
-  left: 0;
-  top: 0;
-  height: 200px;
-  width: 300px;
-  border-radius: 5px;
+  top: 15px;
+  right: 15px;
+  padding: 4px 12px;
+  border-radius: 8px;
+  font-weight: 800;
+  font-size: 14px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
+
+.diff-easy { background: #22c55e; color: white; }
+.diff-normal { background: #3b82f6; color: white; }
+.diff-hard { background: #eab308; color: white; }
+.diff-insane { background: #ef4444; color: white; text-shadow: 0 0 5px rgba(255,255,255,0.5); }
+
 .song-info {
-  position: absolute;
-  left: 0;
-  top: 100px;
-  height: 100px;
-  width: 300px;
-  border-radius: 5px;
-  
-  background: rgba(10, 113, 148, 0.642);
+  padding: 15px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.main-info {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.mini-cover {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.title-area {
+  flex: 1;
+  min-width: 0;
+}
+
+.song-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0;
   overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-.song-cover {
-  position: absolute;
-  left: 10px;
-  top: 10px;
-  height: 80px;
-  width: 80px;
-  border-radius: 5px;
+
+.artist {
+  font-size: 12px;
+  color: var(--text-muted);
 }
-.song-info .content {
-  position: absolute;
-    color: #ffffff;
-  text-shadow: 0 0 2px rgb(64, 64, 64);
-  left: 100px;
-  bottom: 10px;
-  max-width: 200px;
-  font-weight: 200;
-  font-size: 20px;
+
+.stats-row {
+  font-size: 12px;
+  color: var(--text-muted);
+  display: flex;
+  justify-content: flex-end;
 }
-.rank {
+
+.rank-overlay {
   position: absolute;
-  left: 0px;
-  top: 200px;
-  height: 200px;
-  width: 300px;
-  border-radius: 5px;
-  transition: 0.5s;
-  overflow: hidden;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(8px);
+  transform: translateY(100%);
+  transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
 }
-.rank-notopen {
-  position: absolute;
-  left: 0px;
-  top: 200px;
-  height: 0px;
-  width: 300px;
-  border-radius: 5px;
-  transition: 0.5s;
-  overflow: hidden;
+
+.rank-overlay.is-active {
+  transform: translateY(0);
+}
+
+.rank-header {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--accent-cyan);
+  letter-spacing: 2px;
+  margin-bottom: 12px;
+}
+
+.rank-list {
+  flex: 1;
+  overflow-y: auto;
+  font-size: 13px;
+}
+
+.rank-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.rank-num { font-weight: 800; width: 30px; }
+.rank-name { flex: 1; color: var(--text-muted); }
+.rank-score { font-family: monospace; color: var(--accent-pink); }
+
+.my-rank-section {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid var(--glass-border);
+}
+
+.rank-item.mine .rank-name {
+  color: var(--text-main);
+  font-weight: 600;
 }
 </style>
+
