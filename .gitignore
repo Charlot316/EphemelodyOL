@@ -30,3 +30,4 @@ pnpm-debug.log*
 /back/rhythm_game/target/
 .env
 .env.local
+CREDENTIALS.md
