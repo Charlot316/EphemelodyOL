@@ -5,8 +5,8 @@
       <Header />
       <main class="main-content">
         <div class="welcome-section">
-          <h1 class="glitch-text">SELECT YOUR JOURNEY</h1>
-          <p class="subtitle">Where every beat tells an eternal story</p>
+          <h1 class="glitch-text">{{ $t('home.title') }}</h1>
+          <p class="subtitle">{{ $t('home.subtitle') }}</p>
         </div>
 
         <div class="nav-grid">
@@ -14,27 +14,27 @@
             <div class="icon-box cyan-glow">
               <i class="el-icon-video-play"></i>
             </div>
-            <h3>Official</h3>
-            <p>Master the original rhythm collections</p>
-            <div class="card-footer">PLAY NOW</div>
+            <h3>{{ $t('home.official') }}</h3>
+            <p>{{ $t('home.officialDesc') }}</p>
+            <div class="card-footer">{{ $t('home.playNow') }}</div>
           </div>
 
           <div class="nav-card glass" @click="$router.push({path:'/society'})">
             <div class="icon-box pink-glow">
               <i class="el-icon-ship"></i>
             </div>
-            <h3>Community</h3>
-            <p>Explore thousands of player-created charts</p>
-            <div class="card-footer">EXPLORE</div>
+            <h3>{{ $t('home.community') }}</h3>
+            <p>{{ $t('home.communityDesc') }}</p>
+            <div class="card-footer">{{ $t('home.explore') }}</div>
           </div>
 
           <div class="nav-card glass" @click="$router.push({path:'/admin'})">
             <div class="icon-box purple-glow">
               <i class="el-icon-setting"></i>
             </div>
-            <h3>Workshop</h3>
-            <p>Create and manage your own melodies</p>
-            <div class="card-footer">MANAGE</div>
+            <h3>{{ $t('home.workshop') }}</h3>
+            <p>{{ $t('home.workshopDesc') }}</p>
+            <div class="card-footer">{{ $t('home.manage') }}</div>
           </div>
         </div>
       </main>

@@ -5,6 +5,7 @@ import store from './store'
 import installElementPlus from './plugins/element'
 import './assets/css/icon.css'
 import installAxios from './plugins/axios'
+import i18n from './plugins/i18n'
 import * as echarts from 'echarts'
 const app = createApp(App)
 installElementPlus(app)
@@ -13,6 +14,7 @@ app.config.globalProperties.$echarts = echarts
 app
     .use(store)
     .use(router)
+    .use(i18n)
     .mount('#app')
 
 router.beforeEach((to, from, next) => {

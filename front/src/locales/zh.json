@@ -1,0 +1,79 @@
+{
+    "common": {
+        "login": "登录",
+        "register": "注册",
+        "logout": "退出登录",
+        "username": "用户名",
+        "password": "密码",
+        "confirmPassword": "确认密码",
+        "cancel": "取消",
+        "update": "更新",
+        "success": "成功",
+        "failed": "失败",
+        "error": "错误",
+        "loading": "加载中..."
+    },
+    "home": {
+        "title": "选择你的旅程",
+        "subtitle": "每一个节奏都在诉说着永恒的故事",
+        "official": "官方谱面",
+        "officialDesc": "挑战原版音乐收藏",
+        "community": "社区谱面",
+        "communityDesc": "探索海量玩家自制谱面",
+        "workshop": "工作室",
+        "workshopDesc": "创建并管理你的个人谱面",
+        "playNow": "立即游玩",
+        "explore": "立即探索",
+        "manage": "前往管理"
+    },
+    "login": {
+        "title": "以全新的方式体验旋律",
+        "submit": "立即登录",
+        "newHere": "初来乍到？",
+        "createAccount": "创建账号",
+        "placeholderUser": "请输入账号",
+        "placeholderPass": "请输入密码"
+    },
+    "register": {
+        "title": "加入我们的社区，开始你的旅程",
+        "submit": "创建账号",
+        "alreadyHave": "已有账号？",
+        "loginNow": "立即登录",
+        "placeholderUser": "起一个独特的账号名",
+        "placeholderPass": "设置一个强密码",
+        "placeholderConfirm": "请再次输入密码"
+    },
+    "header": {
+        "notLoggedIn": "未登录",
+        "dashboard": "个人面板",
+        "adminPanel": "管理面板",
+        "resetPassword": "重置密码",
+        "changeAvatar": "修改头像",
+        "goToLogin": "前往登录",
+        "currentPass": "当前密码",
+        "newPass": "新密码",
+        "passPlaceholder": "请输入当前密码",
+        "newPassPlaceholder": "至少6位字符",
+        "avatarTitle": "修改头像",
+        "avatarDesc": "支持 JPG/PNG (最大 2MB)"
+    },
+    "select": {
+        "searchMelodies": "搜索旋律...",
+        "type": "类型",
+        "sortBy": "排序",
+        "order": "顺序",
+        "noData": "未找到相关内容，尝试换个词搜搜？",
+        "name": "名称",
+        "artist": "艺术家",
+        "uploader": "上传者",
+        "level": "难度",
+        "popularity": "热度",
+        "asc": "正序",
+        "desc": "倒序"
+    },
+    "result": {
+        "maxCombo": "最大连击",
+        "bestScore": "历史最佳成绩",
+        "continue": "继续"
+    }
+}

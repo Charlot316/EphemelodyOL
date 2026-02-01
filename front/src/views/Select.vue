@@ -7,14 +7,14 @@
       <div class="filter-header-wrapper">
         <div class="filter-header glass">
           <div class="search-section">
-            <el-select v-model="params.searchType" placeholder="Type" class="type-select">
-              <el-option label="Name" value="0"></el-option>
-              <el-option label="Artist" value="1"></el-option>
-              <el-option label="Uploader" value="2"></el-option>
-              <el-option label="Level" value="3"></el-option>
+            <el-select v-model="params.searchType" :placeholder="$t('select.type')" class="type-select">
+              <el-option :label="$t('select.name')" value="0"></el-option>
+              <el-option :label="$t('select.artist')" value="1"></el-option>
+              <el-option :label="$t('select.uploader')" value="2"></el-option>
+              <el-option :label="$t('select.level')" value="3"></el-option>
             </el-select>
             <el-input
-              placeholder="Search melodies..."
+              :placeholder="$t('select.searchMelodies')"
               v-model="params.searchContent"
               class="search-input"
               @keyup.enter="getCharts()"
@@ -26,14 +26,14 @@
           </div>
 
           <div class="sort-section">
-            <el-select v-model="params.sortType" placeholder="Sort By" class="sort-select">
-              <el-option label="Name" value="0"></el-option>
-              <el-option label="Artist" value="1"></el-option>
-              <el-option label="Popularity" value="4"></el-option>
+            <el-select v-model="params.sortType" :placeholder="$t('select.sortBy')" class="sort-select">
+              <el-option :label="$t('select.name')" value="0"></el-option>
+              <el-option :label="$t('select.artist')" value="1"></el-option>
+              <el-option :label="$t('select.popularity')" value="4"></el-option>
             </el-select>
-            <el-select v-model="params.sortWay" placeholder="Order" class="order-select">
-              <el-option label="ASC" value="0"></el-option>
-              <el-option label="DESC" value="1"></el-option>
+            <el-select v-model="params.sortWay" :placeholder="$t('select.order')" class="order-select">
+              <el-option :label="$t('select.asc')" value="0"></el-option>
+              <el-option :label="$t('select.desc')" value="1"></el-option>
             </el-select>
           </div>
         </div>
@@ -47,7 +47,7 @@
         </transition-group>
         <div v-if="songs.length === 0" class="no-data">
           <i class="el-icon-info"></i>
-          <p>No rhythms found. Try another search.</p>
+          <p>{{ $t('select.noData') }}</p>
         </div>
       </div>
     </div>

@@ -1,0 +1,79 @@
+{
+    "common": {
+        "login": "Login",
+        "register": "Register",
+        "logout": "Logout",
+        "username": "Username",
+        "password": "Password",
+        "confirmPassword": "Confirm Password",
+        "cancel": "Cancel",
+        "update": "Update",
+        "success": "Success",
+        "failed": "Failed",
+        "error": "Error",
+        "loading": "Loading..."
+    },
+    "home": {
+        "title": "SELECT YOUR JOURNEY",
+        "subtitle": "Where every beat tells an eternal story",
+        "official": "Official",
+        "officialDesc": "Master the original rhythm collections",
+        "community": "Community",
+        "communityDesc": "Explore thousands of player-created charts",
+        "workshop": "Workshop",
+        "workshopDesc": "Create and manage your own melodies",
+        "playNow": "PLAY NOW",
+        "explore": "EXPLORE",
+        "manage": "MANAGE"
+    },
+    "login": {
+        "title": "Experience the melody in a new way",
+        "submit": "LOGIN NOW",
+        "newHere": "New here?",
+        "createAccount": "Create Account",
+        "placeholderUser": "Enter your account",
+        "placeholderPass": "Enter your password"
+    },
+    "register": {
+        "title": "Join our community and start your journey",
+        "submit": "CREATE ACCOUNT",
+        "alreadyHave": "Already have an account?",
+        "loginNow": "Login Now",
+        "placeholderUser": "Pick a unique account name",
+        "placeholderPass": "Choose a strong password",
+        "placeholderConfirm": "Repeat your password"
+    },
+    "header": {
+        "notLoggedIn": "NOT LOGGED IN",
+        "dashboard": "Dashboard",
+        "adminPanel": "Admin Panel",
+        "resetPassword": "Reset Password",
+        "changeAvatar": "Change Avatar",
+        "goToLogin": "Go to Login",
+        "currentPass": "CURRENT PASSWORD",
+        "newPass": "NEW PASSWORD",
+        "passPlaceholder": "Enter current one",
+        "newPassPlaceholder": "Enter at least 6 characters",
+        "avatarTitle": "UPDATE AVATAR",
+        "avatarDesc": "Upload JPG/PNG (Max 2MB)"
+    },
+    "select": {
+        "searchMelodies": "Search melodies...",
+        "type": "Type",
+        "sortBy": "Sort By",
+        "order": "Order",
+        "noData": "No rhythms found. Try another search.",
+        "name": "Name",
+        "artist": "Artist",
+        "uploader": "Uploader",
+        "level": "Level",
+        "popularity": "Popularity",
+        "asc": "ASC",
+        "desc": "DESC"
+    },
+    "result": {
+        "maxCombo": "Max Combo",
+        "bestScore": "Best Score",
+        "continue": "CONTINUE"
+    }
+}

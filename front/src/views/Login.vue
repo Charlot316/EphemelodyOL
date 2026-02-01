@@ -5,24 +5,24 @@
       <div class="login-card glass">
         <div class="login-header">
           <h1 class="logo-text">EPHEMELODY</h1>
-          <p class="subtitle">Experience the melody in a new way</p>
+          <p class="subtitle">{{ $t('login.title') }}</p>
         </div>
         
         <div class="form-container">
           <el-form ref="login" :model="form" :rules="rules">
             <el-form-item prop="username">
-              <div class="input-label">Username</div>
+              <div class="input-label">{{ $t('common.username') }}</div>
               <el-input
                 v-model="form.username"
-                placeholder="Enter your account"
+                :placeholder="$t('login.placeholderUser')"
                 prefix-icon="User"
               ></el-input>
             </el-form-item>
             <el-form-item prop="password">
-              <div class="input-label">Password</div>
+              <div class="input-label">{{ $t('common.password') }}</div>
               <el-input
                 v-model="form.password"
-                placeholder="Enter your password"
+                :placeholder="$t('login.placeholderPass')"
                 show-password
                 prefix-icon="Lock"
                 @keyup.enter="login()"
@@ -32,9 +32,9 @@
         </div>
 
         <div class="login-actions">
-          <el-button type="primary" class="login-btn" @click="login()">LOGIN NOW</el-button>
+          <el-button type="primary" class="login-btn" @click="login()">{{ $t('login.submit') }}</el-button>
           <div class="register-hint">
-            New here? <router-link to="/register" class="link-text">Create Account</router-link>
+            {{ $t('login.newHere') }} <router-link to="/register" class="link-text">{{ $t('login.createAccount') }}</router-link>
           </div>
         </div>
       </div>

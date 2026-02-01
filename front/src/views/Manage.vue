@@ -7,14 +7,14 @@
       <div class="filter-header-wrapper">
         <div class="filter-header glass">
           <div class="search-section">
-            <el-select v-model="params.searchType" placeholder="Type" class="type-select">
-              <el-option label="Name" value="0"></el-option>
-              <el-option label="Artist" value="1"></el-option>
-              <el-option label="Uploader" value="2"></el-option>
-              <el-option label="Level" value="3"></el-option>
+            <el-select v-model="params.searchType" :placeholder="$t('select.type')" class="type-select">
+              <el-option :label="$t('select.name')" value="0"></el-option>
+              <el-option :label="$t('select.artist')" value="1"></el-option>
+              <el-option :label="$t('select.uploader')" value="2"></el-option>
+              <el-option :label="$t('select.level')" value="3"></el-option>
             </el-select>
             <el-input
-              placeholder="Filter your works..."
+              :placeholder="$t('select.searchMelodies')"
               v-model="params.searchContent"
               class="search-input"
               @keyup.enter="getCharts()"
@@ -26,13 +26,13 @@
           </div>
 
           <div class="sort-section">
-            <el-select v-model="sort" placeholder="Sort Order" class="sort-select" @change="getCharts()">
-              <el-option label="Name (A-Z)" value="00"></el-option>
-              <el-option label="Name (Z-A)" value="01"></el-option>
-              <el-option label="Artist (A-Z)" value="10"></el-option>
-              <el-option label="Artist (Z-A)" value="11"></el-option>
-              <el-option label="Level (Low-High)" value="30"></el-option>
-              <el-option label="Level (High-Low)" value="31"></el-option>
+            <el-select v-model="sort" :placeholder="$t('select.sortBy')" class="sort-select" @change="getCharts()">
+              <el-option :label="$t('select.name') + ' (A-Z)'" value="00"></el-option>
+              <el-option :label="$t('select.name') + ' (Z-A)'" value="01"></el-option>
+              <el-option :label="$t('select.artist') + ' (A-Z)'" value="10"></el-option>
+              <el-option :label="$t('select.artist') + ' (Z-A)'" value="11"></el-option>
+              <el-option :label="$t('select.level') + ' (Low-High)'" value="30"></el-option>
+              <el-option :label="$t('select.level') + ' (High-Low)'" value="31"></el-option>
             </el-select>
           </div>
         </div>

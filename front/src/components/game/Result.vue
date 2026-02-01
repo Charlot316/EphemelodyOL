@@ -44,7 +44,7 @@
             <div
               style="min-width:400px;text-align:left;text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:20px;color:rgb(255,255,255);padding:0px 10px;"
             >
-              最大连击:{{ global.maxCombo + "\u3000" }}历史最佳成绩:{{
+              {{ $t('result.maxCombo') }}:{{ global.maxCombo + "\u3000" }}{{ $t('result.bestScore') }}:{{
                 global.formerBestScore
               }}
             </div>
@@ -64,7 +64,7 @@
         @click="goBack()"
         style="width:150px;height:150px;line-height:150px;position:absolute;bottom:50px;right:50px;border-radius:50%;text-align: center;"
       >
-        继续
+        {{ $t('result.continue') }}
       </div>
     </div>
   </div>

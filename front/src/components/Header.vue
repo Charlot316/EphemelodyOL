@@ -6,26 +6,39 @@
       </div>
       
       <div class="right-section">
+        <el-dropdown trigger="hover" @command="handleLangCommand" class="lang-dropdown">
+          <div class="lang-selector">
+            <i class="el-icon-discover"></i>
+            <span>{{ $i18n.locale.toUpperCase() }}</span>
+          </div>
+          <template #dropdown>
+            <el-dropdown-menu class="user-dropdown glass">
+              <el-dropdown-item command="zh">中文 (ZH)</el-dropdown-item>
+              <el-dropdown-item command="en">English (EN)</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+
         <el-dropdown trigger="hover" @command="handleCommand">
           <div class="user-profile">
             <template v-if="$store.state.islogin">
               <Icon />
               <span class="username-display">{{ $store.state.user.username }}</span>
             </template>
-            <span v-else class="login-prompt">NOT LOGGED IN</span>
+            <span v-else class="login-prompt">{{ $t('header.notLoggedIn') }}</span>
           </div>
           
           <template #dropdown>
             <el-dropdown-menu class="user-dropdown glass">
               <template v-if="$store.state.islogin">
-                <el-dropdown-item command="home" icon="el-icon-house">Dashboard</el-dropdown-item>
-                <el-dropdown-item v-if="$store.state.user.isAdmin" command="admin" icon="el-icon-monitor">Admin Panel</el-dropdown-item>
-                <el-dropdown-item divided command="changepassword" icon="el-icon-key">Reset Password</el-dropdown-item>
-                <el-dropdown-item command="uploadicon" icon="el-icon-picture-outline">Change Avatar</el-dropdown-item>
-                <el-dropdown-item divided command="loginout" icon="el-icon-switch-button" class="logout-item">Logout</el-dropdown-item>
+                <el-dropdown-item command="home" icon="el-icon-house">{{ $t('header.dashboard') }}</el-dropdown-item>
+                <el-dropdown-item v-if="$store.state.user.isAdmin" command="admin" icon="el-icon-monitor">{{ $t('header.adminPanel') }}</el-dropdown-item>
+                <el-dropdown-item divided command="changepassword" icon="el-icon-key">{{ $t('header.resetPassword') }}</el-dropdown-item>
+                <el-dropdown-item command="uploadicon" icon="el-icon-picture-outline">{{ $t('header.changeAvatar') }}</el-dropdown-item>
+                <el-dropdown-item divided command="loginout" icon="el-icon-switch-button" class="logout-item">{{ $t('common.logout') }}</el-dropdown-item>
               </template>
               <template v-else>
-                <el-dropdown-item command="login" icon="el-icon-user">Go to Login</el-dropdown-item>
+                <el-dropdown-item command="login" icon="el-icon-user">{{ $t('header.goToLogin') }}</el-dropdown-item>
               </template>
             </el-dropdown-menu>
           </template>
@@ -34,27 +47,27 @@
     </div>
 
     <!-- Password Dialog -->
-    <el-dialog title="RESET PASSWORD" v-model="editVisible_changepassword" width="450px" class="glass-dialog">
+    <el-dialog :title="$t('header.resetPassword')" v-model="editVisible_changepassword" width="450px" class="glass-dialog">
       <div class="dialog-body">
         <el-form label-position="top" :model="param">
-          <el-form-item label="CURRENT PASSWORD">
-            <el-input type="password" v-model="param.oldPassword" show-password placeholder="Enter current one"></el-input>
+          <el-form-item :label="$t('header.currentPass')">
+            <el-input type="password" v-model="param.oldPassword" show-password :placeholder="$t('header.passPlaceholder')"></el-input>
           </el-form-item>
-          <el-form-item label="NEW PASSWORD">
-            <el-input type="password" v-model="param.newPassword" show-password placeholder="Enter at least 6 characters" @keyup.enter="changePassword()"></el-input>
+          <el-form-item :label="$t('header.newPass')">
+            <el-input type="password" v-model="param.newPassword" show-password :placeholder="$t('header.newPassPlaceholder')" @keyup.enter="changePassword()"></el-input>
           </el-form-item>
         </el-form>
       </div>
       <template #footer>
         <div class="dialog-footer">
-          <el-button @click="quitChangePassword" size="medium">CANCEL</el-button>
-          <el-button type="primary" @click="changePassword()" size="medium">UPDATE PASSWORD</el-button>
+          <el-button @click="quitChangePassword" size="medium">{{ $t('common.cancel') }}</el-button>
+          <el-button type="primary" @click="changePassword()" size="medium">{{ $t('common.update') }}</el-button>
         </div>
       </template>
     </el-dialog>
 
     <!-- Avatar Dialog -->
-    <el-dialog title="UPDATE AVATAR" v-model="editVisible_uploadIcon" width="400px" class="glass-dialog">
+    <el-dialog :title="$t('header.avatarTitle')" v-model="editVisible_uploadIcon" width="400px" class="glass-dialog">
       <div class="upload-area">
         <el-upload
           class="avatar-uploader"
@@ -68,7 +81,7 @@
         >
           <div class="upload-placeholder" v-if="!imgUrl">
             <i class="el-icon-plus"></i>
-            <p>Upload JPG/PNG (Max 2MB)</p>
+            <p>{{ $t('header.avatarDesc') }}</p>
           </div>
           <img v-else :src="imgUrl" class="preview-avatar" />
         </el-upload>
@@ -93,6 +106,10 @@ export default {
   },
   components: { Icon },
   methods: {
+    handleLangCommand(lang) {
+      this.$i18n.locale = lang;
+      localStorage.setItem('lang', lang);
+    },
     handleCommand(command) {
       switch(command) {
         case 'loginout': 
@@ -181,6 +198,30 @@ export default {
 
 .header-logo:hover {
   opacity: 0.8;
+}
+
+.right-section {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.lang-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.05);
+  font-size: 13px;
+  font-weight: 700;
+  transition: all 0.3s;
+}
+
+.lang-selector:hover {
+  background: rgba(255,255,255,0.1);
+  color: var(--accent-cyan);
 }
 
 .user-profile {

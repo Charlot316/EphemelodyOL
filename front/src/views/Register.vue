@@ -2,36 +2,36 @@
   <div class="login-page">
     <background-display />
     <div class="login-wrapper">
-      <div class="login-card glass">
-        <div class="login-header">
+      <div class="register-card glass">
+        <div class="register-header">
           <h1 class="logo-text">EPHEMELODY</h1>
-          <p class="subtitle">Join our community and start your journey</p>
+          <p class="subtitle">{{ $t('register.title') }}</p>
         </div>
 
         <div class="form-container">
           <el-form ref="register" :model="form" :rules="rules">
             <el-form-item prop="username">
-              <div class="input-label">Username</div>
+              <div class="input-label">{{ $t('common.username') }}</div>
               <el-input
                 v-model="form.username"
-                placeholder="Pick a unique account name"
+                :placeholder="$t('register.placeholderUser')"
                 prefix-icon="User"
               ></el-input>
             </el-form-item>
             <el-form-item prop="password">
-              <div class="input-label">Password</div>
+              <div class="input-label">{{ $t('common.password') }}</div>
               <el-input
                 v-model="form.password"
-                placeholder="Choose a strong password"
+                :placeholder="$t('register.placeholderPass')"
                 show-password
                 prefix-icon="Lock"
               ></el-input>
             </el-form-item>
-            <el-form-item prop="password1">
-              <div class="input-label">Confirm Password</div>
+            <el-form-item prop="confirmPassword">
+              <div class="input-label">{{ $t('common.confirmPassword') }}</div>
               <el-input
-                v-model="form.password1"
-                placeholder="Repeat your password"
+                v-model="form.confirmPassword"
+                :placeholder="$t('register.placeholderConfirm')"
                 show-password
                 prefix-icon="Check"
                 @keyup.enter="register()"
@@ -40,13 +40,12 @@
           </el-form>
         </div>
 
-        <div class="login-actions">
-          <el-button type="primary" class="login-btn" @click="register()"
-            >CREATE ACCOUNT</el-button
+        <div class="register-actions">
+          <el-button type="primary" class="register-btn" @click="register()"
+            >{{ $t('register.submit') }}</el-button
           >
-          <div class="register-hint">
-            Already have an account?
-            <router-link to="/login" class="link-text">Login Now</router-link>
+          <div class="login-hint">
+            {{ $t('register.alreadyHave') }} <router-link to="/login" class="link-text">{{ $t('register.loginNow') }}</router-link>
           </div>
         </div>
       </div>
