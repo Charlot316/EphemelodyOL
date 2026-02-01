@@ -288,12 +288,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             QueryWrapper<Song> songQueryWrapper = new QueryWrapper<>();
             songQueryWrapper.eq("uploader_id", userId);
             songQueryWrapper.eq("status", status);
-            if (searchType.equals("0")) {
-                songQueryWrapper.eq("song_name", searchContent);
-            } else if (searchType.equals("1")) {
-                songQueryWrapper.eq("song_writer", searchContent);
-            } else if (searchType.equals("3")) {
-                songQueryWrapper.eq("chart_constant", searchContent);
+            if (searchContent != null && !searchContent.trim().isEmpty()) {
+                if (searchType.equals("0")) {
+                    songQueryWrapper.like("song_name", searchContent);
+                } else if (searchType.equals("1")) {
+                    songQueryWrapper.like("song_writer", searchContent);
+                } else if (searchType.equals("3")) {
+                    songQueryWrapper.eq("chart_constant", searchContent);
+                }
             }
             List<Song> songs = songMapper.selectList(songQueryWrapper);
             List<SongVO> songsReturn = new ArrayList<>();
@@ -680,17 +682,23 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             String sortWay = publicChartsDTO.getSortWay();
             QueryWrapper<Song> songQueryWrapper = new QueryWrapper<>();
             songQueryWrapper.eq("status", String.valueOf(status));
-            if (searchType.equals("0")) {
-                songQueryWrapper.eq("song_name", searchContent);
-            } else if (searchType.equals("1")) {
-                songQueryWrapper.eq("song_writer", searchContent);
-            } else if (searchType.equals("2")) {
-                QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
-                userQueryWrapper.eq("username", searchContent);
-                User user = userMapper.selectOne(userQueryWrapper);
-                songQueryWrapper.eq("uploader_id", user.getUserId());
-            } else if (searchType.equals("3")) {
-                songQueryWrapper.eq("chart_constant", searchContent);
+            if (searchContent != null && !searchContent.trim().isEmpty()) {
+                if (searchType.equals("0")) {
+                    songQueryWrapper.like("song_name", searchContent);
+                } else if (searchType.equals("1")) {
+                    songQueryWrapper.like("song_writer", searchContent);
+                } else if (searchType.equals("2")) {
+                    QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+                    userQueryWrapper.eq("username", searchContent);
+                    User user = userMapper.selectOne(userQueryWrapper);
+                    if (user != null) {
+                        songQueryWrapper.eq("uploader_id", user.getUserId());
+                    } else {
+                        songQueryWrapper.eq("uploader_id", "NON_EXISTENT_USER_ID");
+                    }
+                } else if (searchType.equals("3")) {
+                    songQueryWrapper.eq("chart_constant", searchContent);
+                }
             }
             List<Song> songList = songMapper.selectList(songQueryWrapper);
             List<SongsVO> songsVOList = new ArrayList<>();

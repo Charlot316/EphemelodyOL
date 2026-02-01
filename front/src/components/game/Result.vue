@@ -61,7 +61,7 @@
 
       <div
         class="play-button"
-        @click="$router.push('/select')"
+        @click="goBack()"
         style="width:150px;height:150px;line-height:150px;position:absolute;bottom:50px;right:50px;border-radius:50%;text-align: center;"
       >
         继续
@@ -72,7 +72,7 @@
 
 <script setup>
 import { defineProps } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 
 const props = defineProps({
   loadingStatus: Object,
@@ -81,6 +81,17 @@ const props = defineProps({
 });
 
 const router = useRouter();
+const route = useRoute();
+
+const goBack = () => {
+  if (route.query.from) {
+    router.push(route.query.from);
+  } else {
+    // Fallback based on status if 'from' is missing
+    const path = props.chart.status == "1" ? "/society" : "/public";
+    router.push(path);
+  }
+};
 </script>
 
 <style scoped>

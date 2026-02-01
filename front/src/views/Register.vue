@@ -1,51 +1,53 @@
 <template>
-  <div style="width:100%;height:100%;">
+  <div class="login-page">
     <background-display />
-    <div class="loginbody">
-      <div class="logindata">
-        <div class="logintext">
-          <h2>EphemelodyOL</h2>
+    <div class="login-wrapper">
+      <div class="login-card glass">
+        <div class="login-header">
+          <h1 class="logo-text">EPHEMELODY</h1>
+          <p class="subtitle">Join our community and start your journey</p>
         </div>
-        <div class="formdata">
+
+        <div class="form-container">
           <el-form ref="register" :model="form" :rules="rules">
             <el-form-item prop="username">
+              <div class="input-label">Username</div>
               <el-input
                 v-model="form.username"
-                clearable
-                placeholder="请输入账号"
+                placeholder="Pick a unique account name"
+                prefix-icon="User"
               ></el-input>
             </el-form-item>
             <el-form-item prop="password">
+              <div class="input-label">Password</div>
               <el-input
                 v-model="form.password"
-                clearable
-                placeholder="请输入密码"
+                placeholder="Choose a strong password"
                 show-password
+                prefix-icon="Lock"
               ></el-input>
             </el-form-item>
-            <el-form-item prop="password">
+            <el-form-item prop="password1">
+              <div class="input-label">Confirm Password</div>
               <el-input
                 v-model="form.password1"
-                clearable
-                placeholder="请确认密码"
+                placeholder="Repeat your password"
                 show-password
+                prefix-icon="Check"
                 @keyup.enter="register()"
               ></el-input>
             </el-form-item>
           </el-form>
         </div>
-        <div class="tool">
-          <div></div>
-          <div>
-            <span class="shou">
-              <router-link to="/login" style="color:white;">已有帐号，前往登录</router-link>
-            </span>
-          </div>
-        </div>
-        <div class="butt">
-          <el-button class="shou" style="color:white;" type="primary" @click="register()"
-            >注册</el-button
+
+        <div class="login-actions">
+          <el-button type="primary" class="login-btn" @click="register()"
+            >CREATE ACCOUNT</el-button
           >
+          <div class="register-hint">
+            Already have an account?
+            <router-link to="/login" class="link-text">Login Now</router-link>
+          </div>
         </div>
       </div>
     </div>
@@ -56,7 +58,7 @@
 import BackgroundDisplay from "../components/BackgroundDisplay";
 export default {
   components: { BackgroundDisplay },
-  name: "login",
+  name: "register",
   data() {
     return {
       form: {
@@ -64,15 +66,17 @@ export default {
         username: "",
         password1: "",
       },
-      checked: false,
       rules: {
         username: [
-          { required: true, message: "请输入用户名", trigger: "blur" },
-          { max: 10, message: "不能大于10个字符", trigger: "blur" },
+          { required: true, message: "Please enter username", trigger: "blur" },
+          { max: 20, message: "Username too long", trigger: "blur" },
         ],
         password: [
-          { required: true, message: "请输入密码", trigger: "blur" },
-          { max: 10, message: "不能大于10个字符", trigger: "blur" },
+          { required: true, message: "Please enter password", trigger: "blur" },
+          { min: 6, message: "Min 6 characters", trigger: "blur" },
+        ],
+        password1: [
+          { required: true, message: "Please confirm password", trigger: "blur" },
         ],
       },
     };
@@ -80,106 +84,154 @@ export default {
   methods: {
     register() {
       this.$refs.register.validate(async (valid) => {
-        if (!valid) {
-          return;
-        }
-        if (this.form.password != this.form.password1) {
+        if (!valid) return;
+        if (this.form.password !== this.form.password1) {
           return this.$notify({
-            title: "错误",
-            message: "两次密码不一致",
+            title: "Error",
+            message: "Passwords do not match",
             type: "error",
           });
-        } else {
-          try {
-            const { hashPassword } = await import("../utils/crypto");
-            const hashedPassword = await hashPassword(this.form.password);
-            const registerForm = {
-              username: this.form.username,
-              password: hashedPassword,
-            };
-            const { data: res } = await this.$http.post(
-              "/user/register",
-              registerForm
-            );
-            if (res.code !== 0)
-              return this.$notify({
-                title: "错误",
-                message: res.data,
-                type: "error",
-              });
-            this.$notify({
-              title: "成功",
-              message: "注册成功！",
-              type: "success",
-            });
-            this.$router.push({ path: "/login" });
-          } catch (err) {
-            console.error(err);
+        }
+        try {
+          const { hashPassword } = await import("../utils/crypto");
+          const hashedPassword = await hashPassword(this.form.password);
+          const registerForm = {
+            username: this.form.username,
+            password: hashedPassword,
+          };
+          const { data: res } = await this.$http.post(
+            "/user/register",
+            registerForm
+          );
+          if (res.code !== 0) {
             return this.$notify({
-              title: "错误",
-              message: "网络异常",
+              title: "Failed",
+              message: res.data || "Registration failed",
               type: "error",
             });
           }
+          this.$notify({
+            title: "Success",
+            message: "Account created successfully!",
+            type: "success",
+          });
+          this.$router.push({ path: "/login" });
+        } catch (err) {
+          console.error(err);
+          return this.$notify({
+            title: "Error",
+            message: "Network Error",
+            type: "error",
+          });
         }
       });
     },
-  },
-  mounted() {
-    if (localStorage.getItem("news")) {
-      this.form = JSON.parse(localStorage.getItem("news"));
-      this.checked = true;
-    }
   },
 };
 </script>
 
 <style scoped>
-.loginbody {
-  width: 100%;
-  height: 100%;
-  min-width: 1000px;
-  background-size: 100% 100%;
-  background-position: center center;
-  overflow: auto;
-  background-repeat: no-repeat;
+.login-page {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.login-wrapper {
   position: absolute;
   top: 0;
   left: 0;
-  line-height: 100%;
-  padding-top: 150px;
-}
-
-.logintext {
-  margin-bottom: 20px;
-  line-height: 50px;
-  text-align: center;
-  font-size: 30px;
-  font-weight: bolder;
-  color: white;
-  text-shadow: 2px 2px 4px #000000;
-}
-
-.logindata {
-  width: 400px;
-  height: 300px;
-  transform: translate(-50%);
-  margin-left: 50%;
-}
-
-.tool {
+  width: 100%;
+  height: 100%;
   display: flex;
-  justify-content: space-between;
-  color: #606266;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  padding: 20px;
 }
 
-.butt {
-  margin-top: 10px;
+.login-card {
+  width: 100%;
+  max-width: 480px;
+  padding: 50px 40px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  animation: slideIn 0.8s ease-out;
+}
+
+.login-header {
   text-align: center;
+  margin-bottom: 30px;
 }
 
-.shou {
-  cursor: pointer;
-  color: #606266;
+.logo-text {
+  font-size: 42px;
+  font-weight: 800;
+  letter-spacing: 4px;
+  background: linear-gradient(to right, #00f3ff, #ff007f);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  color: var(--text-muted);
+  font-size: 14px;
+  letter-spacing: 1px;
+}
+
+.input-label {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.login-btn {
+  width: 100%;
+  height: 54px;
+  border-radius: 12px !important;
+  font-size: 16px !important;
+  letter-spacing: 2px !important;
+  margin-top: 10px;
+}
+
+.register-hint {
+  text-align: center;
+  margin-top: 25px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.link-text {
+  color: var(--accent-cyan);
+  font-weight: 600;
+  text-decoration: none;
+  margin-left: 5px;
+}
+
+.link-text:hover {
+  color: var(--accent-pink);
+  text-shadow: 0 0 10px rgba(255, 0, 127, 0.3);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+:deep(.el-input__inner) {
+  height: 50px !important;
+  font-size: 15px !important;
+  padding-left: 15px !important;
 }
 </style>

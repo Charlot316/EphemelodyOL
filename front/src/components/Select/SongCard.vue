@@ -1,6 +1,6 @@
 <template>
   <router-link
-    :to="{ path: '/play', query: { songId: song.songInfo.songId } }"
+    :to="{ path: '/play', query: { songId: song.songInfo.songId, from: $route.path } }"
     class="card-link"
   >
     <div class="song-card glass" @mouseenter="mouseEnter = true" @mouseleave="mouseEnter = false">

@@ -15,7 +15,7 @@
               <el-input
                 v-model="form.username"
                 placeholder="Enter your account"
-                :prefix-icon="'el-icon-user'"
+                prefix-icon="User"
               ></el-input>
             </el-form-item>
             <el-form-item prop="password">
@@ -24,7 +24,7 @@
                 v-model="form.password"
                 placeholder="Enter your password"
                 show-password
-                :prefix-icon="'el-icon-lock'"
+                prefix-icon="Lock"
                 @keyup.enter="login()"
               ></el-input>
             </el-form-item>
