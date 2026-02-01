@@ -22,7 +22,7 @@
     <Result :loadingStatus="loadingStatus" :chart="chart" :global="global" />
     <el-dialog
       v-model="pauseVisible"
-      title="暂停"
+      :title="$t('play.pause')"
       top="30vh"
       :center="true"
       :show-close="false"

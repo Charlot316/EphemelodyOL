@@ -75,5 +75,10 @@
         "maxCombo": "Max Combo",
         "bestScore": "Best Score",
         "continue": "CONTINUE"
+    },
+    "play": {
+        "pause": "Pause",
+        "start": "START",
+        "loading": "LOADING..."
     }
 }

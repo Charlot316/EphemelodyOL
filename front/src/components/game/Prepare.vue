@@ -46,7 +46,7 @@
           style="width:150px;height:150px;line-height:150px;margin:20px auto;border-radius:50%;"
           @click="startMusic"
         >
-          {{ loadingStatus.canRun ? "开始" : "加载中" }}
+          {{ loadingStatus.canRun ? $t('play.start') : $t('play.loading') }}
         </div>
         <div
           class="loading-text"

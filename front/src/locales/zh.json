@@ -75,5 +75,10 @@
         "maxCombo": "最大连击",
         "bestScore": "历史最佳成绩",
         "continue": "继续"
+    },
+    "play": {
+        "pause": "暂停",
+        "start": "开始",
+        "loading": "加载中..."
     }
 }
