@@ -172,7 +172,7 @@ const getChart = async () => {
     chart.value = res.data;
     loadingStatus.chart = true;
     sortTrack();
-    generateImagePath();
+    // generateImagePath() is now handled inside BeatPlayer.vue
   } catch (err) {
     ElNotification({
       title: "错误",
@@ -221,15 +221,7 @@ const run = () => {
   ) {
     resize();
   }
-  if (global.notePainter) {
-    global.notePainter.clearRect(0, 0, global.noteCanvas.width, global.noteCanvas.height);
-  }
-  if (global.trackPainter) {
-    global.trackPainter.clearRect(0, 0, global.trackCanvas.width, global.trackCanvas.height);
-  }
-  if (global.judgePainter) {
-    global.judgePainter.clearRect(0, 0, global.judgeCanvas.width, global.judgeCanvas.height);
-  }
+  // Rendering is now handled by BeatPlayer.vue
   
   if (audio.value) {
     global.currentTime = Math.floor(audio.value.currentTime * 1000);
@@ -361,13 +353,6 @@ const reStart = () => {
 };
 
 onMounted(() => {
-  global.noteCanvas = document.getElementById("note-canvas");
-  global.trackCanvas = document.getElementById("track-canvas");
-  global.judgeCanvas = document.getElementById("judge-canvas");
-  global.notePainter = global.noteCanvas.getContext("2d");
-  global.trackPainter = global.trackCanvas.getContext("2d");
-  global.judgePainter = global.judgeCanvas.getContext("2d");
-  
   resize();
   window.onkeydown = (e) => {
     if (!e.repeat) {

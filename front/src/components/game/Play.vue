@@ -1,3 +1,4 @@
+<template>
   <div
     v-show="loadingStatus.runStart"
     v-if="!loadingStatus.finished"
@@ -23,13 +24,10 @@
       :style="{
         height: '200px',
         position: 'absolute',
+        top: '0px',
         left: '0px',
         width: global.screenWidth + 'px',
-        background: [
-          '-webkit-linear-gradient(90deg, rgba(0,0,0,0) 0, rgba(0,0,0,1) 100%)',
-          '-moz-linear-gradient(0deg, rgba(0,0,0,0) 0, rgba(0,0,0,1) 100%)',
-          'linear-gradient(0deg, rgba(0,0,0,0) 0, rgba(0,0,0,1) 100%)',
-        ],
+        background: 'linear-gradient(0deg, rgba(0,0,0,0) 0, rgba(0,0,0,1) 100%)',
         zIndex: 100
       }"
     >
@@ -90,8 +88,7 @@
                   : 'rgb(255, 255, 255)',
               ],
             }"
-            >{{ global.lostCount == 0 ? "⬥" : "⬦" }}</span
-          >
+          >{{ global.lostCount == 0 ? "⬥" : "⬦" }}</span>
           COMBO
           <span
             :style="{
@@ -103,8 +100,7 @@
                   : 'rgb(255, 255, 255)',
               ],
             }"
-            >{{ global.lostCount == 0 ? "⬥" : "⬦" }}</span
-          >
+          >{{ global.lostCount == 0 ? "⬥" : "⬦" }}</span>
         </div>
       </div>
     </div>

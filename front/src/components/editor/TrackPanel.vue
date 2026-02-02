@@ -49,7 +49,7 @@
         enter-active-class="animate__animated animate__fadeInUp"
         leave-active-class="animate__animated animate__fadeOutUp"
       >
-        <div v-for="trackItem in chart.tracks" :key="trackItem.index || trackItem.startTiming">
+        <div v-for="(trackItem, idx) in chart.tracks" :key="trackItem.trackId || ('panel-track-' + idx)">
           <transition
             name="flip-list"
             enter-active-class="animate__animated animate__fadeInUp"

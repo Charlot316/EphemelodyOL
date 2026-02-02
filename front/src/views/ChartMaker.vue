@@ -314,6 +314,8 @@ import MenuPanel from "@/components/editor/MenuPanel.vue";
 import TrackPanel from "@/components/editor/TrackPanel.vue";
 import Footer from "@/components/editor/Footer.vue";
 import "animate.css";
+import { useChartEditor } from '@/composables/useChartEditor';
+import { useBpmTool } from '@/composables/useBpmTool';
 
 const route = useRoute();
 const router = useRouter();
@@ -376,6 +378,24 @@ const globalSetting = ref(false);
 const footerHeight = ref(426);
 const form = reactive({});
 
+// Define functions before usage in composables to avoid TDZ issues
+function pause() {
+  playerRef.value?.pause();
+  isRunning.value = false;
+}
+
+function play() {
+  sliding.value = false;
+  isRunning.value = true;
+  playerRef.value?.play();
+}
+
+function changeVolume() {
+  // Volume is now handled via prop and watcher in BeatPlayer,
+  // but we keep the value in state.
+  volume.value = Math.max(0, Math.min(100, volume.value));
+}
+
 const {
   bpmStart,
   bpmcount,
@@ -383,8 +403,8 @@ const {
   calculatebpm,
   endbpm
 } = useBpmTool(chart, global, {
-  play: () => play(),
-  pause: () => pause(),
+  play,
+  pause,
   seek: (t) => playerRef.value?.seek(t)
 });
 
@@ -423,16 +443,7 @@ const SlideMouseUp = () => {
   }
 };
 
-const pause = () => {
-  playerRef.value?.pause();
-  isRunning.value = false;
-};
-
-const play = () => {
-  sliding.value = false;
-  isRunning.value = true;
-  playerRef.value?.play();
-};
+// Redundant declarations removed as they are moved up
 
 const reStart = () => {
   playerRef.value?.reStart();

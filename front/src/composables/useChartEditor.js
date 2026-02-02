@@ -11,6 +11,17 @@ export function useChartEditor(route, router) {
     changeBackgroundOperations: [],
     songLength: 0,
     bpm: 0,
+    beatsCount: 0,
+    firstBeatDelay: 0,
+    lastBeatDelay: 0,
+    songId: null,
+    songName: "",
+    songWriter: "",
+    uploader: "",
+    defaultBackground: null,
+    songUrl: "",
+    songCover: "",
+    difficulty: 0,
   });
 
   const displayStart = ref(0);

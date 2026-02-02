@@ -38,8 +38,8 @@
     <!-- 轨道组件层 -->
     <div
       class="track-container"
-      v-for="trackItem in chart.tracks"
-      :key="trackItem.trackId || trackItem.startTiming"
+      v-for="(trackItem, idx) in chart.tracks"
+      :key="trackItem.trackId || ('track-' + idx)"
     >
       <Track
         :Track="trackItem"
@@ -63,7 +63,7 @@
     <audio
       ref="audioRef"
       preload="auto"
-      :src="chart.songUrl"
+      :src="normalizeUrl(chart.songUrl)"
       style="display:none"
       @canplaythrough="handleAudioLoaded"
     />
@@ -180,6 +180,19 @@ const selectedTrackOverlayStyle = computed(() => {
   };
 });
 
+// URL 规格化：处理旧谱面中的硬编码域名
+const normalizeUrl = (url) => {
+  if (!url) return "";
+  if (url.includes("pic.mcatk.com")) {
+    // 将旧域名替换为当前后端的访问地址
+    // 假设后端直接映射了文件名到根目录或特定路径
+    const fileName = url.split('/').pop();
+    // 这里使用相对路径或拼接当前的后端 baseURL
+    return "http://localhost:8090/" + fileName;
+  }
+  return url;
+};
+
 // 方法
 const resize = () => {
   const container = document.getElementById(props.playerId);
@@ -219,15 +232,27 @@ const generateImagePath = () => {
   
   let end = ops.length === 0 ? songLen : (ops.sort((a,b) => a.startTime - b.startTime), ops[0].startTime || songLen);
   
-  imagePath.value.push({ url: props.chart.defaultBackground, startTime: 0, endTime: end });
+  imagePath.value.push({ 
+    url: normalizeUrl(props.chart.defaultBackground), 
+    startTime: 0, 
+    endTime: end 
+  });
   
   ops.forEach((op, i) => {
     const start = op.startTime;
     if (i !== ops.length - 1) {
       const nextStart = ops[i+1].startTime;
-      imagePath.value.push({ url: op.background, startTime: start, endTime: nextStart });
+      imagePath.value.push({ 
+        url: normalizeUrl(op.background), 
+        startTime: start, 
+        endTime: nextStart 
+      });
     } else {
-      imagePath.value.push({ url: op.background, startTime: start, endTime: songLen + 1000 });
+      imagePath.value.push({ 
+        url: normalizeUrl(op.background), 
+        startTime: start, 
+        endTime: songLen + 1000 
+      });
     }
   });
 };
@@ -360,18 +385,25 @@ onMounted(() => {
   document.addEventListener('keydown', handleKeyDown);
   document.addEventListener('keyup', handleKeyUp);
   
-  // 自动重绘逻辑：如果外部时间变化
-  watch(() => props.externalTime, (newTime) => {
-    if (newTime !== null && !isRunning.value) {
-      seek(newTime);
+  // 自动重绘和音频同步：当非播放状态下 currentTime 改变时
+  watch(() => global.currentTime, (newTime) => {
+    if (!isRunning.value) {
+      if (audioRef.value) {
+        const diff = Math.abs(audioRef.value.currentTime * 1000 - newTime);
+        if (diff > 100) { // 阈值加大，减少过于频繁的音频 seek
+          audioRef.value.currentTime = newTime / 1000;
+        }
+      }
+      // 不要在 watcher 里直接调研可能触发深度更新的操作，改用 nextTick 或更加粒度的控制
+      repaint();
     }
   });
 
-  watch(() => props.chart, () => {
+  watch(() => props.chart.songId, () => {
     generateImagePath();
     resetTrackStates();
     repaint();
-  }, { deep: true });
+  });
 
   watch(() => props.volume, (newVol) => {
     if (audioRef.value) {

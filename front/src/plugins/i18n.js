@@ -3,7 +3,7 @@ import en from '../locales/en.json'
 import zh from '../locales/zh.json'
 
 const i18n = createI18n({
-  legacy: false, // Vue 3
+  legacy: true, // Enable legacy mode for Options API ($t)
   locale: localStorage.getItem('lang') || 'zh',
   fallbackLocale: 'en',
   messages: {
