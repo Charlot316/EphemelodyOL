@@ -112,9 +112,7 @@ const newOperation = () => {
     props.chart.changeBackgroundOperations.push(op);
     updateOperation();
     
-    setTimeout(() => {
-      document.querySelector("#backgroundOperation0")?.scrollIntoView({ behavior: "smooth" });
-    }, 50);
+    document.querySelector("#backgroundOperation0")?.scrollIntoView({ behavior: "auto" });
   } else {
     ElNotification({
       title: "提示",
@@ -123,7 +121,7 @@ const newOperation = () => {
     });
     const editIndex = props.chart.changeBackgroundOperations.findIndex(op => op.edit);
     if (editIndex !== -1) {
-      document.querySelector("#backgroundOperation" + editIndex)?.scrollIntoView({ behavior: "smooth" });
+      document.querySelector("#backgroundOperation" + editIndex)?.scrollIntoView({ behavior: "auto" });
     }
   }
 };
@@ -134,9 +132,7 @@ watch(() => props.global.currentTime, (newVal) => {
     const index = ops.findIndex(op => newVal > op.startTime && newVal < op.endTime);
     if (index !== -1) {
       const scrollIndex = Math.max(0, index - 1);
-      setTimeout(() => {
-        document.querySelector("#backgroundOperation" + ops[scrollIndex].index)?.scrollIntoView({ behavior: "smooth" });
-      }, 200);
+      document.querySelector("#backgroundOperation" + ops[scrollIndex].index)?.scrollIntoView({ behavior: "auto" });
     }
   }
 });

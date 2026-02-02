@@ -1,187 +1,113 @@
 <template>
-  <div :class="currentClass" @dblclick="handleCurrentTrack">
-    <div
-      style="width:100%;display: flex;justify-content: space-between;border: none;"
-    >
+  <div :class="[currentClass, 'track-row-container']">
+    <div class="glass-card" @dblclick="handleCurrentTrack">
+      <!-- Spatial Indicator Bar (Spatial Preview) -->
       <div
-        style="width: 70px;height:70px;border-radius: 5px;position:relative;pointer-events: none;"
-      >
-        <el-image
-          style="position:absolute;top:0;left:0;width: 70px;height:70px;border-radius: 5px;"
-          :src="trackImage"
-          fit="fit"
-          class="image"
-        />
-        <div
-          style="position:absolute;top:0;left:0;width: 70px;height:70px;border-radius: 5px;
-        text-align:center; line-height: 70px; color:white; text-shadow:2px 2px 5px black; font-size: 50px;"
-        >
-          {{ track.type == 1 ? track.key?.toUpperCase() : "虚" }}
-        </div>
-        <div
-          v-if="
-            global.currentTime > track.startTiming &&
-              global.currentTime < track.endTiming
-          "
-          :style="{
-            position: 'absolute',
-            height: '70px',
-            top: 0,
-            left: (track.tempPositionX - track.tempWidth) * 160 + 75 + 'px',
-            width: 2 * track.tempWidth * 160 + 'px',
-            background:
-              'rgba(' +
-              track.tempR +
-              ',' +
-              track.tempG +
-              ',' +
-              track.tempB +
-              ',0.5)',
-          }"
-        ></div>
-      </div>
-      <div style="width:calc(100% - 80px);">
-        <div
-          style="width:100%;height:20px; display: flex;justify-content: space-between; align-items: center;line-height: 20px;"
-        >
-          <div style="font-weight:800">轨道{{ track.index + 1 }}</div>
-          <div style="display: flex; align-items: center;">
-            <el-tooltip
-              class="item"
-              effect="dark"
-              :content="
-                track.showInTimeline ? '在时间轴中隐去' : '在时间轴中显示'
-              "
-              placement="top"
-            >
-              <el-button
-                type="text"
-                class="hide-button"
-                @click="track.showInTimeline = !track.showInTimeline"
-              >
-                <el-icon><component :is="track.showInTimeline ? 'Minus' : 'View'" /></el-icon>
-              </el-button>
-            </el-tooltip>
-            <el-button
-              v-if="!track.edit"
-              type="text"
-              class="edit-button"
-              @click="startEdit"
-            >
-              <el-icon><Setting /></el-icon>
-            </el-button>
-            <el-button
-              v-if="track.edit && !track.isNew"
-              type="text"
-              class="cancel-button"
-              @click="track.edit = false"
-            >
-              <el-icon><CircleClose /></el-icon>
-            </el-button>
-            <el-button
-              v-if="track.edit"
-              type="text"
-              class="ok-button"
-              @click="saveTrack"
-            >
-              <el-icon><CircleCheck /></el-icon>
-            </el-button>
-            <el-button
-              type="text"
-              class="delete-button"
-              @click="deleteTrack"
-            >
-              <el-icon><Delete /></el-icon>
-            </el-button>
+        v-if="global.currentTime > track.startTiming && global.currentTime < track.endTiming"
+        class="spatial-indicator"
+        :style="{
+          left: (track.tempPositionX - track.tempWidth) * 160 + 75 + 'px',
+          width: 2 * track.tempWidth * 160 + 'px',
+          background: `rgba(${track.tempR}, ${track.tempG}, ${track.tempB}, 0.6)`
+        }"
+      ></div>
+
+      <div class="card-header">
+        <div class="thumbnail-container">
+          <img :src="trackImage" class="thumbnail-img" alt="track-preview" />
+          <div class="key-overlay">
+            {{ track.type == 1 ? track.key?.toUpperCase() : "虚" }}
           </div>
         </div>
-        <div style="width:100%;margin-top:10px;">
-          <h4>时机 {{ track.startTiming }}</h4>
+
+        <div class="info-side">
+          <div class="title-row">
+            <div class="track-index">轨道 {{ track.index + 1 }}</div>
+            <div class="action-buttons">
+              <button
+                class="icon-btn"
+                :title="track.showInTimeline ? '轴上隐藏' : '轴上显示'"
+                @click.stop="track.showInTimeline = !track.showInTimeline"
+                :class="{ 'dimmed': !track.showInTimeline }"
+              >
+                <component :is="track.showInTimeline ? 'View' : 'Hide'" class="svg-icon" />
+              </button>
+              
+              <button v-if="!track.edit" class="icon-btn" @click.stop="startEdit" title="编辑">
+                <Setting class="svg-icon" />
+              </button>
+              
+              <button v-if="track.edit && !track.isNew" class="icon-btn" @click.stop="track.edit = false" title="取消">
+                <CircleClose class="svg-icon" />
+              </button>
+              
+              <button v-if="track.edit" class="icon-btn save" @click.stop="saveTrack" title="保存">
+                <CircleCheck class="svg-icon" />
+              </button>
+              
+              <button class="icon-btn delete" @click.stop="deleteTrack" title="删除">
+                <Delete class="svg-icon" />
+              </button>
+            </div>
+          </div>
+          <div class="timing-info">
+            <span class="label">TIMING</span>
+            <span class="value">{{ track.startTiming }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div v-if="track.edit" class="edit-form-scrollable animate__animated animate__fadeIn">
+        <div class="form-vertical-layout">
+          <div class="form-item">
+            <label>轨道类别</label>
+            <div class="custom-radio-group">
+              <label class="radio-label">
+                <input type="radio" v-model="tempTrack.type" :value="0" />
+                <span>虚轨</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" v-model="tempTrack.type" :value="1" />
+                <span>实轨</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-item">
+            <label>映射按键</label>
+            <input type="text" v-model="tempTrack.key" class="custom-input" @keydown.enter="saveTrack" />
+          </div>
+
+          <div class="form-item">
+            <label>开始时机 (ms)</label>
+            <input type="number" v-model.number="tempTrack.startTiming" class="custom-input" @keydown.enter="saveTrack" />
+          </div>
+
+          <div class="form-item">
+            <label>结束时机 (ms)</label>
+            <input type="number" v-model.number="tempTrack.endTiming" class="custom-input" @keydown.enter="saveTrack" />
+          </div>
+
+          <div class="form-item">
+            <label>横坐标 (X-Offset)</label>
+            <input type="number" step="0.01" v-model.number="tempTrack.positionX" class="custom-input" @keydown.enter="saveTrack" />
+          </div>
+
+          <div class="form-item">
+            <label>宽度 (Width)</label>
+            <input type="number" step="0.01" v-model.number="tempTrack.width" class="custom-input" @keydown.enter="saveTrack" />
+          </div>
+
+          <div class="form-item">
+            <label>主题色彩</label>
+            <div class="color-picker-row">
+               <input type="color" v-model="tempTrack.hexColor" class="custom-color-input" @change="onColorChange" />
+               <input type="text" v-model="tempTrack.hexColor" class="custom-input hex-input" @change="onColorChange" />
+            </div>
+          </div>
         </div>
       </div>
     </div>
-    <transition
-      name="flip-list"
-      enter-active-class="animate__animated animate__fadeInDown"
-      leave-active-class="animate__animated animate__fadeOutUp"
-    >
-      <div v-show="track.edit" style="margin-top:20px;">
-        <el-form
-          :model="tempTrack"
-          :rules="rules"
-          ref="formRef"
-          @submit.prevent="saveTrack"
-        >
-          <el-form-item label="轨道类别" label-width="80px" prop="type">
-            <el-radio-group
-              v-model="tempTrack.type"
-              style="width:130px;line-height: 20px;"
-            >
-              <el-radio :label="0">虚轨</el-radio>
-              <el-radio :label="1">实轨</el-radio>
-            </el-radio-group>
-
-            <el-tooltip
-              class="item"
-              effect="dark"
-              content="设置轨道的类别"
-              placement="top-start"
-            >
-               <el-icon style="margin-left: 10px;"><QuestionFilled /></el-icon>
-            </el-tooltip>
-          </el-form-item>
-          <el-form-item label="按键" label-width="80px" prop="key">
-            <el-input
-              @keydown.enter="saveTrack"
-              v-model="tempTrack.key"
-              style="width:130px"
-            />
-            <el-tooltip
-              class="item"
-              effect="dark"
-              content="设置轨道的按键"
-              placement="top-start"
-            >
-               <el-icon style="margin-left: 10px;"><QuestionFilled /></el-icon>
-            </el-tooltip>
-          </el-form-item>
-          <el-form-item label="开始时机" label-width="100px" prop="startTiming">
-            <el-input
-              @keydown.enter="saveTrack"
-              v-model="tempTrack.startTiming"
-              style="width:130px"
-            />
-          </el-form-item>
-          <el-form-item label="结束时机" label-width="100px" prop="endTiming">
-            <el-input
-              @keydown.enter="saveTrack"
-              v-model="tempTrack.endTiming"
-              style="width:130px"
-            />
-          </el-form-item>
-          <el-form-item label="横坐标" label-width="80px" prop="positionX">
-            <el-input
-              @keydown.enter="saveTrack"
-              v-model="tempTrack.positionX"
-              style="width:130px"
-            />
-          </el-form-item>
-          <el-form-item label="宽度" label-width="80px" prop="width">
-            <el-input
-              @keydown.enter="saveTrack"
-              v-model="tempTrack.width"
-              style="width:130px"
-            />
-          </el-form-item>
-          <el-form-item label="默认颜色" label-width="80px" prop="color">
-            <el-color-picker
-              v-model="tempTrack.color"
-              color-format="rgb"
-            />
-          </el-form-item>
-        </el-form>
-      </div>
-    </transition>
   </div>
 </template>
 
@@ -254,12 +180,34 @@ const updateTrack = () => {
   props.global.reCalculateChartMaker = !props.global.reCalculateChartMaker;
 };
 
+const rgbToHex = (r, g, b) => {
+  return "#" + ((1 << 24) + (parseInt(r) << 16) + (parseInt(g) << 8) + parseInt(b)).toString(16).slice(1);
+};
+
+const hexToRgb = (hex) => {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : null;
+};
+
+const onColorChange = () => {
+  const rgb = hexToRgb(tempTrack.hexColor);
+  if (rgb) {
+    tempTrack.R = rgb.r;
+    tempTrack.G = rgb.g;
+    tempTrack.B = rgb.b;
+  }
+};
+
 const startEdit = () => {
   props.track.edit = true;
-  document.querySelector("#trackCard" + props.track.index)?.scrollIntoView({ behavior: "smooth" });
+  document.querySelector("#trackCard" + props.track.index)?.scrollIntoView({ behavior: "auto" });
   Object.assign(tempTrack, JSON.parse(JSON.stringify(props.track)));
   tempTrack.key = tempTrack.key?.toUpperCase();
-  tempTrack.color = `rgb(${props.track.R},${props.track.G},${props.track.B})`;
+  tempTrack.hexColor = rgbToHex(props.track.R, props.track.G, props.track.B);
 };
 
 const handleCurrentTrack = () => {
@@ -268,22 +216,20 @@ const handleCurrentTrack = () => {
 };
 
 const saveTrack = () => {
-  formRef.value.validate((valid) => {
-    if (valid) {
-      setTimeout(updateTrack, 500);
-      Object.assign(props.track, tempTrack);
-      props.track.key = props.track.key.toUpperCase();
-      const rgb = tempTrack.color.match(/\d+/g);
-      if (rgb) {
-        props.track.R = rgb[0];
-        props.track.G = rgb[1];
-        props.track.B = rgb[2];
-      }
-      props.track.edit = false;
-      if (props.track.isNew) emit("editStatus", true);
-      props.track.isNew = false;
-    }
-  });
+  // Simple validation
+  if (!tempTrack.key || tempTrack.key.length !== 1) {
+    ElNotification({ title: "错误", message: "按键必须为单个字母", type: "error" });
+    return;
+  }
+  
+  Object.assign(props.track, tempTrack);
+  props.track.key = props.track.key.toUpperCase();
+  props.track.edit = false;
+  if (props.track.isNew) emit("editStatus", true);
+  props.track.isNew = false;
+  
+  // Real-time update, no debounce
+  updateTrack();
 };
 
 const deleteTrack = () => {
@@ -303,69 +249,279 @@ onMounted(() => {
   if (props.track.isNew) {
      props.track.showInTimeline = true;
   }
+  // Initialize tempTrack to avoid empty inputs before first edit
+  Object.assign(tempTrack, JSON.parse(JSON.stringify(props.track)));
+  tempTrack.hexColor = rgbToHex(props.track.R, props.track.G, props.track.B);
 });
 </script>
 
 <style scoped>
-.not-edit-track {
-  height: 70px;
-  width: calc(100% - 30px);
-  margin: 10px;
+.track-row-container {
+  height: 90px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 10px;
+  transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.track-row-container.edit-track {
+  height: 525px;
+  align-items: flex-start;
+  padding-top: 8px;
+}
+
+.glass-card {
+  width: 100%;
+  height: 100%;
+  background: rgba(45, 45, 45, 0.45);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 10px 12px;
+  box-sizing: border-box;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: visible; /* Crucial for spatial indicator */
+}
+
+.track-row-container:hover .glass-card {
+  background: rgba(55, 55, 55, 0.6);
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+}
+
+.current-track .glass-card {
+  border-color: rgba(64, 158, 255, 0.4);
+  background: rgba(60, 60, 60, 0.6);
+  box-shadow: 0 0 15px rgba(64, 158, 255, 0.1);
+}
+
+/* Spatial Indicator Bar */
+.spatial-indicator {
+  position: absolute;
+  height: 2px;
+  bottom: 0px;
+  z-index: 100;
+  pointer-events: none;
+  border-radius: 1px;
+  box-shadow: 0 0 8px rgba(255,255,255,0.3);
+}
+
+.card-header {
+  display: flex;
+  gap: 14px;
+  height: 60px;
+  align-items: center;
+}
+
+.thumbnail-container {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #111;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.thumbnail-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.glass-card:hover .thumbnail-img {
+  transform: scale(1.05);
+}
+
+.key-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 26px;
+  font-weight: 900;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+  background: rgba(0,0,0,0.15);
+}
+
+.info-side {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+}
+
+.title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.track-index {
+  font-size: 13px;
+  font-weight: 700;
+  color: #efefef;
+  text-transform: uppercase;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 4px;
+}
+
+.icon-btn {
+  background: rgba(255,255,255,0.03);
+  border: none;
+  cursor: pointer;
   padding: 5px;
-  border-radius: 5px;
-  transition: 0.5s;
-}
-.edit-track {
-  height: 505px;
-  width: calc(100% - 30px);
-  margin: 10px;
-  padding: 5px;
-  border-radius: 5px;
-  transition: 0.5s;
-}
-.hide-button { color: rgb(218, 218, 218); }
-.hide-button:hover { color: rgb(239, 239, 239); }
-.hide-button:active { color: rgb(183, 183, 183); }
-.delete-button { color: #f56c6c; }
-.delete-button:hover { color: #f89898; }
-.delete-button:active { color: #c45656; }
-.ok-button { color: #67c23a; }
-.ok-button:hover { color: #95d475; }
-.ok-button:active { color: #529b2e; }
-.cancel-button { color: #909399; }
-.cancel-button:hover { color: #b1b3b8; }
-.cancel-button:active { color: #73767a; }
-
-.current-track {
-  background: rgb(47, 47, 47);
-  color: rgb(171, 171, 171);
-  box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.5);
-  transition: 0.5s;
+  border-radius: 6px;
+  color: #999;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-:deep(.current-track .el-form-item__label) {
-  color: rgb(171, 171, 171);
+.icon-btn:hover {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
 }
 
-.passed-track {
-  background: rgb(30, 30, 30);
-  color: rgb(100, 100, 100);
-  box-shadow: 0 0 0px 0px rgba(127, 127, 127, 0.5);
-  transition: 0.5s;
+.icon-btn.delete:hover { color: #ff5e5e; }
+.icon-btn.save:hover { color: #2ecc71; }
+.icon-btn.dimmed { opacity: 0.3; }
+
+.svg-icon {
+  width: 15px;
+  height: 15px;
 }
 
-:deep(.passed-track .el-form-item__label) {
-  color: rgb(171, 171, 171);
+.timing-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  color: #777;
+  font-weight: 500;
 }
 
-.to-come-track {
-  background: #2f2f2f;
-  color: rgb(171, 171, 171);
-  box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.5);
-  transition: 0.5s;
+.timing-info .value {
+  color: #51cf66;
+  font-family: 'Consolas', monospace;
 }
 
-:deep(.to-come-track .el-form-item__label) {
-  color: rgb(171, 171, 171);
+/* Scrollable Single Column Form */
+.edit-form-scrollable {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  height: calc(100% - 75px);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.edit-form-scrollable::-webkit-scrollbar {
+  width: 4px;
+}
+
+.edit-form-scrollable::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.1);
+  border-radius: 2px;
+}
+
+.form-vertical-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 2px;
+}
+
+.form-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.form-item label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.custom-input {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  color: #eee;
+  padding: 8px 10px;
+  font-size: 12px;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.custom-input:focus {
+  border-color: rgba(64, 158, 255, 0.4);
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.custom-radio-group {
+  display: flex;
+  gap: 14px;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #bbb;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.color-picker-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.custom-color-input {
+  appearance: none;
+  -webkit-appearance: none;
+  border: none;
+  width: 38px;
+  height: 32px;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.custom-color-input::-webkit-color-swatch-wrapper { padding: 0; }
+.custom-color-input::-webkit-color-swatch { border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 6px; }
+
+.hex-input { font-family: monospace; font-size: 11px; }
+
+/* Animation overrides */
+.animate__animated {
+  --animate-duration: 0.4s;
 }
 </style>

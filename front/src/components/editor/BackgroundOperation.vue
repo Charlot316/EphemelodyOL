@@ -1,134 +1,74 @@
 <template>
-  <div :class="currentClass">
-    <div
-      style="width:100%;display: flex;justify-content: space-between;border: none;"
-    >
-      <div>
-        <el-image
-          style="width: 70px;height:70px;border-radius: 5px;"
-          :src="operation.background"
-          fit="fit"
-          class="image"
-          :preview-src-list="[operation.background]"
-        />
+  <div :class="currentClass" class="glass-card">
+    <div class="card-header">
+      <div class="thumbnail-container">
+        <img :src="operation.background" class="thumbnail-img" alt="bg-preview" />
       </div>
-      <div style="width:calc(100% - 80px);">
-        <div
-          style="width:100%;height:20px; display: flex;justify-content: space-between; align-items: center;line-height: 20px;"
-        >
-          <div style="font-weight:800">操作{{ operation.index + 1 }}</div>
-          <div style="display: flex; align-items: center;">
-            <el-button
-              v-if="!operation.edit"
-              type="text"
-              class="edit-button"
-              @click="startEdit"
-            >
-              <el-icon><Setting /></el-icon>
-            </el-button>
-            <el-button
-              v-if="operation.edit && !operation.isNew"
-              type="text"
-              class="cancel-button"
-              @click="operation.edit = false"
-            >
-              <el-icon><CircleClose /></el-icon>
-            </el-button>
-            <el-button
-              v-if="operation.edit"
-              type="text"
-              class="ok-button"
-              @click="saveOperation"
-            >
-              <el-icon><CircleCheck /></el-icon>
-            </el-button>
-            <el-button
-              type="text"
-              class="delete-button"
-              @click="deleteOperation"
-            >
-              <el-icon><Delete /></el-icon>
-            </el-button>
+
+      <div class="info-side">
+        <div class="title-row">
+          <div class="op-index">操作 {{ operation.index + 1 }}</div>
+          <div class="action-buttons">
+            <button v-if="!operation.edit" class="icon-btn edit" @click.stop="startEdit" title="编辑">
+              <Setting class="svg-icon" />
+            </button>
+            
+            <button v-if="operation.edit && !operation.isNew" class="icon-btn cancel" @click.stop="operation.edit = false" title="取消">
+              <CircleClose class="svg-icon" />
+            </button>
+            
+            <button v-if="operation.edit" class="icon-btn save" @click.stop="saveOperation" title="保存">
+              <CircleCheck class="svg-icon" />
+            </button>
+            
+            <button class="icon-btn delete" @click.stop="deleteOperation" title="删除">
+              <Delete class="svg-icon" />
+            </button>
           </div>
         </div>
-        <div style="width:100%;margin-top:10px;">
-          <h4>时机 {{ operation.startTime }}</h4>
+        <div class="timing-row">
+          <span class="label">时机</span>
+          <span class="value">{{ operation.startTime }}</span>
         </div>
       </div>
     </div>
-    <transition
-      name="flip-list"
-      enter-active-class="animate__animated animate__fadeInDown"
-      leave-active-class="animate__animated animate__fadeOutUp"
-    >
-      <div v-show="operation.edit">
-        <el-form
-          :model="tempOperation"
-          :rules="rules"
-          ref="formRef"
-          @submit.prevent="saveOperation"
-        >
-          <el-form-item label="时机" label-width="80px" prop="startTime">
-            <el-input
-              @keydown.enter="saveOperation"
-              v-model="tempOperation.startTime"
-              style="width:100px"
-            />
-            <el-tooltip
-              class="item"
-              effect="dark"
-              content="设置操作的时机"
-              placement="top-start"
-            >
-               <el-icon style="margin-left: 10px;"><QuestionFilled /></el-icon>
-            </el-tooltip>
-          </el-form-item>
-          <el-form-item label="背景" label-width="80px" prop="background">
-            <el-input
-              @keydown.enter="saveOperation"
-              v-model="tempOperation.background"
-              style="width:100px"
-            />
-            <el-tooltip
-              class="item"
-              effect="dark"
-              content="输入背景图片的url"
-              placement="top-start"
-            >
-               <el-icon style="margin-left: 10px;"><QuestionFilled /></el-icon>
-            </el-tooltip>
-          </el-form-item>
-          <el-form-item label="手动上传" label-width="80px">
-            <el-upload
-              class="upload-demo"
-              action="/api/chart/uploadBackground"
-              :with-credentials="true"
-              name="background"
-              :data="{
-                songId: $route.query.songId,
-                startTime: tempOperation.startTime,
-              }" 
-              :on-success="handleUploadSuccess"
-              :disabled="!tempOperation.startTime"
-            >
-              <el-button
-                size="small"
-                :disabled="!tempOperation.startTime"
-              >
-                {{ !tempOperation.startTime ? "请先填写时机" : "点击上传" }}
-              </el-button>
-            </el-upload>
-          </el-form-item>
-        </el-form>
+
+    <div v-if="operation.edit" class="edit-form animate__animated animate__fadeInDown">
+      <div class="form-grid">
+        <div class="form-item full">
+          <label>触发时机</label>
+          <input type="number" v-model.number="tempOperation.startTime" class="custom-input" @keydown.enter="saveOperation" />
+        </div>
+
+        <div class="form-item full">
+          <label>背景 URL</label>
+          <input type="text" v-model="tempOperation.background" class="custom-input" @keydown.enter="saveOperation" />
+        </div>
+
+        <div class="form-item full">
+          <label>更换背景</label>
+          <div class="upload-area">
+             <label class="upload-btn" :class="{ disabled: !tempOperation.startTime }">
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  @change="handleFileChange" 
+                  :disabled="!tempOperation.startTime"
+                />
+                <span>{{ !tempOperation.startTime ? '请先填写时机' : '点击上传本地图片' }}</span>
+             </label>
+          </div>
+        </div>
       </div>
-    </transition>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, reactive, computed, defineProps, defineEmits } from 'vue';
-import { Setting, CircleClose, CircleCheck, Delete, QuestionFilled } from '@element-plus/icons-vue';
+import { Setting, CircleClose, CircleCheck, Delete } from '@element-plus/icons-vue';
 import { ElMessageBox, ElNotification } from 'element-plus';
+import axios from 'axios';
 
 const props = defineProps({
   operation: Object,
@@ -138,40 +78,16 @@ const props = defineProps({
 
 const emit = defineEmits(["editStatus"]);
 
-const formRef = ref(null);
 const tempOperation = reactive({});
-
-const checkStartTime = (rule, value, callback) => {
-  if (!value && value !== 0) {
-    return callback(new Error("时机不能为空"));
-  }
-  const val = parseFloat(value);
-  if (isNaN(val)) {
-    callback(new Error("请输入数字值"));
-  } else {
-    if (val < 0) {
-      callback(new Error("时机不能小于0"));
-    } else if (val > props.chart.songLength) {
-      callback(new Error("时机不能超过歌曲长度"));
-    } else {
-      callback();
-    }
-  }
-};
-
-const rules = {
-  startTime: [{ required: true, validator: checkStartTime, trigger: "blur" }],
-  background: [{ required: true, message: '背景不能为空', trigger: "blur" }],
-};
 
 const currentClass = computed(() => {
   let cls = props.operation.edit ? "edit " : "not-edit ";
   const { currentTime } = props.global;
   const { startTime, endTime } = props.operation;
   
-  if (currentTime > startTime && currentTime < endTime) {
+  if (currentTime > startTime && currentTime < (endTime || Infinity)) {
     cls += "current-operation";
-  } else if (currentTime > endTime) {
+  } else if (currentTime > (endTime || Infinity)) {
     cls += "passed-operation";
   } else {
     cls += "to-come-operation ";
@@ -188,22 +104,42 @@ const startEdit = () => {
   Object.assign(tempOperation, JSON.parse(JSON.stringify(props.operation)));
 };
 
-const handleUploadSuccess = (response) => {
-  tempOperation.background = response.data.background;
-  ElNotification({ title: "上传成功", message: "图片已上传至服务器", type: "success" });
-  saveOperation();
+const handleFileChange = async (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const formData = new FormData();
+  formData.append('background', file);
+  formData.append('songId', props.chart.songId);
+  formData.append('startTime', tempOperation.startTime);
+
+  try {
+    const response = await axios.post('/api/chart/uploadBackground', formData, {
+      withCredentials: true,
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    
+    if (response.data.code === 0) {
+      tempOperation.background = response.data.data.background;
+      ElNotification({ title: "上传成功", message: "图片已上传", type: "success" });
+      saveOperation();
+    }
+  } catch (err) {
+    ElNotification({ title: "错误", message: "上传失败", type: "error" });
+  }
 };
 
 const saveOperation = () => {
-  formRef.value.validate((valid) => {
-    if (valid) {
-      setTimeout(updateOperation, 500);
-      emit("editStatus", true);
-      Object.assign(props.operation, tempOperation);
-      props.operation.edit = false;
-      props.operation.isNew = false;
-    }
-  });
+  if (tempOperation.startTime === undefined || tempOperation.startTime === '') {
+    ElNotification({ title: "错误", message: "请填写时机", type: "error" });
+    return;
+  }
+  
+  updateOperation();
+  emit("editStatus", true);
+  Object.assign(props.operation, tempOperation);
+  props.operation.edit = false;
+  props.operation.isNew = false;
 };
 
 const deleteOperation = () => {
@@ -221,61 +157,174 @@ const deleteOperation = () => {
 </script>
 
 <style scoped>
-.not-edit {
-  height: 70px;
-  width: calc(100% - 30px);
-  margin: 10px;
-  padding: 5px;
-  border-radius: 5px;
-  transition: 0.5s;
-}
-.edit {
-  height: 270px;
-  width: calc(100% - 30px);
-  margin: 10px;
-  padding: 5px;
-  border-radius: 5px;
-  transition: 0.5s;
-}
-.current-operation {
-  background: rgb(47, 47, 47);
-  color: rgb(171, 171, 171);
-  box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.5);
-  transition: 0.5s;
+.glass-card {
+  box-sizing: border-box;
+  background: rgba(35, 35, 35, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  margin: 5px 12px;
+  padding: 5px 12px;
+  height: 80px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
-:deep(.current-operation .el-form-item__label) {
-  color: rgb(171, 171, 171);
+.glass-card:hover {
+  background: rgba(60, 60, 60, 0.7);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.edit.glass-card {
+  height: 300px; /* Refined expanded height */
+}
+
+.current-operation {
+  border-color: rgba(64, 158, 255, 0.6);
+  box-shadow: 0 0 15px rgba(64, 158, 255, 0.2);
 }
 
 .passed-operation {
-  background: rgb(30, 30, 30);
-  color: rgb(100, 100, 100);
-  box-shadow: 0 0 0px 0px rgba(127, 127, 127, 0.5);
-  transition: 0.5s;
+  opacity: 0.6;
 }
 
-:deep(.passed-operation .el-form-item__label) {
-  color: rgb(171, 171, 171);
+.card-header {
+  display: flex;
+  gap: 12px;
 }
 
-.to-come-operation {
-  background: #2f2f2f;
-  color: rgb(171, 171, 171);
-  box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.5);
-  transition: 0.5s;
+.thumbnail-container {
+  width: 70px;
+  height: 70px;
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #1a1a1a;
 }
 
-:deep(.to-come-operation .el-form-item__label) {
-  color: rgb(171, 171, 171);
+.thumbnail-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
-.delete-button { color: #f56c6c; }
-.delete-button:hover { color: #f89898; }
-.delete-button:active { color: #c45656; }
-.ok-button { color: #67c23a; }
-.ok-button:hover { color: #95d475; }
-.ok-button:active { color: #529b2e; }
-.cancel-button { color: #909399; }
-.cancel-button:hover { color: #b1b3b8; }
-.cancel-button:active { color: #73767a; }
+
+.info-side {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.op-index {
+  font-size: 14px;
+  font-weight: 600;
+  color: #eee;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 4px;
+}
+
+.icon-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  color: #999;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.icon-btn:hover {
+  background: rgba(255,255,255,0.1);
+  color: white;
+}
+
+.svg-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.timing-row {
+  font-size: 13px;
+  color: #aaa;
+}
+
+.timing-row .value {
+  color: #fff;
+  margin-left: 8px;
+  font-family: monospace;
+}
+
+.edit-form {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.form-item label {
+  font-size: 12px;
+  color: #888;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.custom-input {
+  width: 100%;
+  box-sizing: border-box;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: white;
+  padding: 8px 10px;
+  font-size: 13px;
+  outline: none;
+}
+
+.upload-area {
+  width: 100%;
+}
+
+.upload-btn {
+  display: block;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  padding: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 13px;
+  color: #bbb;
+}
+
+.upload-btn:hover:not(.disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.4);
+  color: white;
+}
+
+.upload-btn input {
+  display: none;
+}
+
+.upload-btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 </style>

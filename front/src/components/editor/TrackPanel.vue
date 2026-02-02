@@ -129,9 +129,7 @@ const newTrack = () => {
     props.global.timeSort = true;
     updateOperation();
     
-    setTimeout(() => {
-      document.querySelector("#trackCard0")?.scrollIntoView({ behavior: "smooth" });
-    }, 50);
+    document.querySelector("#trackCard0")?.scrollIntoView({ behavior: "auto" });
   } else {
     ElNotification({
       title: "提示",
@@ -140,7 +138,7 @@ const newTrack = () => {
     });
     const editIndex = props.chart.tracks.findIndex(t => t.edit);
     if (editIndex !== -1) {
-      document.querySelector("#trackCard" + editIndex)?.scrollIntoView({ behavior: "smooth" });
+      document.querySelector("#trackCard" + editIndex)?.scrollIntoView({ behavior: "auto" });
     }
   }
 };
@@ -151,9 +149,7 @@ watch(() => props.global.currentTime, (newVal) => {
     for (let i = tracks.length - 1; i >= 0; i--) {
       if (newVal > tracks[i].startTiming && newVal < tracks[i].endTiming) {
         const scrollIndex = Math.max(0, i - 2);
-        setTimeout(() => {
-          document.querySelector("#trackCard" + tracks[scrollIndex].index)?.scrollIntoView({ behavior: "smooth" });
-        }, 200);
+        document.querySelector("#trackCard" + tracks[scrollIndex].index)?.scrollIntoView({ behavior: "auto" });
         break;
       }
     }

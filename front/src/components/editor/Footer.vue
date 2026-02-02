@@ -74,18 +74,16 @@
         >{{ enableEdit ? "禁用编辑弹窗" : "开启编辑弹窗" }}</el-button>
       </div>
       <div class="footer-header-right">
-        <el-tooltip
-          class="item"
-          effect="dark"
-          content="设置时间轴部分显示的时间范围"
-          placement="top-start"
-        >
-          <el-slider
-            v-model="displayAreaTime"
-            :min="1000"
+        <div class="custom-slider-container">
+          <label>预览范围</label>
+          <input 
+            type="range" 
+            v-model.number="displayAreaTime" 
+            :min="1000" 
             :max="chart.songLength > 1000 ? chart.songLength : 1001"
-          ></el-slider>
-        </el-tooltip>
+            class="custom-range"
+          />
+        </div>
       </div>
     </div>
     <div v-if="chart.tracks">
@@ -129,13 +127,7 @@
         "
       >
         <div
-          :style="{
-            position: 'absolute',
-            left: 0,
-            top: scrollTop + 'px',
-            height: '20px',
-            width: '100%',
-          }"
+          class="beat-line-wrapper-absolute"
         >
           <BeatLine
             :chart="chart"
@@ -303,7 +295,7 @@ watch(() => props.global.currentTime, (newVal) => {
     const tracks = props.chart.tracks;
     for (let i = 0; i < tracks.length; i++) {
       if (newVal >= tracks[i].startTiming && newVal <= tracks[i].endTiming) {
-        document.querySelector("#trackCardPanel" + tracks[i].index)?.scrollIntoView({ behavior: "smooth" });
+        document.querySelector("#trackCardPanel" + tracks[i].index)?.scrollIntoView({ behavior: "auto" });
         break;
       }
     }
@@ -322,11 +314,14 @@ onMounted(() => {
 .footer-container { height: 100%; width: 100vw; position: relative; }
 .footer-header { height: 35px; padding-bottom: 5px; width: 100vw; position: absolute; top: 0px; left: 0px; display: flex; justify-content: space-between; align-items: center; }
 .footer-left { height: calc(100% - 35px); width: 300px; position: absolute; top: 35px; left: 0px; }
-.footer-track-container { width: calc(90% - 1px); height: 100%; padding: 0% 5%; border: 0px solid rgba(255, 255, 255, 0.2); background: rgb(32, 32, 32); border-right-width: 1px; overflow: auto; }
-.footer-right { height: calc(100% - 40px); width: calc(100vw - 300px); background: rgb(32, 32, 32); position: absolute; top: 35px; left: 300px; padding-top: 5px; overflow: auto; }
+.footer-track-container { width: 100%; height: 100%; border-right: 1px solid rgba(255,255,255,0.1); background: rgb(32, 32, 32); overflow: auto; padding-top: 0px; }
+.footer-right { height: calc(100% - 35px); width: calc(100vw - 300px); background: rgb(32, 32, 32); position: absolute; top: 35px; left: 300px; overflow: auto; padding-top: 0px; }
 .footer-track-container::-webkit-scrollbar { width: 0 !important; }
-.footer-header-left { padding-left: 25px; min-width: 960px; }
-.footer-header-right { padding-right: 25px; width: 200px; }
+.footer-header-left { padding-left: 25px; min-width: 900px; }
+
+.custom-slider-container { display: flex; align-items: center; gap: 10px; color: #aaa; font-size: 12px; }
+.custom-range { appearance: none; background: rgba(255,255,255,0.1); height: 4px; border-radius: 2px; outline: none; width: 120px; }
+.custom-range::-webkit-slider-thumb { appearance: none; width: 12px; height: 12px; background: #67c23a; border-radius: 50%; cursor: pointer; }
 .show-button-selected { color: #67c23a; }
 .show-button-selected:hover { color: #95d475; }
 .show-button-selected:active { color: #529b2e; }
@@ -334,4 +329,14 @@ onMounted(() => {
 .show-button:hover { color: #dfdfdf; }
 .show-button:active { color: #808080; }
 .delete-button { color: #f56c6c; }
+
+.beat-line-wrapper-absolute {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  z-index: 5;
+  pointer-events: none;
+}
 </style>

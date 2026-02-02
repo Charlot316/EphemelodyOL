@@ -286,8 +286,8 @@
           id="footer-resizer"
           @mousedown="canDrag = true"
         >
-          <span style="color:rgb(200,200,200)">{{ global.currentTime }}</span>
-          <span style="color:rgb(150,150,150)">/{{ chart.songLength }}</span>
+          <span style="color:rgb(200,200,200)">{{ Math.floor(global.currentTime) }}</span>
+          <span style="color:rgb(150,150,150)">/{{ Math.floor(chart.songLength) }}</span>
         </div>
         <div style="height:calc(100% - 20px);width:100%;">
           <Footer
@@ -322,6 +322,7 @@ const router = useRouter();
 const store = useStore();
 const playerRef = ref(null);
 const canDrag = ref(false);
+let resizeTimer = null;
 
 const {
   chart,
@@ -424,8 +425,9 @@ const footerStyle = computed(() => ({
 }));
 
 const changeTime = () => {
+  global.currentTime = Math.floor(global.currentTime);
   playerRef.value?.seek(global.currentTime);
-  document.querySelector("#time-indicater")?.scrollIntoView({ behavior: "smooth" });
+  document.querySelector("#time-indicater")?.scrollIntoView({ behavior: "auto", block: "nearest", inline: "center" });
 };
 
 const SlideMouseDown = () => {
@@ -437,9 +439,7 @@ const SlideMouseUp = () => {
   sliding.value = false;
   playerRef.value?.seek(global.currentTime);
   if (isRunning.value) {
-    setTimeout(() => {
-      play();
-    }, 50);
+    play();
   }
 };
 
@@ -467,16 +467,17 @@ const checkbpm = () => {
 
 watch(() => global.currentTime, () => {
   if (sliding.value) {
-    document.querySelector("#time-indicater")?.scrollIntoView({ behavior: "smooth" });
+    // 拖拽时使用 auto 滚动，避免 smooth 滚动的动画开销和延迟感
+    document.querySelector("#time-indicater")?.scrollIntoView({ behavior: "auto", block: "nearest", inline: "center" });
   }
 });
 
 const handleTrackClick = (track) => {
   if (currentSelectTrack.value) currentSelectTrack.value.edit = false;
   currentSelectTrack.value = track;
-  document.querySelector("#trackCard" + track.index)?.scrollIntoView({ behavior: "smooth" });
-  document.querySelector("#trackCardPanel" + track.index)?.scrollIntoView({ behavior: "smooth" });
-  setTimeout(() => { track.edit = true; }, 10);
+  document.querySelector("#trackCard" + track.index)?.scrollIntoView({ behavior: "auto" });
+  document.querySelector("#trackCardPanel" + track.index)?.scrollIntoView({ behavior: "auto" });
+  track.edit = true;
 };
 
 const handleCurrentTrack = (track) => {
@@ -524,8 +525,13 @@ onMounted(() => {
     if (canDrag.value) {
       if (e.clientY > 130 && e.clientY < global.documentHeight - 100) {
         footerHeight.value = global.documentHeight - e.clientY;
-        playerRef.value?.resize();
-        setTimeout(() => playerRef.value?.repaint(), 10);
+        
+        // Debounce resize for performance
+        if (resizeTimer) clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+          playerRef.value?.resize();
+          playerRef.value?.repaint();
+        }, 50); // 50ms buffer for smooth dragging
       }
     }
   };

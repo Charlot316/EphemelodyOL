@@ -390,11 +390,10 @@ onMounted(() => {
     if (!isRunning.value) {
       if (audioRef.value) {
         const diff = Math.abs(audioRef.value.currentTime * 1000 - newTime);
-        if (diff > 100) { // 阈值加大，减少过于频繁的音频 seek
+        if (diff > 10) { 
           audioRef.value.currentTime = newTime / 1000;
         }
       }
-      // 不要在 watcher 里直接调研可能触发深度更新的操作，改用 nextTick 或更加粒度的控制
       repaint();
     }
   });

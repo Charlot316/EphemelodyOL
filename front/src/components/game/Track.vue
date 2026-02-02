@@ -769,7 +769,8 @@ watch(() => myglobal.currentTime, () => {
     ) {
       myTrack.judges.shift();
     }
-    paintTrack();
+    // paintTrack() is handled by BeatPlayer triggering global.repaint
+    // which ensures all tracks draw after the canvas is cleared.
   }
   while (
     myTrack.lastNote < myTrack.notes.length - 1 &&

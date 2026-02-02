@@ -259,9 +259,7 @@ const setZIndex = () => {
 };
 
 const longNoteCanMove = () => {
-  setTimeout(() => {
-    passedTime.value = Math.ceil(props.global.currentTime - props.note.timing);
-  }, 10);
+  passedTime.value = Math.ceil(props.global.currentTime - props.note.timing);
   canMove.value = true;
 };
 

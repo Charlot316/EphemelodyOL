@@ -223,9 +223,7 @@ const setZIndex = () => {
 };
 
 const longOperationCanMove = () => {
-  setTimeout(() => {
-    passedTime.value = Math.ceil(props.global.currentTime - props.operation.startTime);
-  }, 10);
+  passedTime.value = Math.ceil(props.global.currentTime - props.operation.startTime);
   canMove.value = true;
 };
 

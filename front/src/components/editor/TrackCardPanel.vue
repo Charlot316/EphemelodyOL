@@ -309,31 +309,29 @@ watch(() => props.global.mouseMove, () => {
 
 <style scoped>
 .panel-no-edit {
-  height: 80px;
-  padding-top: 5px;
-  padding-bottom: 5px;
-  border-radius: 5px;
-  transition: 0.5s;
+  box-sizing: border-box;
+  height: 90px;
+  padding: 0;
   position: relative;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* Match Left Side */
 }
 .panel-edit {
-  height: 515px;
-  padding-top: 5px;
-  padding-bottom: 5px;
-  border-radius: 5px;
-  transition: 0.5s;
+  box-sizing: border-box;
+  height: 525px;
+  padding: 0;
   position: relative;
+  background: rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
-.track-tracks { position: absolute; top: 0; left: 0; }
-.track-labels { position: absolute; top: 0; left: 0; }
-.note-track { position: absolute; top: 5px; left: 0px; height: 80px; transition: 0.5s; width: 100%; }
-.note-track-edit { position: absolute; left: 0px; top: 40px; height: 80px; transition: 0.5s; width: 100%; }
-.positionX-track { position: absolute; left: 0px; top: 160px; height: 80px; }
-.width-track { position: absolute; left: 0px; top: 280px; height: 80px; }
-.color-track { position: absolute; left: 0px; top: 400px; height: 80px; }
+.note-track { position: absolute; top: 5px; left: 0px; height: 80px; width: 100%; }
+.note-track-edit { position: absolute; left: 0px; top: 10px; height: 80px; width: 100%; }
+.positionX-track { position: absolute; left: 0px; top: 130px; height: 80px; }
+.width-track { position: absolute; left: 0px; top: 250px; height: 80px; }
+.color-track { position: absolute; left: 0px; top: 370px; height: 80px; }
 
-.note-track-label { color: rgb(210, 210, 210); position: absolute; left: 0px; top: 15px; width: 300px; }
-.positionX-track-label { color: rgb(210, 210, 210); position: absolute; left: 0px; top: 135px; width: 300px; }
-.width-track-label { color: rgb(210, 210, 210); position: absolute; left: 0px; top: 255px; width: 300px; }
-.color-track-label { color: rgb(210, 210, 210); position: absolute; left: 0px; top: 375px; width: 300px; }
+.note-track-label { color: rgba(255, 255, 255, 0.3); position: absolute; left: 10px; top: 5px; width: 300px; font-size: 11px; }
+.positionX-track-label { color: rgba(255, 255, 255, 0.3); position: absolute; left: 10px; top: 110px; width: 300px; font-size: 11px; }
+.width-track-label { color: rgba(255, 255, 255, 0.3); position: absolute; left: 10px; top: 230px; width: 300px; font-size: 11px; }
+.color-track-label { color: rgba(255, 255, 255, 0.3); position: absolute; left: 10px; top: 350px; width: 300px; font-size: 11px; }
 </style>

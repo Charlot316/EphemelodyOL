@@ -5,67 +5,65 @@
       position: 'absolute',
       left: 0,
       width: (chart.songLength / displayAreaTime) * (global.documentWidth - 300) + 'px',
-      height: '30px',
-      zIndex: 10,
-      overflow: 'hidden',
+      height: '35px',
+      zIndex: 100,
+      pointerEvents: 'none',
+      overflow: 'visible',
     }"
   >
     <div v-for="count in LineCount" :key="count">
+      <!-- Major Beat (1 beat) - 30px -->
       <div
         v-if="(count - 1) % 16 == 0 && (count - 1) * singleWidth + left > 0"
+        class="beat-line"
         :style="{
-          position: 'absolute',
-          top: 0,
           left: (count - 1) * singleWidth + left + 'px',
-          width: '1px',
           height: '30px',
-          background: 'rgb(255,255,255)',
+          background: 'rgba(255,255,255,0.8)',
+          boxShadow: '0 0 5px rgba(255,255,255,0.3)'
         }"
       ></div>
+      <!-- Quarter Beat - 20px -->
       <div
-        v-else-if="
-          (count - 1) % 8 == 0 &&
-            display4 &&
-            (count - 1) * singleWidth + left > 0
-        "
+        v-else-if="(count - 1) % 8 == 0 && display4 && (count - 1) * singleWidth + left > 0"
+        class="beat-line"
         :style="{
-          position: 'absolute',
-          top: 0,
           left: (count - 1) * singleWidth + left + 'px',
-          width: '1px',
           height: '20px',
-          background: 'rgb(255,255,255)',
+          background: 'rgba(255,255,255,0.5)'
         }"
       ></div>
+      <!-- Eighth Beat - 12px -->
       <div
-        v-else-if="
-          (count - 1) % 4 == 0 &&
-            display8 &&
-            (count - 1) * singleWidth + left > 0
-        "
+        v-else-if="(count - 1) % 4 == 0 && display8 && (count - 1) * singleWidth + left > 0"
+        class="beat-line"
         :style="{
-          position: 'absolute',
-          top: 0,
           left: (count - 1) * singleWidth + left + 'px',
-          width: '1px',
           height: '12px',
-          background: 'rgb(255,255,255)',
+          background: 'rgba(255,255,255,0.3)'
         }"
       ></div>
+      <!-- Sixteenth Beat - 8px -->
       <div
         v-else-if="display16 && (count - 1) * singleWidth + left > 0"
+        class="beat-line"
         :style="{
-          position: 'absolute',
-          top: 0,
           left: (count - 1) * singleWidth + left + 'px',
-          width: '1px',
           height: '8px',
-          background: 'rgb(255,255,255)',
+          background: 'rgba(255,255,255,0.15)'
         }"
       ></div>
     </div>
   </div>
 </template>
+
+<style scoped>
+.beat-line {
+  position: absolute;
+  top: 0;
+  width: 1px;
+}
+</style>
 
 <script setup>
 import { ref, defineProps, watch, onMounted } from 'vue';
@@ -93,7 +91,7 @@ const setDisplay = () => {
   const bpm4 = bpm / 4;
   const wholeLength = props.global.documentWidth - 300;
   
-  if ((wholeLength * bpm) / props.displayAreaTime > 100) {
+  if (bpm > 0) {
     display.value = true;
     const delay = props.chart.firstBeatDelay || 0;
     const d = delay % bpm;
@@ -101,9 +99,10 @@ const setDisplay = () => {
     left.value -= (bpm / props.displayAreaTime) * wholeLength;
     singleWidth.value = (wholeLength * bpm16) / props.displayAreaTime;
 
-    display4.value = (wholeLength * bpm4) / props.displayAreaTime > 25;
-    display8.value = (wholeLength * bpm8) / props.displayAreaTime > 20;
-    display16.value = (wholeLength * bpm16) / props.displayAreaTime > 15;
+    // Adjust visibility based on density but never hide major beats
+    display4.value = (wholeLength * bpm4) / props.displayAreaTime > 5;
+    display8.value = (wholeLength * bpm8) / props.displayAreaTime > 5;
+    display16.value = (wholeLength * bpm16) / props.displayAreaTime > 5;
   } else {
     display.value = false;
     display4.value = false;
