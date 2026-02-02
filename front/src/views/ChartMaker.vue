@@ -75,90 +75,17 @@
         id="play-interface-container"
         :style="containerStyle"
       >
-        <!-- 音频 -->
-        <audio
-          id="audioSong"
-          preload="auto"
-          controls
-          :src="chart.songUrl"
-          style="display:none"
+        <BeatPlayer
+          ref="playerRef"
+          :chart="chart"
+          :global="global"
+          mode="edit"
+          :selectedTrackId="currentSelectTrack ? (currentSelectTrack.trackId || currentSelectTrack.index) : null"
+          :displayRange="[displayStart, displayEnd]"
+          @track-click="handleTrackClick"
+          @audio-loaded="onAudioLoaded"
+          playerId="editor-player"
         />
-        <!-- 背景 -->
-        <div v-for="image in imagePath" :key="image.url + image.startTime">
-          <img
-            :src="image.url"
-            v-show="
-              global.currentTime >= image.startTime &&
-                global.currentTime <= image.endTime
-            "
-            style="position:absolute;left:0;top:0;width:100%;height:100%;object-fit:fill;user-drag:none;"
-          />
-        </div>
-        <!-- 判定线 -->
-        <div
-          :style="{
-            height: '2px',
-            position: 'absolute',
-            left: '0px',
-            top: global.screenHeight * global.finalY - 1 + 'px',
-            width: global.screenWidth + 'px',
-          }"
-        >
-          <div
-            class="white-line"
-            :style="{
-              height: '100%',
-              position: 'absolute',
-              left: (global.screenWidth - whiteLineLength) / 2 + 'px',
-              width: whiteLineLength + 'px',
-              background: 'rgba(255,255,255,1)',
-            }"
-          ></div>
-        </div>
-        <canvas id="track-canvas" style="position:absolute;top:0;left:0;" />
-        <canvas id="note-canvas" style="position:absolute;top:0;left:0;" />
-        <canvas id="judge-canvas" style="position:absolute;top:0;left:0;" />
-        <!-- 轨道 -->
-        <div
-          class="play-interface-track-container"
-          v-for="trackItem in chart.tracks"
-          :key="trackItem.trackId || trackItem.startTiming"
-        >
-          <div>
-            <Track
-              :Track="trackItem"
-              :global="global"
-              v-if="
-                global.currentTime > trackItem.startTiming &&
-                  global.currentTime < trackItem.endTiming
-              "
-            />
-          </div>
-        </div>
-        <div
-          class="selected-track"
-          v-if="
-            currentSelectTrack != null &&
-              global.currentTime > currentSelectTrack.startTiming &&
-              global.currentTime < currentSelectTrack.endTiming &&
-              currentSelectTrack.tempPositionX >= 0 &&
-              currentSelectTrack.tempPositionX <= 1
-          "
-          :style="{
-            position: 'absolute',
-            top: '0px',
-            left:
-              (currentSelectTrack.tempPositionX -
-                currentSelectTrack.tempWidth) *
-                global.screenWidth +
-              'px',
-            width:
-              2 * currentSelectTrack.tempWidth * global.screenWidth - 4 + 'px',
-            height: global.finalY * global.screenHeight - 2 + 'px',
-            border: '2px solid rgba(255,255,255,1)',
-            background: 'rgba(255,255,255,0.2)',
-          }"
-        ></div>
       </div>
     </div>
 
@@ -381,6 +308,7 @@ import { Axios } from '@/plugins/axios';
 import { ElNotification } from 'element-plus';
 import { FullScreen, RefreshLeft, VideoPause, VideoPlay, Setting, QuestionFilled } from '@element-plus/icons-vue';
 import Track from "@/components/game/Track.vue";
+import BeatPlayer from "@/components/game/BeatPlayer.vue";
 import MenuPanel from "@/components/editor/MenuPanel.vue";
 import TrackPanel from "@/components/editor/TrackPanel.vue";
 import Footer from "@/components/editor/Footer.vue";
@@ -389,6 +317,7 @@ import "animate.css";
 const route = useRoute();
 const router = useRouter();
 const store = useStore();
+const playerRef = ref(null);
 
 const canDrag = ref(false);
 const chart = reactive({
@@ -471,23 +400,8 @@ const displayRange = computed({
   }
 });
 
-const whiteLineLength = computed(() => {
-  const time = 200;
-  const waitLoad = 1000;
-  if (global.currentTime > time + waitLoad && global.currentTime < chart.songLength - time) {
-    return global.screenWidth;
-  } else {
-    if (global.currentTime <= time + waitLoad) {
-      if (global.currentTime < waitLoad) return 0;
-      return ((global.currentTime - waitLoad) * global.screenWidth) / time;
-    } else {
-      return ((chart.songLength - global.currentTime) * global.screenWidth) / time;
-    }
-  }
-});
-
-let audio = null;
-let playInterfaceContainer = null;
+const audio = ref(null);
+const playInterfaceContainer = ref(null);
 
 const setIndex = () => {
   chart.tracks.forEach((t, i) => (t.index = i));
@@ -503,101 +417,10 @@ const sortTrack = () => {
   setIndex();
 };
 
-const generateImagePath = () => {
-  imagePath.value = [];
-  const ops = chart.changeBackgroundOperations || [];
-  let end = ops.length === 0 ? chart.songLength : (ops.sort((a,b) => a.startTime - b.startTime), ops[0].startTime);
-  
-  imagePath.value.push({ url: chart.defaultBackground, startTime: 0, endTime: end });
-  
-  ops.forEach((op, i) => {
-    const start = op.startTime;
-    if (i !== ops.length - 1) {
-      const nextStart = ops[i+1].startTime;
-      imagePath.value.push({ url: op.background, startTime: start, endTime: nextStart });
-      op.endTime = nextStart;
-    } else {
-      imagePath.value.push({ url: op.background, startTime: start, endTime: chart.songLength + 1000 });
-      op.endTime = chart.songLength + 1000;
-    }
-  });
-};
-
-const resetTrack = () => {
-  global.keyPressTime = {};
-  global.keyIsHold = {};
-  global.keyUsed = {};
-  chart.tracks.forEach((track) => {
-    let index = 0;
-    let last = track.notes.length;
-    track.notes.forEach((note, j) => {
-      note.judged = false;
-      if (note.timing + global.lostTime > global.currentTime) index = Math.min(index, j) === 0 ? j : index; // Wrong logic in original? index = j means last one that satisfies?
-      // Re-implementing logic correctly based on what it seems to do
-    });
-    // Original loop:
-    track.notes.forEach((note, j) => {
-       if (note.timing + global.lostTime > global.currentTime) {
-         // This sets index to the LAST note that satisfies? No, looking at original j goes track.notes.length - 1 down to 0
-       }
-    });
-    
-    // Better:
-    let foundIndex = 0;
-    for (let j = track.notes.length - 1; j >= 0; j--) {
-      if (track.notes[j].timing + global.lostTime > global.currentTime) foundIndex = j;
-    }
-    track.currentNote = foundIndex;
-    
-    let foundLast = track.notes.length;
-    for (let j = track.notes.length - 1; j >= 0; j--) {
-      if (global.currentTime < track.notes[j].timing - global.remainingTime) foundLast = j;
-    }
-    track.lastNote = foundLast - 1;
-    
-    track.judges = [];
-    track.judgeFinished = track.currentNote === track.notes.length;
-  });
-};
-
-const repaint = () => {
-  global.notePainter?.clearRect(0, 0, global.noteCanvas.width, global.noteCanvas.height);
-  global.trackPainter?.clearRect(0, 0, global.trackCanvas.width, global.trackCanvas.height);
-  global.judgePainter?.clearRect(0, 0, global.judgeCanvas.width, global.judgeCanvas.height);
-  global.repaint = !global.repaint;
-};
-
-const resize = () => {
-  playInterfaceContainer = document.getElementById("play-interface-container");
-  if (!playInterfaceContainer) return;
-  global.screenWidth = playInterfaceContainer.offsetWidth;
-  global.screenHeight = playInterfaceContainer.offsetHeight;
-  if (global.noteCanvas) {
-    global.noteCanvas.width = global.screenWidth;
-    global.noteCanvas.height = global.screenHeight;
-  }
-  if (global.trackCanvas) {
-    global.trackCanvas.width = global.screenWidth;
-    global.trackCanvas.height = global.screenHeight;
-  }
-  if (global.judgeCanvas) {
-    global.judgeCanvas.width = global.screenWidth;
-    global.judgeCanvas.height = global.screenHeight;
-  }
-};
-
-const run = () => {
-  if (!sliding.value) {
-    global.currentTime = Math.floor(audio.currentTime * 1000);
-  } else {
-    resetTrack();
-  }
-  if (global.currentTime >= chart.songLength) isRunning.value = false;
-  if (global.currentTime >= displayEnd.value) {
-    audio.currentTime = displayEnd.value / 1000;
-    pause();
-  }
-  requestAnimationFrame(run);
+const onAudioLoaded = (audioEl) => {
+  audio.value = audioEl;
+  chart.songLength = Math.round(1000 * audio.value.duration);
+  displayEnd.value = chart.songLength;
 };
 
 const getChart = async () => {
@@ -611,14 +434,8 @@ const getChart = async () => {
     chartGot.value = true;
     displayStart.value = 0;
     sortTrack();
-    audio = document.getElementById("audioSong");
-    audio.oncanplay = () => {
-      chart.songLength = Math.round(1000 * audio.duration);
-      generateImagePath();
-      displayEnd.value = chart.songLength;
-    };
+    audio.value = document.getElementById("audio-player"); // Not needed here as BeatPlayer handles it
     audio.volume = volume.value / 100;
-    requestAnimationFrame(run);
     
     if (!chart.bpm || chart.bpm === 0) {
       globalSetting.value = true;
@@ -649,8 +466,8 @@ const changeMenuDisplay = () => {
   menuOpened.value = !menuOpened.value;
   for (let i = 0; i < 1000; i += 16) {
     setTimeout(() => {
-      resize();
-      repaint();
+      playerRef.value?.resize();
+      playerRef.value?.repaint();
     }, i);
   }
 };
@@ -670,68 +487,45 @@ const footerStyle = computed(() => ({
   '--documentHeight': global.documentHeight + 'px',
 }));
 
-const handleCurrentTrack = (param) => {
-  if (currentSelectTrack.value) currentSelectTrack.value.edit = false;
-  currentSelectTrack.value = param;
-};
-
 const changeTime = () => {
-  resetTrack();
-  audio.currentTime = global.currentTime / 1000;
+  playerRef.value?.seek(global.currentTime);
   document.querySelector("#time-indicater")?.scrollIntoView({ behavior: "smooth" });
 };
 
 const SlideMouseDown = () => {
-  audio.pause();
+  pause();
   sliding.value = true;
-  resetTrack();
 };
 
 const SlideMouseUp = () => {
   sliding.value = false;
-  audio.currentTime = global.currentTime / 1000;
-  resetTrack();
+  playerRef.value?.seek(global.currentTime);
   if (isRunning.value) {
     setTimeout(() => {
-      resetTrack();
-      audio.play();
+      play();
     }, 50);
   }
 };
 
 const pause = () => {
-  audio.pause();
+  playerRef.value?.pause();
   isRunning.value = false;
 };
 
 const play = () => {
-  resetTrack();
   sliding.value = false;
   isRunning.value = true;
-  setTimeout(() => {
-    resetTrack();
-    audio.play();
-  }, 50);
+  playerRef.value?.play();
 };
 
 const reStart = () => {
-  resetTrack();
-  audio.currentTime = displayStart.value / 1000;
-  global.currentTime = displayStart.value;
-  if (isRunning.value) {
-    setTimeout(() => {
-      resetTrack();
-      audio.play();
-    }, 50);
-  }
+  playerRef.value?.reStart();
 };
 
 const changeDisplayArea = (val) => {
   displayStart.value = val[0];
   displayEnd.value = val[1];
-  global.currentTime = displayStart.value;
-  audio.currentTime = global.currentTime / 1000;
-  resetTrack();
+  playerRef.value?.seek(displayStart.value);
 };
 
 const changeVolume = () => {
@@ -779,15 +573,13 @@ const calculatebpm = () => {
 };
 
 const endbpm = () => {
-  audio.pause();
-  global.currentTime = 0;
-  audio.currentTime = 0;
+  pause();
+  playerRef.value?.seek(0);
   startTotal.value = 0;
   bpmcount.value = 0;
   bpmStart.value = false;
   lastTime.value = 0;
   bpmtotal.value = 0;
-  resetTrack();
 };
 
 const checkbpm = () => {
@@ -801,34 +593,34 @@ const checkbpm = () => {
 };
 
 watch(() => global.currentTime, () => {
-  repaint();
   if (sliding.value) {
     document.querySelector("#time-indicater")?.scrollIntoView({ behavior: "smooth" });
   }
 });
 
+const handleTrackClick = (track) => {
+  if (currentSelectTrack.value) currentSelectTrack.value.edit = false;
+  currentSelectTrack.value = track;
+  document.querySelector("#trackCard" + track.index)?.scrollIntoView({ behavior: "smooth" });
+  document.querySelector("#trackCardPanel" + track.index)?.scrollIntoView({ behavior: "smooth" });
+  setTimeout(() => { track.edit = true; }, 10);
+};
+
+const handleCurrentTrack = (track) => {
+  if (currentSelectTrack.value) currentSelectTrack.value.edit = false;
+  currentSelectTrack.value = track;
+};
+
 watch(() => global.reCalculateChartMaker, () => {
-  if (chart.changeBackgroundOperations) {
-    generateImagePath();
-    sortTrack();
-    resetTrack();
-  }
+  sortTrack();
+  playerRef.value?.seek(global.currentTime);
 });
 
 onMounted(() => {
-  global.noteCanvas = document.getElementById("note-canvas");
-  global.trackCanvas = document.getElementById("track-canvas");
-  global.judgeCanvas = document.getElementById("judge-canvas");
-  global.notePainter = global.noteCanvas.getContext("2d");
-  global.trackPainter = global.trackCanvas.getContext("2d");
-  global.judgePainter = global.judgeCanvas.getContext("2d");
-  
   global.documentHeight = document.documentElement.clientHeight;
   global.documentWidth = document.documentElement.clientWidth;
   
-  window.addEventListener('resize', resize);
-  
-  document.onkeydown = (e) => {
+  window.onkeydown = (e) => {
     if (!e.repeat) {
       global.keyPressTime[e.key.toUpperCase()] = global.currentTime;
       global.keyIsHold[e.key.toUpperCase()] = true;
@@ -850,24 +642,7 @@ onMounted(() => {
     global.keyIsHold[e.key.toUpperCase()] = false;
   };
 
-  const container = document.getElementById("play-interface-container");
-  container.onmousedown = (e) => {
-    if (currentSelectTrack.value) currentSelectTrack.value.edit = false;
-    currentSelectTrack.value = null;
-    
-    const visibleTracks = chart.tracks.filter(t => global.currentTime > t.startTiming && global.currentTime < t.endTiming);
-    for (const track of visibleTracks) {
-      const left = (track.tempPositionX - track.tempWidth) * global.screenWidth;
-      const right = (track.tempPositionX + track.tempWidth) * global.screenWidth;
-      if (e.offsetX > left && e.offsetX < right) {
-        currentSelectTrack.value = track;
-        document.querySelector("#trackCard" + track.index)?.scrollIntoView({ behavior: "smooth" });
-        document.querySelector("#trackCardPanel" + track.index)?.scrollIntoView({ behavior: "smooth" });
-        setTimeout(() => { track.edit = true; }, 10);
-        break;
-      }
-    }
-  };
+  // Click selection is now handled by BeatPlayer emitting track-click
 
   document.onmousemove = (e) => {
     global.clientX = e.clientX;
@@ -876,8 +651,8 @@ onMounted(() => {
     if (canDrag.value) {
       if (e.clientY > 130 && e.clientY < global.documentHeight - 100) {
         footerHeight.value = global.documentHeight - e.clientY;
-        resize();
-        setTimeout(repaint, 10);
+        playerRef.value?.resize();
+        setTimeout(() => playerRef.value?.repaint(), 10);
       }
     }
   };
@@ -898,7 +673,8 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
-  window.removeEventListener('resize', resize);
+  window.onkeydown = null;
+  window.onkeyup = null;
 });
 </script>
 

@@ -6,11 +6,10 @@
       @startMusic="startMusic"
     />
     <Play
+      ref="playRef"
       :loadingStatus="loadingStatus"
       :chart="chart"
       :global="global"
-      :imagePath="imagePath"
-      :whiteLineLength="whiteLineLength"
       :score="score"
       @audioLoaded="audioLoaded"
       @imageLoaded="imageLoaded"
@@ -98,10 +97,10 @@ const global = reactive({
   repaint: false,
 });
 
-const imagePath = ref([]);
 const pauseVisible = ref(false);
 const audio = ref(null);
 const playInterface = ref(null);
+const playRef = ref(null);
 
 const loadingStatus = reactive({
   chart: false,
@@ -113,33 +112,6 @@ const loadingStatus = reactive({
   beforeFinished: false,
   finished: false,
   imageCurrentCount: 0,
-});
-
-const whiteLineLength = computed(() => {
-  const time = 200;
-  const waitLoad = 1000;
-  if (
-    global.currentTime > time + waitLoad &&
-    global.currentTime < chart.value.songLength - time
-  ) {
-    return global.screenWidth;
-  } else {
-    if (global.currentTime <= time + waitLoad) {
-      if (global.currentTime < waitLoad) {
-        return 0;
-      } else
-        return (
-          ((global.currentTime - waitLoad) * global.screenWidth) /
-          time
-        );
-    } else {
-      return (
-        ((chart.value.songLength - global.currentTime) *
-          global.screenWidth) /
-        time
-      );
-    }
-  }
 });
 
 const score = computed(() => {
@@ -181,48 +153,6 @@ const resize = () => {
 const sortTrack = () => {
   if (chart.value.tracks) {
     chart.value.tracks.sort((a, b) => a.startTiming - b.startTiming);
-  }
-};
-
-const generateImagePath = () => {
-  imagePath.value = [];
-  if (!chart.value.changeBackgroundOperations) return;
-  
-  let length = chart.value.changeBackgroundOperations.length;
-  let start = 0;
-  let end = start;
-  let defaultBackground = chart.value.defaultBackground;
-  
-  if (length === 0) {
-    end = chart.value.songLength;
-  } else {
-    chart.value.changeBackgroundOperations.sort((a, b) => a.startTime - b.startTime);
-    end = chart.value.changeBackgroundOperations[0].startTime;
-  }
-  
-  imagePath.value.push({
-    url: defaultBackground,
-    startTime: 0,
-    endTime: end,
-  });
-  
-  for (let i = 0; i < length; i++) {
-    let operation = chart.value.changeBackgroundOperations[i];
-    start = operation.startTime;
-    if (i !== length - 1) {
-      let nextOperation = chart.value.changeBackgroundOperations[i + 1];
-      imagePath.value.push({
-        url: operation.background,
-        startTime: start,
-        endTime: nextOperation.startTime,
-      });
-    } else {
-      imagePath.value.push({
-        url: operation.background,
-        startTime: start,
-        endTime: chart.value.songLength + 1000,
-      });
-    }
   }
 };
 
@@ -318,20 +248,15 @@ const run = () => {
   }
 };
 
-const audioLoaded = () => {
-  audio.value = document.getElementById("audioSong");
-  chart.value.songLength = Math.round(1000 * audio.value.duration);
-  generateImagePath();
+const audioLoaded = (audioEl) => {
+  audio.value = audioEl;
   loadingStatus.audio = true;
   checkIfLoaded();
 };
 
 const imageLoaded = () => {
-  loadingStatus.imageCurrentCount++;
-  if (loadingStatus.imageCurrentCount === imagePath.value.length) {
-    loadingStatus.image = true;
-    checkIfLoaded();
-  }
+  loadingStatus.image = true;
+  checkIfLoaded();
 };
 
 const checkIfLoaded = () => {
@@ -444,9 +369,7 @@ onMounted(() => {
   global.judgePainter = global.judgeCanvas.getContext("2d");
   
   resize();
-  window.addEventListener('resize', resize);
-  
-  document.onkeydown = (e) => {
+  window.onkeydown = (e) => {
     if (!e.repeat) {
       global.keyPressTime[e.key.toUpperCase()] = global.currentTime;
       global.keyIsHold[e.key.toUpperCase()] = true;
@@ -507,9 +430,8 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
-  window.removeEventListener('resize', resize);
-  document.onkeydown = null;
-  document.onkeyup = null;
+  window.onkeydown = null;
+  window.onkeyup = null;
 });
 </script>
 
