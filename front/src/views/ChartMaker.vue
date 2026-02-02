@@ -82,6 +82,7 @@
           mode="edit"
           :selectedTrackId="currentSelectTrack ? (currentSelectTrack.trackId || currentSelectTrack.index) : null"
           :displayRange="[displayStart, displayEnd]"
+          :volume="volume"
           @track-click="handleTrackClick"
           @audio-loaded="onAudioLoaded"
           playerId="editor-player"
@@ -318,33 +319,21 @@ const route = useRoute();
 const router = useRouter();
 const store = useStore();
 const playerRef = ref(null);
-
 const canDrag = ref(false);
-const chart = reactive({
-  songLength: 0,
-  tracks: [],
-  changeBackgroundOperations: [],
-  defaultBackground: '',
-  songUrl: '',
-  songCover: '',
-  uploader: '',
-  songName: '',
-  songWriter: '',
-  loadingText: '',
-  loadedText: '',
-  bpm: 0,
-  firstBeatDelay: 0,
-  lastBeatDelay: 0,
-  beatsCount: 0
-});
 
-const chartGot = ref(false);
-const bpmStart = ref(false);
-const bpmcount = ref(0);
-const bpmtotal = ref(0);
-const startTotal = ref(0);
-const lastTime = ref(0);
-const startTime = ref(0);
+const {
+  chart,
+  chartGot,
+  isRunning,
+  sliding,
+  displayStart,
+  displayEnd,
+  displayRange,
+  sortTrack,
+  getChart,
+  saveChart,
+  onAudioLoaded
+} = useChartEditor(route, router);
 
 const global = reactive({
   currentTime: 0,
@@ -379,98 +368,25 @@ const global = reactive({
   documentWidth: 0
 });
 
-const imagePath = ref([]);
-const isRunning = ref(false);
-const sliding = ref(false);
 const menuOpened = ref(true);
 const volume = ref(store.state.volume || 100);
 const currentSelectTrack = ref(null);
 const currentTracks = ref([]);
 const globalSetting = ref(false);
-const displayStart = ref(0);
-const displayEnd = ref(10);
 const footerHeight = ref(426);
 const form = reactive({});
 
-const displayRange = computed({
-  get: () => [displayStart.value, displayEnd.value],
-  set: (val) => {
-    displayStart.value = val[0];
-    displayEnd.value = val[1];
-  }
+const {
+  bpmStart,
+  bpmcount,
+  ManualCalculatebpm,
+  calculatebpm,
+  endbpm
+} = useBpmTool(chart, global, {
+  play: () => play(),
+  pause: () => pause(),
+  seek: (t) => playerRef.value?.seek(t)
 });
-
-const audio = ref(null);
-const playInterfaceContainer = ref(null);
-
-const setIndex = () => {
-  chart.tracks.forEach((t, i) => (t.index = i));
-  chart.changeBackgroundOperations?.forEach((op, i) => (op.index = i));
-};
-
-const sortTrack = () => {
-  if (global.timeSort) {
-    chart.tracks.sort((a, b) => a.startTiming - b.startTiming);
-  } else {
-    chart.tracks.sort((a, b) => a.positionX - b.positionX);
-  }
-  setIndex();
-};
-
-const onAudioLoaded = (audioEl) => {
-  audio.value = audioEl;
-  chart.songLength = Math.round(1000 * audio.value.duration);
-  displayEnd.value = chart.songLength;
-};
-
-const getChart = async () => {
-  try {
-    const { data: res } = await Axios.get(`/user/getChart?songId=${route.query.songId}`);
-    if (res.code !== 0) {
-      ElNotification({ title: "失败", message: "谱面获取失败！", type: "error" });
-      return;
-    }
-    Object.assign(chart, res.data);
-    chartGot.value = true;
-    displayStart.value = 0;
-    sortTrack();
-    audio.value = document.getElementById("audio-player"); // Not needed here as BeatPlayer handles it
-    audio.volume = volume.value / 100;
-    
-    if (!chart.bpm || chart.bpm === 0) {
-      globalSetting.value = true;
-      ElNotification({ type: "warning", title: "提示", message: "请设置节拍" });
-    }
-    
-    setTimeout(resize, 1000);
-  } catch (err) {
-    ElNotification({ title: "错误", message: "网络异常", type: "error" });
-  }
-};
-
-const saveChart = async (back) => {
-  try {
-    const { data: res } = await Axios.post("/chart/editChartContent", chart);
-    if (res.code !== 0) {
-      ElNotification({ title: "失败", message: "谱面保存失败！", type: "error" });
-      return;
-    }
-    ElNotification({ title: "成功", message: "谱面保存成功！", type: "success" });
-    if (back) router.push("/admin");
-  } catch (err) {
-    ElNotification({ title: "错误", message: "网络异常", type: "error" });
-  }
-};
-
-const changeMenuDisplay = () => {
-  menuOpened.value = !menuOpened.value;
-  for (let i = 0; i < 1000; i += 16) {
-    setTimeout(() => {
-      playerRef.value?.resize();
-      playerRef.value?.repaint();
-    }, i);
-  }
-};
 
 const siderStyle = computed(() => ({
   '--footerHeight': footerHeight.value + 'px',
@@ -526,60 +442,6 @@ const changeDisplayArea = (val) => {
   displayStart.value = val[0];
   displayEnd.value = val[1];
   playerRef.value?.seek(displayStart.value);
-};
-
-const changeVolume = () => {
-  audio.volume = volume.value / 100;
-};
-
-const ManualCalculatebpm = () => {
-  if (chart.beatsCount && chart.lastBeatDelay && chart.firstBeatDelay) {
-    chart.bpm = (chart.lastBeatDelay - chart.firstBeatDelay) / chart.beatsCount;
-  } else {
-    ElNotification({ title: "错误", message: "请先输入首拍、末拍偏移和节拍数", type: "error" });
-  }
-};
-
-const calculatebpm = () => {
-  if (!bpmStart.value) {
-    global.currentTime = 0;
-    audio.currentTime = 0;
-    bpmcount.value = 0;
-    lastTime.value = 0;
-    bpmtotal.value = 0;
-    startTotal.value = 0;
-    resetTrack();
-    lastTime.value = global.currentTime;
-    bpmStart.value = true;
-    audio.play();
-  } else {
-    if (bpmcount.value <= 3) {
-      lastTime.value = global.currentTime;
-    } else if (bpmcount.value < 10) {
-      const now = global.currentTime;
-      bpmtotal.value += now - lastTime.value;
-      startTotal.value += now - (now - lastTime.value) * bpmcount.value;
-      lastTime.value = now;
-    } else {
-      const now = global.currentTime;
-      bpmtotal.value += now - lastTime.value;
-      startTotal.value += now - (now - lastTime.value) * bpmcount.value;
-      lastTime.value = now;
-      chart.bpm = bpmtotal.value / (bpmcount.value - 3);
-      chart.firstBeatDelay = Math.round(startTotal.value / (bpmcount.value - 3));
-    }
-    bpmcount.value++;
-  }
-};
-
-const endbpm = () => {
-  pause();
-  playerRef.value?.seek(0);
-  startTotal.value = 0;
-  bpmcount.value = 0;
-  bpmStart.value = false;
-  lastTime.value = 0;
-  bpmtotal.value = 0;
 };
 
 const checkbpm = () => {
@@ -669,7 +531,13 @@ onMounted(() => {
     global.mouseDown = !global.mouseDown;
   };
 
-  getChart();
+  getChart(() => {
+    globalSetting.value = true;
+  });
+  
+  setTimeout(() => {
+    playerRef.value?.resize();
+  }, 1000);
 });
 
 onBeforeUnmount(() => {

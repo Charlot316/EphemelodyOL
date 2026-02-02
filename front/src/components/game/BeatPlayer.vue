@@ -373,6 +373,12 @@ onMounted(() => {
     repaint();
   }, { deep: true });
 
+  watch(() => props.volume, (newVol) => {
+    if (audioRef.value) {
+      audioRef.value.volume = newVol / 100;
+    }
+  }, { immediate: true });
+
   // 处理轨道点击 (编辑器功能)
   const container = document.getElementById(props.playerId);
   if (container) {
