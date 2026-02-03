@@ -12,14 +12,17 @@ export function useWebSocket(songId, onMessageReceived) {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     // Use the same host as the current page, or a specific port if needed.
     // Assuming backend runs on 8090 based on previous context.
-    const userStr = localStorage.getItem('user');
+    const vuexStr = localStorage.getItem('vuex');
     let username = '未知用户';
-    let userId = 'guest';
-    if (userStr) {
+    let userId = 'guest_' + Math.random().toString(36).substr(2, 9);
+    
+    if (vuexStr) {
       try {
-        const user = JSON.parse(userStr);
-        username = user.username || '未知用户';
-        userId = user.id || user.userId || 'guest';
+        const state = JSON.parse(vuexStr);
+        if (state.user && state.user.username) {
+            username = state.user.username;
+            userId = state.user.id || state.user.userId || userId;
+        }
       } catch (e) { /* ignore */ }
     }
 

@@ -248,9 +248,15 @@ onMounted(() => {
     } else if (e.key === "ArrowRight") {
       global.currentTime = Math.min(chart.songLength, global.currentTime + timeStep.value);
       handleTimeChange();
-    } else if (e.key === " ") {
       e.preventDefault();
       togglePlay();
+    } else if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+      if (e.shiftKey) {
+        commandHistory.redo();
+      } else {
+        commandHistory.undo();
+      }
+      e.preventDefault();
     }
   };
 

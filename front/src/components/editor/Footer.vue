@@ -7,7 +7,7 @@
         class="toolbar-side-aligned" 
         :style="{ 
           width: siderWidth + 'px',
-          order: siderPos === 'left' ? 0 : 10 
+          width: siderWidth + 'px'
         }"
       >
           <div class="toolbar-group-minimal">
