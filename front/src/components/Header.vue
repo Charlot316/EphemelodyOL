@@ -1,6 +1,6 @@
 <template>
   <div class="header-container">
-    <div class="header-content glass">
+    <div class="header-content">
       <div class="left-section" @click="$router.push({ path: '/' })">
         <h1 class="header-logo">EPHEMELODY</h1>
       </div>
@@ -83,6 +83,7 @@ export default {
 .header-container {
   padding: 15px 40px;
   width: 100%;
+  height: 100px; /* Explicit height (70 + 15 + 15) */
   box-sizing: border-box;
   position: relative;
   z-index: 100;
@@ -96,10 +97,13 @@ export default {
   justify-content: space-between;
   align-items: center;
   align-items: center;
+  align-items: center;
   border-radius: 20px;
-  background: rgba(30, 30, 30, 0.6); /* Darker fallback */
+  background: rgba(30, 30, 30, 0.8);
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
 .header-logo {
