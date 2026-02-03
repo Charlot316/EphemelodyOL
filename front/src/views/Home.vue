@@ -2,7 +2,7 @@
   <div class="home-page">
     <BackgroundDisplay />
     <div class="content-overlay">
-      <AppHeader />
+      <app-header />
       <main class="main-content">
         <div class="welcome-section">
           <h1 class="glitch-text">{{ $t('home.title') }}</h1>
@@ -47,7 +47,7 @@ import AppHeader from "../components/Header";
 import BackgroundDisplay from "@/components/BackgroundDisplay";
 export default {
   components: {
-    AppHeader,
+    'app-header': AppHeader,
     BackgroundDisplay,
   },
 };

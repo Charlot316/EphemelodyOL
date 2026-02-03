@@ -1,7 +1,7 @@
 <template>
   <div class="beat-player-container" :id="playerId">
     <!-- 背景图层 -->
-    <div class="background-base">
+    <div class="background-base" style="width:100%; height:100%; position:absolute; top:0; left:0;">
       <img 
         :src="normalizeUrl(chart.defaultBackground)" 
         class="background-image" 
@@ -10,7 +10,7 @@
         @error="handleImageLoaded"
       />
     </div>
-    <div v-for="(op, index) in chart.changeBackgroundOperations" :key="index">
+    <div v-for="(op, index) in chart.changeBackgroundOperations" :key="index" style="width:100%; height:100%; position:absolute; top:0; left:0;">
       <img
         :src="getBackgroundUrl(op)"
         v-show="
@@ -577,6 +577,8 @@ defineExpose({
 
 .background-base {
   z-index: 0;
+  width: 100%;
+  height: 100%;
 }
 
 .judgment-line-container {

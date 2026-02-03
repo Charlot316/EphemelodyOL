@@ -2,7 +2,7 @@
   <div class="admin-view">
     <background-display />
     <div class="view-content">
-      <AppHeader />
+      <app-header />
       
       <div class="filter-header-wrapper">
         <div class="filter-header glass">
@@ -181,7 +181,7 @@
 import BackgroundDisplay from "../components/BackgroundDisplay";
 import AppHeader from "../components/Header";
 export default {
-  components: { BackgroundDisplay, AppHeader },
+  components: { BackgroundDisplay, 'app-header': AppHeader },
   data() {
     return {
       sort: "00",
