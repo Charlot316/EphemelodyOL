@@ -60,7 +60,8 @@ const lengthForKey = computed(() => {
 });
 
 const finalHeight = computed(() => {
-  return myglobal.screenHeight * myglobal.finalY;
+  const finalY = (myglobal.finalY !== undefined) ? myglobal.finalY : 0.8;
+  return myglobal.screenHeight * finalY;
 });
 
 const width = computed(() => {
@@ -83,7 +84,8 @@ const middle = computed(() => {
 });
 
 const Y = computed(() => {
-  return myglobal.finalY * myglobal.screenHeight;
+  const finalY = (myglobal.finalY !== undefined) ? myglobal.finalY : 0.8;
+  return finalY * myglobal.screenHeight;
 });
 
 // Binary Search
@@ -180,10 +182,13 @@ const paintNote = (note) => {
   }
   // console.log('[Track] paintNote', note.index, note.timing, myglobal.currentTime);
   const currentTime = myglobal.currentTime;
+  const remainingTime = myglobal.remainingTime || 1000;
+  const finalY = myglobal.finalY || 0.8;
+  
   const yValue =
-    ((myglobal.finalY / myglobal.remainingTime) * currentTime -
-      (myglobal.finalY / myglobal.remainingTime) *
-        (note.timing - myglobal.remainingTime)) *
+    ((finalY / remainingTime) * currentTime -
+      (finalY / remainingTime) *
+        (note.timing - remainingTime)) *
     myglobal.screenHeight;
   
   // debug log for the first few notes to avoid span

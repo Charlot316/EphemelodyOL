@@ -13,7 +13,7 @@
       >
         <div>
           <el-button
-            type="text"
+            link
             style="margin-left:10px;"
             class="plus-button"
             @click="newTrack"
@@ -24,13 +24,13 @@
         </div>
         <div>
           <el-button
-            type="text"
+            link
             class="show-button"
             style="margin-right:5px;"
             @click="autoScroll = !autoScroll"
           >{{ autoScroll ? "关闭滚动" : "开启滚动" }}</el-button>
           <el-button
-            type="text"
+            link
             class="show-button"
             style="margin-right:13px;"
             @click="trackShowAll = !trackShowAll"

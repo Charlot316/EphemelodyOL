@@ -70,9 +70,9 @@
               size="small"
               class="custom-radio-group"
             >
-              <el-radio-button :label="0">短键</el-radio-button>
-              <el-radio-button :label="1">长键</el-radio-button>
-              <el-radio-button :label="2">滑键</el-radio-button>
+              <el-radio-button :value="0">短键</el-radio-button>
+              <el-radio-button :value="1">长键</el-radio-button>
+              <el-radio-button :value="2">滑键</el-radio-button>
             </el-radio-group>
           </el-form-item>
 
