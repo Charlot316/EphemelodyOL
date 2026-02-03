@@ -333,8 +333,12 @@ export function useChartEditor(route, router) {
     setIndex();
   };
 
-  const sortTrack = () => {
-    chart.tracks?.sort((a, b) => a.startTiming - b.startTiming);
+  const sortTrack = (byTime = true) => {
+    if (byTime) {
+      chart.tracks?.sort((a, b) => a.startTiming - b.startTiming);
+    } else {
+      chart.tracks?.sort((a, b) => (a.positionX || 0) - (b.positionX || 0));
+    }
     setIndex();
   };
 
@@ -376,7 +380,8 @@ export function useChartEditor(route, router) {
           if (track.changeColorOperations) track.changeColorOperations.sort((a, b) => a.startTime - b.startTime);
         });
       }
-      sortTrack();
+      // Default to time sort on load
+      sortTrack(true);
 
       if (!chart.bpm || chart.bpm === 0) {
         globalSettingsCallback?.();
