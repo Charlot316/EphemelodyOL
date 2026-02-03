@@ -419,7 +419,14 @@ const showAllTracks = () => {
 
 const switchToDeleteMode = () => {
   if (currentNoteType.value === 3) {
-      // Already in delete mode, click again to exit (optional, or just do nothing)
+      // 已经在删除模式，再次点击退出
+      currentNoteType.value = -1;
+      ElNotification({
+        title: '快捷删除模式关闭',
+        message: '已退出删除模式',
+        type: 'info',
+        duration: 2000
+      });
       return; 
   }
   ElMessageBox.confirm(
