@@ -10,12 +10,12 @@
         @error="handleImageLoaded"
       />
     </div>
-    <div v-for="(op, index) in chart.changeBackgroundOperations" :key="index" style="width:100%; height:100%; position:absolute; top:0; left:0;">
+    <div v-for="(op, index) in chart.changeBackgroundOperations" :key="index" style="width:100%; height:100%; position:absolute; top:0; left:0; z-index: 1;">
       <img
         :src="getBackgroundUrl(op)"
         v-show="
-          global.currentTime >= op.startTiming &&
-          (op.endTiming === null || op.endTiming === undefined || global.currentTime <= op.endTiming)
+          Number(global.currentTime) >= Number(op.startTiming) &&
+          (op.endTiming === null || op.endTiming === undefined || Number(global.currentTime) <= Number(op.endTiming))
         "
         class="background-image background-overlay"
         alt="op-bg"
