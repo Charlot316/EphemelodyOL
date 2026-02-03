@@ -153,6 +153,11 @@ const global = reactive({
   keyUsed: {},
   reCalculateChartMaker: false,
   siderWidth: 300, 
+  remainingTime: 1000,
+  finalY: 0.8,
+  lostTime: 150,
+  pureTime: 50,
+  farTime: 100,
 });
 
 const menuOpened = ref(true);

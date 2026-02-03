@@ -355,7 +355,7 @@ const resetTrackStates = () => {
     for (let j = track.notes.length - 1; j >= 0; j--) {
       track.notes[j].judged = false;
       if (track.notes[j].timing + global.lostTime > global.currentTime) index = j;
-      if (global.currentTime < track.notes[j].timing - global.remainingTime) last = j;
+      if (global.currentTime < track.notes[j].timing - (global.remainingTime || 1000) - 1000) last = j;
     }
     track.currentNote = index;
     track.lastNote = last - 1;
