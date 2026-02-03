@@ -10,9 +10,9 @@
             class="panel-sider glass-panel" 
             :style="{ width: global.siderWidth + 'px', gridRow: 1 }"
           >
-          <div class="panel-drag-handle">组件库</div>
+          
           <MenuPanel
-            :Height="global.documentHeight - footerHeight - 24"
+            :Height="global.documentHeight - footerHeight"
             :footerHeight="footerHeight"
             :global="global"
             :chart="chart"
@@ -26,7 +26,7 @@
         class="panel-preview glass-panel" 
         :style="{ gridRow: 1, width: `calc(100% - ${siderWidth}px)` }"
       >
-        <div class="panel-drag-handle">预览区</div>
+        
         <div class="player-wrapper">
           <BeatPlayer
             ref="playerRef"
@@ -363,7 +363,7 @@ onMounted(() => {
   flex: 1;
   position: relative;
   width: 100%;
-  height: calc(100% - 24px); /* Subtract handle height */
+  height: 100%;
 }
 
 .panel-footer {
