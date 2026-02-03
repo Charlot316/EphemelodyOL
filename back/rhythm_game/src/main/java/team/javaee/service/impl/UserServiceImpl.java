@@ -454,7 +454,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                                     ChangeBackgroundOperationsVO vo = new ChangeBackgroundOperationsVO();
                                     vo.setStartTiming(dto.getStartTiming());
                                     vo.setEndTiming(dto.getEndTiming());
-                                    vo.setBackground(dto.getBackground());
                                     vo.setAssetId(dto.getAssetId());
                                     return vo;
                                 }).collect(Collectors.toList());
@@ -565,7 +564,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 vo.setId(item.getId());
                 vo.setStartTiming(item.getStartTiming());
                 vo.setEndTiming(item.getEndTiming());
-                vo.setBackground(item.getBackground());
                 vo.setAssetId(item.getAssetId());
                 changeBackgroundOperations.add(vo);
             }

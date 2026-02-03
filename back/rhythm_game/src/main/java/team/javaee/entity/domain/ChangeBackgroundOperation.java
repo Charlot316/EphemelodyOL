@@ -47,11 +47,6 @@ public class ChangeBackgroundOperation implements Serializable {
     private Integer endTiming;
 
     /**
-     * 存放需要更换的背景的路径
-     */
-    private String background;
-
-    /**
      * 素材ID
      */
     private Integer assetId;

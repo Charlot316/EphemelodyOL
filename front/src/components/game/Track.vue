@@ -356,7 +356,7 @@ const paintNotes = () => {
       paintNote(myTrack.notes[i]);
     }
   } else {
-    console.log('[Track] judgeFinished is true');
+    //console.log('[Track] judgeFinished is true');
   }
 };
 

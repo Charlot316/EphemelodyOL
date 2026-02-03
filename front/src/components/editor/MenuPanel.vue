@@ -2,19 +2,18 @@
   <div class="menu-panel-container">
     <div class="panel-header">
       <div class="title-section">
-        <el-icon><Picture /></el-icon>
+        <el-icon>
+          <Picture />
+        </el-icon>
         <h4>图片资源管理</h4>
       </div>
       <div class="header-actions">
-        <el-upload
-          action="/api/chart/uploadAsset"
-          :data="{ songId: chart.songId, type: 'image' }"
-          :show-file-list="false"
-          :on-success="handleUploadSuccess"
-          :with-credentials="true"
-        >
+        <el-upload action="/api/chart/uploadAsset" :data="{ songId: chart.songId, type: 'image' }"
+          :show-file-list="false" :on-success="handleUploadSuccess" :with-credentials="true">
           <el-button size="small" circle class="upload-btn-header">
-            <el-icon><Plus /></el-icon>
+            <el-icon>
+              <Plus />
+            </el-icon>
           </el-button>
         </el-upload>
       </div>
@@ -22,27 +21,21 @@
 
     <div class="assets-grid" :style="{ height: Height - 60 + 'px' }">
       <div v-if="!chart.assets || chart.assets.length === 0" class="empty-state">
-        <el-icon><Files /></el-icon>
+        <el-icon>
+          <Files />
+        </el-icon>
         <p>暂无资源</p>
         <p class="sub">点击上方按钮上传</p>
       </div>
-      <div 
-        v-for="asset in chart.assets" 
-        :key="asset.id" 
-        class="asset-item"
-        draggable="true"
-        @dragstart="onDragStart($event, asset)"
-      >
+      <div v-for="asset in chart.assets" :key="asset.id" class="asset-item" draggable="true"
+        @dragstart="onDragStart($event, asset)">
         <div class="asset-preview">
           <img :src="asset.url" alt="asset" />
           <div class="asset-overlay">
-            <el-button 
-              type="danger" 
-              size="small" 
-              circle 
-              @click="deleteAsset(asset)"
-            >
-              <el-icon><Delete /></el-icon>
+            <el-button type="danger" size="small" circle @click="deleteAsset(asset)">
+              <el-icon>
+                <Delete />
+              </el-icon>
             </el-button>
           </div>
         </div>
@@ -94,10 +87,12 @@ const deleteAsset = (asset) => {
     } catch (err) {
       ElNotification({ title: '错误', message: '网络异常', type: 'error' });
     }
-  }).catch(() => {});
+  }).catch(() => { });
 };
 
 const onDragStart = (event, asset) => {
+  event.dataTransfer.setData('assetUrl', asset.url);
+  event.dataTransfer.setData('assetId', String(asset.id));
   event.dataTransfer.setData('application/json', JSON.stringify({
     type: 'background-asset',
     url: asset.url,

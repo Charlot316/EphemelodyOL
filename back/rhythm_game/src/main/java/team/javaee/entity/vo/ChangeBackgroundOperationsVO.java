@@ -7,6 +7,5 @@ public class ChangeBackgroundOperationsVO {
     private Integer id;
     private Integer startTiming;
     private Integer endTiming;
-    private String background;
     private Integer assetId;
 }

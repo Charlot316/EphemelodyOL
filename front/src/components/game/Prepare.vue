@@ -1,71 +1,46 @@
 <template>
   <div v-if="!loadingStatus.runStart" class="show-info">
-    <img
-      :src="chart.defaultBackground"
-      class="loading-background"
-      style="user-drag:none;"
-    />
+    <img :src="chart.defaultBackground" class="loading-background" style="user-drag:none;" />
     <div style="position:absolute;width:100vw;height:100vh;"></div>
-    <div
-      :class="loadingStatus.runReady ? 'info-container-out' : 'info-container'"
-      style="overflow: auto;"
-    >
-      <div
-        style="display: flex;justify-content: space-between;align-items: center;"
-      >
+    <div :class="loadingStatus.runReady ? 'info-container-out' : 'info-container'" style="overflow: auto;">
+      <div style="display: flex;justify-content: space-between;align-items: center;">
         <div class="songcover-container">
           <img class="songcover-img" :src="chart.songCover" />
         </div>
         <div class="info" style="padding:20px;">
-          <div
-            class="song-uploader"
-            style="text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:30px;color:rgb(255,250,235);"
-          >
+          <div class="song-uploader"
+            style="text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:30px;color:rgb(255,250,235);">
             {{ chart.uploader }}
           </div>
-          <div
-            class="song-name"
-            style="text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:70px;color:rgb(255,255,255);background-color:rgba(105, 245, 202, 0.5);"
-          >
+          <div class="song-name"
+            style="text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:70px;color:rgb(255,255,255);background-color:rgba(105, 245, 202, 0.5);">
             {{ chart.songName }}
           </div>
-          <div
-            class="song-writer"
-            style="text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:50px;color:rgb(255,255,255);background-color:rgba(255, 255, 255, 0.5);"
-          >
+          <div class="song-writer"
+            style="text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:50px;color:rgb(255,255,255);background-color:rgba(255, 255, 255, 0.5);">
             {{ chart.songWriter }}
           </div>
         </div>
       </div>
-      <div
-        class="loading-container"
-        style="text-align: center;margin-right:50px;"
-      >
-        <div
-          :class="loadingStatus.canRun ? 'play-button' : 'play-button-disabled'"
-          style="width:150px;height:150px;line-height:150px;margin:20px auto;border-radius:50%;"
-          @click="startMusic"
-        >
+      <div class="loading-container" style="text-align: center;margin-right:50px;">
+        <div :class="loadingStatus.canRun ? 'play-button' : 'play-button-disabled'"
+          style="width:150px;height:150px;line-height:150px;margin:20px auto;border-radius:50%;" @click="startMusic">
           {{ loadingStatus.canRun ? $t('play.start') : $t('play.loading') }}
         </div>
-        <div
-          class="loading-text"
-          v-if="!loadingStatus.canRun"
-          style="padding:10px;min-width:400px;text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:20px;color:rgb(255,255,255);"
-        >
+        <div class="loading-text" v-if="!loadingStatus.canRun"
+          style="padding:10px;min-width:400px;text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:20px;color:rgb(255,255,255);">
           {{ chart.loadingText }}
+          <span v-if="loadingStatus.imageTotalCount > 0" class="progress-info">
+            ({{ loadingStatus.imageCurrentCount }} / {{ loadingStatus.imageTotalCount }})
+          </span>
         </div>
-        <div
-          v-if="loadingStatus.canRun"
-          style="padding:10px;min-width:400px;text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:20px;color:rgb(255,255,255);"
-        >
+        <div v-if="loadingStatus.canRun"
+          style="padding:10px;min-width:400px;text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:20px;color:rgb(255,255,255);">
           {{ chart.loadedText }}
         </div>
-        <div
-          class="loaded-text"
-          v-if="loadingStatus.canRun"
-          style="height:2px;min-width:400px;text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:20px;color:rgb(255,255,255);"
-        ></div>
+        <div class="loaded-text" v-if="loadingStatus.canRun"
+          style="height:2px;min-width:400px;text-shadow: 1px 1px 0 rgba(0,0,0,0.25);font-size:20px;color:rgb(255,255,255);">
+        </div>
       </div>
     </div>
   </div>
@@ -88,29 +63,45 @@ const startMusic = () => {
 
 <style scoped>
 @keyframes backgroung-image {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 @keyframes linearGradientMove {
-  100% { background-position: 4px 0, -4px 100%, 0 -4px, 100% 4px; }
+  100% {
+    background-position: 4px 0, -4px 100%, 0 -4px, 100% 4px;
+  }
 }
 
 .loading-text {
   background: linear-gradient(90deg, rgb(255, 255, 255) 50%, transparent 0) repeat-x,
-              linear-gradient(90deg, rgb(255, 255, 255) 50%, transparent 0) repeat-x,
-              linear-gradient(0deg, rgb(255, 255, 255) 50%, transparent 0) repeat-y,
-              linear-gradient(0deg, rgb(255, 255, 255) 50%, transparent 0) repeat-y;
+    linear-gradient(90deg, rgb(255, 255, 255) 50%, transparent 0) repeat-x,
+    linear-gradient(0deg, rgb(255, 255, 255) 50%, transparent 0) repeat-y,
+    linear-gradient(0deg, rgb(255, 255, 255) 50%, transparent 0) repeat-y;
   background-size: 0px 0px, 4px 1px, 0px 0px, 0px 0px;
   background-position: 0 0, 0 100%, 0 0, 100% 0;
   animation: linearGradientMove 0.3s infinite linear;
 }
 
 @keyframes loadedText {
-  0% { background-size: 0% 2px; }
-  100% { background-size: 100% 2px; }
+  0% {
+    background-size: 0% 2px;
+  }
+
+  100% {
+    background-size: 100% 2px;
+  }
 }
+
 .loaded-text {
   background-image: linear-gradient(rgb(255, 255, 255), rgb(255, 255, 255));
   background-position: center bottom;
@@ -120,9 +111,15 @@ const startMusic = () => {
 }
 
 @keyframes playbutton {
-  0% { box-shadow: 0px 0px 0px 0px rgba(255, 120, 160, 0.8); }
-  100% { box-shadow: 0px 0px 0px 40px rgba(255, 144, 164, 0.2); }
+  0% {
+    box-shadow: 0px 0px 0px 0px rgba(255, 120, 160, 0.8);
+  }
+
+  100% {
+    box-shadow: 0px 0px 0px 40px rgba(255, 144, 164, 0.2);
+  }
 }
+
 .play-button {
   animation-name: playbutton;
   animation-duration: 2s;
@@ -143,9 +140,11 @@ const startMusic = () => {
   background-image: linear-gradient(330.9453959009229deg, rgb(82, 105, 125) 0, rgb(65, 82, 97) 6%, rgb(27, 55, 80) 53%, rgb(17, 48, 81) 100%);
   transition: 0.5s;
 }
+
 .play-button:hover {
   transform: scale(0.9);
 }
+
 .play-button:active {
   transform: scale(0.85);
   transition: 0.1s;
@@ -165,8 +164,13 @@ const startMusic = () => {
 }
 
 @keyframes info-container-upward {
-  0% { bottom: -400px; }
-  100% { bottom: 0px; }
+  0% {
+    bottom: -400px;
+  }
+
+  100% {
+    bottom: 0px;
+  }
 }
 
 .info-container {
@@ -185,9 +189,15 @@ const startMusic = () => {
 }
 
 @keyframes info-container-downward {
-  0% { bottom: 0px; }
-  100% { bottom: -400px; }
+  0% {
+    bottom: 0px;
+  }
+
+  100% {
+    bottom: -400px;
+  }
 }
+
 .info-container-out {
   animation: info-container-downward 0.5s ease-out;
   position: absolute;
@@ -212,5 +222,12 @@ const startMusic = () => {
   height: 100%;
   object-fit: fill;
   border: 2px solid rgb(255, 255, 255);
+}
+
+.progress-info {
+  margin-left: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 16px;
+  opacity: 0.8;
 }
 </style>

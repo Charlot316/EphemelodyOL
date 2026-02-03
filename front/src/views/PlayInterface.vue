@@ -1,25 +1,10 @@
 <template>
   <div class="play-interface select" id="play-interface-container">
-    <Prepare
-      :loadingStatus="loadingStatus"
-      :chart="chart"
-      @startMusic="startMusic"
-    />
-    <Play
-      ref="playRef"
-      :loadingStatus="loadingStatus"
-      :chart="chart"
-      :global="global"
-      :score="score"
-      @audioLoaded="audioLoaded"
-      @imageLoaded="imageLoaded"
-      @addCount="addCount"
-      @pause="pause"
-      @restart="reStart"
-      @continuePlay="continuePlay"
-      @timeUpdate="handleTimeUpdate"
-      @finished="handleFinished"
-    />
+    <Prepare :loadingStatus="loadingStatus" :chart="chart" @startMusic="startMusic" />
+    <Play ref="playRef" :loadingStatus="loadingStatus" :chart="chart" :global="global" :score="score"
+      @audioLoaded="audioLoaded" @imageLoaded="imageLoaded" @imageProgress="handleImageProgress" @addCount="addCount"
+      @pause="pause" @restart="reStart" @continuePlay="continuePlay" @timeUpdate="handleTimeUpdate"
+      @finished="handleFinished" />
     <Result :loadingStatus="loadingStatus" :chart="chart" :global="global" />
     <transition name="fade">
       <div v-if="pauseVisible" class="pause-overlay">
@@ -27,13 +12,19 @@
           <h2 class="pause-title">{{ $t('play.pause') }}</h2>
           <div class="pause-controls">
             <div class="control-btn" @click="$router.go(-1)">
-              <el-icon><CaretLeft /></el-icon>
+              <el-icon>
+                <CaretLeft />
+              </el-icon>
             </div>
             <div class="control-btn" @click="reStart">
-              <el-icon><RefreshLeft /></el-icon>
+              <el-icon>
+                <RefreshLeft />
+              </el-icon>
             </div>
             <div class="control-btn" @click="continuePlay">
-              <el-icon><CaretRight /></el-icon>
+              <el-icon>
+                <CaretRight />
+              </el-icon>
             </div>
           </div>
         </div>
@@ -103,6 +94,7 @@ const loadingStatus = reactive({
   beforeFinished: false,
   finished: false,
   imageCurrentCount: 0,
+  imageTotalCount: 0,
 });
 
 const score = computed(() => {
@@ -124,14 +116,13 @@ const resize = () => {
 const sortTrack = () => {
   if (chart.value.tracks) {
     chart.value.tracks.sort((a, b) => a.startTiming - b.startTiming);
-    
+
     // Calculate notes count manually to ensure accuracy for scoring
     let count = 0;
     chart.value.tracks.forEach(t => {
       if (t.notes) count += t.notes.length;
     });
     chart.value.notesCount = count;
-    console.log('[PlayInterface] Calculated notesCount:', count);
   }
 };
 
@@ -150,7 +141,6 @@ const getChart = async () => {
     }
     chart.value = res.data;
     loadingStatus.chart = true;
-    console.log('[PlayInterface] Chart loaded:', chart.value.songName);
     checkIfLoaded();
     sortTrack();
     // generateImagePath() is now handled inside BeatPlayer.vue
@@ -200,22 +190,18 @@ const handleTimeUpdate = (time) => {
 };
 
 const handleFinished = () => {
-    loadingStatus.beforeFinished = true;
-    finish();
-    setTimeout(() => {
-      loadingStatus.finished = true;
-    }, 2000);
+  loadingStatus.beforeFinished = true;
+  finish();
+  setTimeout(() => {
+    loadingStatus.finished = true;
+  }, 2000);
 };
 
 const audioLoaded = (audioEl) => {
-  console.log('[PlayInterface] Audio loaded');
   audio.value = audioEl;
-  
+
   if (!chart.value.songLength && audioEl.duration) {
     chart.value.songLength = audioEl.duration * 1000;
-    console.log('[PlayInterface] Updated songLength from audio:', chart.value.songLength);
-  } else {
-    console.log('[PlayInterface] Using chart songLength:', chart.value.songLength);
   }
 
   loadingStatus.audio = true;
@@ -223,19 +209,21 @@ const audioLoaded = (audioEl) => {
 };
 
 const imageLoaded = () => {
-  console.log('[PlayInterface] Image loaded');
   loadingStatus.image = true;
   checkIfLoaded();
 };
 
+const handleImageProgress = (progress) => {
+  loadingStatus.imageCurrentCount = progress.current;
+  loadingStatus.imageTotalCount = progress.total;
+};
+
 const checkIfLoaded = () => {
-  console.log('[PlayInterface] Checking status:', JSON.parse(JSON.stringify(loadingStatus)));
   if (
     loadingStatus.chart &&
     loadingStatus.audio &&
     loadingStatus.image
   ) {
-    console.log('[PlayInterface] All resources loaded, setting canRun = true');
     setTimeout(() => {
       loadingStatus.canRun = true;
     }, 1000);
@@ -243,7 +231,6 @@ const checkIfLoaded = () => {
 };
 
 const startMusic = () => {
-  console.log('[PlayInterface] startMusic called. canRun:', loadingStatus.canRun);
   if (loadingStatus.canRun) {
     loadingStatus.runReady = true;
     // Tell BeatPlayer to start
@@ -259,7 +246,7 @@ const startMusic = () => {
 const addCount = (param) => {
   // 注意：global[param.key]、global.combo 和 global.maxCombo 已经在 BeatPlayer.vue 中更新过了
   // 因为它们共享同一个 reactive global 对象，所以这里不需要再手动自增，否则会导致双倍计数
-  
+
   const notesCount = chart.value.notesCount;
   if (!notesCount) return;
 
@@ -281,7 +268,7 @@ const addCount = (param) => {
   } else if (param.type === "far") {
     global.score += Math.floor(noteValue * 0.5);
   }
-  
+
   // 如果是 last note，可以做一次最终校准（虽然理论上已经准确）
   if (totalJudged === notesCount && global.score > 10000000) {
     global.score = 10000000;
@@ -304,9 +291,9 @@ const resetTrack = () => {
   global.keyPressTime = {};
   global.keyIsHold = {};
   global.keyUsed = {};
-  
+
   if (!chart.value.tracks) return;
-  
+
   for (let i = 0; i < chart.value.tracks.length; i++) {
     let track = chart.value.tracks[i];
     let index = 0;
@@ -356,7 +343,6 @@ onMounted(() => {
   const savedSpeed = localStorage.getItem('noteSpeed');
   if (savedSpeed) {
     global.remainingTime = parseInt(savedSpeed);
-    console.log('[PlayInterface] Loaded Note Speed:', global.remainingTime);
   }
   resize();
   window.onkeydown = (e) => {
@@ -368,28 +354,28 @@ onMounted(() => {
     if (e.key === "Escape") pause();
     if (e.key === "Enter") continuePlay();
   };
-  
+
   document.onkeyup = (e) => {
     global.keyIsHold[e.key.toUpperCase()] = false;
   };
-  
+
   const container = document.getElementById("play-interface-container");
   container.ontouchstart = (e) => {
     if (chart.value.tracks) {
       let currentTime = global.currentTime;
-      let currentTracks = chart.value.tracks.filter(track => 
-        currentTime > track.startTiming && 
-        currentTime < track.endTiming && 
+      let currentTracks = chart.value.tracks.filter(track =>
+        currentTime > track.startTiming &&
+        currentTime < track.endTiming &&
         track.type === 1
       );
-      
+
       for (let j = 0; j < e.touches.length; j++) {
         for (let k = 0; k < currentTracks.length; k++) {
           let track = currentTracks[k];
           let touch = e.touches[j];
           let left = (parseFloat(track.tempPositionX) - parseFloat(track.tempWidth)) * global.screenWidth;
           let right = (parseFloat(track.tempPositionX) + parseFloat(track.tempWidth)) * global.screenWidth;
-          
+
           if (touch.pageX > left && touch.pageX < right) {
             let key = track.key.toUpperCase();
             global.keyPressTime[key] = currentTime;
@@ -402,7 +388,7 @@ onMounted(() => {
     }
     if (e.touches.length > 1) e.preventDefault();
   };
-  
+
   let lastTouchEnd = 0;
   container.ontouchend = (e) => {
     let now = new Date().getTime();
@@ -417,7 +403,7 @@ onMounted(() => {
       }
     }
   };
-  
+
   getChart();
 });
 
@@ -471,7 +457,7 @@ onBeforeUnmount(() => {
   font-size: 24px;
   font-weight: 600;
   margin: 0;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .pause-controls {
@@ -509,6 +495,7 @@ onBeforeUnmount(() => {
 .fade-leave-to {
   opacity: 0;
 }
+
 .select {
   -webkit-user-select: none;
   -moz-user-select: none;

@@ -1,29 +1,14 @@
 <template>
-  <div
-    v-show="loadingStatus.runStart"
-    v-if="!loadingStatus.finished"
-    class="play-container"
-  >
-    <BeatPlayer
-      ref="playerRef"
-      :chart="chart"
-      :global="global"
-      mode="play"
-      @audio-loaded="audioLoaded"
-      @image-loaded="imageLoaded"
-      @add-count="addCount"
-      @time-update="$emit('timeUpdate', $event)"
-      @finished="$emit('finished')"
-    />
+  <div v-show="loadingStatus.runStart" v-if="!loadingStatus.finished" class="play-container">
+    <BeatPlayer ref="playerRef" :chart="chart" :global="global" mode="play" @audio-loaded="audioLoaded"
+      @image-loaded="imageLoaded" @image-progress="$emit('imageProgress', $event)" @add-count="addCount"
+      @time-update="$emit('timeUpdate', $event)" @finished="$emit('finished')" />
 
     <!-- 记分板 -->
-    <div
-      :class="
-        loadingStatus.beforeFinished
-          ? 'play-interface-scoreboard-container-upward'
-          : 'play-interface-scoreboard-container-downward'
-      "
-      :style="{
+    <div :class="loadingStatus.beforeFinished
+        ? 'play-interface-scoreboard-container-upward'
+        : 'play-interface-scoreboard-container-downward'
+      " :style="{
         height: '200px',
         position: 'absolute',
         top: '0px',
@@ -31,11 +16,8 @@
         width: global.screenWidth + 'px',
         background: 'linear-gradient(0deg, rgba(0,0,0,0) 0, rgba(0,0,0,1) 100%)',
         zIndex: 100
-      }"
-    >
-      <div
-        class="score-counter"
-        style="text-align:center;
+      }">
+      <div class="score-counter" style="text-align:center;
           position:absolute;
           left:0px;
           width: 50px;
@@ -43,66 +25,53 @@
           text-shadow: 1px 1px 0 rgba(0,0,0,0.25);
           font-size:30px;
           color:rgb(255,255,255);
-          cursor: pointer;"
-        @click="pause"
-      >
+          cursor: pointer;" @click="pause">
         {{ "|" + "&#32;" + "|" }}
       </div>
-      <div
-        class="score-counter"
-        style="text-align:center;
+      <div class="score-counter" style="text-align:center;
           position:absolute;
           right:0px;
           width: 200px;
           margin: 0 auto;
           text-shadow: 1px 1px 0 rgba(0,0,0,0.25);
           font-size:40px;
-          color:rgb(255,255,255)"
-      >
+          color:rgb(255,255,255)">
         {{ score }}
       </div>
       <div class="combo-counter" v-if="global.combo > 1">
-        <div
-          style="text-align:center;
+        <div style="text-align:center;
           width: 200px;
           margin: 0 auto;
           text-shadow: 1px 1px 0 rgba(0,0,0,0.25);
           font-size:70px;
-          color:rgb(255,255,255)"
-        >
+          color:rgb(255,255,255)">
           {{ global.combo }}
         </div>
-        <div
-          style="text-align:center;
+        <div style="text-align:center;
           width: 200px;
           margin: 0 auto;
           text-shadow: 1px 1px 0 rgba(0,0,0,0.25);
           font-size:20px;
-          color:rgb(255,255,255)"
-        >
-          <span
-            :style="{
-              color: [
-                global.combo == global.pureCount && global.lostCount == 0
-                  ? 'rgb(247, 199, 9)'
-                  : global.lostCount == 0
+          color:rgb(255,255,255)">
+          <span :style="{
+            color: [
+              global.combo == global.pureCount && global.lostCount == 0
+                ? 'rgb(247, 199, 9)'
+                : global.lostCount == 0
                   ? 'rgb(135, 206, 250)'
                   : 'rgb(255, 255, 255)',
-              ],
-            }"
-          >{{ global.lostCount == 0 ? "⬥" : "⬦" }}</span>
+            ],
+          }">{{ global.lostCount == 0 ? "⬥" : "⬦" }}</span>
           COMBO
-          <span
-            :style="{
-              color: [
-                global.combo == global.pureCount && global.lostCount == 0
-                  ? 'rgb(247, 199, 9)'
-                  : global.lostCount == 0
+          <span :style="{
+            color: [
+              global.combo == global.pureCount && global.lostCount == 0
+                ? 'rgb(247, 199, 9)'
+                : global.lostCount == 0
                   ? 'rgb(135, 206, 250)'
                   : 'rgb(255, 255, 255)',
-              ],
-            }"
-          >{{ global.lostCount == 0 ? "⬥" : "⬦" }}</span>
+            ],
+          }">{{ global.lostCount == 0 ? "⬥" : "⬦" }}</span>
         </div>
       </div>
     </div>
@@ -157,6 +126,7 @@ defineExpose({
   0% {
     top: -200px;
   }
+
   100% {
     top: 0px;
   }
@@ -166,10 +136,12 @@ defineExpose({
   0% {
     top: 0px;
   }
+
   100% {
     top: -200px;
   }
 }
+
 .play-interface-scoreboard-container-downward {
   top: 0;
   animation: scoreboard-container-downward 0.5s ease-out;

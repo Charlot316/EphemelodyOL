@@ -3,27 +3,24 @@
     <!-- 左侧固定部分 -->
     <div class="bg-timeline-left">
       <div class="header">
-        <el-icon><Picture /></el-icon>
+        <el-icon>
+          <Picture />
+        </el-icon>
         <span>背景轨道</span>
-        <el-button 
-          type="text" 
-          size="small" 
-          class="collapse-btn" 
-          @click="toggleCollapse"
-        >
-          <el-icon><ArrowDown v-if="!isCollapsed"/><ArrowUp v-else/></el-icon>
+        <el-button type="text" size="small" class="collapse-btn" @click="toggleCollapse">
+          <el-icon>
+            <ArrowDown v-if="!isCollapsed" />
+            <ArrowUp v-else />
+          </el-icon>
         </el-button>
       </div>
     </div>
 
     <!-- 右侧滚动部分 -->
     <div class="bg-timeline-right" @scroll="handleScroll" ref="scrollRef">
-      <div 
-        class="bg-track-content"
+      <div class="bg-track-content"
         :style="{ width: (chart.songLength / displayAreaTime) * (global.documentWidth - global.siderWidth) + 'px' }"
-        @dragover.prevent
-        @drop="handleDrop"
-      >
+        @dragover.prevent @drop="handleDrop">
         <div v-if="!isCollapsed" class="bg-segments">
           <!-- 默认背景底色/片段 -->
           <div class="default-bg-segment" :style="{ width: '100%' }">
@@ -31,60 +28,44 @@
           </div>
 
           <!-- 背景操作片段 -->
-          <div 
-            v-for="(op, index) in chart.changeBackgroundOperations" 
-            :key="index"
-            class="bg-segment"
-            :style="{
-              left: (op.startTiming / displayAreaTime) * (global.documentWidth - global.siderWidth) + 'px',
-              width: (( (op.endTiming || (op.startTiming + 2000)) - op.startTiming) / displayAreaTime) * (global.documentWidth - global.siderWidth) + 'px'
-            }"
-            @mousedown.stop="props.global.currentNoteType === 3 ? deleteOp(index) : startDragOp($event, op)"
-          >
+          <div v-for="(op, index) in chart.changeBackgroundOperations" :key="index" class="bg-segment" :style="{
+            left: (op.startTiming / displayAreaTime) * (global.documentWidth - global.siderWidth) + 'px',
+            width: (((op.endTiming || (op.startTiming + 2000)) - op.startTiming) / displayAreaTime) * (global.documentWidth - global.siderWidth) + 'px'
+          }" @mousedown.stop="props.global.currentNoteType === 3 ? deleteOp(index) : startDragOp($event, op)">
             <!-- Resize Handles -->
-            <div 
-              class="resize-handle left" 
-              @mousedown.stop="startResizeLeft($event, op)"
-            ></div>
-            <div 
-              class="resize-handle right" 
-              @mousedown.stop="startResizeRight($event, op)"
-            ></div>
+            <div class="resize-handle left" @mousedown.stop="startResizeLeft($event, op)"></div>
+            <div class="resize-handle right" @mousedown.stop="startResizeRight($event, op)"></div>
 
-            <img :src="op.background" alt="bg" @dragstart.prevent />
+            <img :src="getBackgroundUrl(op)" alt="bg" @dragstart.prevent />
             <div class="segment-info">{{ op.startTiming }}ms</div>
             <div class="segment-actions">
-              <el-icon class="delete-icon" @click.stop="deleteOp(index)"><Delete /></el-icon>
+              <el-icon class="delete-icon" @click.stop="deleteOp(index)">
+                <Delete />
+              </el-icon>
             </div>
           </div>
 
           <!-- Time Indicators -->
-          <div
-            class="time-indicater"
-            :style="{
-              width: '1px',
-              background: 'rgb(255,255,0)',
-              height: '100%',
-              position: 'absolute',
-              pointerEvents: 'none',
-              top: '0px',
-              left: (global.currentTime / displayAreaTime) * (global.documentWidth - global.siderWidth) + 'px',
-              zIndex: 30
-            }"
-          ></div>
-          <div
-            class="time-indicater-false"
-            :style="{
-              width: '1px',
-              background: 'rgb(255,255,255)',
-              height: '100%',
-              position: 'absolute',
-              pointerEvents: 'none',
-              top: '0px',
-              left: indicatorLeft + 'px',
-              zIndex: 30
-            }"
-          ></div>
+          <div class="time-indicater" :style="{
+            width: '1px',
+            background: 'rgb(255,255,0)',
+            height: '100%',
+            position: 'absolute',
+            pointerEvents: 'none',
+            top: '0px',
+            left: (global.currentTime / displayAreaTime) * (global.documentWidth - global.siderWidth) + 'px',
+            zIndex: 30
+          }"></div>
+          <div class="time-indicater-false" :style="{
+            width: '1px',
+            background: 'rgb(255,255,255)',
+            height: '100%',
+            position: 'absolute',
+            pointerEvents: 'none',
+            top: '0px',
+            left: indicatorLeft + 'px',
+            zIndex: 30
+          }"></div>
 
         </div>
       </div>
@@ -130,7 +111,7 @@ const collectSnapPoints = (currentOp) => {
       if (op.endTiming !== undefined) points.push(op.endTiming);
     }
   });
-  
+
   // Collect from Tracks
   if (props.chart.tracks) {
     props.chart.tracks.forEach(track => {
@@ -152,7 +133,7 @@ const collectSnapPoints = (currentOp) => {
           if (o.endTiming !== undefined) points.push(o.endTiming);
         });
       }
-       if (track.changeColorOperations) {
+      if (track.changeColorOperations) {
         track.changeColorOperations.forEach(o => {
           if (o.startTiming !== undefined) points.push(o.startTiming);
           if (o.endTiming !== undefined) points.push(o.endTiming);
@@ -166,10 +147,10 @@ const collectSnapPoints = (currentOp) => {
 const getSnappedTime = (time, points) => {
   const pxThreshold = 10;
   const msThreshold = (pxThreshold / (props.global.documentWidth - props.global.siderWidth)) * props.displayAreaTime;
-  
+
   let bestTime = time;
   let minDiff = msThreshold;
-  
+
   for (const point of points) {
     const diff = Math.abs(time - point);
     if (diff < minDiff) {
@@ -178,6 +159,26 @@ const getSnappedTime = (time, points) => {
     }
   }
   return bestTime;
+};
+
+const normalizeUrl = (url) => {
+  if (!url) return "";
+  if (url.startsWith("http://localhost:8080")) {
+    return url.replace("http://localhost:8080", "http://localhost:8090");
+  }
+  if (url.includes("pic.mcatk.com")) {
+    const fileName = url.split('/').pop();
+    return "http://localhost:8090/" + fileName;
+  }
+  return url;
+};
+
+const getBackgroundUrl = (op) => {
+  if (op.assetId && props.chart.assets) {
+    const asset = props.chart.assets.find(a => a.id === op.assetId);
+    if (asset) return normalizeUrl(asset.url);
+  }
+  return normalizeUrl(op.background);
 };
 
 const checkOverlap = (start, end, excludeOp) => {
@@ -195,23 +196,23 @@ const checkOverlap = (start, end, excludeOp) => {
 const deleteOp = (index) => {
   const op = props.chart.changeBackgroundOperations[index];
   props.chart.changeBackgroundOperations.splice(index, 1);
-  
+
   if (syncAction) syncAction("DELETE_BG_OP", op.id);
 
   if (commandHistory) {
     commandHistory.pushCommand({
       description: 'Delete BG Op',
       undo: () => {
-         props.chart.changeBackgroundOperations.push(op);
-         props.chart.changeBackgroundOperations.sort((a,b) => a.startTiming - b.startTiming);
-         if (syncAction) syncAction("ADD_BG_OP", op);
+        props.chart.changeBackgroundOperations.push(op);
+        props.chart.changeBackgroundOperations.sort((a, b) => a.startTiming - b.startTiming);
+        if (syncAction) syncAction("ADD_BG_OP", op);
       },
       redo: () => {
-         const idx = props.chart.changeBackgroundOperations.indexOf(op);
-         if (idx !== -1) {
-            props.chart.changeBackgroundOperations.splice(idx, 1);
-            if (syncAction) syncAction("DELETE_BG_OP", op.id);
-         }
+        const idx = props.chart.changeBackgroundOperations.indexOf(op);
+        if (idx !== -1) {
+          props.chart.changeBackgroundOperations.splice(idx, 1);
+          if (syncAction) syncAction("DELETE_BG_OP", op.id);
+        }
       }
     });
   }
@@ -224,7 +225,7 @@ const startDragOp = (e, op) => {
   dragStartX.value = props.global.clientX;
   dragStartStartTiming.value = op.startTiming;
   dragStartEndTiming.value = op.endTiming || (op.startTiming + 2000);
-  
+
   snapPoints.value = collectSnapPoints(op);
 };
 
@@ -234,7 +235,7 @@ const startResizeLeft = (e, op) => {
   dragStartX.value = props.global.clientX;
   dragStartStartTiming.value = op.startTiming;
   dragStartEndTiming.value = op.endTiming || (op.startTiming + 2000);
-  
+
   snapPoints.value = collectSnapPoints(op);
 };
 
@@ -244,7 +245,7 @@ const startResizeRight = (e, op) => {
   dragStartX.value = props.global.clientX;
   dragStartStartTiming.value = op.startTiming;
   dragStartEndTiming.value = op.endTiming || (op.startTiming + 2000);
-  
+
   snapPoints.value = collectSnapPoints(op);
 };
 
@@ -252,30 +253,30 @@ watch(() => props.global.mouseMove, () => {
   if (draggingOp.value) {
     const deltaX = props.global.clientX - dragStartX.value;
     const deltaTime = Math.round((deltaX / (props.global.documentWidth - props.global.siderWidth)) * props.displayAreaTime);
-    
+
     if (dragType.value === 'move') {
       const duration = dragStartEndTiming.value - dragStartStartTiming.value;
       let newStart = dragStartStartTiming.value + deltaTime;
-      
+
       if (newStart < 0) newStart = 0;
       newStart = getSnappedTime(newStart, snapPoints.value);
       let newEnd = newStart + duration;
-      
+
       if (!checkOverlap(newStart, newEnd, draggingOp.value)) {
         draggingOp.value.startTiming = newStart;
         draggingOp.value.endTiming = newEnd;
       }
-      
+
     } else if (dragType.value === 'left') {
       let newStart = dragStartStartTiming.value + deltaTime;
       newStart = getSnappedTime(newStart, snapPoints.value);
       if (newStart < 0) newStart = 0;
       if (newStart >= draggingOp.value.endTiming - 100) newStart = draggingOp.value.endTiming - 100;
-      
+
       if (!checkOverlap(newStart, draggingOp.value.endTiming, draggingOp.value)) {
         draggingOp.value.startTiming = newStart;
       }
-      
+
     } else if (dragType.value === 'right') {
       let newEnd = dragStartEndTiming.value + deltaTime;
       newEnd = getSnappedTime(newEnd, snapPoints.value);
@@ -291,39 +292,39 @@ watch(() => props.global.mouseMove, () => {
 
 watch(() => props.global.mouseUp, () => {
   if (draggingOp.value) {
-    props.chart.changeBackgroundOperations.sort((a,b) => a.startTiming - b.startTiming);
-    
+    props.chart.changeBackgroundOperations.sort((a, b) => a.startTiming - b.startTiming);
+
     const currentOp = draggingOp.value;
     const finalStart = currentOp.startTiming;
     const finalEnd = currentOp.endTiming;
-    
+
     if (finalStart !== dragStartStartTiming.value || finalEnd !== dragStartEndTiming.value) {
-        const oldS = dragStartStartTiming.value;
-        const oldE = dragStartEndTiming.value;
-        
-        if (syncAction) syncAction("UPDATE_BG_OP", currentOp);
-        
-        if (commandHistory) {
-           commandHistory.pushCommand({
-              description: 'Move BG Op',
-              undo: () => {
-                 currentOp.startTiming = oldS;
-                 currentOp.endTiming = oldE;
-                 props.chart.changeBackgroundOperations.sort((a,b) => a.startTiming - b.startTiming);
-                 if (syncAction) syncAction("UPDATE_BG_OP", currentOp);
-                 props.global.reCalculateChartMaker = !props.global.reCalculateChartMaker;
-              },
-              redo: () => {
-                 currentOp.startTiming = finalStart;
-                 currentOp.endTiming = finalEnd;
-                 props.chart.changeBackgroundOperations.sort((a,b) => a.startTiming - b.startTiming);
-                 if (syncAction) syncAction("UPDATE_BG_OP", currentOp);
-                 props.global.reCalculateChartMaker = !props.global.reCalculateChartMaker;
-              }
-           });
-        }
-     }
-    
+      const oldS = dragStartStartTiming.value;
+      const oldE = dragStartEndTiming.value;
+
+      if (syncAction) syncAction("UPDATE_BG_OP", currentOp);
+
+      if (commandHistory) {
+        commandHistory.pushCommand({
+          description: 'Move BG Op',
+          undo: () => {
+            currentOp.startTiming = oldS;
+            currentOp.endTiming = oldE;
+            props.chart.changeBackgroundOperations.sort((a, b) => a.startTiming - b.startTiming);
+            if (syncAction) syncAction("UPDATE_BG_OP", currentOp);
+            props.global.reCalculateChartMaker = !props.global.reCalculateChartMaker;
+          },
+          redo: () => {
+            currentOp.startTiming = finalStart;
+            currentOp.endTiming = finalEnd;
+            props.chart.changeBackgroundOperations.sort((a, b) => a.startTiming - b.startTiming);
+            if (syncAction) syncAction("UPDATE_BG_OP", currentOp);
+            props.global.reCalculateChartMaker = !props.global.reCalculateChartMaker;
+          }
+        });
+      }
+    }
+
     draggingOp.value = null;
     dragType.value = null;
     snapPoints.value = [];
@@ -343,23 +344,25 @@ const handleScroll = (e) => {
 // Handle dropping an asset from MenuPanel to create a new BG operation
 const handleDrop = (e) => {
   const assetUrl = e.dataTransfer.getData('assetUrl');
+  const assetId = e.dataTransfer.getData('assetId');
   if (!assetUrl) return;
 
   const rect = e.currentTarget.getBoundingClientRect();
   const x = e.clientX - rect.left;
   const timeOffset = Math.round((x / (props.global.documentWidth - props.global.siderWidth)) * props.displayAreaTime);
-  
+
   const newOp = {
     startTiming: timeOffset,
     endTiming: timeOffset + 5000,
     background: assetUrl,
+    assetId: assetId ? parseInt(assetId) : null,
     isPending: true,
     clientId: Math.random().toString(36).substr(2, 9)
   };
 
   props.chart.changeBackgroundOperations.push(newOp);
   props.chart.changeBackgroundOperations.sort((a, b) => a.startTiming - b.startTiming);
-  
+
   if (syncAction) syncAction("ADD_BG_OP", newOp, newOp.clientId);
 };
 </script>
@@ -469,7 +472,7 @@ const handleDrop = (e) => {
   bottom: 2px;
   left: 4px;
   font-size: 10px;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.5);
   padding: 1px 3px;
   border-radius: 2px;
   color: #eee;

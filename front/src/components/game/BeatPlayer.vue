@@ -1,44 +1,31 @@
 <template>
   <div class="beat-player-container" :id="playerId">
-    <!-- 背景图层 -->
-    <div class="background-base" style="width:100%; height:100%; position:absolute; top:0; left:0;">
-      <img 
-        :src="normalizeUrl(chart.defaultBackground)" 
-        class="background-image" 
-        alt="default-bg" 
-        @load="handleImageLoaded"
-        @error="handleImageLoaded"
-      />
+    <div class="background-layers">
+      <!-- 基础图层 -->
+      <img :src="normalizeUrl(chart.defaultBackground)" class="background-image" alt="default-bg" />
+      <!-- 动态变化图层 -->
+      <transition name="bg-fade">
+        <img v-if="currentBgUrl" :key="currentBgUrl" :src="currentBgUrl" class="background-image background-overlay"
+          alt="dynamic-bg" />
+      </transition>
     </div>
-    <div v-for="(op, index) in chart.changeBackgroundOperations" :key="index" style="width:100%; height:100%; position:absolute; top:0; left:0; z-index: 1;">
-      <img
-        :src="getBackgroundUrl(op)"
-        v-show="
-          Number(global.currentTime) >= Number(op.startTiming) &&
-          (op.endTiming === null || op.endTiming === undefined || Number(global.currentTime) <= Number(op.endTiming))
-        "
-        class="background-image background-overlay"
-        alt="op-bg"
-        @load="handleImageLoaded"
-        @error="handleImageLoaded"
-      />
+
+    <!-- 预加载图层（完全隐藏但确保触发加载） -->
+    <div class="preload-layer"
+      style="position:fixed; top:-9999px; left:-9999px; visibility:hidden; pointer-events:none;">
+      <img v-for="(url, idx) in imagePath" :key="'preload-' + idx" :src="url" @load="handleImageLoaded"
+        @error="handleImageLoaded" />
     </div>
 
     <!-- 判定线 -->
-    <div
-      class="judgment-line-container"
-      :style="{
-        top: global.screenHeight * (global.finalY || 0.8) - 1 + 'px',
-        width: global.screenWidth + 'px',
-      }"
-    >
-      <div
-        class="white-line"
-        :style="{
-          left: (global.screenWidth - whiteLineLength) / 2 + 'px',
-          width: whiteLineLength + 'px',
-        }"
-      ></div>
+    <div class="judgment-line-container" :style="{
+      top: global.screenHeight * (global.finalY || 0.8) - 1 + 'px',
+      width: global.screenWidth + 'px',
+    }">
+      <div class="white-line" :style="{
+        left: (global.screenWidth - whiteLineLength) / 2 + 'px',
+        width: whiteLineLength + 'px',
+      }"></div>
     </div>
 
     <!-- Canvas 层 -->
@@ -47,38 +34,20 @@
     <canvas :id="playerId + '-judge-canvas'" class="player-canvas" />
 
     <!-- 轨道组件层 -->
-    <div
-      class="track-container"
-      v-for="(trackItem, idx) in chart.tracks"
-      :key="trackItem.trackId || ('track-' + idx)"
-    >
-      <Track
-        :Track="trackItem"
-        :global="global"
-        @addCount="handleAddCount"
-        v-if="
-          global.currentTime > trackItem.startTiming &&
-          global.currentTime < trackItem.endTiming
-        "
-      />
+    <div class="track-container" v-for="(trackItem, idx) in chart.tracks" :key="trackItem.trackId || ('track-' + idx)">
+      <Track :Track="trackItem" :global="global" @addCount="handleAddCount" v-if="
+        global.currentTime > trackItem.startTiming &&
+        global.currentTime < trackItem.endTiming
+      " />
     </div>
 
     <!-- 编辑模式下的选中高亮 -->
-    <div
-      v-if="mode === 'edit' && selectedTrack"
-      class="selected-track-overlay"
-      :style="selectedTrackOverlayStyle"
-    ></div>
+    <div v-if="mode === 'edit' && selectedTrack" class="selected-track-overlay" :style="selectedTrackOverlayStyle">
+    </div>
 
     <!-- 音频控制（隐藏） -->
-    <audio
-      ref="audioRef"
-      preload="auto"
-      :src="normalizeUrl(chart.songUrl)"
-      style="display:none"
-      @canplaythrough="handleAudioLoaded"
-      @ended="handleAudioEnded"
-    />
+    <audio ref="audioRef" preload="auto" :src="normalizeUrl(chart.songUrl)" style="display:none"
+      @canplaythrough="handleAudioLoaded" @ended="handleAudioEnded" />
 
     <!-- Player HUD (Only for Edit Mode) -->
     <transition name="hud-fade">
@@ -86,29 +55,33 @@
         <div class="hud-content glass-hud">
           <div class="hud-left">
             <el-button circle class="hud-btn" @click="togglePlay">
-              <el-icon><VideoPause v-if="isRunning"/><VideoPlay v-else/></el-icon>
+              <el-icon>
+                <VideoPause v-if="isRunning" />
+                <VideoPlay v-else />
+              </el-icon>
             </el-button>
             <div class="hud-time">{{ formatTime(global.currentTime) }} / {{ formatTime(chart.songLength) }}</div>
           </div>
-          
+
           <div class="hud-center">
-             <el-slider 
-               v-model="global.currentTime" 
-               :max="chart.songLength" 
-               :format-tooltip="formatTime"
-               @change="seek(global.currentTime)"
-             />
+            <el-slider v-model="global.currentTime" :max="chart.songLength" :format-tooltip="formatTime"
+              @change="seek(global.currentTime)" />
           </div>
 
           <div class="hud-right">
-             <el-tooltip content="重置" placement="top">
-               <el-button circle class="hud-btn-small" @click="reStart">
-                 <el-icon><RefreshLeft /></el-icon>
-               </el-button>
-             </el-tooltip>
-             <el-button circle class="hud-btn-main" @click="$emit('toggle-fullscreen')">
-               <el-icon><FullScreen v-if="!isFullscreen"/><Close v-else/></el-icon>
-             </el-button>
+            <el-tooltip content="重置" placement="top">
+              <el-button circle class="hud-btn-small" @click="reStart">
+                <el-icon>
+                  <RefreshLeft />
+                </el-icon>
+              </el-button>
+            </el-tooltip>
+            <el-button circle class="hud-btn-main" @click="$emit('toggle-fullscreen')">
+              <el-icon>
+                <FullScreen v-if="!isFullscreen" />
+                <Close v-else />
+              </el-icon>
+            </el-button>
           </div>
         </div>
       </div>
@@ -176,6 +149,7 @@ const props = defineProps({
 const emit = defineEmits([
   'audio-loaded',
   'image-loaded',
+  'image-progress',
   'add-count',
   'time-update',
   'track-click',
@@ -187,6 +161,7 @@ const audioRef = ref(null);
 const imagePath = ref([]);
 const isRunning = ref(false);
 const imageLoadedCount = ref(0);
+const imageTotalCount = ref(0);
 const showHUD = ref(true);
 
 // 使用外部传入的 global
@@ -197,7 +172,7 @@ const whiteLineLength = computed(() => {
   const time = 200;
   const waitLoad = 1000;
   const songLen = props.chart.songLength || 0;
-  
+
   if (global.currentTime > time + waitLoad && global.currentTime < songLen - time) {
     return global.screenWidth;
   } else {
@@ -220,7 +195,7 @@ const selectedTrackOverlayStyle = computed(() => {
   const t = selectedTrack.value;
   // 只有在时间范围内才显示
   if (global.currentTime < t.startTiming || global.currentTime > t.endTiming) return { display: 'none' };
-  
+
   return {
     position: 'absolute',
     top: '0px',
@@ -234,11 +209,31 @@ const selectedTrackOverlayStyle = computed(() => {
   };
 });
 
+const currentBgUrl = computed(() => {
+  if (!props.chart.changeBackgroundOperations || props.chart.changeBackgroundOperations.length === 0) return null;
+
+  const currentTime = Number(global.currentTime);
+  const ops = [...props.chart.changeBackgroundOperations].sort((a, b) => a.startTiming - b.startTiming);
+
+  // Find the last operation that started before currentTime and hasn't ended
+  for (let i = ops.length - 1; i >= 0; i--) {
+    const op = ops[i];
+    const start = Number(op.startTiming);
+    const end = op.endTiming !== null && op.endTiming !== undefined ? Number(op.endTiming) : Infinity;
+
+    if (currentTime >= start && currentTime <= end) {
+      const url = getBackgroundUrl(op);
+      if (url) return url;
+    }
+  }
+  return null;
+});
+
 // URL 规格化：处理旧谱面中的硬编码域名
 const normalizeUrl = (url) => {
   if (!url) return "";
   if (url.startsWith("http://localhost:8080")) {
-      return url.replace("http://localhost:8080", "http://localhost:8090");
+    return url.replace("http://localhost:8080", "http://localhost:8090");
   }
   if (url.includes("pic.mcatk.com")) {
     const fileName = url.split('/').pop();
@@ -248,11 +243,12 @@ const normalizeUrl = (url) => {
 };
 
 const getBackgroundUrl = (op) => {
+  if (!op) return "";
   if (op.assetId && props.chart.assets) {
     const asset = props.chart.assets.find(a => a.id === op.assetId);
     if (asset) return normalizeUrl(asset.url);
   }
-  return normalizeUrl(op.background);
+  return normalizeUrl(op.background || "");
 };
 
 const formatTime = (ms) => {
@@ -272,13 +268,13 @@ const resize = () => {
   nextTick(() => {
     const container = document.getElementById(props.playerId);
     if (!container) {
-       console.warn('[BeatPlayer] Resize skipped: container not found', props.playerId);
-       return;
+      console.warn('[BeatPlayer] Resize skipped: container not found', props.playerId);
+      return;
     }
-    
+
     const w = container.offsetWidth;
     const h = container.offsetHeight;
-    
+
     // Avoid rendering issues with 0 size
     if (w === 0 || h === 0) {
       setTimeout(resize, 200);
@@ -287,7 +283,7 @@ const resize = () => {
 
     global.screenWidth = w;
     global.screenHeight = h;
-    
+
     const setupCanvas = (idSuffix, painterKey, canvasKey) => {
       const canvas = document.getElementById(props.playerId + idSuffix);
       if (canvas) {
@@ -299,7 +295,7 @@ const resize = () => {
         // If we change this, we must scale the context
         canvas.width = w;
         canvas.height = h;
-        
+
         global[canvasKey] = canvas;
         const ctx = canvas.getContext('2d');
         // ctx.scale(dpr, dpr); // Not enabling scaling yet as Track.vue relies on pixels
@@ -308,11 +304,11 @@ const resize = () => {
         console.error('[BeatPlayer] Canvas not found:', props.playerId + idSuffix);
       }
     };
-    
+
     setupCanvas('-track-canvas', 'trackPainter', 'trackCanvas');
     setupCanvas('-note-canvas', 'notePainter', 'noteCanvas');
     setupCanvas('-judge-canvas', 'judgePainter', 'judgeCanvas');
-    
+
     repaint();
   });
 };
@@ -325,28 +321,33 @@ const repaint = () => {
 };
 
 const generateImagePath = () => {
-    const paths = new Set();
-    const defaultBg = props.chart.defaultBackground;
-    if (defaultBg) paths.add(normalizeUrl(defaultBg));
-    
-    if (props.chart.changeBackgroundOperations) {
-        props.chart.changeBackgroundOperations.forEach(op => {
-            const url = getBackgroundUrl(op);
-            if (url) paths.add(url);
-        });
-    }
-    
-    imagePath.value = Array.from(paths);
-    imageLoadedCount.value = 0;
-    
-    if (imagePath.value.length === 0) {
-        emit('image-loaded');
-    }
+  if (!props.chart) return;
+
+  const paths = new Set();
+  const defaultBg = props.chart.defaultBackground;
+  if (defaultBg) paths.add(normalizeUrl(defaultBg));
+
+  if (props.chart.changeBackgroundOperations) {
+    props.chart.changeBackgroundOperations.forEach(op => {
+      const url = getBackgroundUrl(op);
+      if (url && url !== "") paths.add(url);
+    });
+  }
+
+  imagePath.value = Array.from(paths);
+  imageLoadedCount.value = 0;
+  imageTotalCount.value = imagePath.value.length;
+
+  if (imagePath.value.length === 0) {
+    emit('image-loaded');
+  } else {
+    emit('image-progress', { current: 0, total: imageTotalCount.value });
+  }
 };
 
 const resetTrackStates = () => {
   if (!props.chart.tracks) return;
-  
+
   props.chart.tracks.forEach((track) => {
     let index = 0;
     let last = track.notes.length;
@@ -390,6 +391,7 @@ const handleAudioEnded = () => {
 
 const handleImageLoaded = () => {
   imageLoadedCount.value++;
+  emit('image-progress', { current: imageLoadedCount.value, total: imageTotalCount.value });
   if (imageLoadedCount.value >= imagePath.value.length) {
     emit('image-loaded');
   }
@@ -399,7 +401,7 @@ const handleImageLoaded = () => {
 let animationId = null;
 const run = () => {
   if (!isRunning.value) return;
-  
+
   if (audioRef.value) {
     global.currentTime = Math.floor(audioRef.value.currentTime * 1000);
   }
@@ -423,8 +425,8 @@ const play = () => {
   if (audioRef.value) {
     isRunning.value = true;
     audioRef.value.play().catch(e => {
-        console.error("[BeatPlayer] Auto-play blocked or failed:", e);
-        // Fallback or UI notification could be added here
+      console.error("[BeatPlayer] Auto-play blocked or failed:", e);
+      // Fallback or UI notification could be added here
     });
     run();
   }
@@ -463,7 +465,7 @@ onMounted(() => {
   generateImagePath();
   resize();
   window.addEventListener('resize', resize);
-  
+
   // 处理键盘输入
   const handleKeyDown = (e) => {
     if (!e.repeat) {
@@ -473,7 +475,7 @@ onMounted(() => {
       global.keyUsed[key] = false;
     }
   };
-  
+
   const handleKeyUp = (e) => {
     const key = e.key.toUpperCase();
     global.keyIsHold[key] = false;
@@ -481,13 +483,13 @@ onMounted(() => {
 
   document.addEventListener('keydown', handleKeyDown);
   document.addEventListener('keyup', handleKeyUp);
-  
+
   // 自动重绘和音频同步：当非播放状态下 currentTime 改变时
   watch(() => global.currentTime, (newTime) => {
     if (!isRunning.value) {
       if (audioRef.value) {
         const diff = Math.abs(audioRef.value.currentTime * 1000 - newTime);
-        if (diff > 10) { 
+        if (diff > 10) {
           audioRef.value.currentTime = newTime / 1000;
         }
       }
@@ -501,6 +503,15 @@ onMounted(() => {
     repaint();
   });
 
+  // Watch for dynamic changes in assets or operations (important for editor)
+  watch(() => props.chart.assets, () => {
+    generateImagePath();
+  }, { deep: true });
+
+  watch(() => props.chart.changeBackgroundOperations, () => {
+    generateImagePath();
+  }, { deep: true });
+
   watch(() => props.volume, (newVol) => {
     if (audioRef.value) {
       audioRef.value.volume = newVol / 100;
@@ -512,15 +523,15 @@ onMounted(() => {
   if (container) {
     container.onmousedown = (e) => {
       if (props.mode !== 'edit') return;
-      
+
       const rect = container.getBoundingClientRect();
       const offsetX = e.clientX - rect.left;
-      
-      const visibleTracks = props.chart.tracks.filter(t => 
-        global.currentTime > t.startTiming && 
+
+      const visibleTracks = props.chart.tracks.filter(t =>
+        global.currentTime > t.startTiming &&
         global.currentTime < t.endTiming
       );
-      
+
       for (const track of visibleTracks) {
         const left = (track.tempPositionX - track.tempWidth) * global.screenWidth;
         const right = (track.tempPositionX + track.tempWidth) * global.screenWidth;
@@ -567,7 +578,8 @@ defineExpose({
   top: 0;
   width: 100%;
   height: 100%;
-  object-fit: fill; /* Ensure full coverage even if distorted */
+  object-fit: fill;
+  /* Ensure full coverage even if distorted */
   pointer-events: none;
 }
 
@@ -577,8 +589,24 @@ defineExpose({
 
 .background-base {
   z-index: 0;
+}
+
+.background-layers {
   width: 100%;
   height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.bg-fade-enter-active,
+.bg-fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.bg-fade-enter-from,
+.bg-fade-leave-to {
+  opacity: 0;
 }
 
 .judgment-line-container {
@@ -642,7 +670,7 @@ defineExpose({
   gap: 20px;
   padding: 0 20px;
   border-radius: 30px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
 }
 
 .glass-hud {
@@ -651,7 +679,8 @@ defineExpose({
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.hud-left, .hud-right {
+.hud-left,
+.hud-right {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -693,17 +722,24 @@ defineExpose({
 
 .hud-btn-small {
   background: transparent !important;
-  border: 1px solid rgba(255,255,255,0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
   color: #888 !important;
   width: 32px;
   height: 32px;
 }
-.hud-btn-small:hover { color: #fff !important; border-color: #fff !important; }
 
-.hud-fade-enter-active, .hud-fade-leave-active {
+.hud-btn-small:hover {
+  color: #fff !important;
+  border-color: #fff !important;
+}
+
+.hud-fade-enter-active,
+.hud-fade-leave-active {
   transition: opacity 0.3s, transform 0.3s;
 }
-.hud-fade-enter-from, .hud-fade-leave-to {
+
+.hud-fade-enter-from,
+.hud-fade-leave-to {
   opacity: 0;
   transform: translateY(20px);
 }

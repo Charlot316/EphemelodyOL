@@ -288,7 +288,6 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
 
             ChangeBackgroundOperation changeBackgroundOperation = new ChangeBackgroundOperation();
             changeBackgroundOperation.setSongId(uploadBackgroundDTO.getSongId());
-            changeBackgroundOperation.setBackground(url);
             changeBackgroundOperation.setAssetId(asset.getId());
             changeBackgroundOperation.setStartTiming(uploadBackgroundDTO.getStartTiming());
             changeBackgroundOperationMapper.insert(changeBackgroundOperation);
@@ -496,7 +495,6 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
                 for (ChangeBackgroundOperationDTO bDto : chart.getChangeBackgroundOperations()) {
                     ChangeBackgroundOperation bo = new ChangeBackgroundOperation();
                     bo.setSongId(songId);
-                    bo.setBackground(bDto.getBackground());
                     bo.setStartTiming(bDto.getStartTiming());
                     bo.setEndTiming(bDto.getEndTiming());
                     changeBackgroundOperationMapper.insert(bo);
@@ -578,12 +576,17 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
                 java.util.List<ChangeBackgroundOperationDTO> bgDtos = new java.util.ArrayList<>();
                 for (ChangeBackgroundOperation bo : bgOps) {
                     ChangeBackgroundOperationDTO bd = new ChangeBackgroundOperationDTO();
-                    bd.setBackground(bo.getBackground());
                     bd.setStartTiming(bo.getStartTiming());
                     bd.setEndTiming(bo.getEndTiming());
+                    bd.setAssetId(bo.getAssetId());
                     bgDtos.add(bd);
                 }
                 dto.setChangeBackgroundOperations(bgDtos);
+
+                // 获取素材库
+                java.util.List<SongAsset> assets = songAssetMapper
+                        .selectList(new QueryWrapper<SongAsset>().eq("song_id", songId));
+                dto.setAssets(assets);
 
                 // 写入文件
                 String chartsFolder = uploadPath + "charts/";
