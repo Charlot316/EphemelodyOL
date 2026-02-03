@@ -158,6 +158,8 @@ const getChart = async () => {
     }
     chart.value = res.data;
     loadingStatus.chart = true;
+    console.log('[PlayInterface] Chart loaded:', chart.value.songName);
+    checkIfLoaded();
     sortTrack();
     // generateImagePath() is now handled inside BeatPlayer.vue
   } catch (err) {
@@ -215,22 +217,26 @@ const handleFinished = () => {
 };
 
 const audioLoaded = (audioEl) => {
+  console.log('[PlayInterface] Audio loaded');
   audio.value = audioEl;
   loadingStatus.audio = true;
   checkIfLoaded();
 };
 
 const imageLoaded = () => {
+  console.log('[PlayInterface] Image loaded');
   loadingStatus.image = true;
   checkIfLoaded();
 };
 
 const checkIfLoaded = () => {
+  console.log('[PlayInterface] Checking status:', JSON.parse(JSON.stringify(loadingStatus)));
   if (
     loadingStatus.chart &&
     loadingStatus.audio &&
     loadingStatus.image
   ) {
+    console.log('[PlayInterface] All resources loaded, setting canRun = true');
     setTimeout(() => {
       loadingStatus.canRun = true;
     }, 1000);
@@ -238,6 +244,7 @@ const checkIfLoaded = () => {
 };
 
 const startMusic = () => {
+  console.log('[PlayInterface] startMusic called. canRun:', loadingStatus.canRun);
   if (loadingStatus.canRun) {
     loadingStatus.runReady = true;
     // Tell BeatPlayer to start

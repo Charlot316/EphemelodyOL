@@ -177,10 +177,7 @@ const setHeightAndTop = () => {
 
 const paintNote = (note) => {
   const painter = myglobal.notePainter;
-  if (!painter) {
-    console.warn('[Track] paintNote skipped: painter is null');
-    return;
-  }
+  if (!painter) return;
   // console.log('[Track] paintNote', note.index, note.timing, myglobal.currentTime);
   const currentTime = myglobal.currentTime;
   const remainingTime = myglobal.remainingTime || 1000;
@@ -192,10 +189,6 @@ const paintNote = (note) => {
         (note.timing - remainingTime)) *
     myglobal.screenHeight;
   
-  // debug log for the first few notes to avoid span
-  if (note.index < 3) {
-      console.log(`[Track] Note ${note.index} paint: x=${middle.value}, y=${yValue}, canvas=${myglobal.screenWidth}x${myglobal.screenHeight}`);
-  }
   
   const canMirror =
     (note.noteType != 1 &&
@@ -370,11 +363,7 @@ const paintNotes = () => {
 const paintTrack = async () => {
   await paintNotes();
   const painter = myglobal.trackPainter;
-  if (!painter) {
-    console.warn('[Track] paintTrack skipped: trackPainter is null');
-    return;
-  }
-  console.log(`[Track] paintTrack: left=${left.value}, top=${top.value}, w=${width.value}, h=${height.value}, Y=${Y.value}, canvas=${myglobal.screenWidth}x${myglobal.screenHeight}`);
+  if (!painter) return;
 
   if (width.value > 4 && height.value > 0) {
     const longerThanScreen = height.value > myglobal.screenHeight - Y.value;
@@ -759,7 +748,6 @@ const initiate = () => {
   generateRGBPath();
   myTrack.notes.sort((a, b) => a.timing - b.timing);
   myTrack.notes.forEach((note, i) => (note.index = i));
-  console.log('[Track] initiate complete. Notes count:', myTrack.notes.length);
   
   let index = 0;
   let last = myTrack.notes.length;
