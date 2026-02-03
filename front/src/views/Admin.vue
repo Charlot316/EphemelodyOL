@@ -269,7 +269,6 @@ export default {
     },
     next(songId) {
       this.$router.push({ path: "/chart/maker", query: { songId } });
-      setTimeout(() => location.reload(), 100);
     },
     getStatusType(status) {
       if (status === 2) return 'success';
