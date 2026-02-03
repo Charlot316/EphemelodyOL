@@ -4,10 +4,8 @@
       <!-- 基础图层 -->
       <img :src="normalizeUrl(chart.defaultBackground)" class="background-image" alt="default-bg" />
       <!-- 动态变化图层 -->
-      <transition name="bg-fade">
-        <img v-if="currentBgUrl" :key="currentBgUrl" :src="currentBgUrl" class="background-image background-overlay"
-          alt="dynamic-bg" />
-      </transition>
+      <img v-if="currentBgUrl" :key="currentBgUrl" :src="currentBgUrl" class="background-image background-overlay"
+        alt="dynamic-bg" />
     </div>
 
     <!-- 预加载图层（完全隐藏但确保触发加载） -->
@@ -599,15 +597,7 @@ defineExpose({
   left: 0;
 }
 
-.bg-fade-enter-active,
-.bg-fade-leave-active {
-  transition: opacity 0.5s ease;
-}
 
-.bg-fade-enter-from,
-.bg-fade-leave-to {
-  opacity: 0;
-}
 
 .judgment-line-container {
   height: 2px;
