@@ -81,9 +81,9 @@
       @canplaythrough="handleAudioLoaded"
     />
 
-    <!-- Player HUD (Apple-style) -->
+    <!-- Player HUD (Only for Edit Mode) -->
     <transition name="hud-fade">
-      <div v-if="showHUD || isRunning" class="player-hud">
+      <div v-if="mode === 'edit'" class="player-hud">
         <div class="hud-content glass-hud">
           <div class="hud-left">
             <el-button circle class="hud-btn" @click="togglePlay">
@@ -416,7 +416,10 @@ const run = () => {
 const play = () => {
   if (audioRef.value) {
     isRunning.value = true;
-    audioRef.value.play();
+    audioRef.value.play().catch(e => {
+        console.error("[BeatPlayer] Auto-play blocked or failed:", e);
+        // Fallback or UI notification could be added here
+    });
     run();
   }
 };
