@@ -17,6 +17,8 @@
       @pause="pause"
       @restart="reStart"
       @continuePlay="continuePlay"
+      @timeUpdate="handleTimeUpdate"
+      @finished="handleFinished"
     />
     <Result :loadingStatus="loadingStatus" :chart="chart" :global="global" />
     <el-dialog
@@ -91,9 +93,6 @@ const global = reactive({
   notePainter: null,
   trackPainter: null,
   judgePainter: null,
-  noteCanvas: null,
-  trackCanvas: null,
-  judgeCanvas: null,
   repaint: false,
 });
 
@@ -133,20 +132,8 @@ watch(() => global.pureCount, calculateScore);
 watch(() => global.farCount, calculateScore);
 
 const resize = () => {
-  playInterface.value = document.getElementById("play-interface-container");
-  global.screenWidth = document.documentElement.clientWidth;
-  global.screenHeight = document.documentElement.clientHeight;
-  if (global.noteCanvas) {
-    global.noteCanvas.height = playInterface.value.offsetHeight;
-    global.noteCanvas.width = playInterface.value.offsetWidth;
-  }
-  if (global.trackCanvas) {
-    global.trackCanvas.height = playInterface.value.offsetHeight;
-    global.trackCanvas.width = playInterface.value.offsetWidth;
-  }
-  if (global.judgeCanvas) {
-    global.judgeCanvas.height = playInterface.value.offsetHeight;
-    global.judgeCanvas.width = playInterface.value.offsetWidth;
+  if (playRef.value) {
+    playRef.value.resize();
   }
 };
 
@@ -213,31 +200,18 @@ const finish = async () => {
   }
 };
 
-let runAnimationId = null;
-const run = () => {
-  if (
-    document.documentElement.clientWidth !== global.screenWidth ||
-    document.documentElement.clientHeight !== global.screenHeight
-  ) {
-    resize();
-  }
-  // Rendering is now handled by BeatPlayer.vue
-  
-  if (audio.value) {
-    global.currentTime = Math.floor(audio.value.currentTime * 1000);
-  }
-  
-  if (global.currentTime < chart.value.songLength - 150) {
-    setTimeout(run, 10);
-  } else {
-    global.currentTime = chart.value.songLength;
+// Game loop is now handled by BeatPlayer
+const handleTimeUpdate = (time) => {
+  global.currentTime = time;
+};
+
+const handleFinished = () => {
     loadingStatus.beforeFinished = true;
     calculateScore();
     finish();
     setTimeout(() => {
       loadingStatus.finished = true;
     }, 2000);
-  }
 };
 
 const audioLoaded = (audioEl) => {
@@ -264,16 +238,14 @@ const checkIfLoaded = () => {
 };
 
 const startMusic = () => {
-  if (loadingStatus.canRun && audio.value) {
-    audio.value.play();
-    audio.value.muted = true;
+  if (loadingStatus.canRun) {
     loadingStatus.runReady = true;
+    // Tell BeatPlayer to start
     setTimeout(() => {
       loadingStatus.runStart = true;
-      audio.value.currentTime = 0;
-      audio.value.muted = false;
-      audio.value.volume = store.state.volume / 100;
-      run();
+      if (playRef.value) {
+        playRef.value.play();
+      }
     }, 500);
   }
 };

@@ -12,6 +12,8 @@
       @audio-loaded="audioLoaded"
       @image-loaded="imageLoaded"
       @add-count="addCount"
+      @time-update="$emit('timeUpdate', $event)"
+      @finished="$emit('finished')"
     />
 
     <!-- 记分板 -->
@@ -125,7 +127,11 @@ const emit = defineEmits([
   "back",
   "reStart",
   "continuePlay",
-  "addCount"
+  "reStart",
+  "continuePlay",
+  "addCount",
+  "timeUpdate",
+  "finished"
 ]);
 
 const playerRef = ref(null);
