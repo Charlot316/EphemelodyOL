@@ -165,6 +165,42 @@
             {{ enableEdit ? '编辑弹窗:开' : '编辑弹窗:关' }}
           </el-button>
         </div>
+
+        <div class="toolbar-divider"></div>
+
+        <!-- 分组 6: 系统 -->
+        <div class="toolbar-group">
+          <el-tooltip content="返回列表" placement="top">
+            <el-button
+              size="small"
+              class="tool-btn-rect"
+              @click="router.go(-1)"
+            >
+              <el-icon><Back /></el-icon>
+              返回
+            </el-button>
+          </el-tooltip>
+          <el-tooltip content="仅发布更改" placement="top">
+            <el-button
+              size="small"
+              class="tool-btn-rect"
+              @click="saveChart(false)"
+            >
+              <el-icon><Upload /></el-icon>
+              发布
+            </el-button>
+          </el-tooltip>
+          <el-tooltip content="通过表决后生成游玩文件并返回" placement="top">
+            <el-button
+              size="small"
+              class="tool-btn-rect is-primary"
+              @click="saveChart(true)"
+            >
+              <el-icon><UploadFilled /></el-icon>
+              发布并返回
+            </el-button>
+          </el-tooltip>
+        </div>
       </div>
 
       <div class="footer-header-right">
@@ -304,7 +340,8 @@
 import { ref, computed, watch, defineProps, defineEmits, onMounted, inject } from 'vue';
 import { 
   Sort, Timer, Filter, Aim, Compass, CircleCheck, 
-  MagicStick, Delete, EditPen, ZoomIn, CirclePlus, View, Refresh 
+  MagicStick, Delete, EditPen, ZoomIn, CirclePlus, View, Refresh,
+  Back, Upload, UploadFilled
 } from '@element-plus/icons-vue';
 import { ElMessageBox, ElNotification } from 'element-plus';
 import TrackCard from "./TrackCard.vue";
@@ -316,6 +353,8 @@ import "animate.css";
 const onlineUsers = inject('onlineUsers');
 const onlineCount = inject('onlineCount');
 const resetChart = inject('resetChart');
+const saveChart = inject('saveChart');
+const router = inject('router');
 
 const props = defineProps({
   chart: Object,
@@ -647,6 +686,8 @@ onMounted(() => {
 .delete-mode-btn.is-selected { color: #f56c6c !important; }
 .tool-btn-rect { background: rgba(255, 255, 255, 0.05) !important; border: 1px solid rgba(255, 255, 255, 0.1) !important; color: #aaa !important; border-radius: 4px !important; }
 .tool-btn-rect.is-warning { color: #f56c6c !important; border-color: rgba(245, 108, 108, 0.3) !important; }
+.tool-btn-rect.is-primary { background: linear-gradient(135deg, #409eff, #3a8ee6) !important; color: #fff !important; border: none !important; font-weight: 600 !important; }
+.tool-btn-rect.is-primary:hover { filter: brightness(1.1); box-shadow: 0 0 10px rgba(64, 158, 255, 0.4); }
 .footer-header-right { display: flex; align-items: center; }
 .time-display-wrapper { background: rgba(0, 0, 0, 0.3); padding: 4px 12px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.05); font-family: 'Inter', monospace; }
 .current-time { color: #fff; font-size: 14px; font-weight: 700; min-width: 50px; text-align: right; }
