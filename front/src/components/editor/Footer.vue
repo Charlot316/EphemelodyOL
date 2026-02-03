@@ -159,7 +159,7 @@
     </div>
 
     <!-- 主内容区 -->
-    <div v-if="chart.tracks" class="footer-main-content">
+    <div v-if="chart.tracks" class="footer-main-content" @wheel="handleWheel">
       <div 
         class="footer-track-area" 
         :style="{ height: bgCollapsed ? 'calc(100% - 32px)' : 'calc(100% - 100px)' }"
@@ -446,6 +446,26 @@ const rightMouseMove = (e) => {
     if (audio) audio.currentTime = currentTime / 1000;
     props.global.currentTime = currentTime;
     updateTrack();
+  }
+};
+
+const handleWheel = (e) => {
+  if (e.ctrlKey || e.metaKey) {
+    e.preventDefault();
+    // Zoom logic
+    // deltaY positive = zoom out (increase time range)?
+    // Chrome: pinch out -> deltaY negative (zoom in).
+    // Let's assume negative deltaY means ZOOM IN (smaller displayAreaTime).
+    
+    const zoomFactor = 1 + (e.deltaY * 0.001);
+    let newTime = displayAreaTime.value * zoomFactor;
+    
+    // Constraints
+    if (newTime < 1000) newTime = 1000;
+    if (newTime > props.chart.songLength) newTime = props.chart.songLength;
+    if (newTime > 300000) newTime = 300000; // Hard max if songLength is weird
+    
+    displayAreaTime.value = newTime;
   }
 };
 

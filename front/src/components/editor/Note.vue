@@ -281,12 +281,115 @@ const setZIndex = () => {
 const dragStartX = ref(0);
 const dragStartTiming = ref(0);
 const dragEndTiming = ref(0);
+const snapPoints = ref([]);
+const dragBounds = ref({ min: -Infinity, max: Infinity });
+
+const collectSnapPoints = (currentNote) => {
+  const points = [];
+  
+  // 1. All Track Elements
+  if (props.chart.tracks) {
+    props.chart.tracks.forEach(track => {
+      // Notes
+      if (track.notes) {
+        track.notes.forEach(n => {
+          if (n !== currentNote) {
+            if (n.timing !== undefined) points.push(n.timing);
+            if (n.endTiming !== undefined) points.push(n.endTiming);
+          }
+        });
+      }
+      // Operations
+      ['moveOperations', 'changeWidthOperations', 'changeColorOperations'].forEach(key => {
+        if (track[key]) {
+          track[key].forEach(op => {
+            if (op.startTime !== undefined) points.push(op.startTime);
+            if (op.endTime !== undefined) points.push(op.endTime);
+          });
+        }
+      });
+    });
+  }
+  
+  // 2. Background Operations
+  if (props.chart.changeBackgroundOperations) {
+    props.chart.changeBackgroundOperations.forEach(op => {
+      if (op.startTime !== undefined) points.push(op.startTime);
+      if (op.endTime !== undefined) points.push(op.endTime);
+    });
+  }
+  
+  // 3. Beat Lines
+  if (props.chart.bpm > 0) {
+    // Generate beat points around the current view roughly
+    // optimization: only generate beats in valid rang e.g. 0 to songLength
+    const msPerBeat = props.chart.bpm; // Assuming chart.bpm is ms per beat from memories
+    const offset = props.chart.firstBeatDelay || 0;
+    const songLen = props.chart.songLength || 300000;
+    
+    for (let t = offset; t <= songLen; t += msPerBeat) {
+      points.push(t);
+    }
+  }
+  
+  return points;
+};
+
+const getSnappedTime = (time, points) => {
+  // Threshold: ~10px converted to time
+  const pxThreshold = 10;
+  const msThreshold = (pxThreshold / (props.global.documentWidth - 300)) * props.displayAreaTime;
+  
+  let bestTime = time;
+  let minDiff = msThreshold;
+  
+  for (const point of points) {
+    const diff = Math.abs(time - point);
+    if (diff < minDiff) {
+      minDiff = diff;
+      bestTime = point;
+    }
+  }
+  return bestTime;
+};
+
+const calculateBounds = (note) => {
+  // Find prev/next notes on THIS track to avoid overlap
+  // Sort notes on this track
+  const sorted = [...props.track.notes].sort((a,b) => a.timing - b.timing);
+  const idx = sorted.indexOf(note);
+  
+  let min = props.track.startTiming;
+  let max = props.track.endTiming;
+  
+  if (idx > 0) {
+    const prev = sorted[idx - 1];
+    // Min gap 100ms
+    min = prev.endTiming + 100;
+  } else {
+    // Check track start
+    min = props.track.startTiming;
+  }
+  
+  if (idx > -1 && idx < sorted.length - 1) {
+    const next = sorted[idx + 1];
+    // Min gap 100ms
+    max = next.timing - 100;
+  } else {
+    max = props.track.endTiming;
+  }
+  
+  return { min, max };
+};
 
 const longNoteCanMove = () => {
   canMove.value = true;
   dragStartX.value = props.global.clientX;
   dragStartTiming.value = props.note.timing;
   dragEndTiming.value = props.note.endTiming;
+  
+  snapPoints.value = collectSnapPoints(props.note);
+  dragBounds.value = calculateBounds(props.note);
 };
 
 const startLeftMove = () => {
@@ -294,6 +397,20 @@ const startLeftMove = () => {
   dragStartX.value = props.global.clientX;
   dragStartTiming.value = props.note.timing;
   dragEndTiming.value = props.note.endTiming;
+  
+  snapPoints.value = collectSnapPoints(props.note);
+  // For left resize, min is bounded by prev note + 100.
+  // Max is bounded by current END time (minus 100ms min length?).
+  // Actually min length for long note logic? Usually > 0.
+  // Constraint from user: "Min time gap 100ms between notes".
+  // Does current note have min length? 
+  // Let's assume min length 50ms for safety.
+  
+  const bounds = calculateBounds(props.note);
+  dragBounds.value = {
+    min: bounds.min,
+    max: props.note.endTiming - 50 
+  };
 };
 
 const startRightMove = () => {
@@ -301,6 +418,14 @@ const startRightMove = () => {
   dragStartX.value = props.global.clientX;
   dragStartTiming.value = props.note.timing;
   dragEndTiming.value = props.note.endTiming;
+  
+  snapPoints.value = collectSnapPoints(props.note);
+  
+  const bounds = calculateBounds(props.note);
+  dragBounds.value = {
+    min: props.note.timing + 50,
+    max: bounds.max
+  };
 };
 
 const startEdit = () => {
@@ -347,9 +472,18 @@ const selfClicked = () => {
 };
 
 watch(() => props.global.mouseUp, () => {
-  canMove.value = false;
-  leftMove.value = false;
-  rightMove.value = false;
+  if (canMove.value || leftMove.value || rightMove.value) {
+    canMove.value = false;
+    leftMove.value = false;
+    rightMove.value = false;
+    snapPoints.value = [];
+    
+    // Re-sort track notes to keep order correct
+    // (Though drag constraints prevent swapping, sorting is safe)
+    props.track.notes.sort((a,b) => a.timing - b.timing);
+    
+    updateTrack();
+  }
   deleteMenuVisible.value = false;
 });
 
@@ -363,37 +497,44 @@ watch(() => props.global.mouseMove, () => {
     const deltaX = props.global.clientX - dragStartX.value;
     const deltaTime = Math.round((deltaX / (props.global.documentWidth - 300)) * props.displayAreaTime);
     
-    // Normal move
-    if (props.note.noteType === 1) {
-       const duration = dragEndTiming.value - dragStartTiming.value;
-       let newStart = roundTime(dragStartTiming.value + deltaTime);
-       
-       if (newStart < props.track.startTiming) newStart = props.track.startTiming;
-       if (newStart + duration > props.track.endTiming) newStart = props.track.endTiming - duration;
-
-       props.note.timing = newStart;
-       props.note.endTiming = newStart + duration;
-    } else {
-       // Short/Slide notes
-       let newStart = roundTime(dragStartTiming.value + deltaTime);
-       if (newStart < props.track.startTiming) newStart = props.track.startTiming;
-       if (newStart > props.track.endTiming) newStart = props.track.endTiming;
-       
-       props.note.timing = newStart;
-       if (props.note.noteType !== 1) props.note.endTiming = newStart + 150; 
+    // Original duration
+    const duration = dragEndTiming.value - dragStartTiming.value;
+    let newStart = dragStartTiming.value + deltaTime;
+    
+    // Snap
+    newStart = getSnappedTime(newStart, snapPoints.value);
+    let newEnd = newStart + duration;
+    
+    // Bounds Check
+    if (newStart < dragBounds.value.min) {
+      newStart = dragBounds.value.min;
+      newEnd = newStart + duration;
     }
+    if (newEnd > dragBounds.value.max) {
+      newEnd = dragBounds.value.max;
+      newStart = newEnd - duration;
+    }
+    
+    // Double check start bound
+    if (newStart < dragBounds.value.min) newStart = dragBounds.value.min;
+    
+    props.note.timing = newStart;
+    props.note.endTiming = newStart + duration;
     updateTemp();
+    
   } else if (leftMove.value) {
     const deltaX = props.global.clientX - dragStartX.value;
     const deltaTime = Math.round((deltaX / (props.global.documentWidth - 300)) * props.displayAreaTime);
     
-    let newStart = roundTime(dragStartTiming.value + deltaTime);
-    // Boundary checks
-    if (newStart < props.track.startTiming) newStart = props.track.startTiming;
-    if (newStart > dragEndTiming.value - 100) newStart = dragEndTiming.value - 100;
+    let newStart = dragStartTiming.value + deltaTime;
+    newStart = getSnappedTime(newStart, snapPoints.value);
+    
+    if (newStart < dragBounds.value.min) newStart = dragBounds.value.min;
+    if (newStart > dragBounds.value.max) newStart = dragBounds.value.max;
     
     props.note.timing = newStart;
     updateTemp();
+    
   } else if (rightMove.value) {
     const deltaX = props.global.clientX - dragStartX.value;
     const deltaTime = Math.round((deltaX / (props.global.documentWidth - 300)) * props.displayAreaTime);

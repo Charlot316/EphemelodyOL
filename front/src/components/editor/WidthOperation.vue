@@ -233,15 +233,77 @@ const setZIndex = () => {
   props.operation.zIndex = 10;
 };
 
-const dragStartX = ref(0);
-const dragStartTiming = ref(0);
-const dragEndTiming = ref(0);
+const snapPoints = ref([]);
+const dragBounds = ref({ min: -Infinity, max: Infinity });
+
+const collectSnapPoints = (currentOp) => {
+  const points = [];
+  if (props.chart.tracks) {
+    props.chart.tracks.forEach(track => {
+      if (track.notes) track.notes.forEach(n => {
+        if (n.timing !== undefined) points.push(n.timing);
+        if (n.endTiming !== undefined) points.push(n.endTiming);
+      });
+      ['moveOperations', 'changeWidthOperations', 'changeColorOperations'].forEach(key => {
+        if (track[key]) track[key].forEach(op => {
+          if (op !== currentOp) {
+            if (op.startTime !== undefined) points.push(op.startTime);
+            if (op.endTime !== undefined) points.push(op.endTime);
+          }
+        });
+      });
+    });
+  }
+  if (props.chart.changeBackgroundOperations) {
+    props.chart.changeBackgroundOperations.forEach(op => {
+      if (op.startTime !== undefined) points.push(op.startTime);
+      if (op.endTime !== undefined) points.push(op.endTime);
+    });
+  }
+  if (props.chart.bpm > 0) {
+    const msPerBeat = props.chart.bpm;
+    const offset = props.chart.firstBeatDelay || 0;
+    const songLen = props.chart.songLength || 300000;
+    for (let t = offset; t <= songLen; t += msPerBeat) points.push(t);
+  }
+  return points;
+};
+
+const getSnappedTime = (time, points) => {
+  const pxThreshold = 10;
+  const msThreshold = (pxThreshold / (props.global.documentWidth - 300)) * props.displayAreaTime;
+  let bestTime = time;
+  let minDiff = msThreshold;
+  for (const point of points) {
+    const diff = Math.abs(time - point);
+    if (diff < minDiff) {
+      minDiff = diff;
+      bestTime = point;
+    }
+  }
+  return bestTime;
+};
+
+const calculateBounds = (op) => {
+  const sorted = [...props.track.changeWidthOperations].sort((a,b) => a.startTime - b.startTime);
+  const idx = sorted.indexOf(op);
+  let min = props.track.startTiming;
+  let max = props.track.endTiming;
+  
+  if (idx > 0) min = sorted[idx - 1].endTime;
+  if (idx > -1 && idx < sorted.length - 1) max = sorted[idx + 1].startTime;
+  
+  return { min, max };
+};
 
 const longOperationCanMove = () => {
   canMove.value = true;
   dragStartX.value = props.global.clientX;
   dragStartTiming.value = props.operation.startTime;
   dragEndTiming.value = props.operation.endTime;
+  
+  snapPoints.value = collectSnapPoints(props.operation);
+  dragBounds.value = calculateBounds(props.operation);
 };
 
 const startLeftMove = () => {
@@ -249,6 +311,10 @@ const startLeftMove = () => {
   dragStartX.value = props.global.clientX;
   dragStartTiming.value = props.operation.startTime;
   dragEndTiming.value = props.operation.endTime;
+  
+  snapPoints.value = collectSnapPoints(props.operation);
+  const bounds = calculateBounds(props.operation);
+  dragBounds.value = { min: bounds.min, max: props.operation.endTime - 20 };
 };
 
 const startRightMove = () => {
@@ -256,7 +322,62 @@ const startRightMove = () => {
   dragStartX.value = props.global.clientX;
   dragStartTiming.value = props.operation.startTime;
   dragEndTiming.value = props.operation.endTime;
+  
+  snapPoints.value = collectSnapPoints(props.operation);
+  const bounds = calculateBounds(props.operation);
+  dragBounds.value = { min: props.operation.startTime + 20, max: bounds.max };
 };
+
+watch(() => props.global.mouseMove, () => {
+  if (canMove.value) {
+    const deltaX = props.global.clientX - dragStartX.value;
+    const deltaTime = Math.round((deltaX / (props.global.documentWidth - 300)) * props.displayAreaTime);
+    
+    const duration = dragEndTiming.value - dragStartTiming.value;
+    let newStart = dragStartTiming.value + deltaTime;
+    
+    newStart = getSnappedTime(newStart, snapPoints.value);
+    let newEnd = newStart + duration;
+    
+    if (newStart < dragBounds.value.min) {
+      newStart = dragBounds.value.min;
+      newEnd = newStart + duration;
+    }
+    if (newEnd > dragBounds.value.max) {
+      newEnd = dragBounds.value.max;
+      newStart = newEnd - duration;
+    }
+    if (newStart < dragBounds.value.min) newStart = dragBounds.value.min;
+    
+    props.operation.startTime = newStart;
+    props.operation.endTime = newStart + duration;
+    updateTemp();
+  } else if (leftMove.value) {
+    const deltaX = props.global.clientX - dragStartX.value;
+    const deltaTime = Math.round((deltaX / (props.global.documentWidth - 300)) * props.displayAreaTime);
+    
+    let newStart = dragStartTiming.value + deltaTime;
+    newStart = getSnappedTime(newStart, snapPoints.value);
+    
+    if (newStart < dragBounds.value.min) newStart = dragBounds.value.min;
+    if (newStart > dragBounds.value.max) newStart = dragBounds.value.max;
+    
+    props.operation.startTime = newStart;
+    updateTemp();
+  } else if (rightMove.value) {
+    const deltaX = props.global.clientX - dragStartX.value;
+    const deltaTime = Math.round((deltaX / (props.global.documentWidth - 300)) * props.displayAreaTime);
+    
+    let newEnd = dragEndTiming.value + deltaTime;
+    newEnd = getSnappedTime(newEnd, snapPoints.value);
+    
+    if (newEnd > dragBounds.value.max) newEnd = dragBounds.value.max;
+    if (newEnd < dragBounds.value.min) newEnd = dragBounds.value.min;
+    
+    props.operation.endTime = newEnd;
+    updateTemp();
+  }
+});
 
 const startEdit = () => {
   edit.value = true;

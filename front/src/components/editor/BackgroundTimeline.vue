@@ -117,74 +117,68 @@ const dragType = ref(null); // 'move', 'left', 'right'
 const dragStartX = ref(0);
 const dragStartStartTime = ref(0);
 const dragStartEndTime = ref(0);
+const snapPoints = ref([]);
+const dragBounds = ref({ min: 0, max: Infinity });
 
-const toggleCollapse = () => {
-  isCollapsed.value = !isCollapsed.value;
-  emit('toggle-collapse', isCollapsed.value);
-};
-
-// Synchronize prop scrollLeft to element
-watch(() => props.scrollLeft, (newVal) => {
-  if (scrollRef.value && scrollRef.value.scrollLeft !== newVal) {
-    scrollRef.value.scrollLeft = newVal;
-  }
-});
-
-const handleScroll = (e) => {
-  emit('update:scrollLeft', e.target.scrollLeft);
-};
-
-const handleDrop = (e) => {
-  try {
-    const data = JSON.parse(e.dataTransfer.getData('application/json'));
-    if (data.type === 'background-asset') {
-      if (data.isCover) {
-        ElNotification({
-          title: '操作受限',
-          message: '这是封面图片，不能作为背景图使用。请上传或选择专门的背景素材。',
-          type: 'warning',
-          duration: 3000
-        });
-        return;
-      }
-      const rect = e.currentTarget.getBoundingClientRect();
-      const x = e.clientX - rect.left + scrollRef.value.scrollLeft;
-      const startTime = Math.round((x / (props.global.documentWidth - 300)) * props.displayAreaTime);
-      
-      // Calculate End Time: try to give it 2000ms duration
-      const proposedEndTime = startTime + 2000;
-      let endTime = proposedEndTime;
-
-      // Find next operation to avoid overlap if needed, or clamp endTime
-      const nextOp = props.chart.changeBackgroundOperations
-          .filter(op => op.startTime > startTime)
-          .sort((a, b) => a.startTime - b.startTime)[0];
-          
-      if (nextOp && endTime > nextOp.startTime) {
-          endTime = nextOp.startTime;
-      }
-
-      // Add new background operation
-      props.chart.changeBackgroundOperations.push({
-        startTime: startTime,
-        endTime: endTime,
-        background: data.url,
-        assetId: data.id,
-        edit: false
-      });
-      props.chart.changeBackgroundOperations.sort((a,b) => a.startTime - b.startTime);
-      
-      props.global.reCalculateChartMaker = !props.global.reCalculateChartMaker;
-      ElNotification({ title: '已添加背景', type: 'success', size: 'small' });
+const collectSnapPoints = (currentOp) => {
+  const points = [];
+  // Collect from Background Operations (excluding self)
+  props.chart.changeBackgroundOperations.forEach(op => {
+    if (op !== currentOp) {
+      if (op.startTime !== undefined) points.push(op.startTime);
+      if (op.endTime !== undefined) points.push(op.endTime);
     }
-  } catch (err) {
-    console.error('Drop error:', err);
+  });
+  
+  // Collect from Tracks
+  if (props.chart.tracks) {
+    props.chart.tracks.forEach(track => {
+      if (track.notes) {
+        track.notes.forEach(n => {
+          if (n.timing !== undefined) points.push(n.timing);
+          if (n.endTiming !== undefined) points.push(n.endTiming);
+        });
+      }
+      if (track.moveOperations) {
+        track.moveOperations.forEach(o => {
+          if (o.startTime !== undefined) points.push(o.startTime);
+          if (o.endTime !== undefined) points.push(o.endTime);
+        });
+      }
+      if (track.changeWidthOperations) {
+        track.changeWidthOperations.forEach(o => {
+          if (o.startTime !== undefined) points.push(o.startTime);
+          if (o.endTime !== undefined) points.push(o.endTime);
+        });
+      }
+       if (track.changeColorOperations) {
+        track.changeColorOperations.forEach(o => {
+          if (o.startTime !== undefined) points.push(o.startTime);
+          if (o.endTime !== undefined) points.push(o.endTime);
+        });
+      }
+    });
   }
+  return points;
 };
 
-const deleteOp = (index) => {
-  props.chart.changeBackgroundOperations.splice(index, 1);
-  props.global.reCalculateChartMaker = !props.global.reCalculateChartMaker;
+const getSnappedTime = (time, points, threshold = 100) => { // 100ms visual equivalent roughly or just 50ms
+  // Calculate threshold in ms based on a pixel distance, e.g. 10px
+  // 10px in ms = (10 / (docWidth - 300)) * displayTime
+  const pxThreshold = 10;
+  const msThreshold = (pxThreshold / (props.global.documentWidth - 300)) * props.displayAreaTime;
+  
+  let bestTime = time;
+  let minDiff = msThreshold;
+  
+  for (const point of points) {
+    const diff = Math.abs(time - point);
+    if (diff < minDiff) {
+      minDiff = diff;
+      bestTime = point;
+    }
+  }
+  return bestTime;
 };
 
 // Dragging Handlers
@@ -194,6 +188,19 @@ const startDragOp = (e, op) => {
   dragStartX.value = props.global.clientX;
   dragStartStartTime.value = op.startTime;
   dragStartEndTime.value = op.endTime || (op.startTime + 2000);
+  
+  snapPoints.value = collectSnapPoints(op);
+  
+  // Calculate Bounds
+  const sorted = [...props.chart.changeBackgroundOperations].sort((a,b) => a.startTime - b.startTime);
+  const idx = sorted.indexOf(op);
+  const prev = idx > 0 ? sorted[idx - 1] : null;
+  const next = idx < sorted.length - 1 ? sorted[idx + 1] : null;
+  
+  dragBounds.value = {
+    min: prev ? prev.endTime : 0,
+    max: next ? next.startTime : props.chart.songLength
+  };
 };
 
 const startResizeLeft = (e, op) => {
@@ -202,6 +209,17 @@ const startResizeLeft = (e, op) => {
   dragStartX.value = props.global.clientX;
   dragStartStartTime.value = op.startTime;
   dragStartEndTime.value = op.endTime || (op.startTime + 2000);
+  
+  snapPoints.value = collectSnapPoints(op);
+  
+  const sorted = [...props.chart.changeBackgroundOperations].sort((a,b) => a.startTime - b.startTime);
+  const idx = sorted.indexOf(op);
+  const prev = idx > 0 ? sorted[idx - 1] : null;
+
+  dragBounds.value = {
+    min: prev ? prev.endTime : 0,
+    max: op.endTime // Cannot pass its own end time
+  };
 };
 
 const startResizeRight = (e, op) => {
@@ -210,6 +228,17 @@ const startResizeRight = (e, op) => {
   dragStartX.value = props.global.clientX;
   dragStartStartTime.value = op.startTime;
   dragStartEndTime.value = op.endTime || (op.startTime + 2000);
+  
+  snapPoints.value = collectSnapPoints(op);
+  
+  const sorted = [...props.chart.changeBackgroundOperations].sort((a,b) => a.startTime - b.startTime);
+  const idx = sorted.indexOf(op);
+  const next = idx < sorted.length - 1 ? sorted[idx + 1] : null;
+
+  dragBounds.value = {
+    min: op.startTime, // Cannot pass start
+    max: next ? next.startTime : props.chart.songLength
+  };
 };
 
 watch(() => props.global.mouseMove, () => {
@@ -220,18 +249,47 @@ watch(() => props.global.mouseMove, () => {
     if (dragType.value === 'move') {
       const duration = dragStartEndTime.value - dragStartStartTime.value;
       let newStart = dragStartStartTime.value + deltaTime;
-      if (newStart < 0) newStart = 0;
       
+      // Snap Start
+      newStart = getSnappedTime(newStart, snapPoints.value);
+      // Snap End? Usually snap the edge we are most "aware" of, or both.
+      // Let's try snapping start first. If that doesn't snap, maybe snap end?
+      // Priorities: Start Snap > End Snap.
+      
+      let newEnd = newStart + duration;
+      
+      // Bounds Check
+      if (newStart < dragBounds.value.min) {
+        newStart = dragBounds.value.min;
+        newEnd = newStart + duration;
+      }
+      if (newEnd > dragBounds.value.max) {
+        newEnd = dragBounds.value.max;
+        newStart = newEnd - duration;
+      }
+      
+      // Re-verify start min bound in case end bound pushed it back
+      if (newStart < dragBounds.value.min) newStart = dragBounds.value.min;
+
       draggingOp.value.startTime = newStart;
       draggingOp.value.endTime = newStart + duration;
+      
     } else if (dragType.value === 'left') {
       let newStart = dragStartStartTime.value + deltaTime;
-      if (newStart < 0) newStart = 0;
-      if (newStart >= draggingOp.value.endTime - 100) newStart = draggingOp.value.endTime - 100;
+      newStart = getSnappedTime(newStart, snapPoints.value);
+      
+      if (newStart < dragBounds.value.min) newStart = dragBounds.value.min;
+      if (newStart > dragBounds.value.max - 100) newStart = dragBounds.value.max - 100; // Min duration 100ms?
+      
       draggingOp.value.startTime = newStart;
+      
     } else if (dragType.value === 'right') {
       let newEnd = dragStartEndTime.value + deltaTime;
-      if (newEnd <= draggingOp.value.startTime + 100) newEnd = draggingOp.value.startTime + 100;
+      newEnd = getSnappedTime(newEnd, snapPoints.value);
+      
+      if (newEnd > dragBounds.value.max) newEnd = dragBounds.value.max;
+      if (newEnd < dragBounds.value.min + 100) newEnd = dragBounds.value.min + 100;
+
       draggingOp.value.endTime = newEnd;
     }
   }
@@ -242,6 +300,7 @@ watch(() => props.global.mouseUp, () => {
     props.chart.changeBackgroundOperations.sort((a,b) => a.startTime - b.startTime);
     draggingOp.value = null;
     dragType.value = null;
+    snapPoints.value = [];
     props.global.reCalculateChartMaker = !props.global.reCalculateChartMaker;
   }
 });
