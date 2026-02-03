@@ -194,6 +194,20 @@
 </template>
 
 <script setup>
+import { ref, reactive, computed, watch, defineProps, onMounted, inject } from 'vue';
+import { CircleClose, CircleCheck, Delete, QuestionFilled } from '@element-plus/icons-vue';
+import { ElMessageBox, ElNotification } from 'element-plus';
+
+const props = defineProps({
+  operation: Object,
+  global: Object,
+  track: Object,
+  displayAreaTime: Number,
+  currentNoteType: Number,
+  enableEdit: Boolean,
+  chart: Object
+});
+
 const syncAction = inject('syncAction');
 const commandHistory = inject('commandHistory');
 

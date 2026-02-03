@@ -109,7 +109,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, defineProps, defineEmits, onMounted } from 'vue';
+import { ref, reactive, computed, defineProps, defineEmits, onMounted, inject } from 'vue';
 import { Setting, CircleClose, CircleCheck, Delete, QuestionFilled, Minus, View, Hide } from '@element-plus/icons-vue';
 import { ElMessageBox, ElNotification } from 'element-plus';
 import trackImage from '@/assets/img/EpheTrack.jpg';
