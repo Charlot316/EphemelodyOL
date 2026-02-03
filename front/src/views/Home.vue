@@ -2,7 +2,7 @@
   <div class="home-page">
     <BackgroundDisplay />
     <div class="content-overlay">
-      <Header />
+      <AppHeader />
       <main class="main-content">
         <div class="welcome-section">
           <h1 class="glitch-text">{{ $t('home.title') }}</h1>
@@ -43,11 +43,11 @@
 </template>
 
 <script>
-import Header from "../components/Header";
+import AppHeader from "../components/Header";
 import BackgroundDisplay from "@/components/BackgroundDisplay";
 export default {
   components: {
-    Header,
+    AppHeader,
     BackgroundDisplay,
   },
 };
