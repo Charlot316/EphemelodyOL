@@ -174,7 +174,11 @@ const setHeightAndTop = () => {
 
 const paintNote = (note) => {
   const painter = myglobal.notePainter;
-  if (!painter) return;
+  if (!painter) {
+    console.warn('[Track] paintNote skipped: painter is null');
+    return;
+  }
+  // console.log('[Track] paintNote', note.index, note.timing, myglobal.currentTime);
   const currentTime = myglobal.currentTime;
   const yValue =
     ((myglobal.finalY / myglobal.remainingTime) * currentTime -
@@ -341,17 +345,25 @@ const paintNote = (note) => {
 };
 
 const paintNotes = () => {
+  // console.log('[Track] paintNotes', myTrack.lastNote, myTrack.currentNote, myTrack.notes.length);
   if (!myTrack.judgeFinished) {
     for (let i = myTrack.lastNote; i >= myTrack.currentNote; i--) {
+      // console.log('[Track] painting note index', i);
       paintNote(myTrack.notes[i]);
     }
+  } else {
+    console.log('[Track] judgeFinished is true');
   }
 };
 
 const paintTrack = async () => {
   await paintNotes();
   const painter = myglobal.trackPainter;
-  if (!painter) return;
+  if (!painter) {
+    console.warn('[Track] paintTrack skipped: trackPainter is null');
+    return;
+  }
+  // console.log('[Track] paintTrack dimensions:', { width: width.value, height: height.value, top: top.value, left: left.value, Y: Y.value });
   if (width.value > 4 && height.value > 0) {
     const longerThanScreen = height.value > myglobal.screenHeight - Y.value;
     // Fill main rect
@@ -735,6 +747,7 @@ const initiate = () => {
   generateRGBPath();
   myTrack.notes.sort((a, b) => a.timing - b.timing);
   myTrack.notes.forEach((note, i) => (note.index = i));
+  console.log('[Track] initiate complete. Notes count:', myTrack.notes.length);
   
   let index = 0;
   let last = myTrack.notes.length;
