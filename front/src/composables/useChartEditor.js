@@ -302,7 +302,8 @@ export function useChartEditor(route, router) {
     }
   };
 
-  const { send, isConnected } = useWebSocket(route.query.songId, handleSocketMessage);
+  const targetSongId = route.query.songId || route.query.id;
+  const { send, isConnected } = useWebSocket(targetSongId, handleSocketMessage);
 
   const syncAction = (type, payload, clientId = null) => {
     if (isConnected.value) {
@@ -339,12 +340,29 @@ export function useChartEditor(route, router) {
 
   const getChart = async (globalSettingsCallback) => {
     try {
-      const { data: res } = await Axios.get(`/user/getChart?songId=${route.query.songId}&fromDb=true`);
+      const songId = route.query.songId || route.query.id;
+      if (!songId) {
+        ElNotification({ title: "错误", message: "缺少 songId 参数", type: "error" });
+        return;
+      }
+      const { data: res } = await Axios.get(`/user/getChart?songId=${songId}&fromDb=true`);
       if (res.code !== 0) {
         ElNotification({ title: "失败", message: "谱面获取失败！", type: "error" });
         return;
       }
       Object.assign(chart, res.data);
+      // 后端返回的数据可能缺失部分数组字段，需手动补正以防 Vue 渲染崩溃
+      if (chart.tracks) {
+        chart.tracks.forEach(track => {
+          if (!track.notes) track.notes = [];
+          if (!track.moveOperations) track.moveOperations = [];
+          if (!track.changeWidthOperations) track.changeWidthOperations = [];
+          if (!track.changeColorOperations) track.changeColorOperations = [];
+        });
+      }
+      if (!chart.changeBackgroundOperations) chart.changeBackgroundOperations = [];
+      if (!chart.assets) chart.assets = [];
+
       chartGot.value = true;
       displayStart.value = 0;
       if (chart.songLength > 0) migrateBackgroundOperations();
