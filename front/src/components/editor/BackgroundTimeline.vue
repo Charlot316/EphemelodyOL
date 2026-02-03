@@ -94,7 +94,7 @@
 
 
 <script setup>
-import { ref, defineProps, defineEmits, watch } from 'vue';
+import { ref, defineProps, defineEmits, watch, inject } from 'vue';
 import { Picture, ArrowDown, ArrowUp, Delete } from '@element-plus/icons-vue';
 import { ElNotification } from 'element-plus';
 
@@ -107,6 +107,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['update:scrollLeft', 'toggle-collapse']);
+const commandHistory = inject('commandHistory');
 
 const isCollapsed = ref(false);
 const scrollRef = ref(null);
@@ -193,6 +194,29 @@ const checkOverlap = (start, end, excludeOp) => {
   return false;
 };
 
+const deleteOp = (index) => {
+  const op = props.chart.changeBackgroundOperations[index];
+  props.chart.changeBackgroundOperations.splice(index, 1);
+  
+  if (commandHistory) {
+    commandHistory.pushCommand({
+      description: 'Delete BG Op',
+      undo: () => {
+         // Insert back. Since we might have sorted, index usage is risky if concurrent edits happened, 
+         // but for single user session it's ok if we assume linear history.
+         // Better to re-sort or insert at correct time position.
+         // Ideally insert and sort.
+         props.chart.changeBackgroundOperations.push(op);
+         props.chart.changeBackgroundOperations.sort((a,b) => a.startTime - b.startTime);
+      },
+      redo: () => {
+         const idx = props.chart.changeBackgroundOperations.indexOf(op);
+         if (idx !== -1) props.chart.changeBackgroundOperations.splice(idx, 1);
+      }
+    });
+  }
+};
+
 // Dragging Handlers
 const startDragOp = (e, op) => {
   draggingOp.value = op;
@@ -274,6 +298,40 @@ watch(() => props.global.mouseMove, () => {
 watch(() => props.global.mouseUp, () => {
   if (draggingOp.value) {
     props.chart.changeBackgroundOperations.sort((a,b) => a.startTime - b.startTime);
+    
+    // Check changes
+    const currentOp = draggingOp.value;
+    const finalStart = currentOp.startTime;
+    const finalEnd = currentOp.endTime;
+    
+    if (finalStart !== dragStartStartTime.value || finalEnd !== dragStartEndTime.value) {
+        const oldS = dragStartStartTime.value;
+        const oldE = dragStartEndTime.value;
+        // opEnd was possibly undefined default? 
+        // Logic: dragStartEndTime was computed.
+        // We should just restore values.
+        
+        if (commandHistory) {
+           commandHistory.pushCommand({
+              description: 'Move BG Op',
+              undo: () => {
+                 currentOp.startTime = oldS;
+                 // If oldE was the default (start+2000) and it was undefined in obj, 
+                 // we might be setting a concrete value. That's fine.
+                 currentOp.endTime = oldE;
+                 props.chart.changeBackgroundOperations.sort((a,b) => a.startTime - b.startTime);
+                 props.global.reCalculateChartMaker = !props.global.reCalculateChartMaker;
+              },
+              redo: () => {
+                 currentOp.startTime = finalStart;
+                 currentOp.endTime = finalEnd;
+                 props.chart.changeBackgroundOperations.sort((a,b) => a.startTime - b.startTime);
+                 props.global.reCalculateChartMaker = !props.global.reCalculateChartMaker;
+              }
+           });
+        }
+     }
+    
     draggingOp.value = null;
     dragType.value = null;
     snapPoints.value = [];

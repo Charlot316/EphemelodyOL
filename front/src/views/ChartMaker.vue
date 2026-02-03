@@ -282,7 +282,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, watch, onMounted, onBeforeUnmount } from 'vue';
+import { ref, reactive, computed, watch, onMounted, onBeforeUnmount, provide } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 import { Axios } from '@/plugins/axios';
@@ -295,6 +295,7 @@ import Footer from "@/components/editor/Footer.vue";
 import "animate.css";
 import { useChartEditor } from '@/composables/useChartEditor';
 import { useBpmTool } from '@/composables/useBpmTool';
+import { useCommandHistory } from '@/composables/useCommandHistory';
 
 const route = useRoute();
 const router = useRouter();
@@ -302,6 +303,9 @@ const store = useStore();
 const playerRef = ref(null);
 const canDrag = ref(false);
 let resizeTimer = null;
+
+const history = useCommandHistory();
+provide('commandHistory', history);
 
 const {
   chart,
@@ -474,6 +478,19 @@ onMounted(() => {
   global.documentWidth = document.documentElement.clientWidth;
   
   window.onkeydown = (e) => {
+    // Undo/Redo Shortcuts
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+      e.preventDefault();
+      if (e.shiftKey) history.redo();
+      else history.undo();
+      return;
+    }
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') {
+       e.preventDefault();
+       history.redo();
+       return;
+    }
+
     if (!e.repeat) {
       global.keyPressTime[e.key.toUpperCase()] = global.currentTime;
       global.keyIsHold[e.key.toUpperCase()] = true;
@@ -529,6 +546,7 @@ onMounted(() => {
 
   getChart(() => {
     globalSetting.value = true;
+    history.clear(); // Clear history after loading chart
   });
   
   setTimeout(() => {

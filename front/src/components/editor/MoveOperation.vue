@@ -153,7 +153,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, watch, defineProps, onMounted } from 'vue';
+import { ref, reactive, computed, watch, defineProps, onMounted, inject } from 'vue';
 import { CircleClose, CircleCheck, Delete, QuestionFilled } from '@element-plus/icons-vue';
 import { ElMessageBox, ElNotification } from 'element-plus';
 
@@ -166,6 +166,8 @@ const props = defineProps({
   enableEdit: Boolean,
   chart: Object
 });
+
+const commandHistory = inject('commandHistory');
 
 const edit = ref(false);
 const canMove = ref(false);
@@ -332,9 +334,26 @@ const startEdit = () => {
 const saveOperation = () => {
   formRef.value.validate((valid) => {
     if (valid) {
-      Object.assign(props.operation, tempOperation);
+      const oldState = JSON.parse(JSON.stringify(props.operation));
+      const newState = JSON.parse(JSON.stringify(tempOperation));
+      
+      Object.assign(props.operation, newState);
       edit.value = false;
       updateTrack();
+      
+      if (commandHistory) {
+        commandHistory.pushCommand({
+          description: 'Edit Move Op',
+          undo: () => {
+            Object.assign(props.operation, oldState);
+            updateTrack();
+          },
+          redo: () => {
+            Object.assign(props.operation, newState);
+            updateTrack();
+          }
+        });
+      }
     }
   });
 };
@@ -342,8 +361,24 @@ const saveOperation = () => {
 const deleteSelf = () => {
   const index = props.track.moveOperations.indexOf(props.operation);
   if (index !== -1) {
+    const deletedOp = props.operation;
     props.track.moveOperations.splice(index, 1);
     updateTrack();
+    
+    if (commandHistory) {
+      commandHistory.pushCommand({
+        description: 'Delete Move Op',
+        undo: () => {
+           props.track.moveOperations.splice(index, 0, deletedOp);
+           updateTrack();
+        },
+        redo: () => {
+           const idx = props.track.moveOperations.indexOf(deletedOp);
+           if (idx !== -1) props.track.moveOperations.splice(idx, 1);
+           updateTrack();
+        }
+      });
+    }
   }
 };
 
@@ -371,6 +406,35 @@ watch(() => props.global.mouseUp, () => {
     snapPoints.value = [];
     props.track.moveOperations.sort((a,b) => a.startTime - b.startTime);
     updateTrack();
+    
+    // Check if changed
+    const finalStart = props.operation.startTime;
+    const finalEnd = props.operation.endTime;
+    
+    if (finalStart !== dragStartTiming.value || finalEnd !== dragEndTiming.value) {
+      const oldS = dragStartTiming.value;
+      const oldE = dragEndTiming.value;
+      
+      if (commandHistory) {
+        commandHistory.pushCommand({
+          description: 'Move Move Op',
+          undo: () => {
+            props.operation.startTime = oldS;
+            props.operation.endTime = oldE;
+            props.track.moveOperations.sort((a,b) => a.startTime - b.startTime);
+            updateTrack();
+            updateTemp();
+          },
+          redo: () => {
+            props.operation.startTime = finalStart;
+            props.operation.endTime = finalEnd;
+            props.track.moveOperations.sort((a,b) => a.startTime - b.startTime);
+            updateTrack();
+            updateTemp();
+          }
+        });
+      }
+    }
   }
   deleteMenuVisible.value = false;
 });

@@ -153,7 +153,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, watch, defineProps, onMounted } from 'vue';
+import { ref, reactive, computed, watch, defineProps, onMounted, inject } from 'vue';
 import { CircleClose, CircleCheck, Delete, QuestionFilled } from '@element-plus/icons-vue';
 import { ElMessageBox, ElNotification } from 'element-plus';
 
@@ -166,6 +166,8 @@ const props = defineProps({
   enableEdit: Boolean,
   chart: Object
 });
+
+const commandHistory = inject('commandHistory');
 
 const edit = ref(false);
 const canMove = ref(false);
@@ -386,9 +388,26 @@ const startEdit = () => {
 const saveOperation = () => {
   formRef.value.validate((valid) => {
     if (valid) {
-      Object.assign(props.operation, tempOperation);
+      const oldState = JSON.parse(JSON.stringify(props.operation));
+      const newState = JSON.parse(JSON.stringify(tempOperation));
+      
+      Object.assign(props.operation, newState);
       edit.value = false;
       updateTrack();
+      
+      if (commandHistory) {
+        commandHistory.pushCommand({
+          description: 'Edit Width Op',
+          undo: () => {
+            Object.assign(props.operation, oldState);
+            updateTrack();
+          },
+          redo: () => {
+            Object.assign(props.operation, newState);
+            updateTrack();
+          }
+        });
+      }
     }
   });
 };
@@ -396,8 +415,24 @@ const saveOperation = () => {
 const deleteSelf = () => {
   const index = props.track.changeWidthOperations.indexOf(props.operation);
   if (index !== -1) {
+    const deletedOp = props.operation;
     props.track.changeWidthOperations.splice(index, 1);
     updateTrack();
+    
+    if (commandHistory) {
+      commandHistory.pushCommand({
+        description: 'Delete Width Op',
+        undo: () => {
+           props.track.changeWidthOperations.splice(index, 0, deletedOp);
+           updateTrack();
+        },
+        redo: () => {
+           const idx = props.track.changeWidthOperations.indexOf(deletedOp);
+           if (idx !== -1) props.track.changeWidthOperations.splice(idx, 1);
+           updateTrack();
+        }
+      });
+    }
   }
 };
 
@@ -418,9 +453,43 @@ const selfClicked = () => {
 };
 
 watch(() => props.global.mouseUp, () => {
-  canMove.value = false;
-  leftMove.value = false;
-  rightMove.value = false;
+  if (canMove.value || leftMove.value || rightMove.value) {
+    props.track.changeWidthOperations.sort((a,b) => a.startTime - b.startTime);
+    updateTrack();
+    
+    // Check if changed
+    const finalStart = props.operation.startTime;
+    const finalEnd = props.operation.endTime;
+    
+    if (finalStart !== dragStartTiming.value || finalEnd !== dragEndTiming.value) {
+      const oldS = dragStartTiming.value;
+      const oldE = dragEndTiming.value;
+      
+      if (commandHistory) {
+        commandHistory.pushCommand({
+          description: 'Move Width Op',
+          undo: () => {
+            props.operation.startTime = oldS;
+            props.operation.endTime = oldE;
+            props.track.changeWidthOperations.sort((a,b) => a.startTime - b.startTime);
+            updateTrack();
+            updateTemp();
+          },
+          redo: () => {
+            props.operation.startTime = finalStart;
+            props.operation.endTime = finalEnd;
+            props.track.changeWidthOperations.sort((a,b) => a.startTime - b.startTime);
+            updateTrack();
+            updateTemp();
+          }
+        });
+      }
+    }
+    
+    canMove.value = false;
+    leftMove.value = false;
+    rightMove.value = false;
+  }
   deleteMenuVisible.value = false;
 });
 

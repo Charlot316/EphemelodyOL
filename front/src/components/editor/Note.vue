@@ -185,7 +185,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, watch, defineProps, onMounted } from 'vue';
+import { ref, reactive, computed, watch, defineProps, onMounted, inject } from 'vue';
 import { CircleClose, CircleCheck, Delete, QuestionFilled } from '@element-plus/icons-vue';
 import { ElMessageBox, ElNotification } from 'element-plus';
 import hitNoteImage from '@/assets/img/EpheHitNote.png';
@@ -202,6 +202,8 @@ const props = defineProps({
   enableEdit: Boolean,
   chart: Object
 });
+
+const commandHistory = inject('commandHistory');
 
 const edit = ref(false);
 const canMove = ref(false);
@@ -400,10 +402,28 @@ const startEdit = () => {
 const saveNote = () => {
   formRef.value.validate((valid) => {
     if (valid) {
-      Object.assign(props.note, tempNote);
-      props.note.key = props.note.key.toUpperCase();
+      const oldState = JSON.parse(JSON.stringify(props.note));
+      const newState = JSON.parse(JSON.stringify(tempNote));
+      newState.key = newState.key.toUpperCase();
+      
+      Object.assign(props.note, newState);
       edit.value = false;
       updateTrack();
+      
+      // Push Command
+      if (commandHistory) {
+        commandHistory.pushCommand({
+          description: 'Edit Note',
+          undo: () => {
+            Object.assign(props.note, oldState);
+            updateTrack();
+          },
+          redo: () => {
+            Object.assign(props.note, newState);
+            updateTrack();
+          }
+        });
+      }
     }
   });
 };
@@ -411,8 +431,24 @@ const saveNote = () => {
 const deleteSelf = () => {
   const index = props.track.notes.indexOf(props.note);
   if (index !== -1) {
+    const deletedNote = props.note;
     props.track.notes.splice(index, 1);
     updateTrack();
+    
+    if (commandHistory) {
+      commandHistory.pushCommand({
+        description: 'Delete Note',
+        undo: () => {
+          props.track.notes.splice(index, 0, deletedNote);
+          updateTrack();
+        },
+        redo: () => {
+          const idx = props.track.notes.indexOf(deletedNote);
+          if (idx !== -1) props.track.notes.splice(idx, 1);
+          updateTrack();
+        }
+      });
+    }
   }
 };
 
@@ -440,10 +476,37 @@ watch(() => props.global.mouseUp, () => {
     snapPoints.value = [];
     
     // Re-sort track notes to keep order correct
-    // (Though drag constraints prevent swapping, sorting is safe)
     props.track.notes.sort((a,b) => a.timing - b.timing);
-    
     updateTrack();
+
+    // Check if changed
+    const finalStart = props.note.timing;
+    const finalEnd = props.note.endTiming;
+    
+    if (finalStart !== dragStartTiming.value || finalEnd !== dragEndTiming.value) {
+      const oldS = dragStartTiming.value;
+      const oldE = dragEndTiming.value;
+      
+      if (commandHistory) {
+        commandHistory.pushCommand({
+          description: 'Move Note',
+          undo: () => {
+             props.note.timing = oldS;
+             props.note.endTiming = oldE;
+             props.track.notes.sort((a,b) => a.timing - b.timing);
+             updateTrack();
+             updateTemp();
+          },
+          redo: () => {
+             props.note.timing = finalStart;
+             props.note.endTiming = finalEnd;
+             props.track.notes.sort((a,b) => a.timing - b.timing);
+             updateTrack();
+             updateTemp();
+          }
+        });
+      }
+    }
   }
   deleteMenuVisible.value = false;
 });
