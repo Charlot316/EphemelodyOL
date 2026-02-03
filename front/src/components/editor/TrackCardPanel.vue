@@ -199,7 +199,7 @@
 </template>
 
 <script setup>
-import { ref, watch, defineProps, defineEmits } from 'vue';
+import { ref, watch, defineProps, defineEmits, inject } from 'vue';
 import { ElNotification } from 'element-plus';
 import Note from "./Note.vue";
 import MoveOperation from "./MoveOperation.vue";
@@ -218,6 +218,8 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["currentTrack"]);
+const syncAction = inject('syncAction');
+const uuid = inject('uuid');
 
 const canMove = ref(false);
 const leftMove = ref(false);
@@ -269,34 +271,14 @@ const newNote = (e) => {
           return;
       }
       
-      let duration = 0;
-      if (props.currentNoteType === 1) {
-          duration = 500;
-          if (quantizedTime + duration > props.track.endTiming) {
-              duration = props.track.endTiming - quantizedTime;
-          }
-      }
-      
-      props.track.notes.push({
-        noteType: props.currentNoteType,
-        key: props.track.key,
-        timing: quantizedTime,
-        endTiming: quantizedTime + duration,
-      });
-      updateTrack();
+      addNoteAt(props.currentNoteType, quantizedTime);
   }
 };
 
 const newMoveOperations = () => {
   if (props.currentNoteType !== 3) {
     if (props.global.currentTime >= props.track.startTiming && props.global.currentTime < props.track.endTiming - 150) {
-      props.track.moveOperations.push({
-        startX: props.track.tempPositionX,
-        endX: props.track.tempPositionX,
-        startTime: props.global.currentTime,
-        endTime: props.global.currentTime + 150,
-      });
-      updateTrack();
+      addOpAt('move', props.global.currentTime);
     } else {
        ElNotification({ title: "错误", message: "请在轨道范围内添加操作", type: "error" });
     }
@@ -306,13 +288,7 @@ const newMoveOperations = () => {
 const newWidthOperations = () => {
   if (props.currentNoteType !== 3) {
     if (props.global.currentTime >= props.track.startTiming && props.global.currentTime < props.track.endTiming - 150) {
-      props.track.changeWidthOperations.push({
-        startWidth: props.track.tempWidth,
-        endWidth: props.track.tempWidth,
-        startTime: props.global.currentTime,
-        endTime: props.global.currentTime + 150,
-      });
-      updateTrack();
+      addOpAt('width', props.global.currentTime);
     } else {
        ElNotification({ title: "错误", message: "请在轨道范围内添加操作", type: "error" });
     }
@@ -322,17 +298,7 @@ const newWidthOperations = () => {
 const newColorOperations = () => {
   if (props.currentNoteType !== 3) {
     if (props.global.currentTime >= props.track.startTiming && props.global.currentTime < props.track.endTiming - 150) {
-      props.track.changeColorOperations.push({
-        startR: props.track.tempR,
-        startG: props.track.tempG,
-        startB: props.track.tempB,
-        endR: props.track.tempR,
-        endG: props.track.tempG,
-        endB: props.track.tempB,
-        startTime: props.global.currentTime,
-        endTime: props.global.currentTime + 150,
-      });
-      updateTrack();
+      addOpAt('color', props.global.currentTime);
     } else {
        ElNotification({ title: "错误", message: "请在轨道范围内添加操作", type: "error" });
     }
@@ -419,23 +385,42 @@ const contextAction = (action) => {
 const addNoteAt = (type, time) => {
     let duration = (type === 1) ? 500 : 0;
     if (time + duration > props.track.endTiming) duration = props.track.endTiming - time;
-    props.track.notes.push({
+    const clientId = uuid();
+    const newNoteObj = {
         noteType: type,
         key: props.track.key,
         timing: time,
-        endTiming: time + duration
-    });
+        endTiming: time + duration,
+        basedTrack: props.track.id,
+        clientId: clientId,
+        isPending: true
+    };
+    props.track.notes.push(newNoteObj);
+    if (syncAction) syncAction("ADD_NOTE", newNoteObj, clientId);
     updateTrack();
 };
 
 const addOpAt = (type, time) => {
     const endTime = Math.min(time + 150, props.track.endTiming);
+    const clientId = uuid();
+    let op = { startTime: time, endTime: endTime, basedTrack: props.track.id, clientId, isPending: true };
+    
     if (type === 'move') {
-        props.track.moveOperations.push({ startX: props.track.tempPositionX, endX: props.track.tempPositionX, startTime: time, endTime: endTime });
+        op.startX = props.track.tempPositionX || 0; op.endX = props.track.tempPositionX || 0;
+        if (!props.track.moveOperations) props.track.moveOperations = [];
+        props.track.moveOperations.push(op);
+        if (syncAction) syncAction("ADD_MOVE_OP", op, clientId);
     } else if (type === 'width') {
-        props.track.changeWidthOperations.push({ startWidth: props.track.tempWidth, endWidth: props.track.tempWidth, startTime: time, endTime: endTime });
+        op.startWidth = props.track.tempWidth || 1; op.endWidth = props.track.tempWidth || 1;
+        if (!props.track.changeWidthOperations) props.track.changeWidthOperations = [];
+        props.track.changeWidthOperations.push(op);
+        if (syncAction) syncAction("ADD_WIDTH_OP", op, clientId);
     } else if (type === 'color') {
-        props.track.changeColorOperations.push({ startR: props.track.tempR, startG: props.track.tempG, startB: props.track.tempB, endR: props.track.tempR, endG: props.track.tempG, endB: props.track.tempB, startTime: time, endTime: endTime });
+        op.startR = props.track.tempR || 255; op.startG = props.track.tempG || 255; op.startB = props.track.tempB || 255; 
+        op.endR = props.track.tempR || 255; op.endG = props.track.tempG || 255; op.endB = props.track.tempB || 255;
+        if (!props.track.changeColorOperations) props.track.changeColorOperations = [];
+        props.track.changeColorOperations.push(op);
+        if (syncAction) syncAction("ADD_COLOR_OP", op, clientId);
     }
     updateTrack();
 };

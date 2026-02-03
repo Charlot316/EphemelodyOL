@@ -2,12 +2,7 @@
   <div
     @click="selfClicked"
     @contextmenu.prevent.stop="openDeleteMenu"
-    :style="{
-      position: 'absolute',
-      top: '20px',
-      left: left - 20 + 'px',
-      zIndex: note.zIndex,
-    }"
+    :style="noteStyle"
     @mousedown="setZIndex"
   >
     <!-- Delete Context Menu -->
@@ -204,6 +199,7 @@ const props = defineProps({
 });
 
 const commandHistory = inject('commandHistory');
+const syncAction = inject('syncAction');
 
 const edit = ref(false);
 const canMove = ref(false);
@@ -252,6 +248,24 @@ const left = computed(() => {
   return (props.note.timing / props.displayAreaTime) * (props.global.documentWidth - 300);
 });
 
+const noteStyle = computed(() => {
+  let opacity = 1;
+  let filter = 'none';
+  if (props.note.isPending || props.note.isDeleting) {
+    opacity = 0.5;
+    filter = 'grayscale(100%)';
+  }
+  return {
+    position: 'absolute',
+    top: '20px',
+    left: left.value - 20 + 'px',
+    zIndex: props.note.zIndex,
+    opacity,
+    filter,
+    pointerEvents: (props.note.isPending || props.note.isDeleting) ? 'none' : 'auto'
+  };
+});
+
 const roundTime = (timing) => {
   if (props.global.beatLine) {
     const bpm = props.chart.bpm / 16;
@@ -287,11 +301,8 @@ const snapPoints = ref([]);
 
 const collectSnapPoints = (currentNote) => {
   const points = [];
-  
-  // 1. All Track Elements
   if (props.chart.tracks) {
     props.chart.tracks.forEach(track => {
-      // Notes
       if (track.notes) {
         track.notes.forEach(n => {
           if (n !== currentNote) {
@@ -300,7 +311,6 @@ const collectSnapPoints = (currentNote) => {
           }
         });
       }
-      // Operations
       ['moveOperations', 'changeWidthOperations', 'changeColorOperations'].forEach(key => {
         if (track[key]) {
           track[key].forEach(op => {
@@ -311,39 +321,26 @@ const collectSnapPoints = (currentNote) => {
       });
     });
   }
-  
-  // 2. Background Operations
   if (props.chart.changeBackgroundOperations) {
     props.chart.changeBackgroundOperations.forEach(op => {
       if (op.startTime !== undefined) points.push(op.startTime);
       if (op.endTime !== undefined) points.push(op.endTime);
     });
   }
-  
-  // 3. Beat Lines
   if (props.chart.bpm > 0) {
-    // Generate beat points around the current view roughly
-    // optimization: only generate beats in valid rang e.g. 0 to songLength
-    const msPerBeat = props.chart.bpm; // Assuming chart.bpm is ms per beat from memories
+    const msPerBeat = props.chart.bpm;
     const offset = props.chart.firstBeatDelay || 0;
     const songLen = props.chart.songLength || 300000;
-    
-    for (let t = offset; t <= songLen; t += msPerBeat) {
-      points.push(t);
-    }
+    for (let t = offset; t <= songLen; t += msPerBeat) points.push(t);
   }
-  
   return points;
 };
 
 const getSnappedTime = (time, points) => {
-  // Threshold: ~10px converted to time
   const pxThreshold = 10;
   const msThreshold = (pxThreshold / (props.global.documentWidth - 300)) * props.displayAreaTime;
-  
   let bestTime = time;
   let minDiff = msThreshold;
-  
   for (const point of points) {
     const diff = Math.abs(time - point);
     if (diff < minDiff) {
@@ -357,41 +354,40 @@ const getSnappedTime = (time, points) => {
 const checkOverlap = (start, end, exclude) => {
   for (const n of props.track.notes) {
     if (n === exclude) continue;
-    // Check if collision with 100ms buffer
-    // Overlap condition: start < other.end + 100 AND end > other.start - 100
     if (start < n.endTiming + 100 && end > n.timing - 100) return true;
   }
   return false;
 };
 
 const longNoteCanMove = () => {
+  if (props.note.isPending || props.note.isDeleting) return;
   canMove.value = true;
   dragStartX.value = props.global.clientX;
   dragStartTiming.value = props.note.timing;
   dragEndTiming.value = props.note.endTiming;
-  
   snapPoints.value = collectSnapPoints(props.note);
 };
 
 const startLeftMove = () => {
+  if (props.note.isPending || props.note.isDeleting) return;
   leftMove.value = true;
   dragStartX.value = props.global.clientX;
   dragStartTiming.value = props.note.timing;
   dragEndTiming.value = props.note.endTiming;
-  
   snapPoints.value = collectSnapPoints(props.note);
 };
 
 const startRightMove = () => {
+  if (props.note.isPending || props.note.isDeleting) return;
   rightMove.value = true;
   dragStartX.value = props.global.clientX;
   dragStartTiming.value = props.note.timing;
   dragEndTiming.value = props.note.endTiming;
-  
   snapPoints.value = collectSnapPoints(props.note);
 };
 
 const startEdit = () => {
+  if (props.note.isPending || props.note.isDeleting) return;
   edit.value = true;
   updateTemp();
   if (props.note.noteType !== 1) {
@@ -409,17 +405,20 @@ const saveNote = () => {
       Object.assign(props.note, newState);
       edit.value = false;
       updateTrack();
+
+      if (syncAction) syncAction("UPDATE_NOTE", props.note);
       
-      // Push Command
       if (commandHistory) {
         commandHistory.pushCommand({
           description: 'Edit Note',
           undo: () => {
             Object.assign(props.note, oldState);
+            if (syncAction) syncAction("UPDATE_NOTE", props.note);
             updateTrack();
           },
           redo: () => {
             Object.assign(props.note, newState);
+            if (syncAction) syncAction("UPDATE_NOTE", props.note);
             updateTrack();
           }
         });
@@ -429,27 +428,10 @@ const saveNote = () => {
 };
 
 const deleteSelf = () => {
-  const index = props.track.notes.indexOf(props.note);
-  if (index !== -1) {
-    const deletedNote = props.note;
-    props.track.notes.splice(index, 1);
-    updateTrack();
-    
-    if (commandHistory) {
-      commandHistory.pushCommand({
-        description: 'Delete Note',
-        undo: () => {
-          props.track.notes.splice(index, 0, deletedNote);
-          updateTrack();
-        },
-        redo: () => {
-          const idx = props.track.notes.indexOf(deletedNote);
-          if (idx !== -1) props.track.notes.splice(idx, 1);
-          updateTrack();
-        }
-      });
-    }
-  }
+  if (props.note.isDeleting) return;
+  props.note.isDeleting = true;
+  if (syncAction) syncAction("DELETE_NOTE", props.note.id);
+  // Removal will be handled by WebSocket message from useChartEditor
 };
 
 const deleteNote = () => {
@@ -459,7 +441,6 @@ const deleteNote = () => {
     type: "warning",
   }).then(() => {
     deleteSelf();
-    ElNotification({ title: "成功", message: "删除成功", type: "success" });
   }).catch(() => {});
 };
 
@@ -475,17 +456,17 @@ watch(() => props.global.mouseUp, () => {
     rightMove.value = false;
     snapPoints.value = [];
     
-    // Re-sort track notes to keep order correct
     props.track.notes.sort((a,b) => a.timing - b.timing);
     updateTrack();
 
-    // Check if changed
     const finalStart = props.note.timing;
     const finalEnd = props.note.endTiming;
     
     if (finalStart !== dragStartTiming.value || finalEnd !== dragEndTiming.value) {
       const oldS = dragStartTiming.value;
       const oldE = dragEndTiming.value;
+
+      if (syncAction) syncAction("UPDATE_NOTE", props.note);
       
       if (commandHistory) {
         commandHistory.pushCommand({
@@ -494,6 +475,7 @@ watch(() => props.global.mouseUp, () => {
              props.note.timing = oldS;
              props.note.endTiming = oldE;
              props.track.notes.sort((a,b) => a.timing - b.timing);
+             if (syncAction) syncAction("UPDATE_NOTE", props.note);
              updateTrack();
              updateTemp();
           },
@@ -501,6 +483,7 @@ watch(() => props.global.mouseUp, () => {
              props.note.timing = finalStart;
              props.note.endTiming = finalEnd;
              props.track.notes.sort((a,b) => a.timing - b.timing);
+             if (syncAction) syncAction("UPDATE_NOTE", props.note);
              updateTrack();
              updateTemp();
           }
@@ -513,6 +496,7 @@ watch(() => props.global.mouseUp, () => {
 
 const deleteMenuVisible = ref(false);
 const openDeleteMenu = () => {
+  if (props.note.isDeleting) return;
   deleteMenuVisible.value = true;
 };
 
@@ -520,15 +504,10 @@ watch(() => props.global.mouseMove, () => {
   if (canMove.value) {
     const deltaX = props.global.clientX - dragStartX.value;
     const deltaTime = Math.round((deltaX / (props.global.documentWidth - 300)) * props.displayAreaTime);
-    
-    // Original duration
     const duration = dragEndTiming.value - dragStartTiming.value;
     let newStart = dragStartTiming.value + deltaTime;
-    
-    // Snap
     newStart = getSnappedTime(newStart, snapPoints.value);
     let newEnd = newStart + duration;
-    
     if (newStart < props.track.startTiming) {
        newStart = props.track.startTiming;
        newEnd = newStart + duration;
@@ -538,38 +517,29 @@ watch(() => props.global.mouseMove, () => {
        newStart = newEnd - duration;
        if (newStart < props.track.startTiming) newStart = props.track.startTiming;
     }
-    
     if (!checkOverlap(newStart, newEnd, props.note)) {
       props.note.timing = newStart;
       props.note.endTiming = newEnd;
       updateTemp();
     }
-    
   } else if (leftMove.value) {
     const deltaX = props.global.clientX - dragStartX.value;
     const deltaTime = Math.round((deltaX / (props.global.documentWidth - 300)) * props.displayAreaTime);
-    
     let newStart = dragStartTiming.value + deltaTime;
     newStart = getSnappedTime(newStart, snapPoints.value);
-    
     if (newStart < props.track.startTiming) newStart = props.track.startTiming;
     if (newStart >= props.note.endTiming - 50) newStart = props.note.endTiming - 50; 
-    
     if (!checkOverlap(newStart, props.note.endTiming, props.note)) {
       props.note.timing = newStart;
       updateTemp();
     }
-    
   } else if (rightMove.value) {
     const deltaX = props.global.clientX - dragStartX.value;
     const deltaTime = Math.round((deltaX / (props.global.documentWidth - 300)) * props.displayAreaTime);
-    
     let newEnd = dragEndTiming.value + deltaTime;
     newEnd = getSnappedTime(newEnd, snapPoints.value);
-    
     if (newEnd > props.track.endTiming) newEnd = props.track.endTiming;
     if (newEnd <= props.note.timing + 50) newEnd = props.note.timing + 50;
-    
     if (!checkOverlap(props.note.timing, newEnd, props.note)) {
       props.note.endTiming = newEnd;
       updateTemp();

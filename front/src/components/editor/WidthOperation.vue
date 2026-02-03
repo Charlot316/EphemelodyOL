@@ -2,12 +2,7 @@
   <div
     @click="selfClicked"
     @contextmenu.prevent.stop="openDeleteMenu"
-    :style="{
-      position: 'absolute',
-      top: '20px',
-      left: left + 'px',
-      zIndex: operation.zIndex,
-    }"
+    :style="opStyle"
     @mousedown="setZIndex"
   >
     <!-- Delete Context Menu -->
@@ -168,6 +163,7 @@ const props = defineProps({
 });
 
 const commandHistory = inject('commandHistory');
+const syncAction = inject('syncAction');
 
 const edit = ref(false);
 const canMove = ref(false);
@@ -208,6 +204,24 @@ const left = computed(() => {
   return (props.operation.startTime / props.displayAreaTime) * (props.global.documentWidth - 300);
 });
 
+const opStyle = computed(() => {
+  let opacity = 1;
+  let filter = 'none';
+  if (props.operation.isPending || props.operation.isDeleting) {
+    opacity = 0.5;
+    filter = 'grayscale(100%)';
+  }
+  return {
+    position: 'absolute',
+    top: '20px',
+    left: left.value + 'px',
+    zIndex: props.operation.zIndex,
+    opacity,
+    filter,
+    pointerEvents: (props.operation.isPending || props.operation.isDeleting) ? 'none' : 'auto'
+  };
+});
+
 const roundTime = (timing) => {
   if (props.global.beatLine) {
     const bpm = props.chart.bpm / 16;
@@ -235,6 +249,9 @@ const setZIndex = () => {
   props.operation.zIndex = 10;
 };
 
+const dragStartX = ref(0);
+const dragStartTiming = ref(0);
+const dragEndTiming = ref(0);
 const snapPoints = ref([]);
 
 const collectSnapPoints = (currentOp) => {
@@ -296,91 +313,34 @@ const checkOverlap = (start, end, exclude) => {
 };
 
 const longOperationCanMove = () => {
+  if (props.operation.isPending || props.operation.isDeleting) return;
   canMove.value = true;
   dragStartX.value = props.global.clientX;
   dragStartTiming.value = props.operation.startTime;
   dragEndTiming.value = props.operation.endTime;
-  
   snapPoints.value = collectSnapPoints(props.operation);
 };
 
 const startLeftMove = () => {
+  if (props.operation.isPending || props.operation.isDeleting) return;
   leftMove.value = true;
   dragStartX.value = props.global.clientX;
   dragStartTiming.value = props.operation.startTime;
   dragEndTiming.value = props.operation.endTime;
-  
   snapPoints.value = collectSnapPoints(props.operation);
 };
 
 const startRightMove = () => {
+  if (props.operation.isPending || props.operation.isDeleting) return;
   rightMove.value = true;
   dragStartX.value = props.global.clientX;
   dragStartTiming.value = props.operation.startTime;
   dragEndTiming.value = props.operation.endTime;
-  
   snapPoints.value = collectSnapPoints(props.operation);
 };
 
-watch(() => props.global.mouseMove, () => {
-  if (canMove.value) {
-    const deltaX = props.global.clientX - dragStartX.value;
-    const deltaTime = Math.round((deltaX / (props.global.documentWidth - 300)) * props.displayAreaTime);
-    
-    const duration = dragEndTiming.value - dragStartTiming.value;
-    let newStart = dragStartTiming.value + deltaTime;
-    
-    newStart = getSnappedTime(newStart, snapPoints.value);
-    let newEnd = newStart + duration;
-    
-    if (newStart < props.track.startTiming) {
-      newStart = props.track.startTiming;
-      newEnd = newStart + duration;
-    }
-    if (newEnd > props.track.endTiming) {
-      newEnd = props.track.endTiming;
-      newStart = newEnd - duration;
-    }
-
-    if (!checkOverlap(newStart, newEnd, props.operation)) {
-      props.operation.startTime = newStart;
-      props.operation.endTime = newEnd;
-      updateTemp();
-    }
-    
-  } else if (leftMove.value) {
-    const deltaX = props.global.clientX - dragStartX.value;
-    const deltaTime = Math.round((deltaX / (props.global.documentWidth - 300)) * props.displayAreaTime);
-    
-    let newStart = dragStartTiming.value + deltaTime;
-    newStart = getSnappedTime(newStart, snapPoints.value);
-    
-    if (newStart < props.track.startTiming) newStart = props.track.startTiming;
-    if (newStart > props.operation.endTime - 20) newStart = props.operation.endTime - 20;
-    
-    if (!checkOverlap(newStart, props.operation.endTime, props.operation)) {
-      props.operation.startTime = newStart;
-      updateTemp();
-    }
-    
-  } else if (rightMove.value) {
-    const deltaX = props.global.clientX - dragStartX.value;
-    const deltaTime = Math.round((deltaX / (props.global.documentWidth - 300)) * props.displayAreaTime);
-    
-    let newEnd = dragEndTiming.value + deltaTime;
-    newEnd = getSnappedTime(newEnd, snapPoints.value);
-    
-    if (newEnd > props.track.endTiming) newEnd = props.track.endTiming;
-    if (newEnd < props.operation.startTime + 20) newEnd = props.operation.startTime + 20;
-    
-    if (!checkOverlap(props.operation.startTime, newEnd, props.operation)) {
-      props.operation.endTime = newEnd;
-      updateTemp();
-    }
-  }
-});
-
 const startEdit = () => {
+  if (props.operation.isPending || props.operation.isDeleting) return;
   edit.value = true;
   updateTemp();
 };
@@ -390,20 +350,23 @@ const saveOperation = () => {
     if (valid) {
       const oldState = JSON.parse(JSON.stringify(props.operation));
       const newState = JSON.parse(JSON.stringify(tempOperation));
-      
       Object.assign(props.operation, newState);
       edit.value = false;
       updateTrack();
+
+      if (syncAction) syncAction("UPDATE_WIDTH_OP", props.operation);
       
       if (commandHistory) {
         commandHistory.pushCommand({
           description: 'Edit Width Op',
           undo: () => {
             Object.assign(props.operation, oldState);
+            if (syncAction) syncAction("UPDATE_WIDTH_OP", props.operation);
             updateTrack();
           },
           redo: () => {
             Object.assign(props.operation, newState);
+            if (syncAction) syncAction("UPDATE_WIDTH_OP", props.operation);
             updateTrack();
           }
         });
@@ -413,27 +376,9 @@ const saveOperation = () => {
 };
 
 const deleteSelf = () => {
-  const index = props.track.changeWidthOperations.indexOf(props.operation);
-  if (index !== -1) {
-    const deletedOp = props.operation;
-    props.track.changeWidthOperations.splice(index, 1);
-    updateTrack();
-    
-    if (commandHistory) {
-      commandHistory.pushCommand({
-        description: 'Delete Width Op',
-        undo: () => {
-           props.track.changeWidthOperations.splice(index, 0, deletedOp);
-           updateTrack();
-        },
-        redo: () => {
-           const idx = props.track.changeWidthOperations.indexOf(deletedOp);
-           if (idx !== -1) props.track.changeWidthOperations.splice(idx, 1);
-           updateTrack();
-        }
-      });
-    }
-  }
+  if (props.operation.isDeleting) return;
+  props.operation.isDeleting = true;
+  if (syncAction) syncAction("DELETE_WIDTH_OP", props.operation.id);
 };
 
 const deleteOperation = () => {
@@ -443,7 +388,6 @@ const deleteOperation = () => {
     type: "warning",
   }).then(() => {
     deleteSelf();
-    ElNotification({ title: "成功", message: "删除成功", type: "success" });
   }).catch(() => {});
 };
 
@@ -457,13 +401,14 @@ watch(() => props.global.mouseUp, () => {
     props.track.changeWidthOperations.sort((a,b) => a.startTime - b.startTime);
     updateTrack();
     
-    // Check if changed
     const finalStart = props.operation.startTime;
     const finalEnd = props.operation.endTime;
     
     if (finalStart !== dragStartTiming.value || finalEnd !== dragEndTiming.value) {
       const oldS = dragStartTiming.value;
       const oldE = dragEndTiming.value;
+
+      if (syncAction) syncAction("UPDATE_WIDTH_OP", props.operation);
       
       if (commandHistory) {
         commandHistory.pushCommand({
@@ -472,6 +417,7 @@ watch(() => props.global.mouseUp, () => {
             props.operation.startTime = oldS;
             props.operation.endTime = oldE;
             props.track.changeWidthOperations.sort((a,b) => a.startTime - b.startTime);
+            if (syncAction) syncAction("UPDATE_WIDTH_OP", props.operation);
             updateTrack();
             updateTemp();
           },
@@ -479,6 +425,7 @@ watch(() => props.global.mouseUp, () => {
             props.operation.startTime = finalStart;
             props.operation.endTime = finalEnd;
             props.track.changeWidthOperations.sort((a,b) => a.startTime - b.startTime);
+            if (syncAction) syncAction("UPDATE_WIDTH_OP", props.operation);
             updateTrack();
             updateTemp();
           }
@@ -495,6 +442,7 @@ watch(() => props.global.mouseUp, () => {
 
 const deleteMenuVisible = ref(false);
 const openDeleteMenu = () => {
+  if (props.operation.isDeleting) return;
   deleteMenuVisible.value = true;
 };
 
@@ -502,34 +450,30 @@ watch(() => props.global.mouseMove, () => {
   if (canMove.value) {
     const deltaX = props.global.clientX - dragStartX.value;
     const deltaTime = Math.round((deltaX / (props.global.documentWidth - 300)) * props.displayAreaTime);
-    
     const duration = dragEndTiming.value - dragStartTiming.value;
     let newStart = roundTime(dragStartTiming.value + deltaTime);
-    
+    newStart = getSnappedTime(newStart, snapPoints.value);
     if (newStart < props.track.startTiming) newStart = props.track.startTiming;
     if (newStart + duration > props.track.endTiming) newStart = props.track.endTiming - duration;
-    
     props.operation.startTime = newStart;
     props.operation.endTime = newStart + duration;
     updateTemp();
   } else if (leftMove.value) {
     const deltaX = props.global.clientX - dragStartX.value;
     const deltaTime = Math.round((deltaX / (props.global.documentWidth - 300)) * props.displayAreaTime);
-    
     let newStart = roundTime(dragStartTiming.value + deltaTime);
+    newStart = getSnappedTime(newStart, snapPoints.value);
     if (newStart < props.track.startTiming) newStart = props.track.startTiming;
-    if (newStart > dragEndTiming.value - 100) newStart = dragEndTiming.value - 100;
-    
+    if (newStart > props.operation.endTime - 100) newStart = props.operation.endTime - 100;
     props.operation.startTime = newStart;
     updateTemp();
   } else if (rightMove.value) {
     const deltaX = props.global.clientX - dragStartX.value;
     const deltaTime = Math.round((deltaX / (props.global.documentWidth - 300)) * props.displayAreaTime);
-    
     let newEnd = roundTime(dragEndTiming.value + deltaTime);
-    if (newEnd < dragStartTiming.value + 100) newEnd = dragStartTiming.value + 100;
+    newEnd = getSnappedTime(newEnd, snapPoints.value);
+    if (newEnd < props.operation.startTime + 100) newEnd = props.operation.startTime + 100;
     if (newEnd > props.track.endTiming) newEnd = props.track.endTiming;
-    
     props.operation.endTime = newEnd;
     updateTemp();
   }

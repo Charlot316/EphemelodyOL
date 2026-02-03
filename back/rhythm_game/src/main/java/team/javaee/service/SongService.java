@@ -24,42 +24,51 @@ import javax.servlet.http.HttpServletRequest;
  */
 public interface SongService extends IService<Song> {
 
-    // 新增谱面
-    ReturnResponse<Integer> newChart(NewChartDTO newChartDTO);
+        // 新增谱面
+        ReturnResponse<Integer> newChart(NewChartDTO newChartDTO);
 
-    // 修改谱面
-    ReturnResponse<String> editChartInfo(EditChartDTO editChartDTO);
+        // 修改谱面
+        ReturnResponse<String> editChartInfo(EditChartDTO editChartDTO);
 
-    // 上传歌曲封面
-    ReturnResponse<ImageVO> uploadSongCover(@Param("file") MultipartFile file, @Param("songId") Integer songId,
-            HttpServletRequest request);
+        // 上传歌曲封面
+        ReturnResponse<ImageVO> uploadSongCover(@Param("file") MultipartFile file, @Param("songId") Integer songId,
+                        HttpServletRequest request);
 
-    // 上传歌曲默认背景
-    ReturnResponse<ImageVO> uploadDefaultBackground(@Param("file") MultipartFile file, @Param("songId") Integer songId,
-            HttpServletRequest request);
+        // 上传歌曲默认背景
+        ReturnResponse<ImageVO> uploadDefaultBackground(@Param("file") MultipartFile file,
+                        @Param("songId") Integer songId,
+                        HttpServletRequest request);
 
-    // 上传音频
-    ReturnResponse<String> uploadSong(@Param("file") MultipartFile file, @Param("songId") Integer songId,
-            HttpServletRequest request);
+        // 上传音频
+        ReturnResponse<String> uploadSong(@Param("file") MultipartFile file, @Param("songId") Integer songId,
+                        HttpServletRequest request);
 
-    // 修改谱面具体内容
-    ReturnResponse<String> editChartContent(ChartContentDTO chartContentDTO);
+        // 修改谱面具体内容
+        ReturnResponse<String> editChartContent(ChartContentDTO chartContentDTO);
 
-    // 新增歌曲背景
-    ReturnResponse<BackgroundVO> uploadBackground(UploadBackgroundDTO uploadBackgroundDTO, HttpServletRequest request);
+        // 新增歌曲背景
+        ReturnResponse<BackgroundVO> uploadBackground(UploadBackgroundDTO uploadBackgroundDTO,
+                        HttpServletRequest request);
 
-    // 认定已公开的谱面
-    ReturnResponse<String> accreditChart(SongDTO songDTO);
+        // 认定已公开的谱面
+        ReturnResponse<String> accreditChart(SongDTO songDTO);
 
-    // 认定已公开的谱面
-    ReturnResponse<String> disAccreditChart(SongDTO songDTO);
+        // 认定已公开的谱面
+        ReturnResponse<String> disAccreditChart(SongDTO songDTO);
 
-    // 删除谱面
-    ReturnResponse<String> deleteChart(SongDTO songDTO);
+        // 删除谱面
+        ReturnResponse<String> deleteChart(SongDTO songDTO);
 
-    // 上传资源素材
-    ReturnResponse<SongAsset> uploadAsset(MultipartFile file, Integer songId, String type, HttpServletRequest request);
+        // 上传资源素材
+        ReturnResponse<SongAsset> uploadAsset(MultipartFile file, Integer songId, String type,
+                        HttpServletRequest request);
 
-    // 删除资源素材
-    ReturnResponse<String> deleteAsset(Integer id);
+        // 删除资源素材
+        ReturnResponse<String> deleteAsset(Integer id);
+
+        // 从 JSON 重置数据库
+        ReturnResponse<String> resetChartFromJSON(Integer songId);
+
+        // 强制同步所有 DB 到 JSON
+        ReturnResponse<String> forceSyncAll();
 }

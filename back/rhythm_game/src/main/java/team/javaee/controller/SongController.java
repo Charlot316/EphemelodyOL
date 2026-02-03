@@ -92,4 +92,16 @@ public class SongController {
     public ReturnResponse<String> deleteAsset(@RequestBody SongAsset asset) {
         return songService.deleteAsset(asset.getId());
     }
+
+    @ApiOperation("重置谱面到上次发布的JSON状态")
+    @PostMapping("resetChart")
+    public ReturnResponse<String> resetChart(@RequestParam("songId") Integer songId) {
+        return songService.resetChartFromJSON(songId);
+    }
+
+    @ApiOperation("强制同步所有DB到JSON")
+    @PostMapping("forceSyncAll")
+    public ReturnResponse<String> forceSyncAll() {
+        return songService.forceSyncAll();
+    }
 }

@@ -123,8 +123,38 @@
 
         <div class="toolbar-divider"></div>
 
-        <!-- 分组 4: 杂项 -->
+        <!-- 分组 4: 协作状态 -->
         <div class="toolbar-group">
+          <el-tooltip placement="top">
+            <template #content>
+              <div class="user-list-tooltip">
+                <div class="tooltip-title">当前在线编辑器 ({{ onlineCount }})</div>
+                <div v-for="(user, idx) in onlineUsers" :key="idx" class="user-item">
+                  {{ user }}
+                </div>
+              </div>
+            </template>
+            <div class="online-indicator" :class="{ 'multi-user': onlineCount > 1 }">
+              <span class="pulse-dot"></span>
+              <span class="count-label">{{ onlineCount }} 人在线</span>
+            </div>
+          </el-tooltip>
+        </div>
+
+        <div class="toolbar-divider"></div>
+
+        <!-- 分组 5: 杂项 -->
+        <div class="toolbar-group">
+          <el-tooltip content="重置到上次保存" placement="top">
+            <el-button
+              size="small"
+              class="tool-btn-rect is-warning"
+              @click="resetChart"
+            >
+              <el-icon><Refresh /></el-icon>
+              重置
+            </el-button>
+          </el-tooltip>
           <el-button
             size="small"
             class="tool-btn-rect"
@@ -271,10 +301,10 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, defineProps, defineEmits, onMounted } from 'vue';
+import { ref, computed, watch, defineProps, defineEmits, onMounted, inject } from 'vue';
 import { 
   Sort, Timer, Filter, Aim, Compass, CircleCheck, 
-  MagicStick, Delete, EditPen, ZoomIn, CirclePlus, View 
+  MagicStick, Delete, EditPen, ZoomIn, CirclePlus, View, Refresh 
 } from '@element-plus/icons-vue';
 import { ElMessageBox, ElNotification } from 'element-plus';
 import TrackCard from "./TrackCard.vue";
@@ -282,6 +312,10 @@ import TrackCardPanel from "./TrackCardPanel.vue";
 import BackgroundTimeline from "./BackgroundTimeline.vue";
 import BeatLine from "./BeatLine.vue";
 import "animate.css";
+
+const onlineUsers = inject('onlineUsers');
+const onlineCount = inject('onlineCount');
+const resetChart = inject('resetChart');
 
 const props = defineProps({
   chart: Object,
@@ -625,4 +659,61 @@ onMounted(() => {
 .beat-line-wrapper-absolute { position: absolute; top: 0; left: 0; height: 100%; width: 100%; z-index: 5; pointer-events: none; }
 .animate__animated { --animate-duration: 0.2s; }
 .list-move { transition: transform 0.2s ease; }
+
+.online-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 4px;
+  cursor: default;
+}
+
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #67c23a;
+  box-shadow: 0 0 0 rgba(103, 194, 58, 0.4);
+  animation: pulse 2s infinite;
+}
+
+.online-indicator.multi-user .pulse-dot {
+  background: #e6a23c;
+  box-shadow: 0 0 0 rgba(230, 162, 60, 0.4);
+  animation: pulse-warn 2s infinite;
+}
+
+.count-label {
+  font-size: 12px;
+  color: #eee;
+  font-weight: 600;
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(103, 194, 58, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(103, 194, 58, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(103, 194, 58, 0); }
+}
+
+@keyframes pulse-warn {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(230, 162, 60, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(230, 162, 60, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(230, 162, 60, 0); }
+}
+
+.user-list-tooltip {
+  padding: 4px;
+}
+.tooltip-title {
+  font-size: 12px;
+  color: #888;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  margin-bottom: 6px;
+  padding-bottom: 4px;
+}
+.user-item {
+  font-size: 13px;
+  color: #fff;
+  padding: 2px 0;
+}
 </style>

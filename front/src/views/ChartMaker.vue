@@ -296,6 +296,8 @@ import "animate.css";
 import { useChartEditor } from '@/composables/useChartEditor';
 import { useBpmTool } from '@/composables/useBpmTool';
 import { useCommandHistory } from '@/composables/useCommandHistory';
+import { useWebSocket } from '@/composables/useWebSocket';
+import { v4 as uuidv4 } from 'uuid';
 
 const route = useRoute();
 const router = useRouter();
@@ -320,6 +322,19 @@ const {
   saveChart,
   onAudioLoaded
 } = useChartEditor(route, router);
+
+const { send: sendSocket, isConnected } = useWebSocket(route.query.id);
+
+const syncAction = (action, payload) => {
+  if (isConnected.value) {
+    sendSocket(action, payload);
+  } else {
+    ElNotification({ title: '未连接', message: '实时同步不可用，请检查网络连接', type: 'warning' });
+  }
+};
+
+provide('syncAction', syncAction);
+provide('uuid', uuidv4);
 
 const global = reactive({
   currentTime: 0,

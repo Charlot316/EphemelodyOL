@@ -122,6 +122,7 @@ const props = defineProps({
 
 const emit = defineEmits(["editStatus", "currentTrack"]);
 
+const syncAction = inject('syncAction');
 const formRef = ref(null);
 const tempTrack = reactive({});
 
@@ -166,9 +167,12 @@ const currentClass = computed(() => {
   const { currentTime } = props.global;
   const { startTiming, endTiming } = props.track;
   
-  if (currentTime > startTiming && currentTime < endTiming) cls += "current-track";
-  else if (currentTime > endTiming) cls += "passed-track";
-  else cls += "to-come-track";
+  if (currentTime > startTiming && currentTime < endTiming) cls += "current-track ";
+  else if (currentTime > endTiming) cls += "passed-track ";
+  else cls += "to-come-track ";
+
+  if (props.track.isPending || props.track.isDeleting) cls += "pending-track ";
+  
   return cls;
 });
 
@@ -200,6 +204,7 @@ const onColorChange = () => {
 };
 
 const startEdit = () => {
+  if (props.track.isPending || props.track.isDeleting) return;
   props.track.edit = true;
   document.querySelector("#trackCard" + props.track.index)?.scrollIntoView({ behavior: "auto" });
   Object.assign(tempTrack, JSON.parse(JSON.stringify(props.track)));
@@ -208,12 +213,12 @@ const startEdit = () => {
 };
 
 const handleCurrentTrack = () => {
+  if (props.track.isPending || props.track.isDeleting) return;
   emit("currentTrack", props.track);
   startEdit();
 };
 
 const saveTrack = () => {
-  // Simple validation
   if (!tempTrack.key || tempTrack.key.length !== 1) {
     ElNotification({ title: "错误", message: "按键必须为单个字母", type: "error" });
     return;
@@ -222,10 +227,12 @@ const saveTrack = () => {
   Object.assign(props.track, tempTrack);
   props.track.key = props.track.key.toUpperCase();
   props.track.edit = false;
+  
+  if (syncAction) syncAction("UPDATE_TRACK", props.track);
+  
   if (props.track.isNew) emit("editStatus", true);
   props.track.isNew = false;
   
-  // Real-time update, no debounce
   updateTrack();
 };
 
@@ -285,6 +292,12 @@ onMounted(() => {
   border-color: rgba(64, 158, 255, 0.4);
   background: rgba(60, 60, 60, 0.6);
   box-shadow: 0 0 15px rgba(64, 158, 255, 0.1);
+}
+
+.pending-track .glass-card {
+  opacity: 0.5;
+  filter: grayscale(100%);
+  pointer-events: none;
 }
 
 /* Spatial Indicator Bar */

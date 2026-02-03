@@ -2,12 +2,7 @@
   <div
     @click="selfClicked"
     @contextmenu.prevent.stop="openDeleteMenu"
-    :style="{
-      position: 'absolute',
-      top: '20px',
-      left: left + 'px',
-      zIndex: operation.zIndex,
-    }"
+    :style="opStyle"
     @mousedown="setZIndex"
   >
     <!-- Delete Context Menu -->
@@ -199,19 +194,8 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, watch, defineProps, onMounted } from 'vue';
-import { CircleClose, CircleCheck, Delete, QuestionFilled } from '@element-plus/icons-vue';
-import { ElMessageBox, ElNotification } from 'element-plus';
-
-const props = defineProps({
-  operation: Object,
-  global: Object,
-  track: Object,
-  displayAreaTime: Number,
-  currentNoteType: Number,
-  enableEdit: Boolean,
-  chart: Object
-});
+const syncAction = inject('syncAction');
+const commandHistory = inject('commandHistory');
 
 const edit = ref(false);
 const canMove = ref(false);
@@ -252,6 +236,24 @@ const left = computed(() => {
   return (props.operation.startTime / props.displayAreaTime) * (props.global.documentWidth - 300);
 });
 
+const opStyle = computed(() => {
+  let opacity = 1;
+  let filter = 'none';
+  if (props.operation.isPending || props.operation.isDeleting) {
+    opacity = 0.5;
+    filter = 'grayscale(100%)';
+  }
+  return {
+    position: 'absolute',
+    top: '20px',
+    left: left.value + 'px',
+    zIndex: props.operation.zIndex,
+    opacity,
+    filter,
+    pointerEvents: (props.operation.isPending || props.operation.isDeleting) ? 'none' : 'auto'
+  };
+});
+
 const roundTime = (timing) => {
   if (props.global.beatLine) {
     const bpm = props.chart.bpm / 16;
@@ -281,12 +283,70 @@ const setZIndex = () => {
   props.operation.zIndex = 10;
 };
 
+const dragStartX = ref(0);
+const dragStartTiming = ref(0);
+const dragEndTiming = ref(0);
+const snapPoints = ref([]);
+
+const collectSnapPoints = (currentOp) => {
+  const points = [];
+  if (props.chart.tracks) {
+    props.chart.tracks.forEach(track => {
+      if (track.notes) track.notes.forEach(n => {
+        if (n.timing !== undefined) points.push(n.timing);
+        if (n.endTiming !== undefined) points.push(n.endTiming);
+      });
+      ['moveOperations', 'changeWidthOperations', 'changeColorOperations'].forEach(key => {
+        if (track[key]) track[key].forEach(op => {
+          if (op !== currentOp) {
+            if (op.startTime !== undefined) points.push(op.startTime);
+            if (op.endTime !== undefined) points.push(op.endTime);
+          }
+        });
+      });
+    });
+  }
+  if (props.chart.changeBackgroundOperations) {
+    props.chart.changeBackgroundOperations.forEach(op => {
+      if (op.startTime !== undefined) points.push(op.startTime);
+      if (op.endTime !== undefined) points.push(op.endTime);
+    });
+  }
+  if (props.chart.bpm > 0) {
+    const msPerBeat = props.chart.bpm;
+    const offset = props.chart.firstBeatDelay || 0;
+    const songLen = props.chart.songLength || 300000;
+    for (let t = offset; t <= songLen; t += msPerBeat) points.push(t);
+  }
+  return points;
+};
+
+const getSnappedTime = (time, points) => {
+  const pxThreshold = 10;
+  const msThreshold = (pxThreshold / (props.global.documentWidth - 300)) * props.displayAreaTime;
+  let bestTime = time;
+  let minDiff = msThreshold;
+  for (const point of points) {
+    const diff = Math.abs(time - point);
+    if (diff < minDiff) {
+      minDiff = diff;
+      bestTime = point;
+    }
+  }
+  return bestTime;
+};
+
 const longOperationCanMove = () => {
-  passedTime.value = Math.ceil(props.global.currentTime - props.operation.startTime);
+  if (props.operation.isPending || props.operation.isDeleting) return;
   canMove.value = true;
+  dragStartX.value = props.global.clientX;
+  dragStartTiming.value = props.operation.startTime;
+  dragEndTiming.value = props.operation.endTime;
+  snapPoints.value = collectSnapPoints(props.operation);
 };
 
 const startEdit = () => {
+  if (props.operation.isPending || props.operation.isDeleting) return;
   edit.value = true;
   updateTemp();
 };
@@ -294,31 +354,48 @@ const startEdit = () => {
 const saveOperation = () => {
   formRef.value.validate((valid) => {
     if (valid) {
+      const oldState = JSON.parse(JSON.stringify(props.operation));
       const startRgb = tempOperation.startColor.match(/\d+/g);
       if (startRgb) {
-        tempOperation.startR = startRgb[0];
-        tempOperation.startG = startRgb[1];
-        tempOperation.startB = startRgb[2];
+        tempOperation.startR = parseInt(startRgb[0]);
+        tempOperation.startG = parseInt(startRgb[1]);
+        tempOperation.startB = parseInt(startRgb[2]);
       }
       const endRgb = tempOperation.endColor.match(/\d+/g);
       if (endRgb) {
-        tempOperation.endR = endRgb[0];
-        tempOperation.endG = endRgb[1];
-        tempOperation.endB = endRgb[2];
+        tempOperation.endR = parseInt(endRgb[0]);
+        tempOperation.endG = parseInt(endRgb[1]);
+        tempOperation.endB = parseInt(endRgb[2]);
       }
       Object.assign(props.operation, tempOperation);
       edit.value = false;
       updateTrack();
+
+      if (syncAction) syncAction("UPDATE_COLOR_OP", props.operation);
+      
+      if (commandHistory) {
+        commandHistory.pushCommand({
+          description: 'Edit Color Op',
+          undo: () => {
+            Object.assign(props.operation, oldState);
+            if (syncAction) syncAction("UPDATE_COLOR_OP", props.operation);
+            updateTrack();
+          },
+          redo: () => {
+            Object.assign(props.operation, tempOperation);
+            if (syncAction) syncAction("UPDATE_COLOR_OP", props.operation);
+            updateTrack();
+          }
+        });
+      }
     }
   });
 };
 
 const deleteSelf = () => {
-  const index = props.track.changeColorOperations.indexOf(props.operation);
-  if (index !== -1) {
-    props.track.changeColorOperations.splice(index, 1);
-    updateTrack();
-  }
+  if (props.operation.isDeleting) return;
+  props.operation.isDeleting = true;
+  if (syncAction) syncAction("DELETE_COLOR_OP", props.operation.id);
 };
 
 const deleteOperation = () => {
@@ -328,7 +405,6 @@ const deleteOperation = () => {
     type: "warning",
   }).then(() => {
     deleteSelf();
-    ElNotification({ title: "成功", message: "删除成功", type: "success" });
   }).catch(() => {});
 };
 
@@ -338,35 +414,83 @@ const selfClicked = () => {
 };
 
 watch(() => props.global.mouseUp, () => {
-  canMove.value = false;
-  leftMove.value = false;
-  rightMove.value = false;
+  if (canMove.value || leftMove.value || rightMove.value) {
+    props.track.changeColorOperations.sort((a,b) => a.startTime - b.startTime);
+    updateTrack();
+    const finalStart = props.operation.startTime;
+    const finalEnd = props.operation.endTime;
+    
+    if (finalStart !== dragStartTiming.value || finalEnd !== dragEndTiming.value) {
+      const oldS = dragStartTiming.value;
+      const oldE = dragEndTiming.value;
+      
+      if (syncAction) syncAction("UPDATE_COLOR_OP", props.operation);
+      
+      if (commandHistory) {
+        commandHistory.pushCommand({
+          description: 'Move Color Op',
+          undo: () => {
+            props.operation.startTime = oldS;
+            props.operation.endTime = oldE;
+            props.track.changeColorOperations.sort((a,b) => a.startTime - b.startTime);
+            if (syncAction) syncAction("UPDATE_COLOR_OP", props.operation);
+            updateTrack();
+            updateTemp();
+          },
+          redo: () => {
+            props.operation.startTime = finalStart;
+            props.operation.endTime = finalEnd;
+            props.track.changeColorOperations.sort((a,b) => a.startTime - b.startTime);
+            if (syncAction) syncAction("UPDATE_COLOR_OP", props.operation);
+            updateTrack();
+            updateTemp();
+          }
+        });
+      }
+    }
+    canMove.value = false;
+    leftMove.value = false;
+    rightMove.value = false;
+  }
   deleteMenuVisible.value = false;
 });
 
 const deleteMenuVisible = ref(false);
 const openDeleteMenu = () => {
+  if (props.operation.isDeleting) return;
   deleteMenuVisible.value = true;
 };
 
 watch(() => props.global.mouseMove, () => {
   if (canMove.value) {
-    if (props.global.currentTime > props.track.startTiming && props.global.currentTime < props.track.endTiming) {
-      const duration = props.operation.endTime - props.operation.startTime;
-      props.operation.startTime = roundTime(props.global.currentTime - passedTime.value);
-      props.operation.endTime = props.operation.startTime + duration;
-      updateTemp();
-    }
+    const deltaX = props.global.clientX - dragStartX.value;
+    const deltaTime = Math.round((deltaX / (props.global.documentWidth - 300)) * props.displayAreaTime);
+    const duration = dragEndTiming.value - dragStartTiming.value;
+    let newStart = roundTime(dragStartTiming.value + deltaTime);
+    newStart = getSnappedTime(newStart, snapPoints.value);
+    if (newStart < props.track.startTiming) newStart = props.track.startTiming;
+    if (newStart + duration > props.track.endTiming) newStart = props.track.endTiming - duration;
+    props.operation.startTime = newStart;
+    props.operation.endTime = newStart + duration;
+    updateTemp();
   } else if (leftMove.value) {
-    if (roundTime(props.global.currentTime) <= props.operation.endTime) {
-      props.operation.startTime = roundTime(props.global.currentTime);
-      updateTemp();
-    }
+    const deltaX = props.global.clientX - dragStartX.value;
+    const deltaTime = Math.round((deltaX / (props.global.documentWidth - 300)) * props.displayAreaTime);
+    let newStart = roundTime(dragStartTiming.value + deltaTime);
+    newStart = getSnappedTime(newStart, snapPoints.value);
+    if (newStart < props.track.startTiming) newStart = props.track.startTiming;
+    if (newStart > props.operation.endTime - 20) newStart = props.operation.endTime - 20;
+    props.operation.startTime = newStart;
+    updateTemp();
   } else if (rightMove.value) {
-    if (roundTime(props.global.currentTime) >= props.operation.startTime) {
-      props.operation.endTime = roundTime(props.global.currentTime);
-      updateTemp();
-    }
+    const deltaX = props.global.clientX - dragStartX.value;
+    const deltaTime = Math.round((deltaX / (props.global.documentWidth - 300)) * props.displayAreaTime);
+    let newEnd = roundTime(dragEndTiming.value + deltaTime);
+    newEnd = getSnappedTime(newEnd, snapPoints.value);
+    if (newEnd > props.track.endTiming) newEnd = props.track.endTiming;
+    if (newEnd < props.operation.startTime + 20) newEnd = props.operation.startTime + 20;
+    props.operation.endTime = newEnd;
+    updateTemp();
   }
 });
 

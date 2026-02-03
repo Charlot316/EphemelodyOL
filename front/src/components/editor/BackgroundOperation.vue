@@ -70,7 +70,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, defineProps, defineEmits } from 'vue';
+import { inject, ref, reactive, computed, defineProps, defineEmits } from 'vue';
 import { Setting, CircleClose, CircleCheck, Delete } from '@element-plus/icons-vue';
 import { ElMessageBox, ElNotification } from 'element-plus';
 import axios from 'axios';
@@ -82,7 +82,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["editStatus"]);
-
+const syncAction = inject('syncAction');
 const tempOperation = reactive({});
 
 const currentClass = computed(() => {
@@ -91,12 +91,17 @@ const currentClass = computed(() => {
   const { startTime, endTime } = props.operation;
   
   if (currentTime > startTime && currentTime < (endTime || Infinity)) {
-    cls += "current-operation";
+    cls += "current-operation ";
   } else if (currentTime > (endTime || Infinity)) {
-    cls += "passed-operation";
+    cls += "passed-operation ";
   } else {
     cls += "to-come-operation ";
   }
+
+  if (props.operation.isPending || props.operation.isDeleting) {
+    cls += "pending-operation ";
+  }
+  
   return cls;
 });
 
@@ -105,6 +110,7 @@ const updateOperation = () => {
 };
 
 const startEdit = () => {
+  if (props.operation.isPending || props.operation.isDeleting) return;
   props.operation.edit = true;
   Object.assign(tempOperation, JSON.parse(JSON.stringify(props.operation)));
 };
@@ -140,24 +146,26 @@ const saveOperation = () => {
     return;
   }
   
-  updateOperation();
-  emit("editStatus", true);
   if (tempOperation.endTime === "") tempOperation.endTime = null;
   Object.assign(props.operation, tempOperation);
   props.operation.edit = false;
+
+  if (syncAction) syncAction("UPDATE_BG_OP", props.operation);
+  
+  updateOperation();
+  emit("editStatus", true);
   props.operation.isNew = false;
 };
 
 const deleteOperation = () => {
+  if (props.operation.isDeleting) return;
   ElMessageBox.confirm("您确定删除该操作?", "提示", {
     confirmButtonText: "确定",
     cancelButtonText: "取消",
     type: "warning",
   }).then(() => {
-    if (props.operation.isNew) emit("editStatus", true);
-    props.chart.changeBackgroundOperations.splice(props.operation.index, 1);
-    updateOperation();
-    ElNotification({ title: "成功", message: "删除成功", type: "success" });
+    props.operation.isDeleting = true;
+    if (syncAction) syncAction("DELETE_BG_OP", props.operation.id);
   }).catch(() => {});
 };
 </script>
@@ -191,6 +199,12 @@ const deleteOperation = () => {
 
 .passed-operation {
   opacity: 0.6;
+}
+
+.pending-operation {
+  opacity: 0.5;
+  filter: grayscale(100%);
+  pointer-events: none;
 }
 
 .card-header {
