@@ -84,6 +84,8 @@ export default {
   padding: 15px 40px;
   width: 100%;
   box-sizing: border-box;
+  position: relative;
+  z-index: 100;
 }
 
 .header-content {
@@ -94,7 +96,9 @@ export default {
   align-items: center;
   align-items: center;
   border-radius: 20px;
-  background: rgba(255, 255, 255, 0.05); /* Fallback */
+  background: rgba(30, 30, 30, 0.6); /* Darker fallback */
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.1);
 }
 
 .header-logo {
