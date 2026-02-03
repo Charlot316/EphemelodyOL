@@ -124,7 +124,7 @@
           <div v-if="note.noteType == 0">
             <el-image
               @dragstart.prevent
-              @mousedown="canMove = true"
+              @mousedown="longNoteCanMove"
               style="width:40px;height:40px;user-select:none;cursor: move;"
               :src="hitNoteImage"
             />
@@ -148,13 +148,13 @@
             ></div>
             <el-image
               @dragstart.prevent
-              @mousedown="leftMove = true"
+              @mousedown="startLeftMove"
               style="width:40px;height:40px;position:absolute;left:0;top:0;user-select: none;cursor:w-resize;"
               :src="hitNoteLeftImage"
             />
             <el-image
               @dragstart.prevent
-              @mousedown="rightMove = true"
+              @mousedown="startRightMove"
               :style="{
                 userSelect: 'none',
                 height: '40px',
@@ -172,7 +172,7 @@
           </div>
           <div v-if="note.noteType == 2">
             <el-image
-              @mousedown="canMove = true"
+              @mousedown="longNoteCanMove"
               @dragstart.prevent
               style="width:40px;height:40px;cursor: move;"
               :src="slideNoteImage"
@@ -278,9 +278,29 @@ const setZIndex = () => {
   props.note.zIndex = 10;
 };
 
+const dragStartX = ref(0);
+const dragStartTiming = ref(0);
+const dragEndTiming = ref(0);
+
 const longNoteCanMove = () => {
-  passedTime.value = Math.ceil(props.global.currentTime - props.note.timing);
   canMove.value = true;
+  dragStartX.value = props.global.clientX;
+  dragStartTiming.value = props.note.timing;
+  dragEndTiming.value = props.note.endTiming;
+};
+
+const startLeftMove = () => {
+  leftMove.value = true;
+  dragStartX.value = props.global.clientX;
+  dragStartTiming.value = props.note.timing;
+  dragEndTiming.value = props.note.endTiming;
+};
+
+const startRightMove = () => {
+  rightMove.value = true;
+  dragStartX.value = props.global.clientX;
+  dragStartTiming.value = props.note.timing;
+  dragEndTiming.value = props.note.endTiming;
 };
 
 const startEdit = () => {
@@ -340,28 +360,60 @@ const openDeleteMenu = () => {
 
 watch(() => props.global.mouseMove, () => {
   if (canMove.value) {
-    if (props.global.currentTime > props.track.startTiming && props.global.currentTime < props.track.endTiming) {
-      if (props.note.noteType === 1) {
-        const duration = props.note.endTiming - props.note.timing;
-        props.note.timing = roundTime(props.global.currentTime - passedTime.value);
-        props.note.endTiming = props.note.timing + duration;
-      } else {
-        props.note.timing = roundTime(props.global.currentTime);
-        props.note.endTiming = props.note.timing + 150;
-      }
-      updateTemp();
+    const deltaX = props.global.clientX - dragStartX.value;
+    const deltaTime = Math.round((deltaX / (props.global.documentWidth - 300)) * props.displayAreaTime);
+    
+    // Normal move
+    if (props.note.noteType === 1) {
+       const duration = dragEndTiming.value - dragStartTiming.value;
+       let newStart = roundTime(dragStartTiming.value + deltaTime);
+       
+       if (newStart < props.track.startTiming) newStart = props.track.startTiming;
+       if (newStart + duration > props.track.endTiming) newStart = props.track.endTiming - duration;
+
+       props.note.timing = newStart;
+       props.note.endTiming = newStart + duration;
+    } else {
+       // Short/Slide notes
+       let newStart = roundTime(dragStartTiming.value + deltaTime);
+       if (newStart < props.track.startTiming) newStart = props.track.startTiming;
+       if (newStart > props.track.endTiming) newStart = props.track.endTiming;
+       
+       props.note.timing = newStart;
+       if (props.note.noteType !== 1) props.note.endTiming = newStart + 150; 
     }
+    updateTemp();
   } else if (leftMove.value) {
-    if (props.global.currentTime > props.track.startTiming && props.global.currentTime < props.note.endTiming - 150) {
-      props.note.timing = roundTime(props.global.currentTime);
-      updateTemp();
-    }
+    const deltaX = props.global.clientX - dragStartX.value;
+    const deltaTime = Math.round((deltaX / (props.global.documentWidth - 300)) * props.displayAreaTime);
+    
+    let newStart = roundTime(dragStartTiming.value + deltaTime);
+    // Boundary checks
+    if (newStart < props.track.startTiming) newStart = props.track.startTiming;
+    if (newStart > dragEndTiming.value - 100) newStart = dragEndTiming.value - 100;
+    
+    props.note.timing = newStart;
+    updateTemp();
   } else if (rightMove.value) {
-    if (props.global.currentTime > props.note.timing + 150 && props.global.currentTime < props.track.endTiming) {
-      props.note.endTiming = roundTime(props.global.currentTime);
-      updateTemp();
-    }
+    const deltaX = props.global.clientX - dragStartX.value;
+    const deltaTime = Math.round((deltaX / (props.global.documentWidth - 300)) * props.displayAreaTime);
+    
+    let newEnd = roundTime(dragEndTiming.value + deltaTime);
+    // Boundary checks
+    if (newEnd < dragStartTiming.value + 100) newEnd = dragStartTiming.value + 100;
+    if (newEnd > props.track.endTiming) newEnd = props.track.endTiming;
+    
+    props.note.endTiming = newEnd;
+    updateTemp();
   }
+});
+
+onMounted(() => {
+  props.note.zIndex = 0;
+  if (props.note.noteType !== 1) {
+    props.note.endTiming = parseInt(props.note.timing) + 150;
+  }
+  updateTemp();
 });
 
 onMounted(() => {

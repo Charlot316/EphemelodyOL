@@ -123,11 +123,11 @@
                 </div>
               </div>
               <div
-                @mousedown="leftMove = true"
+                @mousedown="startLeftMove"
                 style="width:1px;height:40px;position:absolute;left:0px;top:0;cursor:w-resize;background:transparent;"
               />
               <div
-                @mousedown="rightMove = true"
+                @mousedown="startRightMove"
                 :style="{
                   userSelect: 'none',
                   height: '40px',
@@ -233,9 +233,29 @@ const setZIndex = () => {
   props.operation.zIndex = 10;
 };
 
+const dragStartX = ref(0);
+const dragStartTiming = ref(0);
+const dragEndTiming = ref(0);
+
 const longOperationCanMove = () => {
-  passedTime.value = Math.ceil(props.global.currentTime - props.operation.startTime);
   canMove.value = true;
+  dragStartX.value = props.global.clientX;
+  dragStartTiming.value = props.operation.startTime;
+  dragEndTiming.value = props.operation.endTime;
+};
+
+const startLeftMove = () => {
+  leftMove.value = true;
+  dragStartX.value = props.global.clientX;
+  dragStartTiming.value = props.operation.startTime;
+  dragEndTiming.value = props.operation.endTime;
+};
+
+const startRightMove = () => {
+  rightMove.value = true;
+  dragStartX.value = props.global.clientX;
+  dragStartTiming.value = props.operation.startTime;
+  dragEndTiming.value = props.operation.endTime;
 };
 
 const startEdit = () => {
@@ -291,22 +311,38 @@ const openDeleteMenu = () => {
 
 watch(() => props.global.mouseMove, () => {
   if (canMove.value) {
-    if (props.global.currentTime > props.track.startTiming && props.global.currentTime < props.track.endTiming) {
-      const duration = props.operation.endTime - props.operation.startTime;
-      props.operation.startTime = roundTime(props.global.currentTime - passedTime.value);
-      props.operation.endTime = props.operation.startTime + duration;
-      updateTemp();
-    }
+    const deltaX = props.global.clientX - dragStartX.value;
+    const deltaTime = Math.round((deltaX / (props.global.documentWidth - 300)) * props.displayAreaTime);
+    
+    const duration = dragEndTiming.value - dragStartTiming.value;
+    let newStart = roundTime(dragStartTiming.value + deltaTime);
+    
+    if (newStart < props.track.startTiming) newStart = props.track.startTiming;
+    if (newStart + duration > props.track.endTiming) newStart = props.track.endTiming - duration;
+    
+    props.operation.startTime = newStart;
+    props.operation.endTime = newStart + duration;
+    updateTemp();
   } else if (leftMove.value) {
-    if (roundTime(props.global.currentTime) <= props.operation.endTime) {
-      props.operation.startTime = roundTime(props.global.currentTime);
-      updateTemp();
-    }
+    const deltaX = props.global.clientX - dragStartX.value;
+    const deltaTime = Math.round((deltaX / (props.global.documentWidth - 300)) * props.displayAreaTime);
+    
+    let newStart = roundTime(dragStartTiming.value + deltaTime);
+    if (newStart < props.track.startTiming) newStart = props.track.startTiming;
+    if (newStart > dragEndTiming.value - 100) newStart = dragEndTiming.value - 100;
+    
+    props.operation.startTime = newStart;
+    updateTemp();
   } else if (rightMove.value) {
-    if (roundTime(props.global.currentTime) >= props.operation.startTime) {
-      props.operation.endTime = roundTime(props.global.currentTime);
-      updateTemp();
-    }
+    const deltaX = props.global.clientX - dragStartX.value;
+    const deltaTime = Math.round((deltaX / (props.global.documentWidth - 300)) * props.displayAreaTime);
+    
+    let newEnd = roundTime(dragEndTiming.value + deltaTime);
+    if (newEnd < dragStartTiming.value + 100) newEnd = dragStartTiming.value + 100;
+    if (newEnd > props.track.endTiming) newEnd = props.track.endTiming;
+    
+    props.operation.endTime = newEnd;
+    updateTemp();
   }
 });
 
