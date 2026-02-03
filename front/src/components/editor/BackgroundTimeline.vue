@@ -51,7 +51,7 @@
               @mousedown.stop="startResizeRight($event, op)"
             ></div>
 
-            <img :src="op.background" alt="bg" />
+            <img :src="op.background" alt="bg" @dragstart.prevent />
             <div class="segment-info">{{ op.startTime }}ms</div>
             <div class="segment-actions">
               <el-icon class="delete-icon" @click.stop="deleteOp(index)"><Delete /></el-icon>
@@ -62,6 +62,7 @@
     </div>
   </div>
 </template>
+
 
 <script setup>
 import { ref, defineProps, defineEmits, watch } from 'vue';
@@ -301,8 +302,12 @@ watch(() => props.global.mouseUp, () => {
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 4px;
   overflow: hidden;
-  cursor: pointer;
+  cursor: grab;
   z-index: 10;
+}
+
+.bg-segment:active {
+  cursor: grabbing;
 }
 
 .bg-segment img {
