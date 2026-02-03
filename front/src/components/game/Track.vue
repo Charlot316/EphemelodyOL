@@ -186,6 +186,11 @@ const paintNote = (note) => {
         (note.timing - myglobal.remainingTime)) *
     myglobal.screenHeight;
   
+  // debug log for the first few notes to avoid span
+  if (note.index < 3) {
+      console.log(`[Track] Note ${note.index} paint: x=${middle.value}, y=${yValue}, canvas=${myglobal.screenWidth}x${myglobal.screenHeight}`);
+  }
+  
   const canMirror =
     (note.noteType != 1 &&
       yValue / myglobal.screenHeight >= 0.6 &&
@@ -363,7 +368,8 @@ const paintTrack = async () => {
     console.warn('[Track] paintTrack skipped: trackPainter is null');
     return;
   }
-  // console.log('[Track] paintTrack dimensions:', { width: width.value, height: height.value, top: top.value, left: left.value, Y: Y.value });
+  console.log(`[Track] paintTrack: left=${left.value}, top=${top.value}, w=${width.value}, h=${height.value}, Y=${Y.value}, canvas=${myglobal.screenWidth}x${myglobal.screenHeight}`);
+
   if (width.value > 4 && height.value > 0) {
     const longerThanScreen = height.value > myglobal.screenHeight - Y.value;
     // Fill main rect
