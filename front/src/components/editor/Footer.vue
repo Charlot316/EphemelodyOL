@@ -1,44 +1,49 @@
 <template>
   <div class="footer-container">
     <div class="footer-header">
-      <div class="footer-toolbar">
-        <!-- 分组 0: 轨道管理与视图对齐 (对齐 siderWidth) -->
-        <div class="toolbar-side-aligned" :style="{ width: siderWidth + 'px' }">
-          <div class="toolbar-group">
+    <div class="footer-toolbar">
+      <!-- 分组 0: 轨道管理与视图对齐 (对齐 siderWidth) -->
+      <div 
+        class="toolbar-side-aligned" 
+        :style="{ 
+          width: siderWidth + 'px',
+          order: siderPos === 'left' ? 0 : 10 
+        }"
+      >
+          <div class="toolbar-group-minimal">
             <el-tooltip content="新建轨道" placement="top">
-              <el-button circle size="small" class="tool-btn" @click="newTrack">
+              <el-button link class="tool-btn-minimal" @click="newTrack">
                 <el-icon><CirclePlus /></el-icon>
               </el-button>
             </el-tooltip>
-            <el-tooltip content="显示所有隐藏轨道" placement="top">
-              <el-button circle size="small" class="tool-btn" @click="showAllTracks">
+            <el-tooltip content="显示所有" placement="top">
+              <el-button link class="tool-btn-minimal" @click="showAllTracks">
                 <el-icon><View /></el-icon>
               </el-button>
             </el-tooltip>
-            <el-tooltip content="切换排序 (时间/坐标)" placement="top">
-              <el-button circle size="small" class="tool-btn" @click="global.timeSort = !global.timeSort; updateTrack();">
+            <el-tooltip content="排序模式" placement="top">
+              <el-button link class="tool-btn-minimal" @click="global.timeSort = !global.timeSort; updateTrack();">
                 <el-icon><Sort v-if="!global.timeSort"/><Timer v-else/></el-icon>
               </el-button>
             </el-tooltip>
-            <el-tooltip :content="showNoRemain ? '过滤无音符' : '显示所有'" placement="top">
-              <el-button circle size="small" :class="['tool-btn', { 'is-active': !showNoRemain }]" @click="showNoRemain = !showNoRemain">
+            <el-tooltip :content="showNoRemain ? '过滤空轨' : '显示空轨'" placement="top">
+              <el-button link :class="['tool-btn-minimal', { 'is-active': !showNoRemain }]" @click="showNoRemain = !showNoRemain">
                 <el-icon><Filter /></el-icon>
               </el-button>
             </el-tooltip>
-            <el-tooltip :content="showCurrent ? '全列表' : '当前时机'" placement="top">
-              <el-button circle size="small" :class="['tool-btn', { 'is-active': showCurrent }]" @click="showCurrent = !showCurrent">
+            <el-tooltip :content="showCurrent ? '显示全局' : '锁定当前'" placement="top">
+              <el-button link :class="['tool-btn-minimal', { 'is-active': showCurrent }]" @click="showCurrent = !showCurrent">
                 <el-icon><Aim /></el-icon>
               </el-button>
             </el-tooltip>
-            <el-tooltip :content="autoScroll ? '关闭跟随' : '开启跟随'" placement="top">
-              <el-button circle size="small" :class="['tool-btn', { 'is-active': autoScroll }]" @click="autoScroll = !autoScroll">
+            <el-tooltip :content="autoScroll ? '锁定轴' : '自由轴'" placement="top">
+              <el-button link :class="['tool-btn-minimal', { 'is-active': autoScroll }]" @click="autoScroll = !autoScroll">
                 <el-icon><Compass /></el-icon>
               </el-button>
             </el-tooltip>
           </div>
         </div>
 
-        <div class="toolbar-divider"></div>
 
         <!-- 分组 2: 轨道类型过滤 -->
         <div class="toolbar-group">
@@ -60,7 +65,6 @@
           </el-button>
         </div>
 
-        <div class="toolbar-divider"></div>
 
         <!-- 分组 3: 点击行为设置 -->
         <div class="toolbar-group mode-selector">
@@ -84,7 +88,6 @@
           </el-button>
         </div>
 
-        <div class="toolbar-divider"></div>
 
         <!-- 分组 4: 协作状态 -->
         <div class="toolbar-group">
@@ -104,7 +107,6 @@
           </el-tooltip>
         </div>
 
-        <div class="toolbar-divider"></div>
 
         <!-- 分组 5: 杂项 -->
         <div class="toolbar-group">
@@ -120,7 +122,6 @@
           </el-tooltip>
         </div>
 
-        <div class="toolbar-divider"></div>
 
         <!-- 分组 6: 系统与视图 -->
         <div class="toolbar-group">
@@ -156,7 +157,6 @@
           </el-tooltip>
         </div>
 
-        <div class="toolbar-divider"></div>
 
         <!-- 分组 7: 全局控制 (移除冗余播放按钮) -->
         <div class="toolbar-group">
@@ -180,7 +180,6 @@
           <span class="total-time">{{ Math.floor(chart.songLength) }}</span>
           <span class="unit">ms</span>
         </div>
-        <div class="toolbar-divider"></div>
         <div class="custom-slider-container">
           <el-icon><ZoomIn /></el-icon>
           <input 
@@ -238,6 +237,7 @@
               :chart="chart"
               :global="global"
               :displayAreaTime="displayAreaTime"
+              :siderWidth="siderWidth"
             />
           </div>
           <div style="position:absolute;left:0;top:0;">
@@ -248,6 +248,7 @@
             >
               <div v-for="track in displayTracks.filter(isVisible)" :key="track.index">
                 <TrackCardPanel
+                  :siderWidth="siderWidth"
                   :currentNoteType="currentNoteType"
                   :id="'trackCardPanel' + track.index"
                   :chart="chart"
@@ -330,10 +331,8 @@ const router = inject('router');
 const props = defineProps({
   chart: Object,
   global: Object,
-  siderWidth: {
-    type: Number,
-    default: 300
-  }
+  siderWidth: Number,
+  siderPos: String
 });
 
 const emit = defineEmits(["currentTrack", "open-settings", "toggle-fullscreen", "restart", "seek-delta"]);
@@ -608,9 +607,9 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   padding: 0;
-  background: rgba(20, 20, 20, 0.8);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(15, 15, 15, 0.9);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   z-index: 100;
   box-sizing: border-box;
 }
@@ -659,28 +658,59 @@ onMounted(() => {
 .footer-toolbar { 
   display: flex; 
   align-items: center; 
-  gap: 4px; 
+  height: 44px; /* 增加高度以提升大气感 */
   overflow-x: auto; 
   white-space: nowrap;
-  padding-bottom: 4px;
+  background: rgba(10, 10, 10, 0.4);
 }
-.footer-toolbar::-webkit-scrollbar { height: 2px; }
 .toolbar-side-aligned {
   display: flex;
-  justify-content: flex-start;
   align-items: center;
-  padding-left: 10px; /* 微调以匹配 TrackCard 的内边距 */
-  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  /* 这里的 22px 是轨道卡片内边距(10px) + 卡片内部边距(12px) 的物理起点，确保对齐预览图 */
+  padding-left: 22px; 
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+.toolbar-group-minimal {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 .toolbar-group {
   display: flex;
   align-items: center;
-  gap: 6px;
-  background: rgba(255, 255, 255, 0.03);
-  padding: 4px 8px;
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  flex-wrap: wrap; /* 支持响应式换行 */
+  gap: 8px;
+  padding: 0 12px;
+  height: 100%;
+}
+
+/* 移除所有按钮边框和背景，消除臃肿感 */
+:deep(.el-button) {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 6px !important;
+  margin: 0 !important;
+  height: auto !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+:deep(.el-button:hover) {
+  background: rgba(255, 255, 255, 0.08) !important;
+  transform: translateY(-1px);
+}
+
+:deep(.el-button.is-active), :deep(.el-button.is-selected) {
+  color: #409eff !important;
+  background: rgba(64, 158, 255, 0.08) !important;
+}
+
+.tool-btn-minimal {
+  font-size: 18px; /* 稍微加大图标 */
+  color: #999;
+}
+.tool-btn-minimal.is-active {
+  color: #409eff;
 }
 .toolbar-divider { width: 1px; height: 20px; background: rgba(255, 255, 255, 0.1); margin: 0 8px; }
 .tool-btn { background: transparent !important; border: none !important; color: #888 !important; transition: all 0.2s ease; }

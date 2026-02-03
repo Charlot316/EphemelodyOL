@@ -258,27 +258,42 @@ const togglePlay = () => {
 
 // 方法
 const resize = () => {
-  const container = document.getElementById(props.playerId);
-  if (!container) return;
-  
-  global.screenWidth = container.offsetWidth;
-  global.screenHeight = container.offsetHeight;
-  
-  const setupCanvas = (idSuffix, painterKey, canvasKey) => {
-    const canvas = document.getElementById(props.playerId + idSuffix);
-    if (canvas) {
-      canvas.width = global.screenWidth;
-      canvas.height = global.screenHeight;
-      global[canvasKey] = canvas;
-      global[painterKey] = canvas.getContext('2d');
-    }
-  };
-  
-  setupCanvas('-track-canvas', 'trackPainter', 'trackCanvas');
-  setupCanvas('-note-canvas', 'notePainter', 'noteCanvas');
-  setupCanvas('-judge-canvas', 'judgePainter', 'judgeCanvas');
-  
-  repaint();
+  // 使用 nextTick 确保容器在 Grid 布局中已完成渲染
+  import('vue').then(({ nextTick }) => {
+    nextTick(() => {
+      const container = document.getElementById(props.playerId);
+      if (!container) return;
+      
+      const w = container.offsetWidth;
+      const h = container.offsetHeight;
+      
+      // 避免 0 尺寸导致的渲染问题
+      if (w === 0 || h === 0) {
+        // 如果依然为 0，尝试 100ms 后再次采样
+        setTimeout(resize, 100);
+        return;
+      }
+
+      global.screenWidth = w;
+      global.screenHeight = h;
+      
+      const setupCanvas = (idSuffix, painterKey, canvasKey) => {
+        const canvas = document.getElementById(props.playerId + idSuffix);
+        if (canvas) {
+          canvas.width = global.screenWidth;
+          canvas.height = global.screenHeight;
+          global[canvasKey] = canvas;
+          global[painterKey] = canvas.getContext('2d');
+        }
+      };
+      
+      setupCanvas('-track-canvas', 'trackPainter', 'trackCanvas');
+      setupCanvas('-note-canvas', 'notePainter', 'noteCanvas');
+      setupCanvas('-judge-canvas', 'judgePainter', 'judgeCanvas');
+      
+      repaint();
+    });
+  });
 };
 
 const repaint = () => {

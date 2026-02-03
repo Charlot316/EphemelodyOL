@@ -20,7 +20,7 @@
     <div class="bg-timeline-right" @scroll="handleScroll" ref="scrollRef">
       <div 
         class="bg-track-content"
-        :style="{ width: (chart.songLength / displayAreaTime) * (global.documentWidth - 300) + 'px' }"
+        :style="{ width: (chart.songLength / displayAreaTime) * (global.documentWidth - global.siderWidth) + 'px' }"
         @dragover.prevent
         @drop="handleDrop"
       >
@@ -36,8 +36,8 @@
             :key="index"
             class="bg-segment"
             :style="{
-              left: (op.startTime / displayAreaTime) * (global.documentWidth - 300) + 'px',
-              width: (( (op.endTime || (op.startTime + 2000)) - op.startTime) / displayAreaTime) * (global.documentWidth - 300) + 'px'
+              left: (op.startTime / displayAreaTime) * (global.documentWidth - global.siderWidth) + 'px',
+              width: (( (op.endTime || (op.startTime + 2000)) - op.startTime) / displayAreaTime) * (global.documentWidth - global.siderWidth) + 'px'
             }"
             @mousedown.stop="props.global.currentNoteType === 3 ? deleteOp(index) : startDragOp($event, op)"
           >
@@ -68,7 +68,7 @@
               position: 'absolute',
               pointerEvents: 'none',
               top: '0px',
-              left: (global.currentTime / displayAreaTime) * (global.documentWidth - 300) + 'px',
+              left: (global.currentTime / displayAreaTime) * (global.documentWidth - global.siderWidth) + 'px',
               zIndex: 30
             }"
           ></div>
@@ -165,7 +165,7 @@ const collectSnapPoints = (currentOp) => {
 
 const getSnappedTime = (time, points) => {
   const pxThreshold = 10;
-  const msThreshold = (pxThreshold / (props.global.documentWidth - 300)) * props.displayAreaTime;
+  const msThreshold = (pxThreshold / (props.global.documentWidth - props.global.siderWidth)) * props.displayAreaTime;
   
   let bestTime = time;
   let minDiff = msThreshold;
@@ -251,7 +251,7 @@ const startResizeRight = (e, op) => {
 watch(() => props.global.mouseMove, () => {
   if (draggingOp.value) {
     const deltaX = props.global.clientX - dragStartX.value;
-    const deltaTime = Math.round((deltaX / (props.global.documentWidth - 300)) * props.displayAreaTime);
+    const deltaTime = Math.round((deltaX / (props.global.documentWidth - props.global.siderWidth)) * props.displayAreaTime);
     
     if (dragType.value === 'move') {
       const duration = dragStartEndTime.value - dragStartStartTime.value;
@@ -347,7 +347,7 @@ const handleDrop = (e) => {
 
   const rect = e.currentTarget.getBoundingClientRect();
   const x = e.clientX - rect.left;
-  const timeOffset = Math.round((x / (props.global.documentWidth - 300)) * props.displayAreaTime);
+  const timeOffset = Math.round((x / (props.global.documentWidth - props.global.siderWidth)) * props.displayAreaTime);
   
   const newOp = {
     startTime: timeOffset,

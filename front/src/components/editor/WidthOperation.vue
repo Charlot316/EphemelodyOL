@@ -132,7 +132,7 @@
                   left:
                     ((operation.endTime - operation.startTime) /
                       displayAreaTime) *
-                      (global.documentWidth - 300) +
+                      (global.documentWidth - global.siderWidth) +
                     1 +
                     'px',
                   top: '0px',
@@ -201,7 +201,7 @@ const rules = {
 };
 
 const left = computed(() => {
-  return (props.operation.startTime / props.displayAreaTime) * (props.global.documentWidth - 300);
+  return (props.operation.startTime / props.displayAreaTime) * (props.global.documentWidth - props.global.siderWidth);
 });
 
 const opStyle = computed(() => {
@@ -289,7 +289,7 @@ const collectSnapPoints = (currentOp) => {
 
 const getSnappedTime = (time, points) => {
   const pxThreshold = 10;
-  const msThreshold = (pxThreshold / (props.global.documentWidth - 300)) * props.displayAreaTime;
+  const msThreshold = (pxThreshold / (props.global.documentWidth - props.global.siderWidth)) * props.displayAreaTime;
   let bestTime = time;
   let minDiff = msThreshold;
   for (const point of points) {
@@ -449,7 +449,7 @@ const openDeleteMenu = () => {
 watch(() => props.global.mouseMove, () => {
   if (canMove.value) {
     const deltaX = props.global.clientX - dragStartX.value;
-    const deltaTime = Math.round((deltaX / (props.global.documentWidth - 300)) * props.displayAreaTime);
+    const deltaTime = Math.round((deltaX / (props.global.documentWidth - props.global.siderWidth)) * props.displayAreaTime);
     const duration = dragEndTiming.value - dragStartTiming.value;
     let newStart = roundTime(dragStartTiming.value + deltaTime);
     newStart = getSnappedTime(newStart, snapPoints.value);
@@ -460,7 +460,7 @@ watch(() => props.global.mouseMove, () => {
     updateTemp();
   } else if (leftMove.value) {
     const deltaX = props.global.clientX - dragStartX.value;
-    const deltaTime = Math.round((deltaX / (props.global.documentWidth - 300)) * props.displayAreaTime);
+    const deltaTime = Math.round((deltaX / (props.global.documentWidth - props.global.siderWidth)) * props.displayAreaTime);
     let newStart = roundTime(dragStartTiming.value + deltaTime);
     newStart = getSnappedTime(newStart, snapPoints.value);
     if (newStart < props.track.startTiming) newStart = props.track.startTiming;
@@ -469,7 +469,7 @@ watch(() => props.global.mouseMove, () => {
     updateTemp();
   } else if (rightMove.value) {
     const deltaX = props.global.clientX - dragStartX.value;
-    const deltaTime = Math.round((deltaX / (props.global.documentWidth - 300)) * props.displayAreaTime);
+    const deltaTime = Math.round((deltaX / (props.global.documentWidth - props.global.siderWidth)) * props.displayAreaTime);
     let newEnd = roundTime(dragEndTiming.value + deltaTime);
     newEnd = getSnappedTime(newEnd, snapPoints.value);
     if (newEnd < props.operation.startTime + 100) newEnd = props.operation.startTime + 100;

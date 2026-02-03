@@ -3,51 +3,61 @@
     <!-- 顶部状态栏 (可选/隐藏) -->
     
     <div class="main-layout" :style="layoutStyle">
-      <!-- 1. 左侧面板: 资产与菜单 -->
+      <!-- 1. 侧边栏: 资产与菜单 -->
       <transition name="panel-slide">
-        <aside v-if="menuOpened" class="panel-sider glass-panel" :style="{ width: siderWidth + 'px', order: layoutMode === 1 ? 2 : 1 }">
-          <div class="panel-drag-handle">
-            组件库
-            <el-button link size="small" @click="layoutMode = (layoutMode + 1) % 2" style="margin-left: auto;">
-              <el-icon><Refresh /></el-icon>
-            </el-button>
-          </div>
+          <aside 
+            v-if="menuOpened" 
+            class="panel-sider glass-panel" 
+            :style="{ width: global.siderWidth + 'px', gridRow: 1 }"
+          >
+          <div class="panel-drag-handle">组件库</div>
           <MenuPanel
-            :Height="global.documentHeight - footerHeight"
+            :Height="global.documentHeight - footerHeight - 24"
             :footerHeight="footerHeight"
             :global="global"
             :chart="chart"
           />
-          <div class="resizer-v" @mousedown="startResizingSider"></div>
+          <div class="resizer-v right" @mousedown="startResizingSider"></div>
         </aside>
       </transition>
 
-      <!-- 2. 中央面板: 播放预览区 -->
-      <main class="panel-preview glass-panel" id="player-view">
+      <!-- 2. 预览区 -->
+      <main 
+        class="panel-preview glass-panel" 
+        :style="{ gridRow: 1, width: `calc(100% - ${siderWidth}px)` }"
+      >
         <div class="panel-drag-handle">预览区</div>
-        <BeatPlayer
-          ref="playerRef"
-          :chart="chart"
-          :global="global"
-          mode="edit"
-          :selectedTrackId="currentSelectTrack ? (currentSelectTrack.trackId || currentSelectTrack.index) : null"
-          :displayRange="[displayStart, displayEnd]"
-          :volume="volume"
-          @track-click="handleTrackClick"
-          @audio-loaded="onAudioLoaded"
-          @toggle-fullscreen="handleToggleFullscreen"
-          :isFullscreen="isEditorFullscreen"
-          playerId="editor-player"
-        />
+        <div class="player-wrapper">
+          <BeatPlayer
+            ref="playerRef"
+            :chart="chart"
+            :global="global"
+            mode="edit"
+            :selectedTrackId="currentSelectTrack ? (currentSelectTrack.trackId || currentSelectTrack.index) : null"
+            :displayRange="[displayStart, displayEnd]"
+            :volume="volume"
+            @track-click="handleTrackClick"
+            @audio-loaded="onAudioLoaded"
+            @toggle-fullscreen="handleToggleFullscreen"
+            :isFullscreen="isEditorFullscreen"
+            playerId="editor-player"
+          />
+        </div>
       </main>
 
-      <!-- 3. 底部面板: 时间轴与工具栏 -->
-      <footer class="panel-footer glass-panel" :style="{ height: footerHeight + 'px' }">
-        <div class="resizer-h" @mousedown="startResizingFooter"></div>
+      <footer 
+        class="panel-footer glass-panel" 
+        :style="{ 
+          height: footerHeight + 'px', 
+          gridColumn: '1 / 3',
+          gridRow: 2
+        }"
+      >
+        <div class="resizer-h top" @mousedown="startResizingFooter"></div>
         <Footer
           :chart="chart"
           :global="global"
-          :siderWidth="siderWidth"
+          :siderWidth="global.siderWidth"
           @currentTrack="handleCurrentTrack"
           @open-settings="globalSetting = true"
           @toggle-fullscreen="handleToggleFullscreen"
@@ -57,17 +67,6 @@
       </footer>
     </div>
 
-    <!-- 全局进度条 (独立出布局，避免抖动) -->
-    <div class="global-time-slider" :style="{ bottom: footerHeight + 'px', left: menuOpened ? '300px' : '0' }">
-      <el-slider
-        v-model="global.currentTime"
-        :min="displayStart"
-        :max="displayEnd"
-        @change="handleTimeChange"
-        @mousedown="handleSlideStart"
-        @mouseup="handleSlideEnd"
-      />
-    </div>
 
     <!-- 全局设置弹窗 -->
     <el-dialog v-model="globalSetting" @close="checkbpm" width="650px" title="全局设置" custom-class="glass-dialog">
@@ -107,7 +106,6 @@ const playerRef = ref(null);
 const isResizingFooter = ref(false);
 const isResizingSider = ref(false);
 const isEditorFullscreen = ref(false);
-const layoutMode = ref(0); // 0: Normal, 1: Swapped Sider, 2: Stacked
 const timeStep = ref(1);
 const siderWidth = ref(300);
 
@@ -145,11 +143,16 @@ const global = reactive({
   beatLine: true,
   documentHeight: 0,
   documentWidth: 0,
+  clientX: 0,
+  clientY: 0,
+  mouseMove: false,
+  mouseUp: false,
   isEdit: true,
   keyPressTime: {},
   keyIsHold: {},
   keyUsed: {},
   reCalculateChartMaker: false,
+  siderWidth: 300, 
 });
 
 const menuOpened = ref(true);
@@ -162,9 +165,9 @@ const form = reactive({});
 // --- Logic ---
 
 const layoutStyle = computed(() => {
-  const columns = layoutMode.value === 1 ? `1fr ${menuOpened.value ? siderWidth.value : 0}px` : `${menuOpened.value ? siderWidth.value : 0}px 1fr`;
+  const sider = menuOpened.value ? `${global.siderWidth}px` : '0px';
   return {
-    gridTemplateColumns: columns,
+    gridTemplateColumns: `${sider} 1fr`,
     gridTemplateRows: `1fr ${footerHeight.value}px`,
   };
 });
@@ -252,12 +255,16 @@ onMounted(() => {
   };
 
   document.onmousemove = (e) => {
+    global.clientX = e.clientX;
+    global.clientY = e.clientY;
+    global.mouseMove = !global.mouseMove;
+
     if (isResizingFooter.value) {
       footerHeight.value = Math.max(100, Math.min(600, global.documentHeight - e.clientY));
       playerRef.value?.resize();
     }
     if (isResizingSider.value) {
-      siderWidth.value = Math.max(200, Math.min(600, e.clientX));
+      global.siderWidth = Math.max(200, Math.min(600, e.clientX));
       playerRef.value?.resize();
     }
   };
@@ -265,6 +272,7 @@ onMounted(() => {
   document.onmouseup = () => {
     isResizingFooter.value = false;
     isResizingSider.value = false;
+    global.mouseUp = !global.mouseUp;
   };
 
   getChart(() => {
@@ -301,16 +309,21 @@ onMounted(() => {
 
 .panel-drag-handle {
   height: 24px;
-  background: rgba(255, 255, 255, 0.05);
-  font-size: 10px;
-  color: #666;
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 11px;
+  color: #aaa;
   display: flex;
   align-items: center;
-  padding: 0 10px;
+  padding: 0 12px;
   text-transform: uppercase;
   letter-spacing: 1px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   cursor: grab;
+}
+.handle-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 2px;
 }
 
 .panel-sider {
@@ -325,6 +338,10 @@ onMounted(() => {
   height: 100%;
   cursor: ew-resize;
   background: rgba(255, 255, 255, 0.05);
+  position: absolute;
+  top: 0;
+  right: -2px;
+  z-index: 100;
   transition: background 0.2s;
 }
 .resizer-v:hover { background: #409eff; }
@@ -333,8 +350,14 @@ onMounted(() => {
   grid-column: 2;
   grid-row: 1;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  flex-direction: column;
+}
+
+.player-wrapper {
+  flex: 1;
+  position: relative;
+  width: 100%;
+  height: calc(100% - 24px); /* Subtract handle height */
 }
 
 .panel-footer {
@@ -350,9 +373,11 @@ onMounted(() => {
   cursor: ns-resize;
   background: rgba(255, 255, 255, 0.1);
   position: absolute;
-  top: 0;
+  z-index: 100;
   transition: background 0.2s;
 }
+.resizer-h.bottom { top: -2px; }
+.resizer-h.top { bottom: -2px; }
 .resizer-h:hover { background: #409eff; }
 
 .global-time-slider {
