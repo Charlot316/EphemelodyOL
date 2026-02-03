@@ -113,11 +113,11 @@
           </el-button>
           <el-button
             size="small"
-            class="delete-mode-btn"
-            :class="{ 'is-selected': currentNoteType == 3 }"
+            :class="['mode-btn', { 'is-selected': currentNoteType == 3 }]"
             @click="switchToDeleteMode"
           >
             <el-icon><Delete /></el-icon>
+            删除
           </el-button>
         </div>
 
@@ -155,15 +155,6 @@
               重置
             </el-button>
           </el-tooltip>
-          <el-button
-            size="small"
-            class="tool-btn-rect"
-            :class="{ 'is-warning': !enableEdit }"
-            @click="enableEdit = !enableEdit"
-          >
-            <el-icon><EditPen /></el-icon>
-            {{ enableEdit ? '编辑弹窗:开' : '编辑弹窗:关' }}
-          </el-button>
         </div>
 
         <div class="toolbar-divider"></div>
