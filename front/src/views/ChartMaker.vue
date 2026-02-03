@@ -90,6 +90,10 @@
         <el-form-item label="音量">
           <el-input-number v-model="volume" :min="0" :max="100" @change="changeVolume" />
         </el-form-item>
+        <el-form-item label="Note Speed (ms)">
+           <el-slider v-model="global.remainingTime" :min="100" :max="2000" :step="50" style="width: 200px; display: inline-block; margin-right: 15px; vertical-align: middle;" />
+           <el-input-number v-model="global.remainingTime" :min="100" :max="2000" :step="50" controls-position="right" />
+        </el-form-item>
         <el-form-item label="微调步长 (ms)">
           <el-input-number v-model="timeStep" :min="1" :max="100" />
         </el-form-item>
@@ -260,6 +264,14 @@ const handleCurrentTrack = (track) => {
 };
 
 onMounted(() => {
+  const savedSpeed = localStorage.getItem('noteSpeed');
+  if (savedSpeed) {
+    global.remainingTime = parseInt(savedSpeed);
+  }
+  watch(() => global.remainingTime, (newVal) => {
+    localStorage.setItem('noteSpeed', newVal);
+  });
+
   const updateDimensions = () => {
     global.documentHeight = document.documentElement.clientHeight;
     global.documentWidth = document.documentElement.clientWidth;

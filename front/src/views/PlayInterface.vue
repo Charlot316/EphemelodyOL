@@ -353,6 +353,11 @@ const reStart = () => {
 };
 
 onMounted(() => {
+  const savedSpeed = localStorage.getItem('noteSpeed');
+  if (savedSpeed) {
+    global.remainingTime = parseInt(savedSpeed);
+    console.log('[PlayInterface] Loaded Note Speed:', global.remainingTime);
+  }
   resize();
   window.onkeydown = (e) => {
     if (!e.repeat) {

@@ -18,20 +18,25 @@ import javax.servlet.http.HttpServletRequest;
 public class PlayController {
     @Autowired
     private PlayService playService;
+
     @ApiOperation("获取一首曲子的基本信息")
     @GetMapping("getChartInfo")
-    public ReturnResponse<ChartInfVO> getChartInfo(HttpServletRequest request, @RequestParam(required = true) String songId) {
+    public ReturnResponse<ChartInfVO> getChartInfo(HttpServletRequest request,
+            @RequestParam(required = true) String songId) {
         String userId = Normal.getUserIdByCookie(request);
-//        String userId = "1";
+        // String userId = "1";
         SongDTO songDTO = new SongDTO(songId);
         return playService.getChartInfo(userId, songDTO);
     }
 
     @ApiOperation("上传游玩结果")
     @PostMapping("uploadRecord")
-    public ReturnResponse<PlayResultVO> uploadRecord(HttpServletRequest request, @RequestBody PlayResultDTO playResultDTO) {
+    public ReturnResponse<PlayResultVO> uploadRecord(HttpServletRequest request,
+            @RequestBody PlayResultDTO playResultDTO) {
         String userId = Normal.getUserIdByCookie(request);
-//        String userId = "1";
+        if (userId == null) {
+            return new ReturnResponse<PlayResultVO>(1, "Please login first");
+        }
         playResultDTO.setUserId(userId);
         return playService.uploadRecord(playResultDTO);
     }

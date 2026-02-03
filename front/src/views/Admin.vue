@@ -60,10 +60,10 @@
             </div>
 
             <div class="card-actions">
-              <el-button-group>
-                <el-button type="primary" icon="el-icon-setting" @click="getEdit(item.songId, item)"></el-button>
-                <el-button type="danger" icon="el-icon-delete" @click="deleteSong(item.songId)"></el-button>
-              </el-button-group>
+              <div class="action-group">
+                <button class="action-btn edit-btn" @click="getEdit(item.songId, item)">EDIT</button>
+                <button class="action-btn delete-btn" @click="deleteSong(item.songId)">DELETE</button>
+              </div>
             </div>
           </div>
         </div>
@@ -323,4 +323,27 @@ export default {
 .hint { font-size: 12px; color: var(--text-muted); margin-top: 10px; }
 
 :deep(.el-upload-dragger) { background: rgba(255,255,255,0.02) !important; border: 1px dashed var(--glass-border) !important; }
+
+.action-group { display: flex; gap: 10px; justify-content: flex-end; }
+.action-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ccc;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.edit-btn:hover {
+  background: rgba(64, 158, 255, 0.2);
+  border-color: #409eff;
+  color: #409eff;
+}
+.delete-btn:hover {
+  background: rgba(245, 108, 108, 0.2);
+  border-color: #f56c6c;
+  color: #f56c6c;
+}
 </style>

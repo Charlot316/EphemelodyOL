@@ -98,6 +98,17 @@ const routes = [{
                 "../views/Manage.vue"
             ),
     },
+    {
+        path: "/profile",
+        name: "Profile",
+        meta: {
+            requireAuth: true,
+        },
+        component: () =>
+            import (
+                "../views/Profile.vue"
+            ),
+    },
 ];
 
 const router = createRouter({

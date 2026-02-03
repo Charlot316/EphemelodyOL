@@ -2,7 +2,6 @@
   <div class="beat-player-container" :id="playerId">
     <!-- 背景图层 -->
     <div class="background-base">
-    <div class="background-base">
       <img 
         :src="normalizeUrl(chart.defaultBackground)" 
         class="background-image" 
@@ -10,7 +9,6 @@
         @load="handleImageLoaded"
         @error="handleImageLoaded"
       />
-    </div>
     </div>
     <div v-for="(op, index) in chart.changeBackgroundOperations" :key="index">
       <img
@@ -575,6 +573,10 @@ defineExpose({
 
 .background-overlay {
   z-index: 1;
+}
+
+.background-base {
+  z-index: 0;
 }
 
 .judgment-line-container {
