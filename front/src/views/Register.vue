@@ -2,8 +2,8 @@
   <div class="login-page">
     <background-display />
     <div class="login-wrapper">
-      <div class="register-card glass">
-        <div class="register-header">
+      <div class="login-card glass">
+        <div class="login-header">
           <h1 class="logo-text">EPHEMELODY</h1>
           <p class="subtitle">{{ $t('register.title') }}</p>
         </div>
@@ -12,40 +12,27 @@
           <el-form ref="register" :model="form" :rules="rules">
             <el-form-item prop="username">
               <div class="input-label">{{ $t('common.username') }}</div>
-              <el-input
-                v-model="form.username"
-                :placeholder="$t('register.placeholderUser')"
-                prefix-icon="User"
-              ></el-input>
+              <el-input v-model="form.username" :placeholder="$t('register.placeholderUser')"
+                prefix-icon="User"></el-input>
             </el-form-item>
             <el-form-item prop="password">
               <div class="input-label">{{ $t('common.password') }}</div>
-              <el-input
-                v-model="form.password"
-                :placeholder="$t('register.placeholderPass')"
-                show-password
-                prefix-icon="Lock"
-              ></el-input>
+              <el-input v-model="form.password" :placeholder="$t('register.placeholderPass')" show-password
+                prefix-icon="Lock"></el-input>
             </el-form-item>
             <el-form-item prop="confirmPassword">
               <div class="input-label">{{ $t('common.confirmPassword') }}</div>
-              <el-input
-                v-model="form.confirmPassword"
-                :placeholder="$t('register.placeholderConfirm')"
-                show-password
-                prefix-icon="Check"
-                @keyup.enter="register()"
-              ></el-input>
+              <el-input v-model="form.confirmPassword" :placeholder="$t('register.placeholderConfirm')" show-password
+                prefix-icon="Check" @keyup.enter="register()"></el-input>
             </el-form-item>
           </el-form>
         </div>
 
-        <div class="register-actions">
-          <el-button type="primary" class="register-btn" @click="register()"
-            >{{ $t('register.submit') }}</el-button
-          >
-          <div class="login-hint">
-            {{ $t('register.alreadyHave') }} <router-link to="/login" class="link-text">{{ $t('register.loginNow') }}</router-link>
+        <div class="login-actions">
+          <el-button type="primary" class="login-btn" @click="register()">{{ $t('register.submit') }}</el-button>
+          <div class="register-hint">
+            {{ $t('register.alreadyHave') }} <router-link to="/login" class="link-text">{{ $t('register.loginNow')
+              }}</router-link>
           </div>
         </div>
       </div>
@@ -63,7 +50,7 @@ export default {
       form: {
         password: "",
         username: "",
-        password1: "",
+        confirmPassword: "",
       },
       rules: {
         username: [
@@ -74,7 +61,7 @@ export default {
           { required: true, message: "Please enter password", trigger: "blur" },
           { min: 6, message: "Min 6 characters", trigger: "blur" },
         ],
-        password1: [
+        confirmPassword: [
           { required: true, message: "Please confirm password", trigger: "blur" },
         ],
       },
@@ -84,7 +71,7 @@ export default {
     register() {
       this.$refs.register.validate(async (valid) => {
         if (!valid) return;
-        if (this.form.password !== this.form.password1) {
+        if (this.form.password !== this.form.confirmPassword) {
           return this.$notify({
             title: "Error",
             message: "Passwords do not match",
@@ -160,7 +147,7 @@ export default {
 
 .login-header {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 40px;
 }
 
 .logo-text {
@@ -195,7 +182,7 @@ export default {
   border-radius: 12px !important;
   font-size: 16px !important;
   letter-spacing: 2px !important;
-  margin-top: 10px;
+  margin-top: 20px;
 }
 
 .register-hint {
@@ -222,6 +209,7 @@ export default {
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
