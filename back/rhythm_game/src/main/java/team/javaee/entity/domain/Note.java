@@ -1,14 +1,14 @@
 package team.javaee.entity.domain;
 
 import com.baomidou.mybatisplus.annotation.*;
-
-import java.time.LocalDateTime;
-import java.util.Date;
-import java.io.Serializable;
-
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -21,9 +21,10 @@ import lombok.experimental.Accessors;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Note implements Serializable {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
 
     /**
      * id
@@ -49,6 +50,7 @@ public class Note implements Serializable {
     /**
      * 音符对应的判定按键
      */
+    @JsonProperty("key")
     private String keyX;
 
     /**
@@ -69,6 +71,5 @@ public class Note implements Serializable {
 
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
-
 
 }

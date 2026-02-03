@@ -108,6 +108,7 @@ const props = defineProps({
 
 const emit = defineEmits(['update:scrollLeft', 'toggle-collapse']);
 const commandHistory = inject('commandHistory');
+const syncAction = inject('syncAction');
 
 const isCollapsed = ref(false);
 const scrollRef = ref(null);
@@ -119,7 +120,6 @@ const dragStartX = ref(0);
 const dragStartStartTime = ref(0);
 const dragStartEndTime = ref(0);
 const snapPoints = ref([]);
-const dragBounds = ref({ min: 0, max: Infinity });
 
 const collectSnapPoints = (currentOp) => {
   const points = [];
@@ -163,9 +163,7 @@ const collectSnapPoints = (currentOp) => {
   return points;
 };
 
-const getSnappedTime = (time, points, threshold = 100) => { // 100ms visual equivalent roughly or just 50ms
-  // Calculate threshold in ms based on a pixel distance, e.g. 10px
-  // 10px in ms = (10 / (docWidth - 300)) * displayTime
+const getSnappedTime = (time, points) => {
   const pxThreshold = 10;
   const msThreshold = (pxThreshold / (props.global.documentWidth - 300)) * props.displayAreaTime;
   
@@ -198,20 +196,22 @@ const deleteOp = (index) => {
   const op = props.chart.changeBackgroundOperations[index];
   props.chart.changeBackgroundOperations.splice(index, 1);
   
+  if (syncAction) syncAction("DELETE_BG_OP", op.id);
+
   if (commandHistory) {
     commandHistory.pushCommand({
       description: 'Delete BG Op',
       undo: () => {
-         // Insert back. Since we might have sorted, index usage is risky if concurrent edits happened, 
-         // but for single user session it's ok if we assume linear history.
-         // Better to re-sort or insert at correct time position.
-         // Ideally insert and sort.
          props.chart.changeBackgroundOperations.push(op);
          props.chart.changeBackgroundOperations.sort((a,b) => a.startTime - b.startTime);
+         if (syncAction) syncAction("ADD_BG_OP", op);
       },
       redo: () => {
          const idx = props.chart.changeBackgroundOperations.indexOf(op);
-         if (idx !== -1) props.chart.changeBackgroundOperations.splice(idx, 1);
+         if (idx !== -1) {
+            props.chart.changeBackgroundOperations.splice(idx, 1);
+            if (syncAction) syncAction("DELETE_BG_OP", op.id);
+         }
       }
     });
   }
@@ -258,11 +258,9 @@ watch(() => props.global.mouseMove, () => {
       let newStart = dragStartStartTime.value + deltaTime;
       
       if (newStart < 0) newStart = 0;
-      // Snap Start
       newStart = getSnappedTime(newStart, snapPoints.value);
       let newEnd = newStart + duration;
       
-      // Check overlap
       if (!checkOverlap(newStart, newEnd, draggingOp.value)) {
         draggingOp.value.startTime = newStart;
         draggingOp.value.endTime = newEnd;
@@ -271,9 +269,7 @@ watch(() => props.global.mouseMove, () => {
     } else if (dragType.value === 'left') {
       let newStart = dragStartStartTime.value + deltaTime;
       newStart = getSnappedTime(newStart, snapPoints.value);
-      
       if (newStart < 0) newStart = 0;
-      // Min duration check
       if (newStart >= draggingOp.value.endTime - 100) newStart = draggingOp.value.endTime - 100;
       
       if (!checkOverlap(newStart, draggingOp.value.endTime, draggingOp.value)) {
@@ -283,8 +279,6 @@ watch(() => props.global.mouseMove, () => {
     } else if (dragType.value === 'right') {
       let newEnd = dragStartEndTime.value + deltaTime;
       newEnd = getSnappedTime(newEnd, snapPoints.value);
-      
-      // Min duration check
       if (newEnd <= draggingOp.value.startTime + 100) newEnd = draggingOp.value.startTime + 100;
       if (newEnd > props.chart.songLength) newEnd = props.chart.songLength;
 
@@ -299,7 +293,6 @@ watch(() => props.global.mouseUp, () => {
   if (draggingOp.value) {
     props.chart.changeBackgroundOperations.sort((a,b) => a.startTime - b.startTime);
     
-    // Check changes
     const currentOp = draggingOp.value;
     const finalStart = currentOp.startTime;
     const finalEnd = currentOp.endTime;
@@ -307,25 +300,24 @@ watch(() => props.global.mouseUp, () => {
     if (finalStart !== dragStartStartTime.value || finalEnd !== dragStartEndTime.value) {
         const oldS = dragStartStartTime.value;
         const oldE = dragStartEndTime.value;
-        // opEnd was possibly undefined default? 
-        // Logic: dragStartEndTime was computed.
-        // We should just restore values.
+        
+        if (syncAction) syncAction("UPDATE_BG_OP", currentOp);
         
         if (commandHistory) {
            commandHistory.pushCommand({
               description: 'Move BG Op',
               undo: () => {
                  currentOp.startTime = oldS;
-                 // If oldE was the default (start+2000) and it was undefined in obj, 
-                 // we might be setting a concrete value. That's fine.
                  currentOp.endTime = oldE;
                  props.chart.changeBackgroundOperations.sort((a,b) => a.startTime - b.startTime);
+                 if (syncAction) syncAction("UPDATE_BG_OP", currentOp);
                  props.global.reCalculateChartMaker = !props.global.reCalculateChartMaker;
               },
               redo: () => {
                  currentOp.startTime = finalStart;
                  currentOp.endTime = finalEnd;
                  props.chart.changeBackgroundOperations.sort((a,b) => a.startTime - b.startTime);
+                 if (syncAction) syncAction("UPDATE_BG_OP", currentOp);
                  props.global.reCalculateChartMaker = !props.global.reCalculateChartMaker;
               }
            });
@@ -338,6 +330,38 @@ watch(() => props.global.mouseUp, () => {
     props.global.reCalculateChartMaker = !props.global.reCalculateChartMaker;
   }
 });
+
+const toggleCollapse = () => {
+  isCollapsed.value = !isCollapsed.value;
+  emit('toggle-collapse', isCollapsed.value);
+};
+
+const handleScroll = (e) => {
+  emit('update:scrollLeft', e.target.scrollLeft);
+};
+
+// Handle dropping an asset from MenuPanel to create a new BG operation
+const handleDrop = (e) => {
+  const assetUrl = e.dataTransfer.getData('assetUrl');
+  if (!assetUrl) return;
+
+  const rect = e.currentTarget.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const timeOffset = Math.round((x / (props.global.documentWidth - 300)) * props.displayAreaTime);
+  
+  const newOp = {
+    startTime: timeOffset,
+    endTime: timeOffset + 5000,
+    background: assetUrl,
+    isPending: true,
+    clientId: Math.random().toString(36).substr(2, 9)
+  };
+
+  props.chart.changeBackgroundOperations.push(newOp);
+  props.chart.changeBackgroundOperations.sort((a, b) => a.startTime - b.startTime);
+  
+  if (syncAction) syncAction("ADD_BG_OP", newOp, newOp.clientId);
+};
 </script>
 
 <style scoped>

@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class MoveOperation implements Serializable {
+public class WidthOperation implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -32,34 +32,34 @@ public class MoveOperation implements Serializable {
     private Integer id;
 
     /**
-     * 歌曲ID
+     * 歌曲id
      */
     private Integer songId;
 
     /**
-     * 所存在的轨道的编号
+     * 对应轨道
      */
     private Integer basedTrack;
 
     /**
-     * 操作开始时间
+     * 开始时间
      */
     private Integer startTime;
 
     /**
-     * 操作结束时间
+     * 结束时间
      */
     private Integer endTime;
 
     /**
-     * 操作的起始坐标
+     * 起始宽度
      */
-    private Float startX;
+    private Float startWidth;
 
     /**
-     * 操作的目的坐标
+     * 目的宽度
      */
-    private Float endX;
+    private Float endWidth;
 
     @Version
     private Integer version;

@@ -41,7 +41,7 @@
                 <CircleClose class="svg-icon" />
               </button>
               
-              <button v-if="track.edit" class="icon-btn save" @click.stop="saveTrack" title="保存">
+              <button v-if="track.edit" class="icon-btn save" @click.stop="saveTrack" title="发布">
                 <CircleCheck class="svg-icon" />
               </button>
               

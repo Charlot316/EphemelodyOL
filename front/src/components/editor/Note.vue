@@ -49,7 +49,7 @@
               size="small"
               class="action-btn save"
               @click="saveNote"
-              title="保存音符"
+              title="发布音符"
             >
               <el-icon><CircleCheck /></el-icon>
             </el-button>

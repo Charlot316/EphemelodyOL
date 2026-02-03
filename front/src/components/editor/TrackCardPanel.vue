@@ -44,12 +44,12 @@
                 }"
               ></div>
               <div
-                @mousedown="leftMove = true"
+                @mousedown="startDragLeft"
                 @click.stop
                 style="width:10px;height:80px;position:absolute;left:-5px;top:0;cursor:w-resize;z-index:100;background:transparent;"
               />
               <div
-                @mousedown="rightMove = true"
+                @mousedown="startDragRight"
                 @click.stop
                 :style="{
                   userSelect: 'none',
@@ -305,10 +305,54 @@ const newColorOperations = () => {
   }
 };
 
+const dragStartTime = ref(0);
+const dragEndTime = ref(0);
+
+const startDragLeft = () => {
+  leftMove.value = true;
+  dragStartTime.value = props.track.startTiming;
+};
+
+const startDragRight = () => {
+  rightMove.value = true;
+  dragEndTime.value = props.track.endTiming;
+};
+
+const commandHistory = inject('commandHistory');
+
 watch(() => props.global.mouseUp, () => {
-  canMove.value = false;
-  leftMove.value = false;
-  rightMove.value = false;
+  if (leftMove.value || rightMove.value) {
+    const finalStart = props.track.startTiming;
+    const finalEnd = props.track.endTiming;
+    const oldStart = dragStartTime.value;
+    const oldEnd = dragEndTime.value;
+
+    if (finalStart !== oldStart || finalEnd !== oldEnd) {
+      if (syncAction) syncAction("UPDATE_TRACK", props.track);
+      
+      if (commandHistory) {
+        commandHistory.pushCommand({
+          description: 'Adjust Track Timing',
+          undo: () => {
+            props.track.startTiming = oldStart;
+            props.track.endTiming = oldEnd;
+            if (syncAction) syncAction("UPDATE_TRACK", props.track);
+            updateTrack();
+          },
+          redo: () => {
+            props.track.startTiming = finalStart;
+            props.track.endTiming = finalEnd;
+            if (syncAction) syncAction("UPDATE_TRACK", props.track);
+            updateTrack();
+          }
+        });
+      }
+    }
+    
+    leftMove.value = false;
+    rightMove.value = false;
+  }
+  if (contextMenuVisible.value) closeContextMenu();
 });
 
 watch(() => props.global.mouseMove, () => {

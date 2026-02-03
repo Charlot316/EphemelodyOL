@@ -1,34 +1,5 @@
 <template>
   <div class="play-interface select">
-    <div class="header">
-      <div class="header-buttons">
-        <div>
-          <el-button
-            size="small"
-            type="text"
-            class="header-button"
-            @click="router.go(-1)"
-            >返回</el-button
-          >
-        </div>
-        <div>
-          <el-button
-            size="small"
-            type="text"
-            class="header-button"
-            @click="saveChart(false)"
-            >保存</el-button
-          >
-          <el-button
-            size="small"
-            type="text"
-            class="header-button"
-            @click="saveChart(true)"
-            >保存并返回</el-button
-          >
-        </div>
-      </div>
-    </div>
     <!-- 侧边栏 -->
     <transition
       name="fade"
@@ -42,7 +13,7 @@
       >
         <MenuPanel
           key="menupanel"
-          :Height="global.documentHeight - footerHeight - 50"
+          :Height="global.documentHeight - footerHeight"
           :footerHeight="footerHeight"
           :global="global"
           :chart="chart"
@@ -332,6 +303,8 @@ provide('uuid', uuidv4);
 provide('onlineUsers', onlineUsers);
 provide('onlineCount', onlineCount);
 provide('resetChart', resetChart);
+provide('saveChart', saveChart);
+provide('router', router);
 
 const global = reactive({
   currentTime: 0,
@@ -608,22 +581,22 @@ onBeforeUnmount(() => {
 
 #play-interface-container {
   position: absolute;
-  top: 50px;
+  top: 0px;
   background: rgb(32, 32, 32);
 }
 
 .sider-closed {
   position: absolute;
-  top: 50px;
-  height: calc(var(--documentHeight) - 50px - var(--footerHeight));
+  top: 0px;
+  height: calc(var(--documentHeight) - var(--footerHeight));
   background: rgb(32, 32, 32);
   width: 0px;
   left: 0px;
 }
 .sider-opened {
   position: absolute;
-  top: 50px;
-  height: calc(var(--documentHeight) - 50px - var(--footerHeight));
+  top: 0px;
+  height: calc(var(--documentHeight) - var(--footerHeight));
   background: rgb(32, 32, 32);
   width: 400px;
   left: 0px;
@@ -658,13 +631,13 @@ onBeforeUnmount(() => {
 
 .container-small {
   left: 400px;
-  top: 50px;
+  top: 0px;
   width: calc(100vw - 400px);
   height: calc(var(--documentHeight) - 80px - var(--footerHeight));
 }
 .container-big {
   left: 0px;
-  top: 50px;
+  top: 0px;
   width: 100vw;
   height: calc(var(--documentHeight) - 120px);
   transition: 0.5s;
