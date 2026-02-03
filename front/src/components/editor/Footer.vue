@@ -2,6 +2,32 @@
   <div class="footer-container">
     <div class="footer-header">
       <div class="footer-toolbar">
+        <!-- 分组 0: 轨道管理 (New) -->
+        <div class="toolbar-group">
+          <el-tooltip content="新建轨道" placement="top">
+            <el-button
+              circle
+              size="small"
+              class="tool-btn"
+              @click="newTrack"
+            >
+              <el-icon><CirclePlus /></el-icon>
+            </el-button>
+          </el-tooltip>
+          <el-tooltip content="显示所有被隐藏轨道" placement="top">
+            <el-button
+              circle
+              size="small"
+              class="tool-btn"
+              @click="showAllTracks"
+            >
+              <el-icon><View /></el-icon>
+            </el-button>
+          </el-tooltip>
+        </div>
+
+        <div class="toolbar-divider"></div>
+
         <!-- 分组 1: 视图与排序 -->
         <div class="toolbar-group">
           <el-tooltip content="切换排序方式" placement="top">
@@ -155,6 +181,7 @@
                   :track="track"
                   :global="global"
                   @currentTrack="handleCurrentTrack"
+                  @editStatus="handleEditStatus"
                 />
               </div>
             </transition-group>
@@ -247,7 +274,7 @@
 import { ref, computed, watch, defineProps, defineEmits, onMounted } from 'vue';
 import { 
   Sort, Timer, Filter, Aim, Compass, CircleCheck, 
-  MagicStick, Delete, EditPen, ZoomIn 
+  MagicStick, Delete, EditPen, ZoomIn, CirclePlus, View 
 } from '@element-plus/icons-vue';
 import { ElMessageBox, ElNotification } from 'element-plus';
 import TrackCard from "./TrackCard.vue";
@@ -262,6 +289,69 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["currentTrack"]);
+
+const editFinished = ref(true);
+
+const handleEditStatus = (val) => {
+  editFinished.value = val;
+};
+
+const newTrack = () => {
+  if (editFinished.value) {
+    editFinished.value = false;
+    const track = {
+      startTiming: 0,
+      endTiming: 1500,
+      isNew: true,
+      type: 1,
+      key: "K",
+      R: "160",
+      G: "160",
+      B: "160",
+      width: 1,
+      positionX: 0,
+      background: props.chart.defaultBackground,
+      notes: [],
+      moveOperations: [],
+      changeWidthOperations: [],
+      changeColorOperations: [],
+      edit: true,
+      index: props.chart.tracks.length,
+      showInTimeline: true
+    };
+    props.chart.tracks.push(track);
+    // Auto scroll to the new track which is at the bottom
+    setTimeout(() => {
+       const newTrackIndex = props.chart.tracks.length - 1;
+       const leftScroll = document.getElementById("footer-left-scroll");
+       if (leftScroll) leftScroll.scrollTop = leftScroll.scrollHeight;
+    }, 100);
+    
+    updateTrack();
+  } else {
+    ElNotification({
+      title: "提示",
+      message: "请先完成正在编辑的轨道",
+      type: "warning",
+    });
+    // Find editing track and scroll to it
+    const editIndex = props.chart.tracks.findIndex(t => t.edit);
+    if (editIndex !== -1) {
+       // logic to scroll to editIndex track
+    }
+  }
+};
+
+const showAllTracks = () => {
+  props.chart.tracks.forEach(track => {
+    track.showInTimeline = true;
+  });
+  ElNotification({
+    title: "成功",
+    message: "已显示所有隐藏轨道",
+    type: "success"
+  });
+};
 
 const switchToDeleteMode = () => {
   if (currentNoteType.value === 3) {

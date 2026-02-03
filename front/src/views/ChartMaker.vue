@@ -48,25 +48,6 @@
           :chart="chart"
         /></div>
     </transition>
-    <transition
-      name="fade"
-      enter-active-class="animate__animated animate__fadeInLeft"
-      leave-active-class="animate__animated animate__fadeOutLeft"
-    >
-      <div
-        v-if="menuOpened"
-        :class="menuOpened ? 'sider-opened-track' : 'sider-closed-track'"
-        :style="siderStyle"
-      >
-        <TrackPanel
-          key="trackpanel"
-          :Height="global.documentHeight - footerHeight - 50"
-          :Track="currentSelectTrack"
-          :global="global"
-          :chart="chart"
-          @currentTrack="handleCurrentTrack"
-        /></div>
-    </transition>
 
     <!-- 谱面展示 -->
     <div class="select">
@@ -310,7 +291,6 @@ import { FullScreen, RefreshLeft, VideoPause, VideoPlay, Setting, QuestionFilled
 import Track from "@/components/game/Track.vue";
 import BeatPlayer from "@/components/game/BeatPlayer.vue";
 import MenuPanel from "@/components/editor/MenuPanel.vue";
-import TrackPanel from "@/components/editor/TrackPanel.vue";
 import Footer from "@/components/editor/Footer.vue";
 import "animate.css";
 import { useChartEditor } from '@/composables/useChartEditor';
@@ -615,7 +595,7 @@ onBeforeUnmount(() => {
   top: 50px;
   height: calc(var(--documentHeight) - 50px - var(--footerHeight));
   background: rgb(32, 32, 32);
-  width: 300px;
+  width: 400px;
   left: 0px;
   overflow: auto;
   padding-bottom: 20px;
@@ -623,23 +603,10 @@ onBeforeUnmount(() => {
 }
 
 .sider-closed-track {
-  position: absolute;
-  top: 50px;
-  height: calc(var(--documentHeight) - 50px - var(--footerHeight));
-  background: rgb(32, 32, 32);
-  width: 0px;
-  left: 0px;
+  display: none;
 }
 .sider-opened-track {
-  position: absolute;
-  top: 50px;
-  height: calc(var(--documentHeight) - 50px - var(--footerHeight));
-  background: rgb(32, 32, 32);
-  width: 300px;
-  left: 300px;
-  overflow: auto;
-  padding-bottom: 20px;
-  z-index: 50;
+  display: none;
 }
 
 .footer-closed {
@@ -660,9 +627,9 @@ onBeforeUnmount(() => {
 }
 
 .container-small {
-  left: 600px;
+  left: 400px;
   top: 50px;
-  width: calc(100vw - 600px);
+  width: calc(100vw - 400px);
   height: calc(var(--documentHeight) - 80px - var(--footerHeight));
 }
 .container-big {
@@ -675,10 +642,10 @@ onBeforeUnmount(() => {
 
 .time-controller-small {
   position: absolute;
-  left: 600px;
+  left: 400px;
   bottom: var(--footerHeight);
   height: 80px;
-  width: calc(100vw - 600px);
+  width: calc(100vw - 400px);
   background: rgb(32, 30, 32);
   z-index: 70;
 }
