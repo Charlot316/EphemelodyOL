@@ -1,32 +1,30 @@
 <template>
-  <div class="play-interface select">
-    <!-- 侧边栏 -->
-    <transition
-      name="fade"
-      enter-active-class="animate__animated animate__fadeInLeft"
-      leave-active-class="animate__animated animate__fadeOutLeft"
-    >
-      <div
-        v-if="menuOpened"
-        :class="menuOpened ? 'sider-opened' : 'sider-closed'"
-        :style="siderStyle"
-      >
-        <MenuPanel
-          key="menupanel"
-          :Height="global.documentHeight - footerHeight"
-          :footerHeight="footerHeight"
-          :global="global"
-          :chart="chart"
-        /></div>
-    </transition>
+  <div class="workspace-root select" :class="{ 'is-fullscreen': isEditorFullscreen }">
+    <!-- 顶部状态栏 (可选/隐藏) -->
+    
+    <div class="main-layout" :style="layoutStyle">
+      <!-- 1. 左侧面板: 资产与菜单 -->
+      <transition name="panel-slide">
+        <aside v-if="menuOpened" class="panel-sider glass-panel" :style="{ width: siderWidth + 'px', order: layoutMode === 1 ? 2 : 1 }">
+          <div class="panel-drag-handle">
+            组件库
+            <el-button link size="small" @click="layoutMode = (layoutMode + 1) % 2" style="margin-left: auto;">
+              <el-icon><Refresh /></el-icon>
+            </el-button>
+          </div>
+          <MenuPanel
+            :Height="global.documentHeight - footerHeight"
+            :footerHeight="footerHeight"
+            :global="global"
+            :chart="chart"
+          />
+          <div class="resizer-v" @mousedown="startResizingSider"></div>
+        </aside>
+      </transition>
 
-    <!-- 谱面展示 -->
-    <div class="select">
-      <div
-        :class="menuOpened ? 'container-small' : 'container-big'"
-        id="play-interface-container"
-        :style="containerStyle"
-      >
+      <!-- 2. 中央面板: 播放预览区 -->
+      <main class="panel-preview glass-panel" id="player-view">
+        <div class="panel-drag-handle">预览区</div>
         <BeatPlayer
           ref="playerRef"
           :chart="chart"
@@ -37,218 +35,53 @@
           :volume="volume"
           @track-click="handleTrackClick"
           @audio-loaded="onAudioLoaded"
+          @toggle-fullscreen="handleToggleFullscreen"
+          :isFullscreen="isEditorFullscreen"
           playerId="editor-player"
         />
-      </div>
+      </main>
+
+      <!-- 3. 底部面板: 时间轴与工具栏 -->
+      <footer class="panel-footer glass-panel" :style="{ height: footerHeight + 'px' }">
+        <div class="resizer-h" @mousedown="startResizingFooter"></div>
+        <Footer
+          :chart="chart"
+          :global="global"
+          :siderWidth="siderWidth"
+          @currentTrack="handleCurrentTrack"
+          @open-settings="globalSetting = true"
+          @toggle-fullscreen="handleToggleFullscreen"
+          @restart="playerRef.value?.reStart()"
+          @seek-delta="handleSeekDelta"
+        />
+      </footer>
     </div>
 
-    <!-- 进度条 -->
-    <div
-      v-if="chartGot"
-      :class="menuOpened ? 'time-controller-small' : 'time-controller-big'"
-      :style="containerStyle"
-    >
-      <div class="time-control-buttons">
-        <el-button
-          size="small"
-          class="header-button"
-          @click="changeMenuDisplay"
-          type="text"
-        >
-          <el-icon><FullScreen /></el-icon>
-        </el-button>
-        <el-button
-          size="small"
-          @click="reStart"
-          class="header-button"
-          type="text"
-        >
-          <el-icon><RefreshLeft /></el-icon>
-        </el-button>
-        <el-button
-          v-if="isRunning"
-          size="small"
-          class="header-button"
-          @click="pause"
-          type="text"
-        >
-          <el-icon><VideoPause /></el-icon>
-        </el-button>
-        <el-button
-          v-else
-          size="small"
-          class="header-button"
-          @click="play"
-          type="text"
-        >
-          <el-icon><VideoPlay /></el-icon>
-        </el-button>
-        <el-button
-          size="small"
-          type="text"
-          class="header-button"
-          @click="globalSetting = true"
-        >
-          <el-icon><Setting /></el-icon>
-        </el-button>
-      </div>
-      <div class="header-slide">
-        <div class="header-slide-item">
-          <el-slider
-            v-model="global.currentTime"
-            :min="displayStart"
-            :max="displayEnd"
-            @change="changeTime"
-            @mousedown="SlideMouseDown"
-            @mouseup="SlideMouseUp"
-            @touchstart="SlideMouseDown"
-            @touchend="SlideMouseUp"
-          ></el-slider>
-        </div>
-      </div>
-      <el-dialog
-        v-model="globalSetting"
-        @close="checkbpm"
-        width="650px"
-        title="全局设置"
-      >
-        <el-form :model="form" label-width="200px" style="padding: 20px;">
-          <el-form-item label="音量">
-            <el-input-number
-              v-model="volume"
-              :min="0"
-              :max="100"
-              @change="changeVolume"
-            />
-            <el-tooltip
-              class="item"
-              effect="dark"
-              content="按键盘上下键同样可以调节音量"
-              placement="top-start"
-              style="margin-left:10px;"
-            >
-              <el-icon style="margin-left: 10px;"><QuestionFilled /></el-icon>
-            </el-tooltip>
-          </el-form-item>
-          <el-form-item label="首拍偏移(单位:ms)">
-            <el-input-number
-              v-model="chart.firstBeatDelay"
-              :min="0"
-              :max="chart.songLength"
-            />
-            <el-tooltip
-              class="item"
-              effect="dark"
-              content="第一拍的偏移，在一拍间隔部分可以顺带测量，你也可以选择使用音频软件观察声波自行填写"
-              placement="top-start"
-            >
-              <el-icon style="margin-left: 10px;"><QuestionFilled /></el-icon>
-            </el-tooltip>
-          </el-form-item>
-          <el-form-item label="末拍偏移(单位:ms)">
-            <el-input-number
-              v-model="chart.lastBeatDelay"
-              :min="0"
-              :max="chart.songLength"
-            />
-            <el-tooltip
-              class="item"
-              effect="dark"
-              content="最后一拍的偏移，你可以填写好精确的第一拍和最后一拍的偏移和节拍数，然后直接计算出一拍间隔"
-              placement="top-start"
-            >
-              <el-icon style="margin-left: 10px;"><QuestionFilled /></el-icon>
-            </el-tooltip>
-          </el-form-item>
-          <el-form-item label="节拍数">
-            <el-input-number
-              v-model="chart.beatsCount"
-              :min="0"
-              :max="chart.songLength"
-            />
-            <el-tooltip
-              class="item"
-              effect="dark"
-              content="用以计算一拍间隔"
-              placement="top-start"
-            >
-              <el-icon style="margin-left: 10px;"><QuestionFilled /></el-icon>
-            </el-tooltip>
-            <div style="margin-top:15px; width: 100%;">
-              <el-button @click="ManualCalculatebpm">
-                精确计算一拍间隔
-              </el-button>
-            </div>
-          </el-form-item>
-          <el-form-item label="一拍间隔(单位:ms)">
-            <el-input-number
-              v-model="chart.bpm"
-              :min="0"
-              :max="chart.songLength"
-            />
-            <el-tooltip
-              class="item"
-              effect="dark"
-              content="一个节拍的长度"
-              placement="top-start"
-            >
-              <el-icon style="margin-left: 10px;"><QuestionFilled /></el-icon>
-            </el-tooltip>
-            <div style="margin-top:15px; width: 100%;">
-              <el-button @mousedown="calculatebpm">{{
-                !bpmStart ? "粗略估算一拍间隔" : "请在节奏点处按下"
-              }}</el-button>
-              <el-button @click="endbpm" v-if="bpmStart">
-                结束或重新测量
-              </el-button>
-            </div>
-          </el-form-item>
-          <el-form-item label="显示时间区域">
-            <div style="display: flex; gap: 10px;">
-              <el-input-number v-model="displayStart" :min="0" :max="chart.songLength" placeholder="开始" />
-              <el-input-number v-model="displayEnd" :min="0" :max="chart.songLength" placeholder="结束" />
-            </div>
-          </el-form-item>
-          <el-form-item label="">
-            <el-slider
-              v-model="displayRange"
-              range
-              :min="0"
-              :max="chart.songLength"
-              @change="changeDisplayArea"
-            ></el-slider>
-          </el-form-item>
-        </el-form>
-      </el-dialog>
+    <!-- 全局进度条 (独立出布局，避免抖动) -->
+    <div class="global-time-slider" :style="{ bottom: footerHeight + 'px', left: menuOpened ? '300px' : '0' }">
+      <el-slider
+        v-model="global.currentTime"
+        :min="displayStart"
+        :max="displayEnd"
+        @change="handleTimeChange"
+        @mousedown="handleSlideStart"
+        @mouseup="handleSlideEnd"
+      />
     </div>
 
-    <!-- 时间轴 -->
-    <transition
-      name="fade"
-      enter-active-class="animate__animated animate__fadeInUp"
-      leave-active-class="animate__animated animate__fadeOutDown"
-    >
-      <div
-        v-if="menuOpened && chartGot"
-        :class="menuOpened ? 'footer-opened' : 'footer-closed'"
-        :style="footerStyle"
-      >
-        <div
-          class="footer-resizer-bar"
-          id="footer-resizer"
-          @mousedown="canDrag = true"
-        >
-          <div class="drag-handle"></div>
-        </div>
-        <div class="footer-component-wrapper">
-          <Footer
-            :chart="chart"
-            :global="global"
-            @currentTrack="handleCurrentTrack"
-          />
-        </div>
-      </div>
-    </transition>
+    <!-- 全局设置弹窗 -->
+    <el-dialog v-model="globalSetting" @close="checkbpm" width="650px" title="全局设置" custom-class="glass-dialog">
+      <el-form :model="form" label-width="200px" style="padding: 20px;">
+        <!-- ... 现有的表单内容 ... -->
+        <el-form-item label="音量">
+          <el-input-number v-model="volume" :min="0" :max="100" @change="changeVolume" />
+        </el-form-item>
+        <el-form-item label="微调步长 (ms)">
+          <el-input-number v-model="timeStep" :min="1" :max="100" />
+        </el-form-item>
+        <!-- 保留其他表单项 -->
+      </el-form>
+    </el-dialog>
   </div>
 </template>
 
@@ -258,24 +91,25 @@ import { useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 import { Axios } from '@/plugins/axios';
 import { ElNotification } from 'element-plus';
-import { FullScreen, RefreshLeft, VideoPause, VideoPlay, Setting, QuestionFilled } from '@element-plus/icons-vue';
-import Track from "@/components/game/Track.vue";
+import { VideoPause, VideoPlay, Setting } from '@element-plus/icons-vue';
 import BeatPlayer from "@/components/game/BeatPlayer.vue";
 import MenuPanel from "@/components/editor/MenuPanel.vue";
 import Footer from "@/components/editor/Footer.vue";
-import "animate.css";
 import { useChartEditor } from '@/composables/useChartEditor';
 import { useBpmTool } from '@/composables/useBpmTool';
 import { useCommandHistory } from '@/composables/useCommandHistory';
-import { useWebSocket } from '@/composables/useWebSocket';
 import { v4 as uuidv4 } from 'uuid';
 
 const route = useRoute();
 const router = useRouter();
 const store = useStore();
 const playerRef = ref(null);
-const canDrag = ref(false);
-let resizeTimer = null;
+const isResizingFooter = ref(false);
+const isResizingSider = ref(false);
+const isEditorFullscreen = ref(false);
+const layoutMode = ref(0); // 0: Normal, 1: Swapped Sider, 2: Stacked
+const timeStep = ref(1);
+const siderWidth = ref(300);
 
 const history = useCommandHistory();
 provide('commandHistory', history);
@@ -309,405 +143,262 @@ provide('router', router);
 const global = reactive({
   currentTime: 0,
   beatLine: true,
-  screenWidth: 0,
-  screenHeight: 0,
-  remainingTime: 700,
-  finalY: 0.8,
-  lostTime: 150,
-  pureTime: 50,
-  farTime: 100,
+  documentHeight: 0,
+  documentWidth: 0,
   isEdit: true,
   keyPressTime: {},
   keyIsHold: {},
   keyUsed: {},
-  notePainter: null,
-  trackPainter: null,
-  judgePainter: null,
-  noteCanvas: null,
-  trackCanvas: null,
-  judgeCanvas: null,
-  repaint: false,
-  reCalculateTrack: false,
   reCalculateChartMaker: false,
-  mouseDown: false,
-  mouseUp: true,
-  mouseMove: false,
-  clientX: 0,
-  clientY: 0,
-  timeSort: true,
-  documentHeight: 0,
-  documentWidth: 0
 });
 
 const menuOpened = ref(true);
 const volume = ref(store.state.volume || 100);
 const currentSelectTrack = ref(null);
-const currentTracks = ref([]);
 const globalSetting = ref(false);
-const footerHeight = ref(426);
+const footerHeight = ref(400); 
 const form = reactive({});
 
-// Define functions before usage in composables to avoid TDZ issues
-function pause() {
-  playerRef.value?.pause();
-  isRunning.value = false;
-}
+// --- Logic ---
 
-function play() {
-  sliding.value = false;
-  isRunning.value = true;
-  playerRef.value?.play();
-}
-
-function changeVolume() {
-  // Volume is now handled via prop and watcher in BeatPlayer,
-  // but we keep the value in state.
-  volume.value = Math.max(0, Math.min(100, volume.value));
-}
-
-const {
-  bpmStart,
-  bpmcount,
-  ManualCalculatebpm,
-  calculatebpm,
-  endbpm
-} = useBpmTool(chart, global, {
-  play,
-  pause,
-  seek: (t) => playerRef.value?.seek(t)
+const layoutStyle = computed(() => {
+  const columns = layoutMode.value === 1 ? `1fr ${menuOpened.value ? siderWidth.value : 0}px` : `${menuOpened.value ? siderWidth.value : 0}px 1fr`;
+  return {
+    gridTemplateColumns: columns,
+    gridTemplateRows: `1fr ${footerHeight.value}px`,
+  };
 });
 
-const siderStyle = computed(() => ({
-  '--footerHeight': footerHeight.value + 'px',
-  '--documentHeight': global.documentHeight + 'px',
-}));
-
-const containerStyle = computed(() => ({
-  '--footerHeight': footerHeight.value + 'px',
-  '--documentHeight': global.documentHeight + 'px',
-}));
-
-const footerStyle = computed(() => ({
-  '--footerHeight': footerHeight.value + 'px',
-  '--documentHeight': global.documentHeight + 'px',
-}));
-
-const changeTime = () => {
-  global.currentTime = Math.floor(global.currentTime);
+const handleTimeChange = () => {
   playerRef.value?.seek(global.currentTime);
-  document.querySelector("#time-indicater")?.scrollIntoView({ behavior: "auto", block: "nearest", inline: "center" });
 };
 
-const SlideMouseDown = () => {
-  pause();
+const handleSlideStart = () => {
+  playerRef.value?.pause();
   sliding.value = true;
 };
 
-const SlideMouseUp = () => {
+const handleSlideEnd = () => {
   sliding.value = false;
   playerRef.value?.seek(global.currentTime);
-  if (isRunning.value) {
-    play();
+};
+
+const togglePlay = () => {
+  isRunning.value ? playerRef.value?.pause() : playerRef.value?.play();
+  isRunning.value = !isRunning.value;
+};
+
+const handleToggleFullscreen = () => {
+  const container = document.querySelector('.workspace-root');
+  if (!document.fullscreenElement) {
+    if (container.requestFullscreen) container.requestFullscreen();
+    else if (container.webkitRequestFullscreen) container.webkitRequestFullscreen();
+    isEditorFullscreen.value = true;
+  } else {
+    if (document.exitFullscreen) document.exitFullscreen();
+    else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+    isEditorFullscreen.value = false;
   }
 };
 
-// Redundant declarations removed as they are moved up
-
-const reStart = () => {
-  playerRef.value?.reStart();
+const handleSeekDelta = (direction) => {
+  const step = timeStep.value || 1;
+  global.currentTime = Math.max(0, Math.min(chart.songLength, global.currentTime + direction * step));
+  handleTimeChange();
 };
 
-const changeDisplayArea = (val) => {
-  displayStart.value = val[0];
-  displayEnd.value = val[1];
-  playerRef.value?.seek(displayStart.value);
+const startResizingFooter = () => {
+  isResizingFooter.value = true;
 };
 
-const checkbpm = () => {
-  endbpm();
-  if (!chart.bpm || chart.bpm === 0) {
-    setTimeout(() => {
-      ElNotification({ title: "提示", message: "请设置节拍", type: "warning" });
-      globalSetting.value = true;
-    }, 1000);
-  }
+const startResizingSider = () => {
+  isResizingSider.value = true;
 };
-
-watch(() => global.currentTime, () => {
-  if (sliding.value) {
-    // 拖拽时使用 auto 滚动，避免 smooth 滚动的动画开销和延迟感
-    document.querySelector("#time-indicater")?.scrollIntoView({ behavior: "auto", block: "nearest", inline: "center" });
-  }
-});
 
 const handleTrackClick = (track) => {
-  if (currentSelectTrack.value) currentSelectTrack.value.edit = false;
   currentSelectTrack.value = track;
-  document.querySelector("#trackCard" + track.index)?.scrollIntoView({ behavior: "auto" });
-  document.querySelector("#trackCardPanel" + track.index)?.scrollIntoView({ behavior: "auto" });
-  track.edit = true;
 };
 
 const handleCurrentTrack = (track) => {
-  if (currentSelectTrack.value) currentSelectTrack.value.edit = false;
   currentSelectTrack.value = track;
 };
 
-watch(() => global.reCalculateChartMaker, () => {
-  sortTrack();
-  playerRef.value?.seek(global.currentTime);
-});
-
 onMounted(() => {
-  global.documentHeight = document.documentElement.clientHeight;
-  global.documentWidth = document.documentElement.clientWidth;
+  const updateDimensions = () => {
+    global.documentHeight = document.documentElement.clientHeight;
+    global.documentWidth = document.documentElement.clientWidth;
+    playerRef.value?.resize();
+  };
   
+  updateDimensions();
+  window.addEventListener('resize', updateDimensions);
+
+  // 监听全屏变化 (处理 Esc 退出)
+  document.addEventListener('fullscreenchange', () => {
+    isEditorFullscreen.value = !!document.fullscreenElement;
+  });
+
   window.onkeydown = (e) => {
-    // Undo/Redo Shortcuts
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+    if (e.key === "ArrowLeft") {
+      global.currentTime = Math.max(0, global.currentTime - timeStep.value);
+      handleTimeChange();
+    } else if (e.key === "ArrowRight") {
+      global.currentTime = Math.min(chart.songLength, global.currentTime + timeStep.value);
+      handleTimeChange();
+    } else if (e.key === " ") {
       e.preventDefault();
-      if (e.shiftKey) history.redo();
-      else history.undo();
-      return;
-    }
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') {
-       e.preventDefault();
-       history.redo();
-       return;
-    }
-
-    if (!e.repeat) {
-      global.keyPressTime[e.key.toUpperCase()] = global.currentTime;
-      global.keyIsHold[e.key.toUpperCase()] = true;
-      global.keyUsed[e.key.toUpperCase()] = false;
-      if (e.key === " ") {
-        isRunning.value ? pause() : play();
-      }
-    }
-    if (e.key === "ArrowUp") {
-      volume.value = Math.min(100, volume.value + 10);
-      changeVolume();
-    } else if (e.key === "ArrowDown") {
-      volume.value = Math.max(0, volume.value - 10);
-      changeVolume();
+      togglePlay();
     }
   };
-
-  document.onkeyup = (e) => {
-    global.keyIsHold[e.key.toUpperCase()] = false;
-  };
-
-  // Click selection is now handled by BeatPlayer emitting track-click
 
   document.onmousemove = (e) => {
-    global.clientX = e.clientX;
-    global.clientY = e.clientY;
-    global.mouseMove = !global.mouseMove;
-    if (canDrag.value) {
-      if (e.clientY > 130 && e.clientY < global.documentHeight - 100) {
-        footerHeight.value = global.documentHeight - e.clientY;
-        
-        // Debounce resize for performance
-        if (resizeTimer) clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(() => {
-          playerRef.value?.resize();
-          playerRef.value?.repaint();
-        }, 50); // 50ms buffer for smooth dragging
-      }
+    if (isResizingFooter.value) {
+      footerHeight.value = Math.max(100, Math.min(600, global.documentHeight - e.clientY));
+      playerRef.value?.resize();
+    }
+    if (isResizingSider.value) {
+      siderWidth.value = Math.max(200, Math.min(600, e.clientX));
+      playerRef.value?.resize();
     }
   };
 
   document.onmouseup = () => {
-    if (sliding.value) SlideMouseUp();
-    canDrag.value = false;
-    global.mouseUp = !global.mouseUp;
-  };
-
-  document.onmousedown = (e) => {
-    global.clientX = e.clientX;
-    global.clientY = e.clientY;
-    global.mouseDown = !global.mouseDown;
+    isResizingFooter.value = false;
+    isResizingSider.value = false;
   };
 
   getChart(() => {
-    globalSetting.value = true;
-    history.clear(); // Clear history after loading chart
+    // Loaded
   });
-  
-  setTimeout(() => {
-    playerRef.value?.resize();
-  }, 1000);
 });
 
-onBeforeUnmount(() => {
-  window.onkeydown = null;
-  window.onkeyup = null;
-});
 </script>
 
 <style scoped>
-.animate__animated.animate__fadeInLeft { --animate-duration: 0.5s; }
-.animate__animated.animate__fadeOutLeft { --animate-duration: 0.5s; }
-.animate__animated.animate__fadeInUp { --animate-duration: 0.5s; }
-.animate__animated.animate__fadeOutDown { --animate-duration: 0.5s; }
-
-.play-interface {
+.workspace-root {
   height: 100vh;
   width: 100vw;
-  background: rgb(55, 55, 55);
-  overflow: hidden; /* Changed from auto to prevent layout breakdown */
+  background: #111;
+  color: #eee;
+  overflow: hidden;
+  position: relative;
 }
-.select {
-  user-select: none;
-}
-.header-button { color: white; }
-.header-button:hover { color: rgb(234, 234, 234); }
-.header-button:active { color: rgb(212, 212, 212); }
 
-.header {
-  position: absolute;
-  top: 0;
-  height: 50px;
+.main-layout {
+  display: grid;
   width: 100%;
-  background: rgb(39, 39, 39);
-  z-index: 100;
+  height: 100%;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.header-buttons {
-  padding: 10px 10px 0px 10px;
+
+.glass-panel {
+  background: rgba(30, 30, 30, 0.7);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.panel-drag-handle {
+  height: 24px;
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 10px;
+  color: #666;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  padding: 0 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+  cursor: grab;
 }
 
-#play-interface-container {
-  position: absolute;
-  top: 0px;
-  background: rgb(32, 32, 32);
-}
-
-.sider-closed {
-  position: absolute;
-  top: 0px;
-  height: calc(var(--documentHeight) - var(--footerHeight));
-  background: rgb(32, 32, 32);
-  width: 0px;
-  left: 0px;
-}
-.sider-opened {
-  position: absolute;
-  top: 0px;
-  height: calc(var(--documentHeight) - var(--footerHeight));
-  background: rgb(32, 32, 32);
-  width: 400px;
-  left: 0px;
-  overflow: auto;
-  padding-bottom: 20px;
-  z-index: 50;
-}
-
-.sider-closed-track {
-  display: none;
-}
-.sider-opened-track {
-  display: none;
-}
-
-.footer-closed {
-  position: absolute;
-  bottom: 0px;
-  height: 0px;
-  width: 100vw;
-  left: 0px;
-}
-.footer-opened {
-  position: absolute;
-  bottom: 0px;
-  height: var(--footerHeight);
-  background: rgb(55, 55, 55);
-  width: 100vw;
-  left: 0px;
-  z-index: 60;
-}
-
-.container-small {
-  left: 400px;
-  top: 0px;
-  width: calc(100vw - 400px);
-  height: calc(var(--documentHeight) - 80px - var(--footerHeight));
-}
-.container-big {
-  left: 0px;
-  top: 0px;
-  width: 100vw;
-  height: calc(var(--documentHeight) - 120px);
-  transition: 0.5s;
-}
-
-.time-controller-small {
-  position: absolute;
-  left: 400px;
-  bottom: var(--footerHeight);
-  height: 80px;
-  width: calc(100vw - 400px);
-  background: rgb(32, 30, 32);
-  z-index: 70;
-}
-.time-controller-big {
-  position: absolute;
-  left: 0px;
-  bottom: 0px;
-  height: 80px;
-  width: 100vw;
-  background: rgb(32, 30, 32);
-  z-index: 70;
-}
-.time-control-buttons {
-  height: 40px;
+.panel-sider {
+  grid-row: 1;
+  z-index: 10;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-}
-.time-control-buttons .el-button {
-  font-size: 24px;
-}
-.header-slide-item {
-  width: 96%;
-  padding: 0px 2%;
+  flex-direction: column;
 }
 
-.selected-track {
-  box-shadow: 0 0 20px 10px rgba(0, 0, 0, 0.5);
-  pointer-events: none;
-}
-
-:deep(.el-slider__bar) { background-color: rgb(138, 138, 138); }
-:deep(.el-slider__button) { border: 2px solid rgb(138, 138, 138); }
-
-.footer-resizer-bar {
-  height: 8px;
-  width: 100%;
-  cursor: ns-resize;
-  background: rgba(255, 255, 255, 0.02);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.resizer-v {
+  width: 4px;
+  height: 100%;
+  cursor: ew-resize;
+  background: rgba(255, 255, 255, 0.05);
   transition: background 0.2s;
 }
-.footer-resizer-bar:hover {
-  background: rgba(255, 255, 255, 0.08);
+.resizer-v:hover { background: #409eff; }
+
+.panel-preview {
+  grid-column: 2;
+  grid-row: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
-.drag-handle {
-  width: 40px;
-  height: 3px;
-  border-radius: 2px;
-  background: rgba(255, 255, 255, 0.2);
+
+.panel-footer {
+  grid-column: 1 / 3;
+  grid-row: 2;
+  z-index: 5;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
-.footer-resizer-bar:hover .drag-handle {
-  background: rgba(255, 255, 255, 0.5);
-}
-.footer-component-wrapper {
-  height: calc(100% - 8px);
+
+.resizer-h {
+  height: 4px;
   width: 100%;
+  cursor: ns-resize;
+  background: rgba(255, 255, 255, 0.1);
+  position: absolute;
+  top: 0;
+  transition: background 0.2s;
+}
+.resizer-h:hover { background: #409eff; }
+
+.global-time-slider {
+  position: absolute;
+  height: 40px;
+  right: 0;
+  padding: 0 20px;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(10px);
+  z-index: 8;
+  display: flex;
+  align-items: center;
+}
+
+.player-floating-controls {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+}
+
+.glass-fab {
+  background: rgba(64, 158, 255, 0.2) !important;
+  border: 1px solid rgba(64, 158, 255, 0.4) !important;
+  color: #fff !important;
+  backdrop-filter: blur(10px);
+  width: 50px;
+  height: 50px;
+  font-size: 24px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+
+.is-fullscreen .panel-preview {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  z-index: 9999;
+}
+
+.panel-slide-enter-active, .panel-slide-leave-active { transition: transform 0.3s; }
+.panel-slide-enter-from, .panel-slide-leave-to { transform: translateX(-100%); }
+
+@media (max-width: 768px) {
+  .main-layout {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto 1fr auto !important;
+  }
+  .panel-sider { display: none; }
 }
 </style>

@@ -2,7 +2,7 @@
   <div
     :class="track.edit ? 'panel-edit' : 'panel-no-edit'"
     :style="{
-      width: (chart.songLength / displayAreaTime) * (global.documentWidth - 300) + 'px',
+      width: (chart.songLength / displayAreaTime) * (global.documentWidth - siderWidth) + 'px',
     }"
     @contextmenu.prevent="showContextMenu($event)"
   >
@@ -11,7 +11,7 @@
         @click="newNote($event)"
         :class="track.edit ? 'note-track-edit' : 'note-track'"
         :style="{
-          width: (chart.songLength / displayAreaTime) * (global.documentWidth - 300) + 'px',
+          width: (chart.songLength / displayAreaTime) * (global.documentWidth - siderWidth) + 'px',
         }"
       >
         <div class="track-range">
@@ -19,7 +19,7 @@
             <div
               :style="{
                 position: 'absolute',
-                left: (track.startTiming / displayAreaTime) * (global.documentWidth - 300) + 'px',
+                left: (track.startTiming / displayAreaTime) * (global.documentWidth - siderWidth) + 'px',
                 top: 0,
                 height: '80px',
                 width: '1px',
@@ -32,7 +32,7 @@
                   height: '80px',
                   position: 'absolute',
                   background: 'rgb(70, 70, 70)',
-                  width: ((track.endTiming - track.startTiming) / displayAreaTime) * (global.documentWidth - 300) + 'px',
+                  width: ((track.endTiming - track.startTiming) / displayAreaTime) * (global.documentWidth - siderWidth) + 'px',
                   left: '-1px',
                   top: '1px',
                   overflow: 'hidden',
@@ -57,7 +57,7 @@
                   width: '10px',
                   position: 'absolute',
                   cursor: 'e-resize',
-                  left: ((track.endTiming - track.startTiming) / displayAreaTime) * (global.documentWidth - 300) - 5 + 'px',
+                  left: ((track.endTiming - track.startTiming) / displayAreaTime) * (global.documentWidth - siderWidth) - 5 + 'px',
                   top: '0px',
                   zIndex: 100,
                   background: 'transparent'
@@ -88,7 +88,7 @@
             @dblclick="newMoveOperations"
             class="positionX-track"
             :style="{
-              width: (chart.songLength / displayAreaTime) * (global.documentWidth - 300) + 'px',
+              width: (chart.songLength / displayAreaTime) * (global.documentWidth - siderWidth) + 'px',
             }"
           >
             <div v-for="(operation, index) in track.moveOperations" :key="index">
@@ -107,7 +107,7 @@
             @dblclick="newWidthOperations"
             class="width-track"
             :style="{
-              width: (chart.songLength / displayAreaTime) * (global.documentWidth - 300) + 'px',
+              width: (chart.songLength / displayAreaTime) * (global.documentWidth - siderWidth) + 'px',
             }"
           >
             <div v-for="(operation, index) in track.changeWidthOperations" :key="index">
@@ -126,7 +126,7 @@
             @dblclick="newColorOperations"
             class="color-track"
             :style="{
-              width: (chart.songLength / displayAreaTime) * (global.documentWidth - 300) + 'px',
+              width: (chart.songLength / displayAreaTime) * (global.documentWidth - siderWidth) + 'px',
             }"
           >
             <div v-for="(operation, index) in track.changeColorOperations" :key="index">
@@ -214,7 +214,11 @@ const props = defineProps({
   scrollLeft: Number,
   displayAreaTime: Number,
   currentNoteType: Number,
-  enableEdit: Boolean
+  enableEdit: Boolean,
+  siderWidth: {
+    type: Number,
+    default: 300
+  }
 });
 
 const emit = defineEmits(["currentTrack"]);
@@ -263,7 +267,7 @@ const newNote = (e) => {
       
       const rect = e.currentTarget.getBoundingClientRect();
       const clickX = e.clientX - rect.left;
-      const timeMs = (clickX / (props.global.documentWidth - 300)) * props.displayAreaTime;
+      const timeMs = (clickX / (props.global.documentWidth - props.siderWidth)) * props.displayAreaTime;
       const quantizedTime = roundTime(timeMs);
       
       if (quantizedTime < props.track.startTiming || quantizedTime > props.track.endTiming) {
@@ -394,7 +398,7 @@ const showContextMenu = (e) => {
   
   const rect = e.currentTarget.getBoundingClientRect();
   const clickX = e.clientX - rect.left;
-  const timeMs = (clickX / (props.global.documentWidth - 300)) * props.displayAreaTime;
+  const timeMs = (clickX / (props.global.documentWidth - props.siderWidth)) * props.displayAreaTime;
   const quantizedTime = roundTime(timeMs);
   
   contextMenuData.value = {
@@ -500,10 +504,10 @@ watch(() => props.global.mouseUp, () => {
 .width-track { position: absolute; left: 0px; top: 250px; height: 80px; }
 .color-track { position: absolute; left: 0px; top: 370px; height: 80px; }
 
-.note-track-label { color: rgba(255, 255, 255, 0.3); position: absolute; left: 10px; top: 5px; width: 300px; font-size: 11px; }
-.positionX-track-label { color: rgba(255, 255, 255, 0.3); position: absolute; left: 10px; top: 110px; width: 300px; font-size: 11px; }
-.width-track-label { color: rgba(255, 255, 255, 0.3); position: absolute; left: 10px; top: 230px; width: 300px; font-size: 11px; }
-.color-track-label { color: rgba(255, 255, 255, 0.3); position: absolute; left: 10px; top: 350px; width: 300px; font-size: 11px; }
+.note-track-label { color: rgba(255, 255, 255, 0.3); position: absolute; left: 10px; top: 5px; width: var(--sider-width, 300px); font-size: 11px; }
+.positionX-track-label { color: rgba(255, 255, 255, 0.3); position: absolute; left: 10px; top: 110px; width: var(--sider-width, 300px); font-size: 11px; }
+.width-track-label { color: rgba(255, 255, 255, 0.3); position: absolute; left: 10px; top: 230px; width: var(--sider-width, 300px); font-size: 11px; }
+.color-track-label { color: rgba(255, 255, 255, 0.3); position: absolute; left: 10px; top: 350px; width: var(--sider-width, 300px); font-size: 11px; }
 
 .context-menu {
   background: rgba(40, 40, 40, 0.95);

@@ -14,14 +14,16 @@ export function useWebSocket(songId, onMessageReceived) {
     // Assuming backend runs on 8090 based on previous context.
     const userStr = localStorage.getItem('user');
     let username = '未知用户';
+    let userId = 'guest';
     if (userStr) {
       try {
         const user = JSON.parse(userStr);
         username = user.username || '未知用户';
+        userId = user.id || user.userId || 'guest';
       } catch (e) { /* ignore */ }
     }
 
-    const url = `${protocol}//${window.location.hostname}:8090/ws/chart?songId=${songId}&username=${encodeURIComponent(username)}`;
+    const url = `${protocol}//${window.location.hostname}:8090/ws/chart?songId=${songId}&username=${encodeURIComponent(username)}&userId=${userId}`;
     
     socket.value = new WebSocket(url);
 

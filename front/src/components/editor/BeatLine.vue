@@ -4,7 +4,7 @@
     :style="{
       position: 'absolute',
       left: 0,
-      width: (chart.songLength / displayAreaTime) * (global.documentWidth - 300) + 'px',
+      width: (chart.songLength / displayAreaTime) * (global.documentWidth - siderWidth) + 'px',
       height: '35px',
       zIndex: 100,
       pointerEvents: 'none',
@@ -71,7 +71,11 @@ import { ref, defineProps, watch, onMounted } from 'vue';
 const props = defineProps({
   global: Object,
   chart: Object,
-  displayAreaTime: Number
+  displayAreaTime: Number,
+  siderWidth: {
+    type: Number,
+    default: 300
+  }
 });
 
 const display = ref(false);
@@ -89,7 +93,7 @@ const setDisplay = () => {
   
   const bpm8 = bpm / 8;
   const bpm4 = bpm / 4;
-  const wholeLength = props.global.documentWidth - 300;
+  const wholeLength = props.global.documentWidth - props.siderWidth;
   
   if (bpm > 0) {
     display.value = true;

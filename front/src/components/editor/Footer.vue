@@ -2,77 +2,40 @@
   <div class="footer-container">
     <div class="footer-header">
       <div class="footer-toolbar">
-        <!-- 分组 0: 轨道管理 (New) -->
-        <div class="toolbar-group">
-          <el-tooltip content="新建轨道" placement="top">
-            <el-button
-              circle
-              size="small"
-              class="tool-btn"
-              @click="newTrack"
-            >
-              <el-icon><CirclePlus /></el-icon>
-            </el-button>
-          </el-tooltip>
-          <el-tooltip content="显示所有被隐藏轨道" placement="top">
-            <el-button
-              circle
-              size="small"
-              class="tool-btn"
-              @click="showAllTracks"
-            >
-              <el-icon><View /></el-icon>
-            </el-button>
-          </el-tooltip>
-        </div>
-
-        <div class="toolbar-divider"></div>
-
-        <!-- 分组 1: 视图与排序 -->
-        <div class="toolbar-group">
-          <el-tooltip content="切换排序方式" placement="top">
-            <el-button
-              circle
-              size="small"
-              class="tool-btn"
-              @click="global.timeSort = !global.timeSort; updateTrack();"
-            >
-              <el-icon><Sort v-if="!global.timeSort"/><Timer v-else/></el-icon>
-            </el-button>
-          </el-tooltip>
-
-          <el-tooltip :content="showNoRemain ? '过滤无音符轨道' : '显示所有轨道'" placement="top">
-            <el-button
-              circle
-              size="small"
-              :class="['tool-btn', { 'is-active': !showNoRemain }]"
-              @click="showNoRemain = !showNoRemain"
-            >
-              <el-icon><Filter /></el-icon>
-            </el-button>
-          </el-tooltip>
-
-          <el-tooltip :content="showCurrent ? '显示完整列表' : '只看当前时机轨道'" placement="top">
-            <el-button
-              circle
-              size="small"
-              :class="['tool-btn', { 'is-active': showCurrent }]"
-              @click="showCurrent = !showCurrent"
-            >
-              <el-icon><Aim /></el-icon>
-            </el-button>
-          </el-tooltip>
-
-          <el-tooltip :content="autoScroll ? '关闭自动跟随' : '开启自动跟随'" placement="top">
-            <el-button
-              circle
-              size="small"
-              :class="['tool-btn', { 'is-active': autoScroll }]"
-              @click="autoScroll = !autoScroll"
-            >
-              <el-icon><Compass /></el-icon>
-            </el-button>
-          </el-tooltip>
+        <!-- 分组 0: 轨道管理与视图对齐 (对齐 siderWidth) -->
+        <div class="toolbar-side-aligned" :style="{ width: siderWidth + 'px' }">
+          <div class="toolbar-group">
+            <el-tooltip content="新建轨道" placement="top">
+              <el-button circle size="small" class="tool-btn" @click="newTrack">
+                <el-icon><CirclePlus /></el-icon>
+              </el-button>
+            </el-tooltip>
+            <el-tooltip content="显示所有隐藏轨道" placement="top">
+              <el-button circle size="small" class="tool-btn" @click="showAllTracks">
+                <el-icon><View /></el-icon>
+              </el-button>
+            </el-tooltip>
+            <el-tooltip content="切换排序 (时间/坐标)" placement="top">
+              <el-button circle size="small" class="tool-btn" @click="global.timeSort = !global.timeSort; updateTrack();">
+                <el-icon><Sort v-if="!global.timeSort"/><Timer v-else/></el-icon>
+              </el-button>
+            </el-tooltip>
+            <el-tooltip :content="showNoRemain ? '过滤无音符' : '显示所有'" placement="top">
+              <el-button circle size="small" :class="['tool-btn', { 'is-active': !showNoRemain }]" @click="showNoRemain = !showNoRemain">
+                <el-icon><Filter /></el-icon>
+              </el-button>
+            </el-tooltip>
+            <el-tooltip :content="showCurrent ? '全列表' : '当前时机'" placement="top">
+              <el-button circle size="small" :class="['tool-btn', { 'is-active': showCurrent }]" @click="showCurrent = !showCurrent">
+                <el-icon><Aim /></el-icon>
+              </el-button>
+            </el-tooltip>
+            <el-tooltip :content="autoScroll ? '关闭跟随' : '开启跟随'" placement="top">
+              <el-button circle size="small" :class="['tool-btn', { 'is-active': autoScroll }]" @click="autoScroll = !autoScroll">
+                <el-icon><Compass /></el-icon>
+              </el-button>
+            </el-tooltip>
+          </div>
         </div>
 
         <div class="toolbar-divider"></div>
@@ -159,7 +122,7 @@
 
         <div class="toolbar-divider"></div>
 
-        <!-- 分组 6: 系统 -->
+        <!-- 分组 6: 系统与视图 -->
         <div class="toolbar-group">
           <el-tooltip content="返回列表" placement="top">
             <el-button
@@ -189,6 +152,22 @@
             >
               <el-icon><UploadFilled /></el-icon>
               发布并返回
+            </el-button>
+          </el-tooltip>
+        </div>
+
+        <div class="toolbar-divider"></div>
+
+        <!-- 分组 7: 全局控制 (移除冗余播放按钮) -->
+        <div class="toolbar-group">
+          <el-tooltip content="全局设置" placement="top">
+            <el-button
+              circle
+              size="small"
+              class="tool-btn-glass"
+              @click="$emit('open-settings')"
+            >
+              <el-icon><Setting /></el-icon>
             </el-button>
           </el-tooltip>
         </div>
@@ -293,7 +272,7 @@
               position: 'absolute',
               pointerEvents: 'none',
               top: scrollTop + 'px',
-              left: (global.currentTime / displayAreaTime) * (global.documentWidth - 300) + 'px',
+              left: (global.currentTime / displayAreaTime) * (global.documentWidth - siderWidth) + 'px',
             }"
           ></div>
           <div
@@ -332,7 +311,8 @@ import { ref, computed, watch, defineProps, defineEmits, onMounted, inject } fro
 import { 
   Sort, Timer, Filter, Aim, Compass, CircleCheck, 
   MagicStick, Delete, EditPen, ZoomIn, CirclePlus, View, Refresh,
-  Back, Upload, UploadFilled
+  Back, Upload, UploadFilled, Setting, FullScreen, RefreshLeft,
+  ArrowLeft, ArrowRight
 } from '@element-plus/icons-vue';
 import { ElMessageBox, ElNotification } from 'element-plus';
 import TrackCard from "./TrackCard.vue";
@@ -349,10 +329,14 @@ const router = inject('router');
 
 const props = defineProps({
   chart: Object,
-  global: Object
+  global: Object,
+  siderWidth: {
+    type: Number,
+    default: 300
+  }
 });
 
-const emit = defineEmits(["currentTrack"]);
+const emit = defineEmits(["currentTrack", "open-settings", "toggle-fullscreen", "restart", "seek-delta"]);
 
 const editFinished = ref(true);
 
@@ -499,21 +483,29 @@ const rightScroll = () => {
 };
 
 const rightClick = (e) => {
-  if (e.clientX < 300) return;
+  const rightElem = document.getElementById("footer-right-scroll");
+  if (!rightElem) return;
+  const rect = rightElem.getBoundingClientRect();
+  if (e.clientX < rect.left) return;
+  
   rightClicked.value = true;
-  const x = e.clientX - 300 + scrollLeft.value;
-  const currentTime = (x / (props.global.documentWidth - 300)) * displayAreaTime.value;
+  const x = e.clientX - rect.left + scrollLeft.value;
+  const currentTime = (x / (rect.width)) * displayAreaTime.value;
   if (audio) audio.currentTime = currentTime / 1000;
   props.global.currentTime = currentTime;
   updateTrack();
 };
 
 const rightMouseMove = (e) => {
-  if (e.clientX < 300) return;
-  const x = e.clientX - 300 + scrollLeft.value;
+  const rightElem = document.getElementById("footer-right-scroll");
+  if (!rightElem) return;
+  const rect = rightElem.getBoundingClientRect();
+  if (e.clientX < rect.left) return;
+  
+  const x = e.clientX - rect.left + scrollLeft.value;
   indicatorLeft.value = x;
   if (rightClicked.value) {
-    const currentTime = (x / (props.global.documentWidth - 300)) * displayAreaTime.value;
+    const currentTime = (x / (rect.width)) * displayAreaTime.value;
     if (audio) audio.currentTime = currentTime / 1000;
     props.global.currentTime = currentTime;
     updateTrack();
@@ -604,6 +596,7 @@ onMounted(() => {
   width: 100vw; 
   position: relative; 
   overflow: hidden; 
+  --sider-width: v-bind(siderWidth + 'px');
 }
 .footer-header {
   height: 48px;
@@ -614,7 +607,7 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 16px;
+  padding: 0;
   background: rgba(20, 20, 20, 0.8);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -636,7 +629,12 @@ onMounted(() => {
   transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.footer-left { width: 300px; height: 100%; flex-shrink: 0; position: relative; }
+.footer-left { 
+  width: var(--sider-width, 300px); 
+  height: 100%; 
+  flex-shrink: 0; 
+  position: relative; 
+}
 .footer-track-container { 
   width: 100%; 
   height: 100%; 
@@ -658,7 +656,22 @@ onMounted(() => {
 .footer-right::-webkit-scrollbar { height: 6px; background: rgba(0,0,0,0.2); }
 .footer-right::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
 
-.footer-toolbar { display: flex; align-items: center; gap: 4px; }
+.footer-toolbar { 
+  display: flex; 
+  align-items: center; 
+  gap: 4px; 
+  overflow-x: auto; 
+  white-space: nowrap;
+  padding-bottom: 4px;
+}
+.footer-toolbar::-webkit-scrollbar { height: 2px; }
+.toolbar-side-aligned {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding-left: 10px; /* 微调以匹配 TrackCard 的内边距 */
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
 .toolbar-group {
   display: flex;
   align-items: center;
@@ -667,6 +680,7 @@ onMounted(() => {
   padding: 4px 8px;
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.05);
+  flex-wrap: wrap; /* 支持响应式换行 */
 }
 .toolbar-divider { width: 1px; height: 20px; background: rgba(255, 255, 255, 0.1); margin: 0 8px; }
 .tool-btn { background: transparent !important; border: none !important; color: #888 !important; transition: all 0.2s ease; }
@@ -754,5 +768,19 @@ onMounted(() => {
   font-size: 13px;
   color: #fff;
   padding: 2px 0;
+}
+.tool-btn-glass {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #aaa !important;
+  backdrop-filter: blur(5px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.tool-btn-glass:hover {
+  background: rgba(64, 158, 255, 0.2) !important;
+  border-color: rgba(64, 158, 255, 0.5) !important;
+  color: #409eff !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 </style>

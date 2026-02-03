@@ -44,6 +44,7 @@ public class ChartWebSocketHandler extends TextWebSocketHandler {
     private static final Map<Integer, Set<WebSocketSession>> rooms = new ConcurrentHashMap<>();
     private static final Map<WebSocketSession, Integer> sessionToRoom = new ConcurrentHashMap<>();
     private static final Map<WebSocketSession, String> sessionToUser = new ConcurrentHashMap<>();
+    private static final Map<WebSocketSession, String> sessionToUserId = new ConcurrentHashMap<>();
 
     // Track publishing and reset consensus
     private static final Map<Integer, PublishConsensus> pendingConsensus = new ConcurrentHashMap<>();
@@ -75,14 +76,18 @@ public class ChartWebSocketHandler extends TextWebSocketHandler {
         if (sessions == null)
             return;
 
-        List<String> users = new ArrayList<>();
+        Map<String, String> uniqueUsers = new HashMap<>(); // userId -> username
         for (WebSocketSession s : sessions) {
-            users.add(sessionToUser.getOrDefault(s, "未知"));
+            String uid = sessionToUserId.get(s);
+            String uname = sessionToUser.get(s);
+            if (uid != null && uname != null) {
+                uniqueUsers.put(uid, uname);
+            }
         }
 
         Map<String, Object> payload = new HashMap<>();
-        payload.put("count", sessions.size());
-        payload.put("users", users);
+        payload.put("count", uniqueUsers.size());
+        payload.put("users", new ArrayList<>(uniqueUsers.values()));
         broadcast(songId, "ONLINE_STATUS", payload, null, null);
     }
 
@@ -95,21 +100,25 @@ public class ChartWebSocketHandler extends TextWebSocketHandler {
         if ("JOIN".equals(msg.getType())) {
             URI uri = session.getUri();
             String username = "未知用户";
-            if (uri != null && uri.getQuery() != null) { // Simplified condition
+            String userId = UUID.randomUUID().toString(); // Default if not provided
+
+            if (uri != null && uri.getQuery() != null) {
                 String query = uri.getQuery();
                 String[] params = query.split("&");
                 for (String param : params) {
                     if (param.startsWith("username=")) {
-                        username = java.net.URLDecoder.decode(param.substring(9), "UTF-8"); // Simplified substring
-                        break;
+                        username = java.net.URLDecoder.decode(param.substring(9), "UTF-8");
+                    } else if (param.startsWith("userId=")) {
+                        userId = java.net.URLDecoder.decode(param.substring(7), "UTF-8");
                     }
                 }
             }
 
             rooms.computeIfAbsent(songId, k -> Collections.newSetFromMap(new ConcurrentHashMap<>())).add(session);
             sessionToRoom.put(session, songId);
-            sessionToUser.put(session, username); // Store user info
-            broadcastOnlineStatus(songId); // Broadcast status after join
+            sessionToUser.put(session, username);
+            sessionToUserId.put(session, userId);
+            broadcastOnlineStatus(songId);
             return;
         }
 
@@ -376,7 +385,8 @@ public class ChartWebSocketHandler extends TextWebSocketHandler {
     public void afterConnectionClosed(@org.springframework.lang.NonNull WebSocketSession session,
             @org.springframework.lang.NonNull CloseStatus status) {
         Integer songId = sessionToRoom.remove(session);
-        sessionToUser.remove(session); // Added removal of user session
+        sessionToUser.remove(session);
+        sessionToUserId.remove(session);
         if (songId != null) {
             Set<WebSocketSession> sessions = rooms.get(songId);
             if (sessions != null) {

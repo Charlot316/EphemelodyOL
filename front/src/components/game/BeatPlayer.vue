@@ -70,6 +70,40 @@
       style="display:none"
       @canplaythrough="handleAudioLoaded"
     />
+
+    <!-- Player HUD (Apple-style) -->
+    <transition name="hud-fade">
+      <div v-if="showHUD || isRunning" class="player-hud">
+        <div class="hud-content glass-hud">
+          <div class="hud-left">
+            <el-button circle class="hud-btn" @click="togglePlay">
+              <el-icon><VideoPause v-if="isRunning"/><VideoPlay v-else/></el-icon>
+            </el-button>
+            <div class="hud-time">{{ formatTime(global.currentTime) }} / {{ formatTime(chart.songLength) }}</div>
+          </div>
+          
+          <div class="hud-center">
+             <el-slider 
+               v-model="global.currentTime" 
+               :max="chart.songLength" 
+               :format-tooltip="formatTime"
+               @change="seek(global.currentTime)"
+             />
+          </div>
+
+          <div class="hud-right">
+             <el-tooltip content="重置" placement="top">
+               <el-button circle class="hud-btn-small" @click="reStart">
+                 <el-icon><RefreshLeft /></el-icon>
+               </el-button>
+             </el-tooltip>
+             <el-button circle class="hud-btn-main" @click="$emit('toggle-fullscreen')">
+               <el-icon><FullScreen v-if="!isFullscreen"/><Close v-else/></el-icon>
+             </el-button>
+          </div>
+        </div>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -85,6 +119,7 @@ import {
   defineEmits,
   defineExpose
 } from 'vue';
+import { VideoPause, VideoPlay, RefreshLeft, FullScreen, Close } from '@element-plus/icons-vue';
 import Track from "./Track.vue";
 
 const props = defineProps({
@@ -112,6 +147,10 @@ const props = defineProps({
     type: String,
     default: 'beat-player'
   },
+  isFullscreen: {
+    type: Boolean,
+    default: false
+  },
   // 外部控制时间（主要用于编辑器滑动）
   externalTime: {
     type: Number,
@@ -130,13 +169,15 @@ const emit = defineEmits([
   'add-count',
   'time-update',
   'track-click',
-  'finished'
+  'finished',
+  'toggle-fullscreen'
 ]);
 
 const audioRef = ref(null);
 const imagePath = ref([]);
 const isRunning = ref(false);
 const imageLoadedCount = ref(0);
+const showHUD = ref(true);
 
 // 使用外部传入的 global
 const global = props.global;
@@ -202,6 +243,17 @@ const getBackgroundUrl = (op) => {
     if (asset) return normalizeUrl(asset.url);
   }
   return normalizeUrl(op.background);
+};
+
+const formatTime = (ms) => {
+  const totalSeconds = Math.floor(ms / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+};
+
+const togglePlay = () => {
+  isRunning.value ? pause() : play();
 };
 
 // 方法
@@ -498,5 +550,93 @@ defineExpose({
 
 .selected-track-overlay {
   pointer-events: none;
+}
+
+/* HUD Styles */
+.player-hud {
+  position: absolute;
+  bottom: 30px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.hud-content {
+  pointer-events: auto;
+  width: 90%;
+  max-width: 800px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 0 20px;
+  border-radius: 30px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+}
+
+.glass-hud {
+  background: rgba(30, 30, 30, 0.6);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.hud-left, .hud-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.hud-center {
+  flex-grow: 1;
+}
+
+.hud-time {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: #ccc;
+  min-width: 100px;
+}
+
+.hud-btn {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: none !important;
+  color: #fff !important;
+  width: 44px;
+  height: 44px;
+  font-size: 20px;
+}
+
+.hud-btn:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+  transform: scale(1.05);
+}
+
+.hud-btn-main {
+  background: #409eff !important;
+  color: #fff !important;
+  border: none !important;
+  width: 44px;
+  height: 44px;
+}
+
+.hud-btn-small {
+  background: transparent !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+  color: #888 !important;
+  width: 32px;
+  height: 32px;
+}
+.hud-btn-small:hover { color: #fff !important; border-color: #fff !important; }
+
+.hud-fade-enter-active, .hud-fade-leave-active {
+  transition: opacity 0.3s, transform 0.3s;
+}
+.hud-fade-enter-from, .hud-fade-leave-to {
+  opacity: 0;
+  transform: translateY(20px);
 }
 </style>
