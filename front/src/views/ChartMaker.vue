@@ -24,7 +24,7 @@
       <!-- 2. 预览区 -->
       <main 
         class="panel-preview glass-panel" 
-        :style="{ gridRow: 1, width: `calc(100% - ${siderWidth}px)` }"
+        :style="{ gridRow: 1, width: '100%' }"
       >
         
         <div class="player-wrapper">
