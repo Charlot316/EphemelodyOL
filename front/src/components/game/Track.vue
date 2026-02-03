@@ -174,6 +174,7 @@ const setHeightAndTop = () => {
 
 const paintNote = (note) => {
   const painter = myglobal.notePainter;
+  if (!painter) return;
   const currentTime = myglobal.currentTime;
   const yValue =
     ((myglobal.finalY / myglobal.remainingTime) * currentTime -
