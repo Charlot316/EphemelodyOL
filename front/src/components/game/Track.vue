@@ -163,7 +163,8 @@ const getRGB = () => {
 };
 
 const setHeightAndTop = () => {
-  let k = myglobal.finalY / animationTime;
+  const finalY = (myglobal.finalY !== undefined) ? myglobal.finalY : 0.8;
+  let k = finalY / animationTime;
   if (myglobal.currentTime < myTrack.startTiming + animationTime) {
     top.value = finalHeight.value - (k * myglobal.currentTime - k * myTrack.startTiming) * myglobal.screenHeight;
   } else if (myglobal.currentTime > myTrack.endTiming - animationTime) {
