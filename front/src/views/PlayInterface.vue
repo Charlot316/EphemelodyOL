@@ -120,6 +120,10 @@ const score = computed(() => {
 });
 
 const calculateScore = () => {
+  if (!chart.value.notesCount) {
+     global.score = 0;
+     return;
+  }
   let singleScore = 10000000 / chart.value.notesCount;
   global.score = Math.floor(
     global.pureCount * singleScore +
@@ -137,11 +141,17 @@ const resize = () => {
   }
 };
 
-const sortTrack = () => {
   if (chart.value.tracks) {
     chart.value.tracks.sort((a, b) => a.startTiming - b.startTiming);
+    
+    // Calculate notes count manually to ensure accuracy for scoring
+    let count = 0;
+    chart.value.tracks.forEach(t => {
+      if (t.notes) count += t.notes.length;
+    });
+    chart.value.notesCount = count;
+    console.log('[PlayInterface] Calculated notesCount:', count);
   }
-};
 
 const getChart = async () => {
   try {
@@ -219,6 +229,14 @@ const handleFinished = () => {
 const audioLoaded = (audioEl) => {
   console.log('[PlayInterface] Audio loaded');
   audio.value = audioEl;
+  
+  if (!chart.value.songLength && audioEl.duration) {
+    chart.value.songLength = audioEl.duration * 1000;
+    console.log('[PlayInterface] Updated songLength from audio:', chart.value.songLength);
+  } else {
+    console.log('[PlayInterface] Using chart songLength:', chart.value.songLength);
+  }
+
   loadingStatus.audio = true;
   checkIfLoaded();
 };
