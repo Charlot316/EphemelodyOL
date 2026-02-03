@@ -1,81 +1,126 @@
 <template>
   <div class="footer-container">
     <div class="footer-header">
-      <div class="footer-header-left">
-        <el-button
-          type="text"
-          class="show-button"
-          style="margin-right:5px;"
-          @click="
-            global.timeSort = !global.timeSort;
-            updateTrack();
-          "
-        >{{ global.timeSort ? "改为坐标排序" : "改为时间排序" }}</el-button>
-        <el-button
-          type="text"
-          class="show-button"
-          style="margin-right:5px;"
-          @click="showNoRemain = !showNoRemain"
-        >{{ showNoRemain ? "关闭无音符轨道" : "显示无音符轨道" }}</el-button>
-        <el-button
-          type="text"
-          class="show-button"
-          style="margin-right:5px;"
-          @click="showCurrent = !showCurrent"
-        >{{ showCurrent ? "显示全部轨道" : "显示当前轨道" }}</el-button>
-        <el-button
-          type="text"
-          class="show-button"
-          style="margin-right:5px;"
-          @click="autoScroll = !autoScroll"
-        >{{ autoScroll ? "关闭滚动" : "开启滚动" }}</el-button>
-        <el-button
-          type="text"
-          class="show-button"
-          style="margin-right:5px;"
-          @click="showReal = !showReal"
-        >{{ showReal ? "关闭实轨" : "显示实轨" }}</el-button>
-        <el-button
-          type="text"
-          class="show-button"
-          style="margin-right:5px;"
-          @click="showFake = !showFake"
-        >{{ showFake ? "关闭虚轨" : "显示虚轨" }}</el-button>
+      <div class="footer-toolbar">
+        <!-- 分组 1: 视图与排序 -->
+        <div class="toolbar-group">
+          <el-tooltip content="切换排序方式" placement="top">
+            <el-button
+              circle
+              size="small"
+              class="tool-btn"
+              @click="global.timeSort = !global.timeSort; updateTrack();"
+            >
+              <el-icon><Sort v-if="!global.timeSort"/><Timer v-else/></el-icon>
+            </el-button>
+          </el-tooltip>
 
-        <el-button
-          type="text"
-          :class="currentNoteType == 0 ? 'show-button-selected' : 'show-button'"
-          style="margin-right:5px;"
-          @click="currentNoteType = 0"
-        >双击短键</el-button>
-        <el-button
-          type="text"
-          :class="currentNoteType == 1 ? 'show-button-selected' : 'show-button'"
-          style="margin-right:5px;"
-          @click="currentNoteType = 1"
-        >双击长键</el-button>
-        <el-button
-          type="text"
-          :class="currentNoteType == 2 ? 'show-button-selected' : 'show-button'"
-          style="margin-right:5px;"
-          @click="currentNoteType = 2"
-        >双击滑键</el-button>
-        <el-button
-          type="text"
-          :class="currentNoteType == 3 ? 'delete-button' : 'show-button'"
-          style="margin-right:5px;"
-          @click="currentNoteType = 3"
-        >单击删除</el-button>
-        <el-button
-          type="text"
-          class="show-button"
-          style="margin-right:5px;"
-          @click="enableEdit = !enableEdit"
-        >{{ enableEdit ? "禁用编辑弹窗" : "开启编辑弹窗" }}</el-button>
+          <el-tooltip :content="showNoRemain ? '过滤无音符轨道' : '显示所有轨道'" placement="top">
+            <el-button
+              circle
+              size="small"
+              :class="['tool-btn', { 'is-active': !showNoRemain }]"
+              @click="showNoRemain = !showNoRemain"
+            >
+              <el-icon><Filter /></el-icon>
+            </el-button>
+          </el-tooltip>
+
+          <el-tooltip :content="showCurrent ? '显示完整列表' : '只看当前时机轨道'" placement="top">
+            <el-button
+              circle
+              size="small"
+              :class="['tool-btn', { 'is-active': showCurrent }]"
+              @click="showCurrent = !showCurrent"
+            >
+              <el-icon><Aim /></el-icon>
+            </el-button>
+          </el-tooltip>
+
+          <el-tooltip :content="autoScroll ? '关闭自动跟随' : '开启自动跟随'" placement="top">
+            <el-button
+              circle
+              size="small"
+              :class="['tool-btn', { 'is-active': autoScroll }]"
+              @click="autoScroll = !autoScroll"
+            >
+              <el-icon><Compass /></el-icon>
+            </el-button>
+          </el-tooltip>
+        </div>
+
+        <div class="toolbar-divider"></div>
+
+        <!-- 分组 2: 轨道类型过滤 -->
+        <div class="toolbar-group">
+          <el-button
+            size="small"
+            class="toggle-btn"
+            :class="{ 'is-active': showReal }"
+            @click="showReal = !showReal"
+          >
+            <el-icon><CircleCheck /></el-icon>实轨
+          </el-button>
+          <el-button
+            size="small"
+            class="toggle-btn"
+            :class="{ 'is-active': showFake }"
+            @click="showFake = !showFake"
+          >
+            <el-icon><MagicStick /></el-icon>虚轨
+          </el-button>
+        </div>
+
+        <div class="toolbar-divider"></div>
+
+        <!-- 分组 3: 点击行为设置 -->
+        <div class="toolbar-group mode-selector">
+          <el-button
+            v-for="(label, idx) in ['短键', '长键', '滑键']"
+            :key="idx"
+            size="small"
+            :class="['mode-btn', { 'is-selected': currentNoteType == idx }]"
+            @click="currentNoteType = idx"
+          >
+            <span class="mode-dot" :class="'mode-' + idx"></span>
+            {{ label }}
+          </el-button>
+          <el-button
+            size="small"
+            class="delete-mode-btn"
+            :class="{ 'is-selected': currentNoteType == 3 }"
+            @click="currentNoteType = 3"
+          >
+            <el-icon><Delete /></el-icon>
+          </el-button>
+        </div>
+
+        <div class="toolbar-divider"></div>
+
+        <!-- 分组 4: 杂项 -->
+        <div class="toolbar-group">
+          <el-button
+            size="small"
+            class="tool-btn-rect"
+            :class="{ 'is-warning': !enableEdit }"
+            @click="enableEdit = !enableEdit"
+          >
+            <el-icon><EditPen /></el-icon>
+            {{ enableEdit ? '编辑弹窗:开' : '编辑弹窗:关' }}
+          </el-button>
+        </div>
       </div>
+
       <div class="footer-header-right">
+        <div class="time-display-wrapper">
+          <span class="current-time">{{ Math.floor(global.currentTime) }}</span>
+          <span class="time-separator">/</span>
+          <span class="total-time">{{ Math.floor(chart.songLength) }}</span>
+          <span class="unit">ms</span>
+        </div>
+        <div class="toolbar-divider"></div>
         <div class="custom-slider-container">
-          <label>预览范围</label>
+          <el-icon><ZoomIn /></el-icon>
           <input 
             type="range" 
             v-model.number="displayAreaTime" 
@@ -94,24 +139,17 @@
           @scroll="leftScroll"
         >
           <transition-group
-            name="flip-list"
+            name="list"
             enter-active-class="animate__animated animate__fadeInUp"
             leave-active-class="animate__animated animate__fadeOutUp"
           >
-            <div v-for="track in chart.tracks" :key="track.index">
-              <transition
-                name="flip-list"
-                enter-active-class="animate__animated animate__fadeInUp"
-                leave-active-class="animate__animated animate__fadeOutUp"
-              >
-                <TrackCard
-                  v-if="isVisible(track)"
-                  :chart="chart"
-                  :track="track"
-                  :global="global"
-                  @currentTrack="handleCurrentTrack"
-                />
-              </transition>
+            <div v-for="track in displayTracks.filter(isVisible)" :key="track.index">
+              <TrackCard
+                :chart="chart"
+                :track="track"
+                :global="global"
+                @currentTrack="handleCurrentTrack"
+              />
             </div>
           </transition-group>
         </div>
@@ -128,6 +166,7 @@
       >
         <div
           class="beat-line-wrapper-absolute"
+          :style="{ top: scrollTop + 'px' }"
         >
           <BeatLine
             :chart="chart"
@@ -137,29 +176,22 @@
         </div>
         <div style="position:absolute;left:0;top:0;">
           <transition-group
-            name="flip-list"
+            name="list"
             enter-active-class="animate__animated animate__fadeInUp"
             leave-active-class="animate__animated animate__fadeOutUp"
           >
-            <div v-for="track in chart.tracks" :key="track.index">
-              <transition
-                name="flip-list"
-                enter-active-class="animate__animated animate__fadeInUp"
-                leave-active-class="animate__animated animate__fadeOutUp"
-              >
-                <TrackCardPanel
-                  v-if="isVisible(track)"
-                  :currentNoteType="currentNoteType"
-                  :id="'trackCardPanel' + track.index"
-                  :chart="chart"
-                  :track="track"
-                  :global="global"
-                  :scrollLeft="scrollLeft"
-                  :displayAreaTime="displayAreaTime"
-                  :enableEdit="enableEdit"
-                  @currentTrack="handleCurrentTrack"
-                />
-              </transition>
+            <div v-for="track in displayTracks.filter(isVisible)" :key="track.index">
+              <TrackCardPanel
+                :currentNoteType="currentNoteType"
+                :id="'trackCardPanel' + track.index"
+                :chart="chart"
+                :track="track"
+                :global="global"
+                :scrollLeft="scrollLeft"
+                :displayAreaTime="displayAreaTime"
+                :enableEdit="enableEdit"
+                @currentTrack="handleCurrentTrack"
+              />
             </div>
           </transition-group>
         </div>
@@ -196,7 +228,11 @@
 </template>
 
 <script setup>
-import { ref, watch, defineProps, defineEmits, onMounted } from 'vue';
+import { ref, computed, watch, defineProps, defineEmits, onMounted } from 'vue';
+import { 
+  Sort, Timer, Filter, Aim, Compass, CircleCheck, 
+  MagicStick, Delete, EditPen, ZoomIn 
+} from '@element-plus/icons-vue';
 import TrackCard from "./TrackCard.vue";
 import TrackCardPanel from "./TrackCardPanel.vue";
 import BeatLine from "./BeatLine.vue";
@@ -235,16 +271,20 @@ const handleCurrentTrack = (param) => {
 };
 
 const leftScroll = () => {
-  if (!rightScrollElement) rightScrollElement = document.getElementById("footer-right-scroll");
-  if (rightScrollElement) rightScrollElement.scrollTop = document.getElementById("footer-left-scroll").scrollTop;
+  const leftElem = document.getElementById("footer-left-scroll");
+  const rightElem = document.getElementById("footer-right-scroll");
+  if (leftElem && rightElem) {
+    rightElem.scrollTop = leftElem.scrollTop;
+  }
 };
 
 const rightScroll = () => {
-  if (!rightScrollElement) rightScrollElement = document.getElementById("footer-right-scroll");
-  if (rightScrollElement) {
-    document.getElementById("footer-left-scroll").scrollTop = rightScrollElement.scrollTop;
-    scrollLeft.value = rightScrollElement.scrollLeft;
-    scrollTop.value = rightScrollElement.scrollTop;
+  const leftElem = document.getElementById("footer-left-scroll");
+  const rightElem = document.getElementById("footer-right-scroll");
+  if (rightElem) {
+    if (leftElem) leftElem.scrollTop = rightElem.scrollTop;
+    scrollLeft.value = rightElem.scrollLeft;
+    scrollTop.value = rightElem.scrollTop;
   }
 };
 
@@ -267,10 +307,29 @@ const rightMouseMove = (e) => {
   }
 };
 
+const displayTracks = computed(() => {
+  if (!props.chart.tracks) return [];
+  const tracks = [...props.chart.tracks];
+  if (props.global.timeSort) {
+    tracks.sort((a, b) => a.startTiming - b.startTiming);
+  } else {
+    tracks.sort((a, b) => a.positionX - b.positionX);
+  }
+  return tracks;
+});
+
 const isVisible = (track) => {
+  // If hidden via the eye icon, always hide
+  if (track.showInTimeline === false) return false;
+  
   const showByNote = !showNoRemain.value ? (track.notes.length > 0) : true;
   const showByType = track.type === 1 ? showReal.value : showFake.value;
-  const showByTime = showCurrent.value ? (props.global.currentTime >= track.startTiming && props.global.currentTime <= track.endTiming) : true;
+  
+  // Only show relevant tracks if 'Show Current Only' is active
+  const showByTime = showCurrent.value 
+    ? (props.global.currentTime >= track.startTiming && props.global.currentTime <= track.endTiming) 
+    : true;
+    
   return showByType && showByNote && showByTime;
 };
 
@@ -294,10 +353,13 @@ watch(() => props.global.currentTime, (newVal) => {
   if (autoScroll.value) {
     const tracks = props.chart.tracks;
     for (let i = 0; i < tracks.length; i++) {
-      if (newVal >= tracks[i].startTiming && newVal <= tracks[i].endTiming) {
-        document.querySelector("#trackCardPanel" + tracks[i].index)?.scrollIntoView({ behavior: "auto" });
-        break;
-      }
+        const trackElem = document.querySelector("#trackCardPanel" + tracks[i].index);
+        if (trackElem) {
+          trackElem.scrollIntoView({ 
+            behavior: "smooth",
+            block: "center"
+          });
+        }
     }
   }
 });
@@ -311,15 +373,167 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.footer-container { height: 100%; width: 100vw; position: relative; }
-.footer-header { height: 35px; padding-bottom: 5px; width: 100vw; position: absolute; top: 0px; left: 0px; display: flex; justify-content: space-between; align-items: center; }
-.footer-left { height: calc(100% - 35px); width: 300px; position: absolute; top: 35px; left: 0px; }
-.footer-track-container { width: 100%; height: 100%; border-right: 1px solid rgba(255,255,255,0.1); background: rgb(32, 32, 32); overflow: auto; padding-top: 0px; }
-.footer-right { height: calc(100% - 35px); width: calc(100vw - 300px); background: rgb(32, 32, 32); position: absolute; top: 35px; left: 300px; overflow: auto; padding-top: 0px; }
-.footer-track-container::-webkit-scrollbar { width: 0 !important; }
-.footer-header-left { padding-left: 25px; min-width: 900px; }
+.footer-container { 
+  height: 100%; 
+  width: 100vw; 
+  position: relative; 
+  overflow: hidden; /* Added to prevent child scroll-into-view from bubbling */
+}
+.footer-header {
+  height: 48px;
+  width: 100vw;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 16px;
+  background: rgba(20, 20, 20, 0.8);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  z-index: 100;
+}
 
-.custom-slider-container { display: flex; align-items: center; gap: 10px; color: #aaa; font-size: 12px; }
+.footer-left { height: calc(100% - 48px); width: 300px; position: absolute; top: 48px; left: 0px; }
+.footer-track-container { 
+  width: 100%; 
+  height: 100%; 
+  border-right: 1px solid rgba(255, 255, 255, 0.05); 
+  background: rgb(32, 32, 32); 
+  overflow-y: auto; 
+  overflow-x: hidden;
+}
+.footer-track-container::-webkit-scrollbar { width: 0 !important; }
+
+.footer-right { 
+  height: calc(100% - 48px); 
+  width: calc(100vw - 300px); 
+  background: rgb(25, 25, 25); 
+  position: absolute; 
+  top: 48px; 
+  left: 300px; 
+  overflow: auto; 
+  padding-top: 0px;
+  z-index: 10; 
+}
+.footer-right::-webkit-scrollbar { height: 6px; background: rgba(0,0,0,0.2); }
+.footer-right::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+
+.footer-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 4px 8px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.toolbar-divider {
+  width: 1px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 0 8px;
+}
+
+.tool-btn {
+  background: transparent !important;
+  border: none !important;
+  color: #888 !important;
+  transition: all 0.2s ease;
+}
+
+.tool-btn:hover { color: #fff !important; transform: scale(1.1); }
+.tool-btn.is-active { color: var(--accent-cyan, #00f3ff) !important; text-shadow: 0 0 8px rgba(0, 243, 255, 0.5); }
+
+.toggle-btn {
+  background: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #999 !important;
+  border-radius: 6px !important;
+  padding: 4px 10px !important;
+}
+
+.toggle-btn.is-active {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #fff !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.mode-selector { padding: 3px !important; }
+.mode-btn {
+  background: transparent !important;
+  border: none !important;
+  color: #777 !important;
+  font-weight: 600 !important;
+}
+
+.mode-btn.is-selected { color: #fff !important; }
+
+.mode-dot { width: 6px; height: 6px; border-radius: 50%; margin-right: 6px; }
+.mode-0 { background: #409eff; box-shadow: 0 0 5px #409eff; }
+.mode-1 { background: #f5b041; box-shadow: 0 0 5px #f5b041; }
+.mode-2 { background: #ec7063; box-shadow: 0 0 5px #ec7063; }
+
+.delete-mode-btn { background: transparent !important; border: none !important; color: #777 !important; }
+.delete-mode-btn.is-selected { color: #f56c6c !important; }
+
+.tool-btn-rect {
+  background: rgba(103, 194, 58, 0.1) !important;
+  border: 1px solid rgba(103, 194, 58, 0.2) !important;
+  color: #67c23a !important;
+}
+
+.tool-btn-rect.is-warning {
+  background: rgba(230, 162, 60, 0.1) !important;
+  border: 1px solid rgba(230, 162, 60, 0.2) !important;
+  color: #e6a23c !important;
+}
+
+.footer-header-right { 
+  margin-left: auto; 
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.time-display-wrapper {
+  display: flex;
+  align-items: baseline;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  font-family: 'Inter', monospace;
+}
+.current-time {
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  min-width: 50px;
+  text-align: right;
+}
+.time-separator {
+  color: rgba(255, 255, 255, 0.3);
+  margin: 0 4px;
+}
+.total-time {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 13px;
+}
+.unit {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.2);
+  margin-left: 4px;
+  text-transform: uppercase;
+}
+.custom-slider-container { color: #888; display: flex; align-items: center; gap: 12px; }
 .custom-range { appearance: none; background: rgba(255,255,255,0.1); height: 4px; border-radius: 2px; outline: none; width: 120px; }
 .custom-range::-webkit-slider-thumb { appearance: none; width: 12px; height: 12px; background: #67c23a; border-radius: 50%; cursor: pointer; }
 .show-button-selected { color: #67c23a; }
@@ -338,5 +552,13 @@ onMounted(() => {
   width: 100%;
   z-index: 5;
   pointer-events: none;
+}
+
+.animate__animated {
+  --animate-duration: 0.2s;
+}
+
+.list-move {
+  transition: transform 0.2s ease;
 }
 </style>

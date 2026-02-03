@@ -282,14 +282,13 @@
         :style="footerStyle"
       >
         <div
-          style="height:15px;width:100%;cursor:ns-resize;text-align: center;padding-top:5px;font-size: 15px;"
+          class="footer-resizer-bar"
           id="footer-resizer"
           @mousedown="canDrag = true"
         >
-          <span style="color:rgb(200,200,200)">{{ Math.floor(global.currentTime) }}</span>
-          <span style="color:rgb(150,150,150)">/{{ Math.floor(chart.songLength) }}</span>
+          <div class="drag-handle"></div>
         </div>
-        <div style="height:calc(100% - 20px);width:100%;">
+        <div class="footer-component-wrapper">
           <Footer
             :chart="chart"
             :global="global"
@@ -573,7 +572,7 @@ onBeforeUnmount(() => {
   height: 100vh;
   width: 100vw;
   background: rgb(55, 55, 55);
-  overflow: auto;
+  overflow: hidden; /* Changed from auto to prevent layout breakdown */
 }
 .select {
   user-select: none;
@@ -664,7 +663,7 @@ onBeforeUnmount(() => {
   left: 600px;
   top: 50px;
   width: calc(100vw - 600px);
-  height: calc(var(--documentHeight) - 120px - var(--footerHeight));
+  height: calc(var(--documentHeight) - 80px - var(--footerHeight));
 }
 .container-big {
   left: 0px;
@@ -714,4 +713,31 @@ onBeforeUnmount(() => {
 
 :deep(.el-slider__bar) { background-color: rgb(138, 138, 138); }
 :deep(.el-slider__button) { border: 2px solid rgb(138, 138, 138); }
+
+.footer-resizer-bar {
+  height: 8px;
+  width: 100%;
+  cursor: ns-resize;
+  background: rgba(255, 255, 255, 0.02);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background 0.2s;
+}
+.footer-resizer-bar:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+.drag-handle {
+  width: 40px;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.2);
+}
+.footer-resizer-bar:hover .drag-handle {
+  background: rgba(255, 255, 255, 0.5);
+}
+.footer-component-wrapper {
+  height: calc(100% - 8px);
+  width: 100%;
+}
 </style>

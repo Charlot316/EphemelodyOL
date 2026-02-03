@@ -12,93 +12,102 @@
     <el-popover
       v-model:visible="edit"
       placement="top"
-      :width="300"
+      :width="320"
       trigger="manual"
+      popper-class="note-editor-popover"
     >
-      <div style="text-align:right;">
-        <el-button
-          type="text"
-          class="cancel-button"
-          @click="edit = false"
+      <div class="note-edit-container">
+        <div class="note-edit-header">
+          <span class="edit-title">编辑音符</span>
+          <div class="header-actions">
+            <el-button
+              circle
+              size="small"
+              class="action-btn delete"
+              @click="deleteNote"
+              title="删除音符"
+            >
+              <el-icon><Delete /></el-icon>
+            </el-button>
+            <el-button
+              circle
+              size="small"
+              class="action-btn cancel"
+              @click="edit = false"
+              title="取消更改"
+            >
+              <el-icon><CircleClose /></el-icon>
+            </el-button>
+            <el-button
+              circle
+              size="small"
+              class="action-btn save"
+              @click="saveNote"
+              title="保存音符"
+            >
+              <el-icon><CircleCheck /></el-icon>
+            </el-button>
+          </div>
+        </div>
+
+        <el-form
+          :model="tempNote"
+          :rules="rules"
+          ref="formRef"
+          label-position="left"
+          @submit.prevent="saveNote"
+          class="note-edit-form"
         >
-          <el-icon><CircleClose /></el-icon>
-        </el-button>
-        <el-button
-          type="text"
-          class="ok-button"
-          @click="saveNote"
-        >
-          <el-icon><CircleCheck /></el-icon>
-        </el-button>
-        <el-button
-          type="text"
-          class="delete-button"
-          @click="deleteNote"
-        >
-          <el-icon><Delete /></el-icon>
-        </el-button>
+          <el-form-item label="音符类别" prop="noteType">
+            <el-radio-group
+              v-model="tempNote.noteType"
+              size="small"
+              class="custom-radio-group"
+            >
+              <el-radio-button :label="0">短键</el-radio-button>
+              <el-radio-button :label="1">长键</el-radio-button>
+              <el-radio-button :label="2">滑键</el-radio-button>
+            </el-radio-group>
+          </el-form-item>
+
+          <el-form-item label="对应按键" prop="key">
+            <div class="input-with-tip">
+              <el-input
+                :disabled="track.type == 1"
+                @keydown.enter="saveNote"
+                v-model="tempNote.key"
+                placeholder="A-Z"
+                class="custom-input small-input"
+              />
+              <el-tooltip content="设置音符触发的按键" placement="top">
+                <el-icon class="input-tip"><QuestionFilled /></el-icon>
+              </el-tooltip>
+            </div>
+          </el-form-item>
+
+          <el-form-item label="触发时机" prop="timing">
+            <el-input-number
+              v-model="tempNote.timing"
+              :controls="false"
+              class="custom-input-number"
+            />
+            <span class="unit-text">ms</span>
+          </el-form-item>
+
+          <el-form-item
+            label="结束时机"
+            prop="endTiming"
+            v-if="tempNote.noteType == 1"
+          >
+            <el-input-number
+              v-model="tempNote.endTiming"
+              :controls="false"
+              class="custom-input-number"
+            />
+            <span class="unit-text">ms</span>
+          </el-form-item>
+        </el-form>
       </div>
-      <el-form
-        :model="tempNote"
-        :rules="rules"
-        ref="formRef"
-        @submit.prevent="saveNote"
-      >
-        <el-form-item label="音符类别" label-width="80px" prop="noteType">
-          <el-radio-group
-            v-model="tempNote.noteType"
-            size="small"
-            style="width:130px;line-height: 20px;"
-          >
-            <el-radio :label="0">短键</el-radio>
-            <el-radio :label="1">长键</el-radio>
-            <el-radio :label="2">滑键</el-radio>
-          </el-radio-group>
-          <el-tooltip
-            class="item"
-            effect="dark"
-            content="设置音符的类别"
-            placement="top-start"
-          >
-             <el-icon style="margin-left: 10px;"><QuestionFilled /></el-icon>
-          </el-tooltip>
-        </el-form-item>
-        <el-form-item label="按键" label-width="80px" prop="key">
-          <el-input
-            :disabled="track.type == 1"
-            @keydown.enter="saveNote"
-            v-model="tempNote.key"
-            style="width:130px"
-          />
-          <el-tooltip
-            class="item"
-            effect="dark"
-            content="设置音符的按键"
-            placement="top-start"
-          >
-             <el-icon style="margin-left: 10px;"><QuestionFilled /></el-icon>
-          </el-tooltip>
-        </el-form-item>
-        <el-form-item label="时机" label-width="80px" prop="timing">
-          <el-input
-            @keydown.enter="saveNote"
-            v-model="tempNote.timing"
-            style="width:130px"
-          />
-        </el-form-item>
-        <el-form-item
-          label="结束时机"
-          label-width="80px"
-          prop="endTiming"
-          v-if="tempNote.noteType == 1"
-        >
-          <el-input
-            @keydown.enter="saveNote"
-            v-model="tempNote.endTiming"
-            style="width:130px"
-          />
-        </el-form-item>
-      </el-form>
       <template #reference>
         <div>
           <div v-if="note.noteType == 0">
@@ -346,3 +355,118 @@ onMounted(() => {
   updateTemp();
 });
 </script>
+
+<style scoped>
+.note-edit-container {
+  color: #fff;
+}
+
+.note-edit-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.edit-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.action-btn {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #fff !important;
+}
+
+.action-btn:hover {
+  transform: translateY(-2px);
+}
+
+.action-btn.delete:hover { border-color: #f56c6c !important; color: #f56c6c !important; }
+.action-btn.cancel:hover { border-color: #909399 !important; color: #909399 !important; }
+.action-btn.save:hover { border-color: #67c23a !important; color: #67c23a !important; }
+
+.note-edit-form :deep(.el-form-item__label) {
+  color: rgba(255, 255, 255, 0.7) !important;
+  font-size: 13px;
+}
+
+.custom-radio-group :deep(.el-radio-button__inner) {
+  background: rgba(0, 0, 0, 0.2) !important;
+  color: #888 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.custom-radio-group :deep(.el-radio-button__original-radio:checked + .el-radio-button__inner) {
+  background: var(--accent-cyan, #00f3ff) !important;
+  color: #000 !important;
+  border-color: var(--accent-cyan, #00f3ff) !important;
+}
+
+.custom-input :deep(.el-input__wrapper) {
+  background: rgba(0, 0, 0, 0.2) !important;
+  box-shadow: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.custom-input :deep(.el-input__inner) {
+  color: #fff !important;
+  text-align: center;
+}
+
+.small-input {
+  width: 100px;
+}
+
+.custom-input-number {
+  width: 120px;
+}
+
+.custom-input-number :deep(.el-input__wrapper) {
+  background: rgba(0, 0, 0, 0.2) !important;
+  box-shadow: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.custom-input-number :deep(.el-input__inner) {
+  color: #fff !important;
+  text-align: left;
+}
+
+.unit-text {
+  margin-left: 8px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.input-tip {
+  color: rgba(255, 255, 255, 0.3);
+  cursor: help;
+}
+</style>
+
+<style>
+/* Global popover styling for glass effect */
+.note-editor-popover {
+  background: rgba(25, 25, 25, 0.85) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+  padding: 16px !important;
+}
+
+.note-editor-popover .el-popper__arrow::before {
+  background: rgba(25, 25, 25, 0.85) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+</style>

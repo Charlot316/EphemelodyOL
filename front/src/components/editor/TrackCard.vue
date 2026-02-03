@@ -113,7 +113,7 @@
 
 <script setup>
 import { ref, reactive, computed, defineProps, defineEmits, onMounted } from 'vue';
-import { Setting, CircleClose, CircleCheck, Delete, QuestionFilled, Minus, View } from '@element-plus/icons-vue';
+import { Setting, CircleClose, CircleCheck, Delete, QuestionFilled, Minus, View, Hide } from '@element-plus/icons-vue';
 import { ElMessageBox, ElNotification } from 'element-plus';
 import trackImage from '@/assets/img/EpheTrack.jpg';
 
@@ -246,8 +246,8 @@ const deleteTrack = () => {
 };
 
 onMounted(() => {
-  if (props.track.isNew) {
-     props.track.showInTimeline = true;
+  if (props.track.showInTimeline === undefined) {
+    props.track.showInTimeline = true;
   }
   // Initialize tempTrack to avoid empty inputs before first edit
   Object.assign(tempTrack, JSON.parse(JSON.stringify(props.track)));
