@@ -9,11 +9,11 @@
         <img
           class="img1"
           :src="
-            $store.state.user.icon
+            $store.state.user && $store.state.user.icon
               ? $store.state.user.icon
               : require('@/assets/img/user.jpg')
           "
-          onerror="onerror=null;src='https://img0.baidu.com/it/u=3730772664,138405132&fm=26&fmt=auto'"
+          @error="handleImageError"
         />
       </div>
     </div>
@@ -33,7 +33,12 @@ export default {
     },
   },
   created() {},
-  methods: {},
+  created() {},
+  methods: {
+    handleImageError(e) {
+      e.target.src = 'https://img0.baidu.com/it/u=3730772664,138405132&fm=26&fmt=auto';
+    }
+  },
   watch: {},
 };
 </script>

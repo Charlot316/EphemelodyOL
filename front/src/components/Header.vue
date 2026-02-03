@@ -83,27 +83,24 @@ export default {
 .header-container {
   padding: 15px 40px;
   width: 100%;
-  height: 100px; /* Explicit height (70 + 15 + 15) */
   box-sizing: border-box;
-  position: relative;
-  z-index: 100;
   flex-shrink: 0;
+  z-index: 1000;
+  position: relative;
 }
 
 .header-content {
   height: 70px;
+  min-height: 70px;
   padding: 0 30px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  align-items: center;
-  align-items: center;
   border-radius: 20px;
-  background: rgba(30, 30, 30, 0.8);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: #1e1e1e;
   border: 1px solid rgba(255,255,255,0.1);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  width: 100%;
 }
 
 .header-logo {
