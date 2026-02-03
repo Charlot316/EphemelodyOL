@@ -6,10 +6,10 @@
     </div>
     <div v-for="(op, index) in chart.changeBackgroundOperations" :key="index">
       <img
-        :src="normalizeUrl(op.background)"
+        :src="getBackgroundUrl(op)"
         v-show="
           global.currentTime >= op.startTime &&
-          global.currentTime <= (op.endTime || 0)
+          (op.endTime === null || op.endTime === undefined || global.currentTime <= op.endTime)
         "
         class="background-image background-overlay"
         alt="op-bg"
@@ -186,14 +186,22 @@ const selectedTrackOverlayStyle = computed(() => {
 // URL 规格化：处理旧谱面中的硬编码域名
 const normalizeUrl = (url) => {
   if (!url) return "";
+  if (url.startsWith("http://localhost:8080")) {
+      return url.replace("http://localhost:8080", "http://localhost:8090");
+  }
   if (url.includes("pic.mcatk.com")) {
-    // 将旧域名替换为当前后端的访问地址
-    // 假设后端直接映射了文件名到根目录或特定路径
     const fileName = url.split('/').pop();
-    // 这里使用相对路径或拼接当前的后端 baseURL
     return "http://localhost:8090/" + fileName;
   }
   return url;
+};
+
+const getBackgroundUrl = (op) => {
+  if (op.assetId && props.chart.assets) {
+    const asset = props.chart.assets.find(a => a.id === op.assetId);
+    if (asset) return normalizeUrl(asset.url);
+  }
+  return normalizeUrl(op.background);
 };
 
 // 方法

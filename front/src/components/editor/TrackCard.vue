@@ -45,9 +45,6 @@
                 <CircleCheck class="svg-icon" />
               </button>
               
-              <button class="icon-btn delete" @click.stop="deleteTrack" title="删除">
-                <Delete class="svg-icon" />
-              </button>
             </div>
           </div>
           <div class="timing-info">
@@ -232,18 +229,6 @@ const saveTrack = () => {
   updateTrack();
 };
 
-const deleteTrack = () => {
-  ElMessageBox.confirm("您确定删除该轨道?", "提示", {
-    confirmButtonText: "确定",
-    cancelButtonText: "取消",
-    type: "warning",
-  }).then(() => {
-    if (props.track.isNew) emit("editStatus", true);
-    props.chart.tracks.splice(props.track.index, 1);
-    updateTrack();
-    ElNotification({ title: "成功", message: "删除成功", type: "success" });
-  }).catch(() => {});
-};
 
 onMounted(() => {
   if (props.track.showInTimeline === undefined) {

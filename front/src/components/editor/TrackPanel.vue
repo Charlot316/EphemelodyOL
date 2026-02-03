@@ -163,9 +163,9 @@ watch(() => props.global.currentTime, (newVal) => {
   padding: 0% 5%;
   height: 100%;
 }
-.plus-button { color: #67c23a; }
-.plus-button:hover { color: #95d475; }
-.plus-button:active { color: #529b2e; }
+.plus-button { color: #888; }
+.plus-button:hover { color: #fff; }
+.plus-button:active { color: #aaa; }
 
 .flip-list-move { transition: transform 1s; }
 

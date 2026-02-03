@@ -13,7 +13,7 @@
           :on-success="handleUploadSuccess"
           :with-credentials="true"
         >
-          <el-button type="primary" size="small" circle>
+          <el-button size="small" circle class="upload-btn-header">
             <el-icon><Plus /></el-icon>
           </el-button>
         </el-upload>
@@ -47,7 +47,10 @@
           </div>
         </div>
         <div class="asset-info">
-          <span class="asset-name">{{ asset.name }}</span>
+          <span class="asset-name">
+            <el-tag v-if="asset.name === 'Cover'" size="small" type="info" class="cover-tag">封面</el-tag>
+            {{ asset.name }}
+          </span>
         </div>
       </div>
     </div>
@@ -98,7 +101,9 @@ const onDragStart = (event, asset) => {
   event.dataTransfer.setData('application/json', JSON.stringify({
     type: 'background-asset',
     url: asset.url,
-    name: asset.name
+    id: asset.id,
+    name: asset.name,
+    isCover: asset.name === 'Cover'
   }));
 };
 </script>
@@ -130,6 +135,17 @@ const onDragStart = (event, asset) => {
 .title-section h4 {
   margin: 0;
   font-size: 14px;
+}
+
+.upload-btn-header {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #aaa !important;
+}
+
+.upload-btn-header:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #fff !important;
 }
 
 .assets-grid {
@@ -200,10 +216,22 @@ const onDragStart = (event, asset) => {
 .asset-name {
   font-size: 11px;
   color: #888;
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 4px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.cover-tag {
+  height: 16px;
+  line-height: 14px;
+  padding: 0 4px;
+  font-size: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #ccc;
 }
 
 .empty-state {

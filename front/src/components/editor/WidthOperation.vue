@@ -1,6 +1,7 @@
 <template>
   <div
     @click="selfClicked"
+    @contextmenu.prevent.stop="openDeleteMenu"
     :style="{
       position: 'absolute',
       top: '20px',
@@ -9,6 +10,16 @@
     }"
     @mousedown="setZIndex"
   >
+    <!-- Delete Context Menu -->
+    <div
+      v-if="deleteMenuVisible"
+      class="delete-context-menu"
+      :style="{ left: '10px', top: '10px' }"
+      @mousedown.stop
+    >
+      <div class="delete-menu-item" @click="deleteOperation">删除</div>
+    </div>
+
     <el-popover
       v-model:visible="edit"
       placement="top"
@@ -270,7 +281,13 @@ watch(() => props.global.mouseUp, () => {
   canMove.value = false;
   leftMove.value = false;
   rightMove.value = false;
+  deleteMenuVisible.value = false;
 });
+
+const deleteMenuVisible = ref(false);
+const openDeleteMenu = () => {
+  deleteMenuVisible.value = true;
+};
 
 watch(() => props.global.mouseMove, () => {
   if (canMove.value) {
@@ -298,3 +315,31 @@ onMounted(() => {
   updateTemp();
 });
 </script>
+
+<style scoped>
+.delete-context-menu {
+  position: absolute;
+  z-index: 9999;
+  background: rgba(40, 40, 40, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  padding: 4px;
+  min-width: 60px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+.delete-menu-item {
+  padding: 4px 8px;
+  cursor: pointer;
+  color: #eee;
+  font-size: 12px;
+  border-radius: 2px;
+  text-align: center;
+}
+
+.delete-menu-item:hover {
+  background: rgba(245, 108, 108, 0.8);
+  color: white;
+}
+</style>

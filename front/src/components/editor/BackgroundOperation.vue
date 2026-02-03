@@ -40,6 +40,11 @@
           <input type="number" v-model.number="tempOperation.startTime" class="custom-input" @keydown.enter="saveOperation" />
         </div>
 
+        <div class="form-item half">
+          <label>结束时机 (可选)</label>
+          <input type="number" v-model.number="tempOperation.endTime" class="custom-input" placeholder="留空则持续至下一个" @keydown.enter="saveOperation" />
+        </div>
+
         <div class="form-item full">
           <label>背景 URL</label>
           <input type="text" v-model="tempOperation.background" class="custom-input" @keydown.enter="saveOperation" />
@@ -137,6 +142,7 @@ const saveOperation = () => {
   
   updateOperation();
   emit("editStatus", true);
+  if (tempOperation.endTime === "") tempOperation.endTime = null;
   Object.assign(props.operation, tempOperation);
   props.operation.edit = false;
   props.operation.isNew = false;

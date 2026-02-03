@@ -89,7 +89,7 @@
             size="small"
             class="delete-mode-btn"
             :class="{ 'is-selected': currentNoteType == 3 }"
-            @click="currentNoteType = 3"
+            @click="switchToDeleteMode"
           >
             <el-icon><Delete /></el-icon>
           </el-button>
@@ -249,6 +249,7 @@ import {
   Sort, Timer, Filter, Aim, Compass, CircleCheck, 
   MagicStick, Delete, EditPen, ZoomIn 
 } from '@element-plus/icons-vue';
+import { ElMessageBox, ElNotification } from 'element-plus';
 import TrackCard from "./TrackCard.vue";
 import TrackCardPanel from "./TrackCardPanel.vue";
 import BackgroundTimeline from "./BackgroundTimeline.vue";
@@ -261,6 +262,34 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["currentTrack"]);
+
+const switchToDeleteMode = () => {
+  if (currentNoteType.value === 3) {
+      // Already in delete mode, click again to exit (optional, or just do nothing)
+      return; 
+  }
+  ElMessageBox.confirm(
+    '进入快捷删除模式后，点击音符或操作将直接删除（无确认）。确定要继续吗？',
+    '警告',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
+  )
+    .then(() => {
+      currentNoteType.value = 3;
+      ElNotification({
+        title: '快捷删除模式开启',
+        message: '点击实体即可删除',
+        type: 'warning',
+        duration: 2000
+      });
+    })
+    .catch(() => {
+      // cancel
+    });
+};
 
 const scrollLeft = ref(0);
 const scrollTop = ref(0);
@@ -353,6 +382,13 @@ const isVisible = (track) => {
     : true;
   return showByType && showByNote && showByTime;
 };
+
+watch(scrollLeft, (newVal) => {
+  const rightElem = document.getElementById("footer-right-scroll");
+  if (rightElem && Math.abs(rightElem.scrollLeft - newVal) > 1) {
+    rightElem.scrollLeft = newVal;
+  }
+});
 
 watch(() => props.global.currentTime, (newVal) => {
   if (autoScroll.value) {

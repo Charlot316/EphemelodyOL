@@ -48,20 +48,27 @@ export function useChartEditor(route, router) {
     chart.changeBackgroundOperations.sort((a, b) => a.startTime - b.startTime);
 
     // 2. Fill EndTime (Legacy Migration)
+    // ONLY fill if endTime is missing. If it's already set, respect it (it might be a gap).
     for (let i = 0; i < chart.changeBackgroundOperations.length; i++) {
       const current = chart.changeBackgroundOperations[i];
       const next = chart.changeBackgroundOperations[i + 1];
       
-      if (next) {
-        current.endTime = next.startTime;
-      } else {
-        // Last one ends at song length or far in future if unknown
-        current.endTime = chart.songLength || (current.startTime + 5000);
+      if (current.endTime === null || current.endTime === undefined || current.endTime === 0) {
+        if (next) {
+          current.endTime = next.startTime;
+        } else {
+          // Last one ends at song length or far in future if unknown
+          current.endTime = chart.songLength || (current.startTime + 5000);
+        }
       }
     }
 
     // 3. Merging/Cleanup Logic: Remove if background equals default
-    // We do this AFTER calculating endTimes so the gap remains correct
+    // BUT we must preserve the endTime of the previous op to maintain the gap
+    // Actually, if we remove an op, it's better to NOT remove it but just let it be,
+    // OR if we remove it, ensure the one before it doesn't stay stretched.
+    // Given the user wants to see the asset management working, we should probably
+    // avoid aggressive cleaning here.
     if (chart.defaultBackground) {
       chart.changeBackgroundOperations = chart.changeBackgroundOperations.filter(op => {
         // Normalizing URLs might be needed, but simple string compare for now

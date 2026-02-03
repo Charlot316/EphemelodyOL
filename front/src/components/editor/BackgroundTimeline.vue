@@ -37,9 +37,9 @@
             class="bg-segment"
             :style="{
               left: (op.startTime / displayAreaTime) * (global.documentWidth - 300) + 'px',
-              width: ((op.endTime - op.startTime) / displayAreaTime) * (global.documentWidth - 300) + 'px'
+              width: (( (op.endTime || (op.startTime + 2000)) - op.startTime) / displayAreaTime) * (global.documentWidth - 300) + 'px'
             }"
-            @mousedown="startDragOp($event, op)"
+            @mousedown.stop="props.global.currentNoteType === 3 ? deleteOp(index) : startDragOp($event, op)"
           >
             <img :src="op.background" alt="bg" />
             <div class="segment-info">{{ op.startTime }}ms</div>
@@ -54,7 +54,7 @@
 </template>
 
 <script setup>
-import { ref, defineProps, defineEmits } from 'vue';
+import { ref, defineProps, defineEmits, watch } from 'vue';
 import { Picture, ArrowDown, ArrowUp, Delete } from '@element-plus/icons-vue';
 import { ElNotification } from 'element-plus';
 
@@ -75,6 +75,13 @@ const toggleCollapse = () => {
   emit('toggle-collapse', isCollapsed.value);
 };
 
+// Synchronize prop scrollLeft to element
+watch(() => props.scrollLeft, (newVal) => {
+  if (scrollRef.value && scrollRef.value.scrollLeft !== newVal) {
+    scrollRef.value.scrollLeft = newVal;
+  }
+});
+
 const handleScroll = (e) => {
   emit('update:scrollLeft', e.target.scrollLeft);
 };
@@ -83,16 +90,44 @@ const handleDrop = (e) => {
   try {
     const data = JSON.parse(e.dataTransfer.getData('application/json'));
     if (data.type === 'background-asset') {
+      if (data.isCover) {
+        ElNotification({
+          title: '操作受限',
+          message: '这是封面图片，不能作为背景图使用。请上传或选择专门的背景素材。',
+          type: 'warning',
+          duration: 3000
+        });
+        return;
+      }
       const rect = e.currentTarget.getBoundingClientRect();
       const x = e.clientX - rect.left + scrollRef.value.scrollLeft;
       const startTime = Math.round((x / (props.global.documentWidth - 300)) * props.displayAreaTime);
       
+      // Calculate End Time: try to give it 2000ms duration
+      const proposedEndTime = startTime + 2000;
+      let endTime = proposedEndTime;
+
+      // Find next operation to avoid overlap if needed, or clamp endTime
+      const nextOp = props.chart.changeBackgroundOperations
+          .filter(op => op.startTime > startTime)
+          .sort((a, b) => a.startTime - b.startTime)[0];
+          
+      if (nextOp && endTime > nextOp.startTime) {
+          endTime = nextOp.startTime;
+          // User rule: endTime cannot be greater than next image starttime.
+          // User rule: default give 1s duration. 
+          // If available space < 1s, we take what is available.
+      }
+
       // Add new background operation
       props.chart.changeBackgroundOperations.push({
         startTime: startTime,
+        endTime: endTime,
         background: data.url,
+        assetId: data.id,
         edit: false
       });
+      props.chart.changeBackgroundOperations.sort((a,b) => a.startTime - b.startTime);
       
       // Trigger migration to update endTimes
       // Note: we might need to emit an event or access a global method
