@@ -119,21 +119,9 @@ const score = computed(() => {
   else return "00000000";
 });
 
-const calculateScore = () => {
-  if (!chart.value.notesCount) {
-     global.score = 0;
-     return;
-  }
-  let singleScore = 10000000 / chart.value.notesCount;
-  global.score = Math.floor(
-    global.pureCount * singleScore +
-      global.farCount * 0.5 * singleScore
-  );
-  if (global.score > 10000000) global.score = 10000000;
-};
+// 移除旧的分数计算逻辑，改为在 addCount 中实时累加
+// 这样可以确保按照个别 note 的分值（包含余数处理）进行计算
 
-watch(() => global.pureCount, calculateScore);
-watch(() => global.farCount, calculateScore);
 
 const resize = () => {
   if (playRef.value) {
@@ -278,12 +266,34 @@ const startMusic = () => {
 };
 
 const addCount = (param) => {
-  global[param.key] += 1;
-  if (param.type === "lost") {
-    global.combo = 0;
-  } else {
-    global.combo++;
-    global.maxCombo = Math.max(global.maxCombo, global.combo);
+  // 注意：global[param.key]、global.combo 和 global.maxCombo 已经在 BeatPlayer.vue 中更新过了
+  // 因为它们共享同一个 reactive global 对象，所以这里不需要再手动自增，否则会导致双倍计数
+  
+  const notesCount = chart.value.notesCount;
+  if (!notesCount) return;
+
+  const baseScore = Math.floor(10000000 / notesCount);
+  const remainder = 10000000 % notesCount;
+
+  // 计算当前是第几个判定到的 note (BeatPlayer 已经自增过了，所以第一次判定时总数就是 1)
+  const totalJudged = global.pureCount + global.farCount + global.lostCount;
+
+  // 按照要求：第一个 note 获得余数，之后平分
+  let noteValue = baseScore;
+  if (totalJudged === 1) {
+    noteValue += remainder;
+  }
+
+  // 计算得分：Pure 100%, Far 50%, Lost 0%
+  if (param.type === "pure") {
+    global.score += noteValue;
+  } else if (param.type === "far") {
+    global.score += Math.floor(noteValue * 0.5);
+  }
+  
+  // 如果是 last note，可以做一次最终校准（虽然理论上已经准确）
+  if (totalJudged === notesCount && global.score > 10000000) {
+    global.score = 10000000;
   }
 };
 
