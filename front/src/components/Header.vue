@@ -97,10 +97,12 @@ export default {
   justify-content: space-between;
   align-items: center;
   border-radius: 20px;
-  background: #1e1e1e;
+  background: rgba(30, 30, 30, 0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255,255,255,0.1);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-  width: 100%;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  width: 100%; /* Ensure content takes full width */
 }
 
 .header-logo {
