@@ -192,10 +192,7 @@
           id="footer-right-scroll"
           @scroll="rightScroll"
           @mousemove="rightMouseMove($event)"
-          @mousedown="
-            rightClick($event);
-            rightClicked = true;
-          "
+          @mousedown="rightClick($event)"
         >
           <div
             class="beat-line-wrapper-absolute"
@@ -264,7 +261,10 @@
         :global="global"
         :displayAreaTime="displayAreaTime"
         v-model:scrollLeft="scrollLeft"
+        :indicatorLeft="indicatorLeft"
         @toggle-collapse="bgCollapsed = $event"
+        @mousemove="rightMouseMove($event)"
+        @mousedown="rightClick($event)"
       />
     </div>
   </div>
@@ -428,6 +428,8 @@ const rightScroll = () => {
 };
 
 const rightClick = (e) => {
+  if (e.clientX < 300) return;
+  rightClicked.value = true;
   const x = e.clientX - 300 + scrollLeft.value;
   const currentTime = (x / (props.global.documentWidth - 300)) * displayAreaTime.value;
   if (audio) audio.currentTime = currentTime / 1000;
@@ -436,6 +438,7 @@ const rightClick = (e) => {
 };
 
 const rightMouseMove = (e) => {
+  if (e.clientX < 300) return;
   const x = e.clientX - 300 + scrollLeft.value;
   indicatorLeft.value = x;
   if (rightClicked.value) {

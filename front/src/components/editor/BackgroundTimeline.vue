@@ -57,6 +57,35 @@
               <el-icon class="delete-icon" @click.stop="deleteOp(index)"><Delete /></el-icon>
             </div>
           </div>
+
+          <!-- Time Indicators -->
+          <div
+            class="time-indicater"
+            :style="{
+              width: '1px',
+              background: 'rgb(255,255,0)',
+              height: '100%',
+              position: 'absolute',
+              pointerEvents: 'none',
+              top: '0px',
+              left: (global.currentTime / displayAreaTime) * (global.documentWidth - 300) + 'px',
+              zIndex: 30
+            }"
+          ></div>
+          <div
+            class="time-indicater-false"
+            :style="{
+              width: '1px',
+              background: 'rgb(255,255,255)',
+              height: '100%',
+              position: 'absolute',
+              pointerEvents: 'none',
+              top: '0px',
+              left: indicatorLeft + 'px',
+              zIndex: 30
+            }"
+          ></div>
+
         </div>
       </div>
     </div>
@@ -73,7 +102,8 @@ const props = defineProps({
   chart: Object,
   global: Object,
   displayAreaTime: Number,
-  scrollLeft: Number
+  scrollLeft: Number,
+  indicatorLeft: Number
 });
 
 const emit = defineEmits(['update:scrollLeft', 'toggle-collapse']);
