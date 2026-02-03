@@ -320,21 +320,18 @@ const {
   sortTrack,
   getChart,
   saveChart,
-  onAudioLoaded
+  onAudioLoaded,
+  onlineUsers,
+  onlineCount,
+  resetChart,
+  syncAction
 } = useChartEditor(route, router);
-
-const { send: sendSocket, isConnected } = useWebSocket(route.query.id);
-
-const syncAction = (action, payload) => {
-  if (isConnected.value) {
-    sendSocket(action, payload);
-  } else {
-    ElNotification({ title: '未连接', message: '实时同步不可用，请检查网络连接', type: 'warning' });
-  }
-};
 
 provide('syncAction', syncAction);
 provide('uuid', uuidv4);
+provide('onlineUsers', onlineUsers);
+provide('onlineCount', onlineCount);
+provide('resetChart', resetChart);
 
 const global = reactive({
   currentTime: 0,
