@@ -234,7 +234,6 @@ const setZIndex = () => {
 };
 
 const snapPoints = ref([]);
-const dragBounds = ref({ min: -Infinity, max: Infinity });
 
 const collectSnapPoints = (currentOp) => {
   const points = [];
@@ -284,16 +283,14 @@ const getSnappedTime = (time, points) => {
   return bestTime;
 };
 
-const calculateBounds = (op) => {
-  const sorted = [...props.track.changeWidthOperations].sort((a,b) => a.startTime - b.startTime);
-  const idx = sorted.indexOf(op);
-  let min = props.track.startTiming;
-  let max = props.track.endTiming;
-  
-  if (idx > 0) min = sorted[idx - 1].endTime;
-  if (idx > -1 && idx < sorted.length - 1) max = sorted[idx + 1].startTime;
-  
-  return { min, max };
+const checkOverlap = (start, end, exclude) => {
+  if (props.track.changeWidthOperations) {
+    for (const op of props.track.changeWidthOperations) {
+      if (op === exclude) continue;
+      if (start < op.endTime && end > op.startTime) return true;
+    }
+  }
+  return false;
 };
 
 const longOperationCanMove = () => {
@@ -303,7 +300,6 @@ const longOperationCanMove = () => {
   dragEndTiming.value = props.operation.endTime;
   
   snapPoints.value = collectSnapPoints(props.operation);
-  dragBounds.value = calculateBounds(props.operation);
 };
 
 const startLeftMove = () => {
@@ -313,8 +309,6 @@ const startLeftMove = () => {
   dragEndTiming.value = props.operation.endTime;
   
   snapPoints.value = collectSnapPoints(props.operation);
-  const bounds = calculateBounds(props.operation);
-  dragBounds.value = { min: bounds.min, max: props.operation.endTime - 20 };
 };
 
 const startRightMove = () => {
@@ -324,8 +318,6 @@ const startRightMove = () => {
   dragEndTiming.value = props.operation.endTime;
   
   snapPoints.value = collectSnapPoints(props.operation);
-  const bounds = calculateBounds(props.operation);
-  dragBounds.value = { min: props.operation.startTime + 20, max: bounds.max };
 };
 
 watch(() => props.global.mouseMove, () => {
@@ -339,19 +331,21 @@ watch(() => props.global.mouseMove, () => {
     newStart = getSnappedTime(newStart, snapPoints.value);
     let newEnd = newStart + duration;
     
-    if (newStart < dragBounds.value.min) {
-      newStart = dragBounds.value.min;
+    if (newStart < props.track.startTiming) {
+      newStart = props.track.startTiming;
       newEnd = newStart + duration;
     }
-    if (newEnd > dragBounds.value.max) {
-      newEnd = dragBounds.value.max;
+    if (newEnd > props.track.endTiming) {
+      newEnd = props.track.endTiming;
       newStart = newEnd - duration;
     }
-    if (newStart < dragBounds.value.min) newStart = dragBounds.value.min;
+
+    if (!checkOverlap(newStart, newEnd, props.operation)) {
+      props.operation.startTime = newStart;
+      props.operation.endTime = newEnd;
+      updateTemp();
+    }
     
-    props.operation.startTime = newStart;
-    props.operation.endTime = newStart + duration;
-    updateTemp();
   } else if (leftMove.value) {
     const deltaX = props.global.clientX - dragStartX.value;
     const deltaTime = Math.round((deltaX / (props.global.documentWidth - 300)) * props.displayAreaTime);
@@ -359,11 +353,14 @@ watch(() => props.global.mouseMove, () => {
     let newStart = dragStartTiming.value + deltaTime;
     newStart = getSnappedTime(newStart, snapPoints.value);
     
-    if (newStart < dragBounds.value.min) newStart = dragBounds.value.min;
-    if (newStart > dragBounds.value.max) newStart = dragBounds.value.max;
+    if (newStart < props.track.startTiming) newStart = props.track.startTiming;
+    if (newStart > props.operation.endTime - 20) newStart = props.operation.endTime - 20;
     
-    props.operation.startTime = newStart;
-    updateTemp();
+    if (!checkOverlap(newStart, props.operation.endTime, props.operation)) {
+      props.operation.startTime = newStart;
+      updateTemp();
+    }
+    
   } else if (rightMove.value) {
     const deltaX = props.global.clientX - dragStartX.value;
     const deltaTime = Math.round((deltaX / (props.global.documentWidth - 300)) * props.displayAreaTime);
@@ -371,11 +368,13 @@ watch(() => props.global.mouseMove, () => {
     let newEnd = dragEndTiming.value + deltaTime;
     newEnd = getSnappedTime(newEnd, snapPoints.value);
     
-    if (newEnd > dragBounds.value.max) newEnd = dragBounds.value.max;
-    if (newEnd < dragBounds.value.min) newEnd = dragBounds.value.min;
+    if (newEnd > props.track.endTiming) newEnd = props.track.endTiming;
+    if (newEnd < props.operation.startTime + 20) newEnd = props.operation.startTime + 20;
     
-    props.operation.endTime = newEnd;
-    updateTemp();
+    if (!checkOverlap(props.operation.startTime, newEnd, props.operation)) {
+      props.operation.endTime = newEnd;
+      updateTemp();
+    }
   }
 });
 

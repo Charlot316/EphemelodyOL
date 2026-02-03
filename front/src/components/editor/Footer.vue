@@ -457,7 +457,8 @@ const handleWheel = (e) => {
     // Chrome: pinch out -> deltaY negative (zoom in).
     // Let's assume negative deltaY means ZOOM IN (smaller displayAreaTime).
     
-    const zoomFactor = 1 + (e.deltaY * 0.001);
+    // Sensitivity increased from 0.001 to 0.005
+    const zoomFactor = 1 + (e.deltaY * 0.005);
     let newTime = displayAreaTime.value * zoomFactor;
     
     // Constraints

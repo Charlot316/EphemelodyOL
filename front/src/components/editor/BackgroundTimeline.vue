@@ -181,6 +181,18 @@ const getSnappedTime = (time, points, threshold = 100) => { // 100ms visual equi
   return bestTime;
 };
 
+const checkOverlap = (start, end, excludeOp) => {
+  for (const op of props.chart.changeBackgroundOperations) {
+    if (op === excludeOp) continue;
+    const opEnd = op.endTime || (op.startTime + 2000);
+    // Strict overlap check
+    if (start < opEnd && end > op.startTime) {
+      return true;
+    }
+  }
+  return false;
+};
+
 // Dragging Handlers
 const startDragOp = (e, op) => {
   draggingOp.value = op;
@@ -190,17 +202,6 @@ const startDragOp = (e, op) => {
   dragStartEndTime.value = op.endTime || (op.startTime + 2000);
   
   snapPoints.value = collectSnapPoints(op);
-  
-  // Calculate Bounds
-  const sorted = [...props.chart.changeBackgroundOperations].sort((a,b) => a.startTime - b.startTime);
-  const idx = sorted.indexOf(op);
-  const prev = idx > 0 ? sorted[idx - 1] : null;
-  const next = idx < sorted.length - 1 ? sorted[idx + 1] : null;
-  
-  dragBounds.value = {
-    min: prev ? prev.endTime : 0,
-    max: next ? next.startTime : props.chart.songLength
-  };
 };
 
 const startResizeLeft = (e, op) => {
@@ -211,15 +212,6 @@ const startResizeLeft = (e, op) => {
   dragStartEndTime.value = op.endTime || (op.startTime + 2000);
   
   snapPoints.value = collectSnapPoints(op);
-  
-  const sorted = [...props.chart.changeBackgroundOperations].sort((a,b) => a.startTime - b.startTime);
-  const idx = sorted.indexOf(op);
-  const prev = idx > 0 ? sorted[idx - 1] : null;
-
-  dragBounds.value = {
-    min: prev ? prev.endTime : 0,
-    max: op.endTime // Cannot pass its own end time
-  };
 };
 
 const startResizeRight = (e, op) => {
@@ -230,15 +222,6 @@ const startResizeRight = (e, op) => {
   dragStartEndTime.value = op.endTime || (op.startTime + 2000);
   
   snapPoints.value = collectSnapPoints(op);
-  
-  const sorted = [...props.chart.changeBackgroundOperations].sort((a,b) => a.startTime - b.startTime);
-  const idx = sorted.indexOf(op);
-  const next = idx < sorted.length - 1 ? sorted[idx + 1] : null;
-
-  dragBounds.value = {
-    min: op.startTime, // Cannot pass start
-    max: next ? next.startTime : props.chart.songLength
-  };
 };
 
 watch(() => props.global.mouseMove, () => {
@@ -250,47 +233,40 @@ watch(() => props.global.mouseMove, () => {
       const duration = dragStartEndTime.value - dragStartStartTime.value;
       let newStart = dragStartStartTime.value + deltaTime;
       
+      if (newStart < 0) newStart = 0;
       // Snap Start
       newStart = getSnappedTime(newStart, snapPoints.value);
-      // Snap End? Usually snap the edge we are most "aware" of, or both.
-      // Let's try snapping start first. If that doesn't snap, maybe snap end?
-      // Priorities: Start Snap > End Snap.
-      
       let newEnd = newStart + duration;
       
-      // Bounds Check
-      if (newStart < dragBounds.value.min) {
-        newStart = dragBounds.value.min;
-        newEnd = newStart + duration;
+      // Check overlap
+      if (!checkOverlap(newStart, newEnd, draggingOp.value)) {
+        draggingOp.value.startTime = newStart;
+        draggingOp.value.endTime = newEnd;
       }
-      if (newEnd > dragBounds.value.max) {
-        newEnd = dragBounds.value.max;
-        newStart = newEnd - duration;
-      }
-      
-      // Re-verify start min bound in case end bound pushed it back
-      if (newStart < dragBounds.value.min) newStart = dragBounds.value.min;
-
-      draggingOp.value.startTime = newStart;
-      draggingOp.value.endTime = newStart + duration;
       
     } else if (dragType.value === 'left') {
       let newStart = dragStartStartTime.value + deltaTime;
       newStart = getSnappedTime(newStart, snapPoints.value);
       
-      if (newStart < dragBounds.value.min) newStart = dragBounds.value.min;
-      if (newStart > dragBounds.value.max - 100) newStart = dragBounds.value.max - 100; // Min duration 100ms?
+      if (newStart < 0) newStart = 0;
+      // Min duration check
+      if (newStart >= draggingOp.value.endTime - 100) newStart = draggingOp.value.endTime - 100;
       
-      draggingOp.value.startTime = newStart;
+      if (!checkOverlap(newStart, draggingOp.value.endTime, draggingOp.value)) {
+        draggingOp.value.startTime = newStart;
+      }
       
     } else if (dragType.value === 'right') {
       let newEnd = dragStartEndTime.value + deltaTime;
       newEnd = getSnappedTime(newEnd, snapPoints.value);
       
-      if (newEnd > dragBounds.value.max) newEnd = dragBounds.value.max;
-      if (newEnd < dragBounds.value.min + 100) newEnd = dragBounds.value.min + 100;
+      // Min duration check
+      if (newEnd <= draggingOp.value.startTime + 100) newEnd = draggingOp.value.startTime + 100;
+      if (newEnd > props.chart.songLength) newEnd = props.chart.songLength;
 
-      draggingOp.value.endTime = newEnd;
+      if (!checkOverlap(draggingOp.value.startTime, newEnd, draggingOp.value)) {
+        draggingOp.value.endTime = newEnd;
+      }
     }
   }
 });

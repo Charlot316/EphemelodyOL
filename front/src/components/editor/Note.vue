@@ -282,7 +282,6 @@ const dragStartX = ref(0);
 const dragStartTiming = ref(0);
 const dragEndTiming = ref(0);
 const snapPoints = ref([]);
-const dragBounds = ref({ min: -Infinity, max: Infinity });
 
 const collectSnapPoints = (currentNote) => {
   const points = [];
@@ -353,33 +352,14 @@ const getSnappedTime = (time, points) => {
   return bestTime;
 };
 
-const calculateBounds = (note) => {
-  // Find prev/next notes on THIS track to avoid overlap
-  // Sort notes on this track
-  const sorted = [...props.track.notes].sort((a,b) => a.timing - b.timing);
-  const idx = sorted.indexOf(note);
-  
-  let min = props.track.startTiming;
-  let max = props.track.endTiming;
-  
-  if (idx > 0) {
-    const prev = sorted[idx - 1];
-    // Min gap 100ms
-    min = prev.endTiming + 100;
-  } else {
-    // Check track start
-    min = props.track.startTiming;
+const checkOverlap = (start, end, exclude) => {
+  for (const n of props.track.notes) {
+    if (n === exclude) continue;
+    // Check if collision with 100ms buffer
+    // Overlap condition: start < other.end + 100 AND end > other.start - 100
+    if (start < n.endTiming + 100 && end > n.timing - 100) return true;
   }
-  
-  if (idx > -1 && idx < sorted.length - 1) {
-    const next = sorted[idx + 1];
-    // Min gap 100ms
-    max = next.timing - 100;
-  } else {
-    max = props.track.endTiming;
-  }
-  
-  return { min, max };
+  return false;
 };
 
 const longNoteCanMove = () => {
@@ -389,7 +369,6 @@ const longNoteCanMove = () => {
   dragEndTiming.value = props.note.endTiming;
   
   snapPoints.value = collectSnapPoints(props.note);
-  dragBounds.value = calculateBounds(props.note);
 };
 
 const startLeftMove = () => {
@@ -399,18 +378,6 @@ const startLeftMove = () => {
   dragEndTiming.value = props.note.endTiming;
   
   snapPoints.value = collectSnapPoints(props.note);
-  // For left resize, min is bounded by prev note + 100.
-  // Max is bounded by current END time (minus 100ms min length?).
-  // Actually min length for long note logic? Usually > 0.
-  // Constraint from user: "Min time gap 100ms between notes".
-  // Does current note have min length? 
-  // Let's assume min length 50ms for safety.
-  
-  const bounds = calculateBounds(props.note);
-  dragBounds.value = {
-    min: bounds.min,
-    max: props.note.endTiming - 50 
-  };
 };
 
 const startRightMove = () => {
@@ -420,12 +387,6 @@ const startRightMove = () => {
   dragEndTiming.value = props.note.endTiming;
   
   snapPoints.value = collectSnapPoints(props.note);
-  
-  const bounds = calculateBounds(props.note);
-  dragBounds.value = {
-    min: props.note.timing + 50,
-    max: bounds.max
-  };
 };
 
 const startEdit = () => {
@@ -505,22 +466,21 @@ watch(() => props.global.mouseMove, () => {
     newStart = getSnappedTime(newStart, snapPoints.value);
     let newEnd = newStart + duration;
     
-    // Bounds Check
-    if (newStart < dragBounds.value.min) {
-      newStart = dragBounds.value.min;
-      newEnd = newStart + duration;
+    if (newStart < props.track.startTiming) {
+       newStart = props.track.startTiming;
+       newEnd = newStart + duration;
     }
-    if (newEnd > dragBounds.value.max) {
-      newEnd = dragBounds.value.max;
-      newStart = newEnd - duration;
+    if (newEnd > props.track.endTiming) {
+       newEnd = props.track.endTiming;
+       newStart = newEnd - duration;
+       if (newStart < props.track.startTiming) newStart = props.track.startTiming;
     }
     
-    // Double check start bound
-    if (newStart < dragBounds.value.min) newStart = dragBounds.value.min;
-    
-    props.note.timing = newStart;
-    props.note.endTiming = newStart + duration;
-    updateTemp();
+    if (!checkOverlap(newStart, newEnd, props.note)) {
+      props.note.timing = newStart;
+      props.note.endTiming = newEnd;
+      updateTemp();
+    }
     
   } else if (leftMove.value) {
     const deltaX = props.global.clientX - dragStartX.value;
@@ -529,23 +489,28 @@ watch(() => props.global.mouseMove, () => {
     let newStart = dragStartTiming.value + deltaTime;
     newStart = getSnappedTime(newStart, snapPoints.value);
     
-    if (newStart < dragBounds.value.min) newStart = dragBounds.value.min;
-    if (newStart > dragBounds.value.max) newStart = dragBounds.value.max;
+    if (newStart < props.track.startTiming) newStart = props.track.startTiming;
+    if (newStart >= props.note.endTiming - 50) newStart = props.note.endTiming - 50; 
     
-    props.note.timing = newStart;
-    updateTemp();
+    if (!checkOverlap(newStart, props.note.endTiming, props.note)) {
+      props.note.timing = newStart;
+      updateTemp();
+    }
     
   } else if (rightMove.value) {
     const deltaX = props.global.clientX - dragStartX.value;
     const deltaTime = Math.round((deltaX / (props.global.documentWidth - 300)) * props.displayAreaTime);
     
-    let newEnd = roundTime(dragEndTiming.value + deltaTime);
-    // Boundary checks
-    if (newEnd < dragStartTiming.value + 100) newEnd = dragStartTiming.value + 100;
-    if (newEnd > props.track.endTiming) newEnd = props.track.endTiming;
+    let newEnd = dragEndTiming.value + deltaTime;
+    newEnd = getSnappedTime(newEnd, snapPoints.value);
     
-    props.note.endTiming = newEnd;
-    updateTemp();
+    if (newEnd > props.track.endTiming) newEnd = props.track.endTiming;
+    if (newEnd <= props.note.timing + 50) newEnd = props.note.timing + 50;
+    
+    if (!checkOverlap(props.note.timing, newEnd, props.note)) {
+      props.note.endTiming = newEnd;
+      updateTemp();
+    }
   }
 });
 
