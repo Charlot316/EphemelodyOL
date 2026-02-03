@@ -208,6 +208,8 @@ const rightMove = ref(false);
 const passedTime = ref(0);
 const formRef = ref(null);
 const tempNote = reactive({});
+const hasDragged = ref(false);
+const mouseDownX = ref(0);
 
 const checkKey = (rule, value, callback) => {
   if (!value) return callback(new Error("按键不能为空"));
@@ -362,6 +364,8 @@ const checkOverlap = (start, end, exclude) => {
 const longNoteCanMove = () => {
   if (props.note.isPending || props.note.isDeleting) return;
   canMove.value = true;
+  hasDragged.value = false;
+  mouseDownX.value = props.global.clientX;
   dragStartX.value = props.global.clientX;
   dragStartTiming.value = props.note.timing;
   dragEndTiming.value = props.note.endTiming;
@@ -371,6 +375,8 @@ const longNoteCanMove = () => {
 const startLeftMove = () => {
   if (props.note.isPending || props.note.isDeleting) return;
   leftMove.value = true;
+  hasDragged.value = false;
+  mouseDownX.value = props.global.clientX;
   dragStartX.value = props.global.clientX;
   dragStartTiming.value = props.note.timing;
   dragEndTiming.value = props.note.endTiming;
@@ -380,6 +386,8 @@ const startLeftMove = () => {
 const startRightMove = () => {
   if (props.note.isPending || props.note.isDeleting) return;
   rightMove.value = true;
+  hasDragged.value = false;
+  mouseDownX.value = props.global.clientX;
   dragStartX.value = props.global.clientX;
   dragStartTiming.value = props.note.timing;
   dragEndTiming.value = props.note.endTiming;
@@ -445,6 +453,12 @@ const deleteNote = () => {
 };
 
 const selfClicked = () => {
+  // 如果刚刚拖拽过，不打开编辑弹窗
+  if (hasDragged.value) {
+    hasDragged.value = false;
+    return;
+  }
+  
   if (props.currentNoteType === 3) deleteSelf();
   else if (props.enableEdit) startEdit();
 };
@@ -503,6 +517,12 @@ const openDeleteMenu = () => {
 watch(() => props.global.mouseMove, () => {
   if (canMove.value) {
     const deltaX = props.global.clientX - dragStartX.value;
+    
+    // 检测是否发生了实际的拖拽（移动距离超过 5px）
+    if (!hasDragged.value && Math.abs(props.global.clientX - mouseDownX.value) > 5) {
+      hasDragged.value = true;
+    }
+    
     const deltaTime = Math.round((deltaX / (props.global.documentWidth - 300)) * props.displayAreaTime);
     const duration = dragEndTiming.value - dragStartTiming.value;
     let newStart = dragStartTiming.value + deltaTime;
@@ -524,6 +544,12 @@ watch(() => props.global.mouseMove, () => {
     }
   } else if (leftMove.value) {
     const deltaX = props.global.clientX - dragStartX.value;
+    
+    // 检测是否发生了实际的拖拽
+    if (!hasDragged.value && Math.abs(props.global.clientX - mouseDownX.value) > 5) {
+      hasDragged.value = true;
+    }
+    
     const deltaTime = Math.round((deltaX / (props.global.documentWidth - 300)) * props.displayAreaTime);
     let newStart = dragStartTiming.value + deltaTime;
     newStart = getSnappedTime(newStart, snapPoints.value);
@@ -535,6 +561,12 @@ watch(() => props.global.mouseMove, () => {
     }
   } else if (rightMove.value) {
     const deltaX = props.global.clientX - dragStartX.value;
+    
+    // 检测是否发生了实际的拖拽
+    if (!hasDragged.value && Math.abs(props.global.clientX - mouseDownX.value) > 5) {
+      hasDragged.value = true;
+    }
+    
     const deltaTime = Math.round((deltaX / (props.global.documentWidth - 300)) * props.displayAreaTime);
     let newEnd = dragEndTiming.value + deltaTime;
     newEnd = getSnappedTime(newEnd, snapPoints.value);
