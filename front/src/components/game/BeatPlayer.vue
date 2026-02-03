@@ -20,7 +20,7 @@
     <div
       class="judgment-line-container"
       :style="{
-        top: global.screenHeight * global.finalY - 1 + 'px',
+        top: global.screenHeight * (global.finalY || 0.8) - 1 + 'px',
         width: global.screenWidth + 'px',
       }"
     >
