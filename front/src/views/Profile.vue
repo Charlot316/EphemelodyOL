@@ -28,20 +28,20 @@
             </div>
             <div class="user-info">
               <h1 class="username">{{ username }}</h1>
-              <el-tag size="small" type="success" v-if="isAdmin">ADMIN</el-tag>
-              <el-tag size="small" type="info" v-else>PLAYER</el-tag>
+              <el-tag size="small" type="success" v-if="isAdmin">{{ $t('profile.admin') }}</el-tag>
+              <el-tag size="small" type="info" v-else>{{ $t('profile.player') }}</el-tag>
             </div>
           </div>
 
           <div class="settings-section">
-            <h3 class="section-title">GAME SETTINGS</h3>
+            <h3 class="section-title">{{ $t('profile.gameSettings') }}</h3>
             
             <div class="setting-item">
               <div class="setting-label">
-                <span>NOTE APPROACH RATE (Flow Speed)</span>
+                <span>{{ $t('profile.noteSpeed') }}</span>
                 <span class="setting-value">{{ noteSpeed }}ms</span>
               </div>
-              <p class="setting-desc">Time it takes for a note to travel from top to bottom. Smaller = Faster.</p>
+              <p class="setting-desc">{{ $t('profile.noteSpeedDesc') }}</p>
               <el-slider 
                 v-model="noteSpeed" 
                 :min="100" 
@@ -52,10 +52,10 @@
               />
             </div>
 
-            <h3 class="section-title">ACCOUNT SECURITY</h3>
+            <h3 class="section-title">{{ $t('profile.accountSecurity') }}</h3>
             <div class="setting-item">
               <el-button type="primary" plain @click="passwordVisible = true" class="security-btn">
-                <i class="el-icon-key"></i> CHANGE PASSWORD
+                <i class="el-icon-key"></i> {{ $t('profile.changePassword') }}
               </el-button>
             </div>
           </div>
@@ -64,19 +64,19 @@
     </div>
 
     <!-- Change Password Dialog -->
-    <el-dialog title="CHANGE PASSWORD" v-model="passwordVisible" width="400px" custom-class="glass-dialog">
+    <el-dialog :title="$t('profile.changePassword')" v-model="passwordVisible" width="400px" custom-class="glass-dialog">
       <el-form label-position="top" :model="passwordForm">
-        <el-form-item label="Current Password">
+        <el-form-item :label="$t('profile.currentPassword')">
           <el-input type="password" v-model="passwordForm.oldPassword" show-password></el-input>
         </el-form-item>
-        <el-form-item label="New Password">
+        <el-form-item :label="$t('profile.newPassword')">
           <el-input type="password" v-model="passwordForm.newPassword" show-password></el-input>
         </el-form-item>
       </el-form>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="passwordVisible = false">CANCEL</el-button>
-          <el-button type="primary" @click="changePassword">UPDATE</el-button>
+          <el-button @click="passwordVisible = false">{{ $t('common.cancel') }}</el-button>
+          <el-button type="primary" @click="changePassword">{{ $t('common.update') }}</el-button>
         </span>
       </template>
     </el-dialog>
@@ -101,7 +101,7 @@ export default {
   },
   computed: {
     username() {
-      return this.$store.state.user.username || "Guest";
+      return this.$store.state.user.username || this.$t('profile.guest');
     },
     userIcon() {
       return this.$store.state.user.iconUrl;
@@ -119,29 +119,29 @@ export default {
   methods: {
     saveSettings() {
       localStorage.setItem('noteSpeed', this.noteSpeed);
-      this.$message.success('Settings Saved');
+      this.$message.success(this.$t('profile.saveSuccess'));
     },
     formatTooltip(val) {
       return `${val}ms`;
     },
     handleAvatarSuccess(res) {
       if(res.code === 0) {
-        this.$message.success("Avatar updated");
+        this.$message.success(this.$t('profile.avatarSuccess'));
         this.$store.commit("changeParam", { key: "icon", value: res.data.iconUrl });
       } else {
-        this.$message.error(res.msg || "Upload failed");
+        this.$message.error(res.msg || this.$t('profile.uploadFailed'));
       }
     },
     beforeAvatarUpload(file) {
       const isValid = file.type === "image/jpeg" || file.type === "image/png";
       const isLt2M = file.size / 1024 / 1024 < 2;
-      if (!isValid) this.$message.error("JPG or PNG only!");
-      if (!isLt2M) this.$message.error("Max 2MB!");
+      if (!isValid) this.$message.error(this.$t('profile.formatError'));
+      if (!isLt2M) this.$message.error(this.$t('profile.sizeError'));
       return isValid && isLt2M;
     },
     async changePassword() {
       if (!this.passwordForm.oldPassword || !this.passwordForm.newPassword) {
-        return this.$message.warning("Please fill all fields");
+        return this.$message.warning(this.$t('profile.fillAll'));
       }
       try {
         const { hashPassword } = await import("../utils/crypto");
@@ -154,14 +154,14 @@ export default {
         });
         
         if (res.code === 0) {
-          this.$message.success("Password updated successfully");
+          this.$message.success(this.$t('profile.passSuccess'));
           this.passwordVisible = false;
           this.passwordForm = { oldPassword: "", newPassword: "" };
         } else {
-          this.$message.error(res.data || "Failed to update password");
+          this.$message.error(res.data || this.$t('common.failed'));
         }
       } catch (err) {
-        this.$message.error("An error occurred");
+        this.$message.error(this.$t('common.error'));
       }
     }
   }

@@ -32,7 +32,7 @@
             <el-dropdown-menu class="user-dropdown glass">
               <template v-if="$store.state.islogin">
                 <el-dropdown-item command="home" icon="el-icon-house">{{ $t('header.dashboard') }}</el-dropdown-item>
-                <el-dropdown-item command="profile" icon="el-icon-user">My Profile</el-dropdown-item>
+                <el-dropdown-item command="profile" icon="el-icon-user">{{ $t('header.myProfile') }}</el-dropdown-item>
                 <el-dropdown-item v-if="$store.state.user.isAdmin" command="admin" icon="el-icon-monitor">{{ $t('header.adminPanel') }}</el-dropdown-item>
                 <el-dropdown-item divided command="loginout" icon="el-icon-switch-button" class="logout-item">{{ $t('common.logout') }}</el-dropdown-item>
               </template>
