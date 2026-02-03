@@ -228,6 +228,7 @@
           @scroll="rightScroll"
           @mousemove="rightMouseMove($event)"
           @mousedown="rightClick($event)"
+          @contextmenu.prevent
         >
           <div
             class="beat-line-wrapper-absolute"
@@ -596,6 +597,7 @@ onMounted(() => {
   position: relative; 
   overflow: hidden; 
   --sider-width: v-bind(siderWidth + 'px');
+  user-select: none;
 }
 .footer-header {
   height: 48px;

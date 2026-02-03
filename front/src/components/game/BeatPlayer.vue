@@ -520,7 +520,7 @@ defineExpose({
   top: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover; /* Changed from fill to cover for better look */
+  object-fit: fill; /* Ensure full coverage even if distorted */
   pointer-events: none;
 }
 
