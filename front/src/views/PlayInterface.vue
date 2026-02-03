@@ -21,33 +21,24 @@
       @finished="handleFinished"
     />
     <Result :loadingStatus="loadingStatus" :chart="chart" :global="global" />
-    <el-dialog
-      v-model="pauseVisible"
-      :title="$t('play.pause')"
-      top="30vh"
-      :center="true"
-      :show-close="false"
-      :close-on-press-escape="false"
-      :close-on-click-modal="false"
-    >
-      <div style="text-align: center;">
-        <el-button
-          icon="el-icon-caret-left"
-          @click="$router.go(-1)"
-          circle
-        ></el-button>
-        <el-button
-          icon="el-icon-refresh-left"
-          circle
-          @click="reStart"
-        ></el-button>
-        <el-button
-          icon="el-icon-caret-right"
-          circle
-          @click="continuePlay"
-        ></el-button>
+    <transition name="fade">
+      <div v-if="pauseVisible" class="pause-overlay">
+        <div class="pause-menu glass-panel">
+          <h2 class="pause-title">{{ $t('play.pause') }}</h2>
+          <div class="pause-controls">
+            <div class="control-btn" @click="$router.go(-1)">
+              <el-icon><CaretLeft /></el-icon>
+            </div>
+            <div class="control-btn" @click="reStart">
+              <el-icon><RefreshLeft /></el-icon>
+            </div>
+            <div class="control-btn" @click="continuePlay">
+              <el-icon><CaretRight /></el-icon>
+            </div>
+          </div>
+        </div>
       </div>
-    </el-dialog>
+    </transition>
   </div>
 </template>
 
@@ -61,6 +52,7 @@ import Play from "@/components/game/Play.vue";
 import Prepare from "@/components/game/Prepare.vue";
 import Result from "@/components/game/Result.vue";
 import { Axios as $http } from "@/plugins/axios";
+import { CaretLeft, CaretRight, RefreshLeft } from '@element-plus/icons-vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -209,7 +201,6 @@ const handleTimeUpdate = (time) => {
 
 const handleFinished = () => {
     loadingStatus.beforeFinished = true;
-    calculateScore();
     finish();
     setTimeout(() => {
       loadingStatus.finished = true;
@@ -415,7 +406,9 @@ onMounted(() => {
     if (chart.value.tracks) {
       for (let j = 0; j < e.changedTouches.length; j++) {
         let touch = e.changedTouches[j];
-        global.keyIsHold[global.keyMap[touch.identifier]] = false;
+        if (global.keyMap[touch.identifier]) {
+          global.keyIsHold[global.keyMap[touch.identifier]] = false;
+        }
       }
     }
   };
@@ -435,6 +428,81 @@ onBeforeUnmount(() => {
   width: 100vw;
   background: white;
   overflow: auto;
+}
+
+.pause-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(5px);
+  z-index: 2000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pause-menu {
+  width: 400px;
+  padding: 30px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.glass-panel {
+  background: rgba(30, 30, 30, 0.6);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.pause-title {
+  color: white;
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.pause-controls {
+  display: flex;
+  gap: 30px;
+}
+
+.control-btn {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 28px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.control-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 .select {
   -webkit-user-select: none;

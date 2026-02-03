@@ -198,6 +198,12 @@ const paintNote = (note) => {
 
   if (note.noteType == 0) {
     if (canMirror) {
+      painter.save();
+      painter.beginPath();
+      // Clip below judgment line to avoid reflection bleeding upwards
+      painter.rect(0, Y.value, myglobal.screenWidth, myglobal.screenHeight - Y.value);
+      painter.clip();
+
       const tempY = 2 * Y.value - yValue;
       painter.beginPath();
       painter.moveTo(middle.value, tempY - blackLength);
@@ -221,6 +227,8 @@ const paintNote = (note) => {
       painter.globalCompositeOperation = "source-over";
       painter.fillStyle = "rgba(203, 105, 121,0.1)";
       painter.fill();
+      
+      painter.restore();
     }
     painter.beginPath();
     painter.moveTo(middle.value, yValue - blackLength);
@@ -251,6 +259,11 @@ const paintNote = (note) => {
     }
     
     if (canMirror) {
+      painter.save();
+      painter.beginPath();
+      painter.rect(0, Y.value, myglobal.screenWidth, myglobal.screenHeight - Y.value);
+      painter.clip();
+
       const tempY = 2 * Y.value - currentY;
       painter.beginPath();
       painter.moveTo(middle.value + blackLength, tempY);
@@ -288,6 +301,8 @@ const paintNote = (note) => {
       painter.globalCompositeOperation = "source-over";
       painter.fillStyle = "rgba(203, 105, 121,0.1)";
       painter.fill();
+
+      painter.restore();
     }
     painter.beginPath();
     painter.moveTo(middle.value + blackLength, currentY);
@@ -319,6 +334,11 @@ const paintNote = (note) => {
     painter.fill();
   } else if (note.noteType == 2) {
     if (canMirror) {
+      painter.save();
+      painter.beginPath();
+      painter.rect(0, Y.value, myglobal.screenWidth, myglobal.screenHeight - Y.value);
+      painter.clip();
+
       const tempY = 2 * Y.value - yValue;
       painter.beginPath();
       painter.moveTo(middle.value, tempY - whiteLength);
@@ -332,6 +352,8 @@ const paintNote = (note) => {
       painter.strokeStyle = "rgba(0,0,0,0.3)";
       painter.lineWidth = 1;
       painter.stroke();
+
+      painter.restore();
     }
     painter.beginPath();
     painter.moveTo(middle.value, yValue - whiteLength);
@@ -788,7 +810,7 @@ watch(() => myglobal.currentTime, () => {
   }
   while (
     myTrack.lastNote < myTrack.notes.length - 1 &&
-    myglobal.currentTime > myTrack.notes[myTrack.lastNote + 1].timing - myglobal.remainingTime
+    myglobal.currentTime > myTrack.notes[myTrack.lastNote + 1].timing - myglobal.remainingTime - 1000
   ) {
     myTrack.lastNote++;
   }
