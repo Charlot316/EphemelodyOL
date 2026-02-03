@@ -2,7 +2,15 @@
   <div class="beat-player-container" :id="playerId">
     <!-- 背景图层 -->
     <div class="background-base">
-      <img :src="normalizeUrl(chart.defaultBackground)" class="background-image" alt="default-bg" />
+    <div class="background-base">
+      <img 
+        :src="normalizeUrl(chart.defaultBackground)" 
+        class="background-image" 
+        alt="default-bg" 
+        @load="handleImageLoaded"
+        @error="handleImageLoaded"
+      />
+    </div>
     </div>
     <div v-for="(op, index) in chart.changeBackgroundOperations" :key="index">
       <img
@@ -13,6 +21,8 @@
         "
         class="background-image background-overlay"
         alt="op-bg"
+        @load="handleImageLoaded"
+        @error="handleImageLoaded"
       />
     </div>
 
@@ -270,12 +280,9 @@ const resize = () => {
     const w = container.offsetWidth;
     const h = container.offsetHeight;
     
-    console.log(`[BeatPlayer] Resizing to: ${w}x${h}`);
-
     // Avoid rendering issues with 0 size
     if (w === 0 || h === 0) {
-      console.warn('[BeatPlayer] Container size is 0, retrying in 100ms...');
-      setTimeout(resize, 100);
+      setTimeout(resize, 200);
       return;
     }
 
@@ -319,7 +326,23 @@ const repaint = () => {
 };
 
 const generateImagePath = () => {
-  // Now handled directly in template for simplicity and fallback logic
+    const paths = new Set();
+    const defaultBg = props.chart.defaultBackground;
+    if (defaultBg) paths.add(normalizeUrl(defaultBg));
+    
+    if (props.chart.changeBackgroundOperations) {
+        props.chart.changeBackgroundOperations.forEach(op => {
+            const url = getBackgroundUrl(op);
+            if (url) paths.add(url);
+        });
+    }
+    
+    imagePath.value = Array.from(paths);
+    imageLoadedCount.value = 0;
+    
+    if (imagePath.value.length === 0) {
+        emit('image-loaded');
+    }
 };
 
 const resetTrackStates = () => {
