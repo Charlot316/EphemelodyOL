@@ -367,13 +367,13 @@ const paintTrack = async () => {
 
   if (width.value > 4 && height.value > 0) {
     const longerThanScreen = height.value > myglobal.screenHeight - Y.value;
-    // Fill main rect
+    // Fill main rect (Always naturally transparent dark background)
     painter.beginPath();
     painter.rect(left.value + 2, top.value, width.value - 4, height.value);
-    painter.fillStyle = `rgba(${myTrack.tempR},${myTrack.tempG},${myTrack.tempB},${opacity})`;
+    painter.fillStyle = `rgba(22, 22, 14, ${opacity})`;
     painter.fill();
     if (isActive.value) {
-      painter.fillStyle = "rgba(255,255,255,0.4)";
+      painter.fillStyle = `rgba(${myTrack.tempR},${myTrack.tempG},${myTrack.tempB},0.4)`;
       painter.fill();
     }
 
@@ -384,17 +384,17 @@ const paintTrack = async () => {
       width.value - 4,
       longerThanScreen ? myglobal.screenHeight - Y.value : height.value
     );
-    painter.fillStyle = `rgba(${myTrack.tempR},${myTrack.tempG},${myTrack.tempB},0.1)`;
+    painter.fillStyle = `rgba(22, 22, 14, 0.15)`; // Mirror part background
     painter.fill();
     if (isActive.value) {
-      painter.fillStyle = "rgba(255,255,255,0.2)";
+      painter.fillStyle = `rgba(${myTrack.tempR},${myTrack.tempG},${myTrack.tempB},0.2)`;
       painter.fill();
     }
-    // Left line
+    // Left line (Use custom Track Color)
     painter.beginPath();
     painter.moveTo(left.value, top.value);
     painter.lineTo(left.value, Y.value);
-    painter.strokeStyle = "rgba(255,255,255,0.8)";
+    painter.strokeStyle = `rgba(${myTrack.tempR},${myTrack.tempG},${myTrack.tempB},0.8)`;
     painter.lineWidth = 2;
     painter.stroke();
 
