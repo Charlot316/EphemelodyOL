@@ -384,8 +384,8 @@ const handleAudioLoaded = () => {
 };
 
 const handleAudioEnded = () => {
+  pause();
   if (props.mode === 'play') {
-    pause();
     emit('finished');
   }
 };

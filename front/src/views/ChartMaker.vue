@@ -71,7 +71,22 @@
     <!-- 全局设置弹窗 -->
     <el-dialog v-model="globalSetting" @close="checkbpm" width="650px" title="全局设置" custom-class="glass-dialog">
       <el-form :model="form" label-width="200px" style="padding: 20px;">
-        <!-- ... 现有的表单内容 ... -->
+        <el-form-item label="BPM / Interval (ms)">
+            <el-input-number v-model="chart.bpm" :min="0.1" :step="0.01" controls-position="right" style="width: 100%;" />
+        </el-form-item>
+        <el-form-item label="First Beat (ms)">
+            <el-input-number v-model="chart.firstBeatDelay" :step="1" controls-position="right" style="width: 100%;" />
+        </el-form-item>
+        <el-divider content-position="left">Auxiliary / Manual</el-divider>
+        <el-form-item label="Total Beats">
+            <el-input-number v-model="chart.beatsCount" :min="0" :step="1" controls-position="right" style="width: 100%;" />
+        </el-form-item>
+        <el-form-item label="Last Beat (ms)">
+            <el-input-number v-model="chart.lastBeatDelay" :step="1" controls-position="right" style="width: 100%;" />
+        </el-form-item>
+        <el-form-item>
+            <el-button @click="ManualCalculatebpm">Manual Calc BPM</el-button>
+        </el-form-item>
         <el-form-item label="音量">
           <el-input-number v-model="volume" :min="0" :max="100" @change="changeVolume" />
         </el-form-item>
@@ -166,6 +181,19 @@ const currentSelectTrack = ref(null);
 const globalSetting = ref(false);
 const footerHeight = ref(400); 
 const form = reactive({});
+
+const playerActions = {
+  seek: (t) => playerRef.value?.seek(t),
+  play: () => playerRef.value?.play(),
+  pause: () => playerRef.value?.pause()
+};
+
+const {
+  ManualCalculatebpm,
+  checkbpm: endbpm, // Map original endbpm to checkbpm if needed, or just use endbpm
+  calculatebpm,     // If needed by template
+  endbpm: checkbpm  // The template uses @close="checkbpm", so we map endbpm to checkbpm
+} = useBpmTool(chart, global, playerActions);
 
 // --- Logic ---
 

@@ -87,7 +87,7 @@ const left = ref(0);
 const singleWidth = ref(0);
 
 const setDisplay = () => {
-  const bpm = props.chart.bpm || 600; // Fallback if bpm is 0
+  const bpm = props.chart.bpm; // No fallback to avoid wrong dense lines
   const bpm16 = bpm / 16;
   LineCount.value = Math.ceil(props.chart.songLength / bpm16) + 16;
   
@@ -95,7 +95,7 @@ const setDisplay = () => {
   const bpm4 = bpm / 4;
   const wholeLength = props.global.documentWidth - props.siderWidth;
   
-  if (bpm > 0) {
+  if (bpm && bpm >= 20) {
     display.value = true;
     const delay = props.chart.firstBeatDelay || 0;
     const d = delay % bpm;
