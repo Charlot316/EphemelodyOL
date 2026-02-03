@@ -8,4 +8,5 @@ public class ChangeBackgroundOperationsVO {
     private Integer startTime;
     private Integer endTime;
     private String background;
+    private Integer assetId;
 }

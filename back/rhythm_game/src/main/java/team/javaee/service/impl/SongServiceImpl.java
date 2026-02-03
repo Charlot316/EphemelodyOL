@@ -6,7 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
 import team.javaee.common.config.ReturnResponse;
 import team.javaee.common.enums.ReturnStatus;
-import team.javaee.entity.domain.*;
+import team.javaee.entity.domain.BestRecord;
+import team.javaee.entity.domain.ChangeBackgroundOperation;
+import team.javaee.entity.domain.ChangeColorOperation;
+import team.javaee.entity.domain.ChangeWidthOperation;
+import team.javaee.entity.domain.MoveOperation;
+import team.javaee.entity.domain.Note;
+import team.javaee.entity.domain.RecentRecord;
+import team.javaee.entity.domain.Song;
+import team.javaee.entity.domain.SongAsset;
+import team.javaee.entity.domain.Track;
 import team.javaee.entity.dto.*;
 import team.javaee.entity.vo.BackgroundVO;
 import team.javaee.entity.vo.ImageVO;
@@ -18,7 +27,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -134,6 +142,8 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
                 folder.mkdirs();
             }
             String oldName = file.getOriginalFilename();
+            if (oldName == null)
+                oldName = "unknown.jpg";
             String newName = UUID.randomUUID().toString() + oldName.substring(oldName.lastIndexOf("."));
             file.transferTo(new File(folder, newName));
             String url = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
@@ -163,6 +173,8 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
                 folder.mkdirs();
             }
             String oldName = file.getOriginalFilename();
+            if (oldName == null)
+                oldName = "unknown.jpg";
             String newName = UUID.randomUUID().toString() + oldName.substring(oldName.lastIndexOf("."));
             file.transferTo(new File(folder, newName));
             String url = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
@@ -192,6 +204,8 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
             }
 
             String oldName = file.getOriginalFilename();
+            if (oldName == null)
+                oldName = "unknown.mp3";
             String newName = UUID.randomUUID().toString() + oldName.substring(oldName.lastIndexOf("."));
             file.transferTo(new File(folder, newName)); // 上传文件
             String url = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + "/mp3/"
@@ -224,7 +238,7 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
 
             // 2. 更新数据库中的元数据
             Song song = songMapper.selectById(songId);
-            song.setBPM(chartContentDTO.getBPM());
+            song.setBpm(chartContentDTO.getBpm());
             song.setFirstBeatDelay(chartContentDTO.getFirstBeatDelay());
 
             int notesCount = 0;
@@ -263,14 +277,24 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
                 folder.mkdirs();
             }
             String oldName = file.getOriginalFilename();
+            if (oldName == null)
+                oldName = "unknown.jpg";
             String newName = UUID.randomUUID().toString() + oldName.substring(oldName.lastIndexOf("."));
             file.transferTo(new File(folder, newName));
             String url = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + "/jpg/"
                     + newName;
 
+            SongAsset asset = new SongAsset();
+            asset.setSongId(uploadBackgroundDTO.getSongId());
+            asset.setName(oldName);
+            asset.setType("image");
+            asset.setUrl(url);
+            songAssetMapper.insert(asset);
+
             ChangeBackgroundOperation changeBackgroundOperation = new ChangeBackgroundOperation();
             changeBackgroundOperation.setSongId(uploadBackgroundDTO.getSongId());
             changeBackgroundOperation.setBackground(url);
+            changeBackgroundOperation.setAssetId(asset.getId());
             changeBackgroundOperation.setStartTime(uploadBackgroundDTO.getStartTime());
             changeBackgroundOperationMapper.insert(changeBackgroundOperation);
 
@@ -312,7 +336,7 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
     public ReturnResponse<String> deleteChart(SongDTO songDTO) {
         try {
             String songId = songDTO.getSongId();
-            songMapper.delete(new QueryWrapper<Song>().eq("song_id", songId));
+            songMapper.delete(new QueryWrapper<Song>().eq("id", songId));
             trackMapper.delete(new QueryWrapper<Track>().eq("song_id", songId));
             moveOperationMapper.delete(new QueryWrapper<MoveOperation>().eq("song_id", songId));
             noteMapper.delete(new QueryWrapper<Note>().eq("song_id", songId));
@@ -338,6 +362,8 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
                 folder.mkdirs();
 
             String oldName = file.getOriginalFilename();
+            if (oldName == null)
+                oldName = "unknown.jpg";
             String newName = UUID.randomUUID().toString() + oldName.substring(oldName.lastIndexOf("."));
             file.transferTo(new File(folder, newName));
 

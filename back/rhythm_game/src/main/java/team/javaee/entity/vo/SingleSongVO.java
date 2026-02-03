@@ -19,7 +19,7 @@ public class SingleSongVO {
     private Integer songLength;
     private String defaultBackground;
     private String songUrl;
-    private Float BPM;
+    private Float bpm;
     private Integer firstBeatDelay;
     private List<ChangeBackgroundOperationsVO> changeBackgroundOperations;
     private List<TracksVO> tracks;

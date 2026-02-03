@@ -23,7 +23,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class Song implements Serializable {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
 
     /**
      * 歌曲id
@@ -104,7 +104,7 @@ public class Song implements Serializable {
     /**
      * BPM
      */
-    private Float BPM;
+    private Float bpm;
 
     /**
      * 第一拍延迟
@@ -119,6 +119,5 @@ public class Song implements Serializable {
 
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
-
 
 }

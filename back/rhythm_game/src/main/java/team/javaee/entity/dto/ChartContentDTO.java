@@ -9,7 +9,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ChartContentDTO {
     private Integer songId;
-    private Float BPM;
+    private Float bpm;
     private Integer firstBeatDelay;
     private List<ChangeBackgroundOperationDTO> changeBackgroundOperations;
     private List<TrackDTO> tracks;

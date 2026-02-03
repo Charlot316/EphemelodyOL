@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import team.javaee.common.Normal;
 import team.javaee.common.config.ReturnResponse;
-import team.javaee.entity.domain.Song;
 import team.javaee.entity.domain.SongAsset;
 import team.javaee.entity.dto.*;
 import team.javaee.entity.vo.BackgroundVO;
@@ -77,7 +76,7 @@ public class SongController {
     @ApiOperation("新增歌曲背景")
     @PostMapping("uploadBackground")
     public ReturnResponse<BackgroundVO> uploadBackground(HttpServletRequest request,
-            @RequestBody UploadBackgroundDTO uploadBackgroundDTO) {
+            @ModelAttribute UploadBackgroundDTO uploadBackgroundDTO) {
         return songService.uploadBackground(uploadBackgroundDTO, request);
     }
 

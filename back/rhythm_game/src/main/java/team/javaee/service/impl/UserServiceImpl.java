@@ -431,8 +431,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             singleSongVO.setSongLength(song.getSongLength());
             singleSongVO.setDefaultBackground(song.getDefaultBackground());
             singleSongVO.setSongUrl(song.getSongUrl());
-            singleSongVO.setBPM(song.getBPM());
+            singleSongVO.setBpm(song.getBpm());
             singleSongVO.setFirstBeatDelay(song.getFirstBeatDelay());
+
+            // Fetch Assets
+            QueryWrapper<SongAsset> assetWrapper = new QueryWrapper<>();
+            assetWrapper.eq("song_id", songId);
+            singleSongVO.setAssets(songAssetMapper.selectList(assetWrapper));
 
             // 优先尝试从 JSON 文件加载
             String jsonPath = uploadPath + "charts/" + songId + ".json";
@@ -448,6 +453,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                                 vo.setStartTime(dto.getStartTime());
                                 vo.setEndTime(dto.getEndTime());
                                 vo.setBackground(dto.getBackground());
+                                vo.setAssetId(dto.getAssetId());
                                 return vo;
                             }).collect(Collectors.toList());
                     singleSongVO.setChangeBackgroundOperations(backgroundOps);
@@ -527,13 +533,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             changeBackgroundOperationList = changeBackgroundOperationMapper
                     .selectList(changeBackgroundOperationQueryWrapper);
             List<ChangeBackgroundOperationsVO> changeBackgroundOperations = new ArrayList<>();
-            for (ChangeBackgroundOperation item : changeBackgroundOperationList) {
-                ChangeBackgroundOperationsVO changeBackgroundOperation = new ChangeBackgroundOperationsVO();
-                changeBackgroundOperation.setId(item.getId());
-                changeBackgroundOperation.setStartTime(item.getStartTime());
-                changeBackgroundOperation.setEndTime(item.getEndTime());
-                changeBackgroundOperation.setBackground(item.getBackground());
-                changeBackgroundOperations.add(changeBackgroundOperation);
+            for (int i = 0; i < changeBackgroundOperationList.size(); i++) {
+                ChangeBackgroundOperation item = changeBackgroundOperationList.get(i);
+                ChangeBackgroundOperationsVO vo = new ChangeBackgroundOperationsVO();
+                vo.setId(item.getId());
+                vo.setStartTime(item.getStartTime());
+                vo.setEndTime(item.getEndTime());
+                vo.setBackground(item.getBackground());
+                vo.setAssetId(item.getAssetId());
+                changeBackgroundOperations.add(vo);
             }
             singleSongVO.setChangeBackgroundOperations(changeBackgroundOperations);
             List<TracksVO> tracksVOList = new ArrayList<>();
@@ -624,11 +632,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 tracksVOList.add(tracksVO);
             }
             singleSongVO.setTracks(tracksVOList);
-
-            // Fetch Assets
-            QueryWrapper<SongAsset> assetWrapper = new QueryWrapper<>();
-            assetWrapper.eq("song_id", Integer.valueOf(songId));
-            singleSongVO.setAssets(songAssetMapper.selectList(assetWrapper));
 
             return ReturnResponse.OK(singleSongVO);
         } catch (Exception e) {

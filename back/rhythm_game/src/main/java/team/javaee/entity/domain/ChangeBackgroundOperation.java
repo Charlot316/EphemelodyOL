@@ -51,6 +51,11 @@ public class ChangeBackgroundOperation implements Serializable {
      */
     private String background;
 
+    /**
+     * 素材ID
+     */
+    private Integer assetId;
+
     @Version
     private Integer version;
 

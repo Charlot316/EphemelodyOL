@@ -1,6 +1,5 @@
 package team.javaee.controller;
 
-
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * <p>
- *  前端控制器
+ * 前端控制器
  * </p>
  *
  * @author nwh
@@ -32,7 +31,8 @@ public class UserController {
 
     @ApiOperation("用户登录")
     @PostMapping("login")
-    public ReturnResponse<Object> login(HttpServletRequest request, HttpServletResponse response, @RequestBody LoginDTO loginDTO) {
+    public ReturnResponse<Object> login(HttpServletRequest request, HttpServletResponse response,
+            @RequestBody LoginDTO loginDTO) {
         return userService.login(request, response, loginDTO);
     }
 
@@ -44,14 +44,14 @@ public class UserController {
 
     @ApiOperation("修改个人密码")
     @PostMapping("changePassword")
-    public ReturnResponse<String> password(HttpServletRequest request, @RequestBody PasswordDTO passwordDTO){
+    public ReturnResponse<String> password(HttpServletRequest request, @RequestBody PasswordDTO passwordDTO) {
         String userId = Normal.getUserIdByCookie(request);
-        return userService.password(userId,passwordDTO);
+        return userService.password(userId, passwordDTO);
     }
 
     @ApiOperation("获取个人信息")
     @PostMapping("getUserInformation")
-    public ReturnResponse<UserVO> getUserInformation(HttpServletRequest request){
+    public ReturnResponse<UserVO> getUserInformation(HttpServletRequest request) {
         String userId = Normal.getUserIdByCookie(request);
         return userService.getUserInformation(userId);
     }
@@ -60,7 +60,7 @@ public class UserController {
     @PostMapping("/uploadIcon")
     public ReturnResponse<ImageVO> imgUpload(@RequestParam("file") MultipartFile file, HttpServletRequest req) {
         String userId = Normal.getUserIdByCookie(req);
-        return userService.imgUpload(file,req);
+        return userService.imgUpload(file, req);
     }
 
     @ApiOperation("公开自己已经存储的谱面")
@@ -79,9 +79,10 @@ public class UserController {
 
     @ApiOperation("搜索自己上传的谱面的基本信息列表")
     @PostMapping("/getMyCharts")
-    public ReturnResponse<SelfSongsListVO> getMyCharts(HttpServletRequest req, @RequestBody PublicChartsDTO publicChartsDTO) {
+    public ReturnResponse<SelfSongsListVO> getMyCharts(HttpServletRequest req,
+            @RequestBody PublicChartsDTO publicChartsDTO) {
         String userId = Normal.getUserIdByCookie(req);
-        return userService.getMyCharts(userId,publicChartsDTO);
+        return userService.getMyCharts(userId, publicChartsDTO);
     }
 
     @ApiOperation("获取自己上传的谱面的基本信息列表")
@@ -101,22 +102,22 @@ public class UserController {
 
     @ApiOperation("删除谱面")
     @PostMapping("/deleteChart")
-    public ReturnResponse<String> deleteChart(HttpServletRequest req,@RequestBody SongDTO songDTO){
+    public ReturnResponse<String> deleteChart(HttpServletRequest req, @RequestBody SongDTO songDTO) {
         String userId = Normal.getUserIdByCookie(req);
         return userService.deleteChart(userId, songDTO);
     }
 
     @ApiOperation("获取已公开的谱面列表")
     @PostMapping("/getPublicCharts")
-    public ReturnResponse<PublicChartsVO> getPublicCharts(HttpServletRequest req, @RequestBody PublicChartsDTO publicChartsDTO){
+    public ReturnResponse<PublicChartsVO> getPublicCharts(HttpServletRequest req,
+            @RequestBody PublicChartsDTO publicChartsDTO) {
         String userId = Normal.getUserIdByCookie(req);
         return userService.getPublicCharts(userId, publicChartsDTO);
     }
 
     @ApiOperation("获取所有公开的谱面列表")
-    @PostMapping("/getAllCharts")
-    public ReturnResponse<SelfSongsListVO> getAllCharts(){
+    @RequestMapping(value = "/getAllCharts", method = { RequestMethod.GET, RequestMethod.POST })
+    public ReturnResponse<SelfSongsListVO> getAllCharts() {
         return userService.getAllCharts();
     }
 }
-
