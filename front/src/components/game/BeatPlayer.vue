@@ -117,7 +117,8 @@ import {
   onBeforeUnmount,
   defineProps,
   defineEmits,
-  defineExpose
+  defineExpose,
+  nextTick
 } from 'vue';
 import { VideoPause, VideoPlay, RefreshLeft, FullScreen, Close } from '@element-plus/icons-vue';
 import Track from "./Track.vue";
@@ -258,41 +259,55 @@ const togglePlay = () => {
 
 // 方法
 const resize = () => {
-  // 使用 nextTick 确保容器在 Grid 布局中已完成渲染
-  import('vue').then(({ nextTick }) => {
-    nextTick(() => {
-      const container = document.getElementById(props.playerId);
-      if (!container) return;
-      
-      const w = container.offsetWidth;
-      const h = container.offsetHeight;
-      
-      // 避免 0 尺寸导致的渲染问题
-      if (w === 0 || h === 0) {
-        // 如果依然为 0，尝试 100ms 后再次采样
-        setTimeout(resize, 100);
-        return;
-      }
+  // Use nextTick to ensure the container is rendered in the Grid layout
+  nextTick(() => {
+    const container = document.getElementById(props.playerId);
+    if (!container) {
+       console.warn('[BeatPlayer] Resize skipped: container not found', props.playerId);
+       return;
+    }
+    
+    const w = container.offsetWidth;
+    const h = container.offsetHeight;
+    
+    console.log(`[BeatPlayer] Resizing to: ${w}x${h}`);
 
-      global.screenWidth = w;
-      global.screenHeight = h;
-      
-      const setupCanvas = (idSuffix, painterKey, canvasKey) => {
-        const canvas = document.getElementById(props.playerId + idSuffix);
-        if (canvas) {
-          canvas.width = global.screenWidth;
-          canvas.height = global.screenHeight;
-          global[canvasKey] = canvas;
-          global[painterKey] = canvas.getContext('2d');
-        }
-      };
-      
-      setupCanvas('-track-canvas', 'trackPainter', 'trackCanvas');
-      setupCanvas('-note-canvas', 'notePainter', 'noteCanvas');
-      setupCanvas('-judge-canvas', 'judgePainter', 'judgeCanvas');
-      
-      repaint();
-    });
+    // Avoid rendering issues with 0 size
+    if (w === 0 || h === 0) {
+      console.warn('[BeatPlayer] Container size is 0, retrying in 100ms...');
+      setTimeout(resize, 100);
+      return;
+    }
+
+    global.screenWidth = w;
+    global.screenHeight = h;
+    
+    const setupCanvas = (idSuffix, painterKey, canvasKey) => {
+      const canvas = document.getElementById(props.playerId + idSuffix);
+      if (canvas) {
+        // Handle High DPI displays
+        const dpr = window.devicePixelRatio || 1;
+        // canvas.width = w * dpr;
+        // canvas.height = h * dpr;
+        // For now keep 1:1 to match logic in Track.vue which uses screenWidth directly
+        // If we change this, we must scale the context
+        canvas.width = w;
+        canvas.height = h;
+        
+        global[canvasKey] = canvas;
+        const ctx = canvas.getContext('2d');
+        // ctx.scale(dpr, dpr); // Not enabling scaling yet as Track.vue relies on pixels
+        global[painterKey] = ctx;
+      } else {
+        console.error('[BeatPlayer] Canvas not found:', props.playerId + idSuffix);
+      }
+    };
+    
+    setupCanvas('-track-canvas', 'trackPainter', 'trackCanvas');
+    setupCanvas('-note-canvas', 'notePainter', 'noteCanvas');
+    setupCanvas('-judge-canvas', 'judgePainter', 'judgeCanvas');
+    
+    repaint();
   });
 };
 
