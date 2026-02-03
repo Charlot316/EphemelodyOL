@@ -14,6 +14,7 @@ export function useWebSocket(songId, onMessageReceived) {
     // Assuming backend runs on 8090 based on previous context.
     const vuexStr = localStorage.getItem('vuex');
     let username = '未知用户';
+    // Default to a random guest ID
     let userId = 'guest_' + Math.random().toString(36).substr(2, 9);
     
     if (vuexStr) {
@@ -21,7 +22,9 @@ export function useWebSocket(songId, onMessageReceived) {
         const state = JSON.parse(vuexStr);
         if (state.user && state.user.username) {
             username = state.user.username;
-            userId = state.user.id || state.user.userId || userId;
+            // Use ID if available, otherwise fallback to username to dedupe same user tabs
+            // This fixes the issue of "4 users, 3 are me"
+            userId = state.user.id || state.user.userId || state.user.username; 
         }
       } catch (e) { /* ignore */ }
     }
