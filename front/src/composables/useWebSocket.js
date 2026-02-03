@@ -1,4 +1,5 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue';
+import store from '../store';
 
 export function useWebSocket(songId, onMessageReceived) {
   const socket = ref(null);
@@ -12,21 +13,16 @@ export function useWebSocket(songId, onMessageReceived) {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     // Use the same host as the current page, or a specific port if needed.
     // Assuming backend runs on 8090 based on previous context.
-    const vuexStr = localStorage.getItem('vuex');
+    // Use Vuex store directly for reliable user info retrieval
+    const user = store.state.user;
     let username = '未知用户';
     // Default to a random guest ID
     let userId = 'guest_' + Math.random().toString(36).substr(2, 9);
     
-    if (vuexStr) {
-      try {
-        const state = JSON.parse(vuexStr);
-        if (state.user && state.user.username) {
-            username = state.user.username;
-            // Use ID if available, otherwise fallback to username to dedupe same user tabs
-            // This fixes the issue of "4 users, 3 are me"
-            userId = state.user.id || state.user.userId || state.user.username; 
-        }
-      } catch (e) { /* ignore */ }
+    if (user && user.username) {
+        username = user.username;
+        // Use ID if available, otherwise fallback to username to dedupe same user tabs
+        userId = user.id || user.userId || user.username; 
     }
 
     const url = `${protocol}//${window.location.hostname}:8090/ws/chart?songId=${songId}&username=${encodeURIComponent(username)}&userId=${userId}`;
