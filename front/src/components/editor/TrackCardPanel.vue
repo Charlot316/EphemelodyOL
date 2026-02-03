@@ -249,7 +249,7 @@ const newNote = (e) => {
   // But here we are on the main track div.
   // Let's assume the click event provides the timing. We need to calculate timing from mouse position.
   
-  if (props.currentNoteType !== 3 && props.currentNoteType !== undefined) {
+  if (props.currentNoteType !== 3 && props.currentNoteType !== undefined && props.currentNoteType >= 0) {
       if (props.global.currentTime < props.track.startTiming || props.global.currentTime > props.track.endTiming) {
           return; // Outside active track area
       }

@@ -80,7 +80,7 @@
             :key="idx"
             size="small"
             :class="['mode-btn', { 'is-selected': currentNoteType == idx }]"
-            @click="currentNoteType = idx"
+            @click="currentNoteType = (currentNoteType === idx ? -1 : idx)"
           >
             <span class="mode-dot" :class="'mode-' + idx"></span>
             {{ label }}
@@ -300,7 +300,7 @@ const autoScroll = ref(false);
 const showReal = ref(true);
 const showFake = ref(true);
 const showNoRemain = ref(true);
-const currentNoteType = ref(0);
+const currentNoteType = ref(-1);
 const enableEdit = ref(true);
 const showCurrent = ref(false);
 const bgCollapsed = ref(false);
