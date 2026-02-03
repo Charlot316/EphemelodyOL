@@ -41,6 +41,16 @@
             }"
             @mousedown.stop="props.global.currentNoteType === 3 ? deleteOp(index) : startDragOp($event, op)"
           >
+            <!-- Resize Handles -->
+            <div 
+              class="resize-handle left" 
+              @mousedown.stop="startResizeLeft($event, op)"
+            ></div>
+            <div 
+              class="resize-handle right" 
+              @mousedown.stop="startResizeRight($event, op)"
+            ></div>
+
             <img :src="op.background" alt="bg" />
             <div class="segment-info">{{ op.startTime }}ms</div>
             <div class="segment-actions">
@@ -69,6 +79,13 @@ const emit = defineEmits(['update:scrollLeft', 'toggle-collapse']);
 
 const isCollapsed = ref(false);
 const scrollRef = ref(null);
+
+// Dragging state
+const draggingOp = ref(null);
+const dragType = ref(null); // 'move', 'left', 'right'
+const dragStartX = ref(0);
+const dragStartStartTime = ref(0);
+const dragStartEndTime = ref(0);
 
 const toggleCollapse = () => {
   isCollapsed.value = !isCollapsed.value;
@@ -114,9 +131,6 @@ const handleDrop = (e) => {
           
       if (nextOp && endTime > nextOp.startTime) {
           endTime = nextOp.startTime;
-          // User rule: endTime cannot be greater than next image starttime.
-          // User rule: default give 1s duration. 
-          // If available space < 1s, we take what is available.
       }
 
       // Add new background operation
@@ -129,8 +143,6 @@ const handleDrop = (e) => {
       });
       props.chart.changeBackgroundOperations.sort((a,b) => a.startTime - b.startTime);
       
-      // Trigger migration to update endTimes
-      // Note: we might need to emit an event or access a global method
       props.global.reCalculateChartMaker = !props.global.reCalculateChartMaker;
       ElNotification({ title: '已添加背景', type: 'success', size: 'small' });
     }
@@ -143,6 +155,65 @@ const deleteOp = (index) => {
   props.chart.changeBackgroundOperations.splice(index, 1);
   props.global.reCalculateChartMaker = !props.global.reCalculateChartMaker;
 };
+
+// Dragging Handlers
+const startDragOp = (e, op) => {
+  draggingOp.value = op;
+  dragType.value = 'move';
+  dragStartX.value = props.global.clientX;
+  dragStartStartTime.value = op.startTime;
+  dragStartEndTime.value = op.endTime || (op.startTime + 2000);
+};
+
+const startResizeLeft = (e, op) => {
+  draggingOp.value = op;
+  dragType.value = 'left';
+  dragStartX.value = props.global.clientX;
+  dragStartStartTime.value = op.startTime;
+  dragStartEndTime.value = op.endTime || (op.startTime + 2000);
+};
+
+const startResizeRight = (e, op) => {
+  draggingOp.value = op;
+  dragType.value = 'right';
+  dragStartX.value = props.global.clientX;
+  dragStartStartTime.value = op.startTime;
+  dragStartEndTime.value = op.endTime || (op.startTime + 2000);
+};
+
+watch(() => props.global.mouseMove, () => {
+  if (draggingOp.value) {
+    const deltaX = props.global.clientX - dragStartX.value;
+    const deltaTime = Math.round((deltaX / (props.global.documentWidth - 300)) * props.displayAreaTime);
+    
+    if (dragType.value === 'move') {
+      const duration = dragStartEndTime.value - dragStartStartTime.value;
+      let newStart = dragStartStartTime.value + deltaTime;
+      if (newStart < 0) newStart = 0;
+      
+      draggingOp.value.startTime = newStart;
+      draggingOp.value.endTime = newStart + duration;
+    } else if (dragType.value === 'left') {
+      let newStart = dragStartStartTime.value + deltaTime;
+      if (newStart < 0) newStart = 0;
+      if (newStart >= draggingOp.value.endTime - 100) newStart = draggingOp.value.endTime - 100;
+      draggingOp.value.startTime = newStart;
+    } else if (dragType.value === 'right') {
+      let newEnd = dragStartEndTime.value + deltaTime;
+      if (newEnd <= draggingOp.value.startTime + 100) newEnd = draggingOp.value.startTime + 100;
+      draggingOp.value.endTime = newEnd;
+    }
+  }
+});
+
+watch(() => props.global.mouseUp, () => {
+  if (draggingOp.value) {
+    props.chart.changeBackgroundOperations.sort((a,b) => a.startTime - b.startTime);
+    draggingOp.value = null;
+    dragType.value = null;
+    props.global.reCalculateChartMaker = !props.global.reCalculateChartMaker;
+  }
+});
 </script>
 
 <style scoped>
@@ -270,5 +341,29 @@ const deleteOp = (index) => {
   padding: 3px;
   border-radius: 50%;
   font-size: 12px;
+}
+
+.resize-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 10px;
+  background: transparent;
+  z-index: 20;
+  cursor: ew-resize;
+}
+
+.resize-handle.left {
+  left: 0;
+  cursor: w-resize;
+}
+
+.resize-handle.right {
+  right: 0;
+  cursor: e-resize;
+}
+
+.resize-handle:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
 </style>
