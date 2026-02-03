@@ -44,12 +44,12 @@ public class WidthOperation implements Serializable {
     /**
      * 开始时间
      */
-    private Integer startTime;
+    private Integer startTiming;
 
     /**
      * 结束时间
      */
-    private Integer endTime;
+    private Integer endTiming;
 
     /**
      * 起始宽度

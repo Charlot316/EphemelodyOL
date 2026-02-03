@@ -36,8 +36,8 @@
             :key="index"
             class="bg-segment"
             :style="{
-              left: (op.startTime / displayAreaTime) * (global.documentWidth - global.siderWidth) + 'px',
-              width: (( (op.endTime || (op.startTime + 2000)) - op.startTime) / displayAreaTime) * (global.documentWidth - global.siderWidth) + 'px'
+              left: (op.startTiming / displayAreaTime) * (global.documentWidth - global.siderWidth) + 'px',
+              width: (( (op.endTiming || (op.startTiming + 2000)) - op.startTiming) / displayAreaTime) * (global.documentWidth - global.siderWidth) + 'px'
             }"
             @mousedown.stop="props.global.currentNoteType === 3 ? deleteOp(index) : startDragOp($event, op)"
           >
@@ -52,7 +52,7 @@
             ></div>
 
             <img :src="op.background" alt="bg" @dragstart.prevent />
-            <div class="segment-info">{{ op.startTime }}ms</div>
+            <div class="segment-info">{{ op.startTiming }}ms</div>
             <div class="segment-actions">
               <el-icon class="delete-icon" @click.stop="deleteOp(index)"><Delete /></el-icon>
             </div>
@@ -117,8 +117,8 @@ const scrollRef = ref(null);
 const draggingOp = ref(null);
 const dragType = ref(null); // 'move', 'left', 'right'
 const dragStartX = ref(0);
-const dragStartStartTime = ref(0);
-const dragStartEndTime = ref(0);
+const dragStartStartTiming = ref(0);
+const dragStartEndTiming = ref(0);
 const snapPoints = ref([]);
 
 const collectSnapPoints = (currentOp) => {
@@ -126,8 +126,8 @@ const collectSnapPoints = (currentOp) => {
   // Collect from Background Operations (excluding self)
   props.chart.changeBackgroundOperations.forEach(op => {
     if (op !== currentOp) {
-      if (op.startTime !== undefined) points.push(op.startTime);
-      if (op.endTime !== undefined) points.push(op.endTime);
+      if (op.startTiming !== undefined) points.push(op.startTiming);
+      if (op.endTiming !== undefined) points.push(op.endTiming);
     }
   });
   
@@ -142,20 +142,20 @@ const collectSnapPoints = (currentOp) => {
       }
       if (track.moveOperations) {
         track.moveOperations.forEach(o => {
-          if (o.startTime !== undefined) points.push(o.startTime);
-          if (o.endTime !== undefined) points.push(o.endTime);
+          if (o.startTiming !== undefined) points.push(o.startTiming);
+          if (o.endTiming !== undefined) points.push(o.endTiming);
         });
       }
       if (track.changeWidthOperations) {
         track.changeWidthOperations.forEach(o => {
-          if (o.startTime !== undefined) points.push(o.startTime);
-          if (o.endTime !== undefined) points.push(o.endTime);
+          if (o.startTiming !== undefined) points.push(o.startTiming);
+          if (o.endTiming !== undefined) points.push(o.endTiming);
         });
       }
        if (track.changeColorOperations) {
         track.changeColorOperations.forEach(o => {
-          if (o.startTime !== undefined) points.push(o.startTime);
-          if (o.endTime !== undefined) points.push(o.endTime);
+          if (o.startTiming !== undefined) points.push(o.startTiming);
+          if (o.endTiming !== undefined) points.push(o.endTiming);
         });
       }
     });
@@ -183,9 +183,9 @@ const getSnappedTime = (time, points) => {
 const checkOverlap = (start, end, excludeOp) => {
   for (const op of props.chart.changeBackgroundOperations) {
     if (op === excludeOp) continue;
-    const opEnd = op.endTime || (op.startTime + 2000);
+    const opEnd = op.endTiming || (op.startTiming + 2000);
     // Strict overlap check
-    if (start < opEnd && end > op.startTime) {
+    if (start < opEnd && end > op.startTiming) {
       return true;
     }
   }
@@ -203,7 +203,7 @@ const deleteOp = (index) => {
       description: 'Delete BG Op',
       undo: () => {
          props.chart.changeBackgroundOperations.push(op);
-         props.chart.changeBackgroundOperations.sort((a,b) => a.startTime - b.startTime);
+         props.chart.changeBackgroundOperations.sort((a,b) => a.startTiming - b.startTiming);
          if (syncAction) syncAction("ADD_BG_OP", op);
       },
       redo: () => {
@@ -222,8 +222,8 @@ const startDragOp = (e, op) => {
   draggingOp.value = op;
   dragType.value = 'move';
   dragStartX.value = props.global.clientX;
-  dragStartStartTime.value = op.startTime;
-  dragStartEndTime.value = op.endTime || (op.startTime + 2000);
+  dragStartStartTiming.value = op.startTiming;
+  dragStartEndTiming.value = op.endTiming || (op.startTiming + 2000);
   
   snapPoints.value = collectSnapPoints(op);
 };
@@ -232,8 +232,8 @@ const startResizeLeft = (e, op) => {
   draggingOp.value = op;
   dragType.value = 'left';
   dragStartX.value = props.global.clientX;
-  dragStartStartTime.value = op.startTime;
-  dragStartEndTime.value = op.endTime || (op.startTime + 2000);
+  dragStartStartTiming.value = op.startTiming;
+  dragStartEndTiming.value = op.endTiming || (op.startTiming + 2000);
   
   snapPoints.value = collectSnapPoints(op);
 };
@@ -242,8 +242,8 @@ const startResizeRight = (e, op) => {
   draggingOp.value = op;
   dragType.value = 'right';
   dragStartX.value = props.global.clientX;
-  dragStartStartTime.value = op.startTime;
-  dragStartEndTime.value = op.endTime || (op.startTime + 2000);
+  dragStartStartTiming.value = op.startTiming;
+  dragStartEndTiming.value = op.endTiming || (op.startTiming + 2000);
   
   snapPoints.value = collectSnapPoints(op);
 };
@@ -254,36 +254,36 @@ watch(() => props.global.mouseMove, () => {
     const deltaTime = Math.round((deltaX / (props.global.documentWidth - props.global.siderWidth)) * props.displayAreaTime);
     
     if (dragType.value === 'move') {
-      const duration = dragStartEndTime.value - dragStartStartTime.value;
-      let newStart = dragStartStartTime.value + deltaTime;
+      const duration = dragStartEndTiming.value - dragStartStartTiming.value;
+      let newStart = dragStartStartTiming.value + deltaTime;
       
       if (newStart < 0) newStart = 0;
       newStart = getSnappedTime(newStart, snapPoints.value);
       let newEnd = newStart + duration;
       
       if (!checkOverlap(newStart, newEnd, draggingOp.value)) {
-        draggingOp.value.startTime = newStart;
-        draggingOp.value.endTime = newEnd;
+        draggingOp.value.startTiming = newStart;
+        draggingOp.value.endTiming = newEnd;
       }
       
     } else if (dragType.value === 'left') {
-      let newStart = dragStartStartTime.value + deltaTime;
+      let newStart = dragStartStartTiming.value + deltaTime;
       newStart = getSnappedTime(newStart, snapPoints.value);
       if (newStart < 0) newStart = 0;
-      if (newStart >= draggingOp.value.endTime - 100) newStart = draggingOp.value.endTime - 100;
+      if (newStart >= draggingOp.value.endTiming - 100) newStart = draggingOp.value.endTiming - 100;
       
-      if (!checkOverlap(newStart, draggingOp.value.endTime, draggingOp.value)) {
-        draggingOp.value.startTime = newStart;
+      if (!checkOverlap(newStart, draggingOp.value.endTiming, draggingOp.value)) {
+        draggingOp.value.startTiming = newStart;
       }
       
     } else if (dragType.value === 'right') {
-      let newEnd = dragStartEndTime.value + deltaTime;
+      let newEnd = dragStartEndTiming.value + deltaTime;
       newEnd = getSnappedTime(newEnd, snapPoints.value);
-      if (newEnd <= draggingOp.value.startTime + 100) newEnd = draggingOp.value.startTime + 100;
+      if (newEnd <= draggingOp.value.startTiming + 100) newEnd = draggingOp.value.startTiming + 100;
       if (newEnd > props.chart.songLength) newEnd = props.chart.songLength;
 
-      if (!checkOverlap(draggingOp.value.startTime, newEnd, draggingOp.value)) {
-        draggingOp.value.endTime = newEnd;
+      if (!checkOverlap(draggingOp.value.startTiming, newEnd, draggingOp.value)) {
+        draggingOp.value.endTiming = newEnd;
       }
     }
   }
@@ -291,15 +291,15 @@ watch(() => props.global.mouseMove, () => {
 
 watch(() => props.global.mouseUp, () => {
   if (draggingOp.value) {
-    props.chart.changeBackgroundOperations.sort((a,b) => a.startTime - b.startTime);
+    props.chart.changeBackgroundOperations.sort((a,b) => a.startTiming - b.startTiming);
     
     const currentOp = draggingOp.value;
-    const finalStart = currentOp.startTime;
-    const finalEnd = currentOp.endTime;
+    const finalStart = currentOp.startTiming;
+    const finalEnd = currentOp.endTiming;
     
-    if (finalStart !== dragStartStartTime.value || finalEnd !== dragStartEndTime.value) {
-        const oldS = dragStartStartTime.value;
-        const oldE = dragStartEndTime.value;
+    if (finalStart !== dragStartStartTiming.value || finalEnd !== dragStartEndTiming.value) {
+        const oldS = dragStartStartTiming.value;
+        const oldE = dragStartEndTiming.value;
         
         if (syncAction) syncAction("UPDATE_BG_OP", currentOp);
         
@@ -307,16 +307,16 @@ watch(() => props.global.mouseUp, () => {
            commandHistory.pushCommand({
               description: 'Move BG Op',
               undo: () => {
-                 currentOp.startTime = oldS;
-                 currentOp.endTime = oldE;
-                 props.chart.changeBackgroundOperations.sort((a,b) => a.startTime - b.startTime);
+                 currentOp.startTiming = oldS;
+                 currentOp.endTiming = oldE;
+                 props.chart.changeBackgroundOperations.sort((a,b) => a.startTiming - b.startTiming);
                  if (syncAction) syncAction("UPDATE_BG_OP", currentOp);
                  props.global.reCalculateChartMaker = !props.global.reCalculateChartMaker;
               },
               redo: () => {
-                 currentOp.startTime = finalStart;
-                 currentOp.endTime = finalEnd;
-                 props.chart.changeBackgroundOperations.sort((a,b) => a.startTime - b.startTime);
+                 currentOp.startTiming = finalStart;
+                 currentOp.endTiming = finalEnd;
+                 props.chart.changeBackgroundOperations.sort((a,b) => a.startTiming - b.startTiming);
                  if (syncAction) syncAction("UPDATE_BG_OP", currentOp);
                  props.global.reCalculateChartMaker = !props.global.reCalculateChartMaker;
               }
@@ -350,15 +350,15 @@ const handleDrop = (e) => {
   const timeOffset = Math.round((x / (props.global.documentWidth - props.global.siderWidth)) * props.displayAreaTime);
   
   const newOp = {
-    startTime: timeOffset,
-    endTime: timeOffset + 5000,
+    startTiming: timeOffset,
+    endTiming: timeOffset + 5000,
     background: assetUrl,
     isPending: true,
     clientId: Math.random().toString(36).substr(2, 9)
   };
 
   props.chart.changeBackgroundOperations.push(newOp);
-  props.chart.changeBackgroundOperations.sort((a, b) => a.startTime - b.startTime);
+  props.chart.changeBackgroundOperations.sort((a, b) => a.startTiming - b.startTiming);
   
   if (syncAction) syncAction("ADD_BG_OP", newOp, newOp.clientId);
 };

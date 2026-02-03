@@ -11,7 +11,9 @@ import java.util.List;
 public class TrackDTO {
     private Integer type;
     private String key;
+    @com.fasterxml.jackson.annotation.JsonAlias("startTime")
     private Integer startTiming;
+    @com.fasterxml.jackson.annotation.JsonAlias("endTime")
     private Integer endTiming;
     private Float positionX;
     private Float width;

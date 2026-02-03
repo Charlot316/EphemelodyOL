@@ -290,7 +290,7 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
             changeBackgroundOperation.setSongId(uploadBackgroundDTO.getSongId());
             changeBackgroundOperation.setBackground(url);
             changeBackgroundOperation.setAssetId(asset.getId());
-            changeBackgroundOperation.setStartTime(uploadBackgroundDTO.getStartTime());
+            changeBackgroundOperation.setStartTiming(uploadBackgroundDTO.getStartTiming());
             changeBackgroundOperationMapper.insert(changeBackgroundOperation);
 
             backgroundVO.setBackground(url); // 返回 url
@@ -452,8 +452,8 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
                             MoveOperation mo = new MoveOperation();
                             mo.setSongId(songId);
                             mo.setBasedTrack(track.getId());
-                            mo.setStartTime(mDto.getStartTime());
-                            mo.setEndTime(mDto.getEndTime());
+                            mo.setStartTiming(mDto.getStartTiming());
+                            mo.setEndTiming(mDto.getEndTiming());
                             mo.setStartX(mDto.getStartX());
                             mo.setEndX(mDto.getEndX());
                             moveOperationMapper.insert(mo);
@@ -465,8 +465,8 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
                             ChangeWidthOperation wo = new ChangeWidthOperation();
                             wo.setSongId(songId);
                             wo.setBasedTrack(track.getId());
-                            wo.setStartTime(wDto.getStartTime());
-                            wo.setEndTime(wDto.getEndTime());
+                            wo.setStartTiming(wDto.getStartTiming());
+                            wo.setEndTiming(wDto.getEndTiming());
                             wo.setStartWidth(wDto.getStartWidth());
                             wo.setEndWidth(wDto.getEndWidth());
                             changeWidthOperationMapper.insert(wo);
@@ -478,8 +478,8 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
                             ChangeColorOperation co = new ChangeColorOperation();
                             co.setSongId(songId);
                             co.setBasedTrack(track.getId());
-                            co.setStartTime(cDto.getStartTime());
-                            co.setEndTime(cDto.getEndTime());
+                            co.setStartTiming(cDto.getStartTiming());
+                            co.setEndTiming(cDto.getEndTiming());
                             co.setStartR(cDto.getStartR());
                             co.setStartG(cDto.getStartG());
                             co.setStartB(cDto.getStartB());
@@ -497,8 +497,8 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
                     ChangeBackgroundOperation bo = new ChangeBackgroundOperation();
                     bo.setSongId(songId);
                     bo.setBackground(bDto.getBackground());
-                    bo.setStartTime(bDto.getStartTime());
-                    bo.setEndTime(bDto.getEndTime());
+                    bo.setStartTiming(bDto.getStartTiming());
+                    bo.setEndTiming(bDto.getEndTiming());
                     changeBackgroundOperationMapper.insert(bo);
                 }
             }
@@ -558,8 +558,8 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
                     java.util.List<MoveOperationDTO> mDtos = new java.util.ArrayList<>();
                     for (MoveOperation mo : mos) {
                         MoveOperationDTO md = new MoveOperationDTO();
-                        md.setStartTime(mo.getStartTime());
-                        md.setEndTime(mo.getEndTime());
+                        md.setStartTiming(mo.getStartTiming());
+                        md.setEndTiming(mo.getEndTiming());
                         md.setStartX(mo.getStartX());
                         md.setEndX(mo.getEndX());
                         mDtos.add(md);
@@ -579,8 +579,8 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
                 for (ChangeBackgroundOperation bo : bgOps) {
                     ChangeBackgroundOperationDTO bd = new ChangeBackgroundOperationDTO();
                     bd.setBackground(bo.getBackground());
-                    bd.setStartTime(bo.getStartTime());
-                    bd.setEndTime(bo.getEndTime());
+                    bd.setStartTiming(bo.getStartTiming());
+                    bd.setEndTiming(bo.getEndTiming());
                     bgDtos.add(bd);
                 }
                 dto.setChangeBackgroundOperations(bgDtos);

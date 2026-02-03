@@ -44,12 +44,12 @@ public class MoveOperation implements Serializable {
     /**
      * 操作开始时间
      */
-    private Integer startTime;
+    private Integer startTiming;
 
     /**
      * 操作结束时间
      */
-    private Integer endTime;
+    private Integer endTiming;
 
     /**
      * 操作的起始坐标

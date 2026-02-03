@@ -309,17 +309,17 @@ const newColorOperations = () => {
   }
 };
 
-const dragStartTime = ref(0);
-const dragEndTime = ref(0);
+const dragStartTiming = ref(0);
+const dragEndTiming = ref(0);
 
 const startDragLeft = () => {
   leftMove.value = true;
-  dragStartTime.value = props.track.startTiming;
+  dragStartTiming.value = props.track.startTiming;
 };
 
 const startDragRight = () => {
   rightMove.value = true;
-  dragEndTime.value = props.track.endTiming;
+  dragEndTiming.value = props.track.endTiming;
 };
 
 const commandHistory = inject('commandHistory');
@@ -328,8 +328,8 @@ watch(() => props.global.mouseUp, () => {
   if (leftMove.value || rightMove.value) {
     const finalStart = props.track.startTiming;
     const finalEnd = props.track.endTiming;
-    const oldStart = dragStartTime.value;
-    const oldEnd = dragEndTime.value;
+    const oldStart = dragStartTiming.value;
+    const oldEnd = dragEndTiming.value;
 
     if (finalStart !== oldStart || finalEnd !== oldEnd) {
       if (syncAction) syncAction("UPDATE_TRACK", props.track);
@@ -449,9 +449,9 @@ const addNoteAt = (type, time) => {
 };
 
 const addOpAt = (type, time) => {
-    const endTime = Math.min(time + 150, props.track.endTiming);
+    const endTiming = Math.min(time + 150, props.track.endTiming);
     const clientId = uuid();
-    let op = { startTime: time, endTime: endTime, basedTrack: props.track.id, clientId, isPending: true };
+    let op = { startTiming: time, endTiming: endTiming, basedTrack: props.track.id, clientId, isPending: true };
     
     if (type === 'move') {
         op.startX = props.track.tempPositionX || 0; op.endX = props.track.tempPositionX || 0;

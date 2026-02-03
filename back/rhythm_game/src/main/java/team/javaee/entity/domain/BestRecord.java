@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.Date;
-
 import java.io.Serializable;
 
 import lombok.Data;
@@ -24,7 +23,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class BestRecord implements Serializable {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
 
     /**
      * id
@@ -89,7 +88,8 @@ public class BestRecord implements Serializable {
     public BestRecord() {
     }
 
-    public BestRecord(Integer songId, String userId, Integer score, Integer pure, Integer far, Integer lost, Integer combo, Float potential, LocalDateTime time) {
+    public BestRecord(Integer songId, String userId, Integer score, Integer pure, Integer far, Integer lost,
+            Integer combo, Float potential, LocalDateTime time) {
         this.songId = songId;
         this.userId = userId;
         this.score = score;

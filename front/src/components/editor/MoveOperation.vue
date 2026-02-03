@@ -50,17 +50,17 @@
         ref="formRef"
         @submit.prevent="saveOperation"
       >
-        <el-form-item label="开始时机" label-width="80px" prop="startTime">
+        <el-form-item label="开始时机" label-width="80px" prop="startTiming">
           <el-input
             @keydown.enter="saveOperation"
-            v-model="tempOperation.startTime"
+            v-model="tempOperation.startTiming"
             style="width:130px"
           />
         </el-form-item>
-        <el-form-item label="结束时机" label-width="80px" prop="endTime">
+        <el-form-item label="结束时机" label-width="80px" prop="endTiming">
           <el-input
             @keydown.enter="saveOperation"
-            v-model="tempOperation.endTime"
+            v-model="tempOperation.endTiming"
             style="width:130px"
           />
         </el-form-item>
@@ -84,7 +84,7 @@
           <el-tooltip class="item" effect="dark" placement="top-start">
             <template #content>
               <div style="text-align:center">
-                {{ operation.startTime + "→" + operation.endTime }}
+                {{ operation.startTiming + "→" + operation.endTiming }}
                 <br />
                 {{ operation.startX + "→" + operation.endX }}
               </div>
@@ -99,7 +99,7 @@
                   background: 'rgb(83, 195, 208)',
                   cursor: 'move',
                   width:
-                    ((operation.endTime - operation.startTime) /
+                    ((operation.endTiming - operation.startTiming) /
                       displayAreaTime) *
                       (global.documentWidth - global.siderWidth) +
                     'px',
@@ -130,7 +130,7 @@
                   position: 'absolute',
                   cursor: 'e-resize',
                   left:
-                    ((operation.endTime - operation.startTime) /
+                    ((operation.endTiming - operation.startTiming) /
                       displayAreaTime) *
                       (global.documentWidth - global.siderWidth) +
                     1 +
@@ -173,7 +173,7 @@ const passedTime = ref(0);
 const formRef = ref(null);
 const tempOperation = reactive({});
 
-const checkStartTime = (rule, value, callback) => {
+const checkStartTiming = (rule, value, callback) => {
   if (value !== 0 && !value) return callback(new Error("开始时机不能为空"));
   const val = parseFloat(value);
   if (isNaN(val)) callback(new Error("请输入数字值"));
@@ -183,7 +183,7 @@ const checkStartTime = (rule, value, callback) => {
   else callback();
 };
 
-const checkEndTime = (rule, value, callback) => {
+const checkEndTiming = (rule, value, callback) => {
   if (value !== 0 && !value) return callback(new Error("结束时机不能为空"));
   const val = parseFloat(value);
   if (isNaN(val)) callback(new Error("请输入数字值"));
@@ -194,14 +194,14 @@ const checkEndTime = (rule, value, callback) => {
 };
 
 const rules = {
-  startTime: [{ required: true, validator: checkStartTime, trigger: "blur" }],
-  endTime: [{ required: true, validator: checkEndTime, trigger: "blur" }],
+  startTiming: [{ required: true, validator: checkStartTiming, trigger: "blur" }],
+  endTiming: [{ required: true, validator: checkEndTiming, trigger: "blur" }],
   startX: [{ required: true, message: "起始坐标不能为空", trigger: "blur" }],
   endX: [{ required: true, message: "终止坐标不能为空", trigger: "blur" }],
 };
 
 const left = computed(() => {
-  return (props.operation.startTime / props.displayAreaTime) * (props.global.documentWidth - props.global.siderWidth);
+  return (props.operation.startTiming / props.displayAreaTime) * (props.global.documentWidth - props.global.siderWidth);
 });
 
 const opStyle = computed(() => {
@@ -266,8 +266,8 @@ const collectSnapPoints = (currentOp) => {
       ['moveOperations', 'changeWidthOperations', 'changeColorOperations'].forEach(key => {
         if (track[key]) track[key].forEach(op => {
           if (op !== currentOp) {
-            if (op.startTime !== undefined) points.push(op.startTime);
-            if (op.endTime !== undefined) points.push(op.endTime);
+            if (op.startTiming !== undefined) points.push(op.startTiming);
+            if (op.endTiming !== undefined) points.push(op.endTiming);
           }
         });
       });
@@ -275,8 +275,8 @@ const collectSnapPoints = (currentOp) => {
   }
   if (props.chart.changeBackgroundOperations) {
     props.chart.changeBackgroundOperations.forEach(op => {
-      if (op.startTime !== undefined) points.push(op.startTime);
-      if (op.endTime !== undefined) points.push(op.endTime);
+      if (op.startTiming !== undefined) points.push(op.startTiming);
+      if (op.endTiming !== undefined) points.push(op.endTiming);
     });
   }
   if (props.chart.bpm > 0) {
@@ -307,7 +307,7 @@ const checkOverlap = (start, end, exclude) => {
   if (props.track.moveOperations) {
     for (const op of props.track.moveOperations) {
       if (op === exclude) continue;
-      if (start < op.endTime && end > op.startTime) return true;
+      if (start < op.endTiming && end > op.startTiming) return true;
     }
   }
   return false;
@@ -317,8 +317,8 @@ const longOperationCanMove = () => {
   if (props.operation.isPending || props.operation.isDeleting) return;
   canMove.value = true;
   dragStartX.value = props.global.clientX;
-  dragStartTiming.value = props.operation.startTime;
-  dragEndTiming.value = props.operation.endTime;
+  dragStartTiming.value = props.operation.startTiming;
+  dragEndTiming.value = props.operation.endTiming;
   snapPoints.value = collectSnapPoints(props.operation);
 };
 
@@ -326,8 +326,8 @@ const startLeftMove = () => {
   if (props.operation.isPending || props.operation.isDeleting) return;
   leftMove.value = true;
   dragStartX.value = props.global.clientX;
-  dragStartTiming.value = props.operation.startTime;
-  dragEndTiming.value = props.operation.endTime;
+  dragStartTiming.value = props.operation.startTiming;
+  dragEndTiming.value = props.operation.endTiming;
   snapPoints.value = collectSnapPoints(props.operation);
 };
 
@@ -335,8 +335,8 @@ const startRightMove = () => {
   if (props.operation.isPending || props.operation.isDeleting) return;
   rightMove.value = true;
   dragStartX.value = props.global.clientX;
-  dragStartTiming.value = props.operation.startTime;
-  dragEndTiming.value = props.operation.endTime;
+  dragStartTiming.value = props.operation.startTiming;
+  dragEndTiming.value = props.operation.endTiming;
   snapPoints.value = collectSnapPoints(props.operation);
 };
 
@@ -404,11 +404,11 @@ watch(() => props.global.mouseUp, () => {
     leftMove.value = false;
     rightMove.value = false;
     snapPoints.value = [];
-    props.track.moveOperations.sort((a,b) => a.startTime - b.startTime);
+    props.track.moveOperations.sort((a,b) => a.startTiming - b.startTiming);
     updateTrack();
     
-    const finalStart = props.operation.startTime;
-    const finalEnd = props.operation.endTime;
+    const finalStart = props.operation.startTiming;
+    const finalEnd = props.operation.endTiming;
     
     if (finalStart !== dragStartTiming.value || finalEnd !== dragEndTiming.value) {
       const oldS = dragStartTiming.value;
@@ -420,17 +420,17 @@ watch(() => props.global.mouseUp, () => {
         commandHistory.pushCommand({
           description: 'Move Move Op',
           undo: () => {
-            props.operation.startTime = oldS;
-            props.operation.endTime = oldE;
-            props.track.moveOperations.sort((a,b) => a.startTime - b.startTime);
+            props.operation.startTiming = oldS;
+            props.operation.endTiming = oldE;
+            props.track.moveOperations.sort((a,b) => a.startTiming - b.startTiming);
             if (syncAction) syncAction("UPDATE_MOVE_OP", props.operation);
             updateTrack();
             updateTemp();
           },
           redo: () => {
-            props.operation.startTime = finalStart;
-            props.operation.endTime = finalEnd;
-            props.track.moveOperations.sort((a,b) => a.startTime - b.startTime);
+            props.operation.startTiming = finalStart;
+            props.operation.endTiming = finalEnd;
+            props.track.moveOperations.sort((a,b) => a.startTiming - b.startTiming);
             if (syncAction) syncAction("UPDATE_MOVE_OP", props.operation);
             updateTrack();
             updateTemp();
@@ -465,8 +465,8 @@ watch(() => props.global.mouseMove, () => {
       newStart = newEnd - duration;
     }
     if (!checkOverlap(newStart, newEnd, props.operation)) {
-      props.operation.startTime = newStart;
-      props.operation.endTime = newEnd;
+      props.operation.startTiming = newStart;
+      props.operation.endTiming = newEnd;
       updateTemp();
     }
   } else if (leftMove.value) {
@@ -475,9 +475,9 @@ watch(() => props.global.mouseMove, () => {
     let newStart = dragStartTiming.value + deltaTime;
     newStart = getSnappedTime(newStart, snapPoints.value);
     if (newStart < props.track.startTiming) newStart = props.track.startTiming;
-    if (newStart > props.operation.endTime - 20) newStart = props.operation.endTime - 20;
-    if (!checkOverlap(newStart, props.operation.endTime, props.operation)) {
-      props.operation.startTime = newStart;
+    if (newStart > props.operation.endTiming - 20) newStart = props.operation.endTiming - 20;
+    if (!checkOverlap(newStart, props.operation.endTiming, props.operation)) {
+      props.operation.startTiming = newStart;
       updateTemp();
     }
   } else if (rightMove.value) {
@@ -486,9 +486,9 @@ watch(() => props.global.mouseMove, () => {
     let newEnd = dragEndTiming.value + deltaTime;
     newEnd = getSnappedTime(newEnd, snapPoints.value);
     if (newEnd > props.track.endTiming) newEnd = props.track.endTiming;
-    if (newEnd < props.operation.startTime + 20) newEnd = props.operation.startTime + 20;
-    if (!checkOverlap(props.operation.startTime, newEnd, props.operation)) {
-      props.operation.endTime = newEnd;
+    if (newEnd < props.operation.startTiming + 20) newEnd = props.operation.startTiming + 20;
+    if (!checkOverlap(props.operation.startTiming, newEnd, props.operation)) {
+      props.operation.endTiming = newEnd;
       updateTemp();
     }
   }

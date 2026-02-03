@@ -9,5 +9,5 @@ import org.springframework.web.multipart.MultipartFile;
 public class UploadBackgroundDTO {
     private Integer songId;
     private MultipartFile background;
-    private Integer startTime;
+    private Integer startTiming;
 }

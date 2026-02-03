@@ -318,13 +318,13 @@ export function useChartEditor(route, router) {
 
   const migrateBackgroundOperations = () => {
     if (!chart.changeBackgroundOperations || chart.changeBackgroundOperations.length === 0) return;
-    chart.changeBackgroundOperations.sort((a, b) => a.startTime - b.startTime);
+    chart.changeBackgroundOperations.sort((a, b) => a.startTiming - b.startTiming);
     for (let i = 0; i < chart.changeBackgroundOperations.length; i++) {
         const current = chart.changeBackgroundOperations[i];
         const next = chart.changeBackgroundOperations[i + 1];
-        if (current.endTime === null || current.endTime === undefined || current.endTime === 0) {
-          if (next) current.endTime = next.startTime;
-          else current.endTime = chart.songLength || (current.startTime + 5000);
+        if (current.endTiming === null || current.endTiming === undefined || current.endTiming === 0) {
+          if (next) current.endTiming = next.startTiming;
+          else current.endTiming = chart.songLength || (current.startTiming + 5000);
         }
     }
     if (chart.defaultBackground) {
@@ -375,9 +375,9 @@ export function useChartEditor(route, router) {
       if (chart.tracks) {
         chart.tracks.forEach(track => {
           if (track.notes) track.notes.sort((a, b) => a.timing - b.timing);
-          if (track.moveOperations) track.moveOperations.sort((a, b) => a.startTime - b.startTime);
-          if (track.changeWidthOperations) track.changeWidthOperations.sort((a, b) => a.startTime - b.startTime);
-          if (track.changeColorOperations) track.changeColorOperations.sort((a, b) => a.startTime - b.startTime);
+          if (track.moveOperations) track.moveOperations.sort((a, b) => a.startTiming - b.startTiming);
+          if (track.changeWidthOperations) track.changeWidthOperations.sort((a, b) => a.startTiming - b.startTiming);
+          if (track.changeColorOperations) track.changeColorOperations.sort((a, b) => a.startTiming - b.startTiming);
         });
       }
       // Default to time sort on load

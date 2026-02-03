@@ -16,8 +16,8 @@
       <img
         :src="getBackgroundUrl(op)"
         v-show="
-          global.currentTime >= op.startTime &&
-          (op.endTime === null || op.endTime === undefined || global.currentTime <= op.endTime)
+          global.currentTime >= op.startTiming &&
+          (op.endTiming === null || op.endTiming === undefined || global.currentTime <= op.endTiming)
         "
         class="background-image background-overlay"
         alt="op-bg"
@@ -79,6 +79,7 @@
       :src="normalizeUrl(chart.songUrl)"
       style="display:none"
       @canplaythrough="handleAudioLoaded"
+      @ended="handleAudioEnded"
     />
 
     <!-- Player HUD (Only for Edit Mode) -->
@@ -382,6 +383,13 @@ const handleAudioLoaded = () => {
   }
 };
 
+const handleAudioEnded = () => {
+  if (props.mode === 'play') {
+    pause();
+    emit('finished');
+  }
+};
+
 const handleImageLoaded = () => {
   imageLoadedCount.value++;
   if (imageLoadedCount.value >= imagePath.value.length) {
@@ -441,14 +449,14 @@ const seek = (time) => {
 };
 
 const reStart = () => {
-  const startTime = props.displayRange[0] || 0;
+  const startTiming = props.displayRange[0] || 0;
   global.score = 0;
   global.pureCount = 0;
   global.farCount = 0;
   global.lostCount = 0;
   global.combo = 0;
   global.maxCombo = 0;
-  seek(startTime);
+  seek(startTiming);
   if (isRunning.value) play();
 };
 

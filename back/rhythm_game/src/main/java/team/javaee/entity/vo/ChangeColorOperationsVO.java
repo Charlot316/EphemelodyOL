@@ -5,8 +5,8 @@ import lombok.Data;
 @Data
 public class ChangeColorOperationsVO {
     private Integer id;
-    private Integer startTime;
-    private Integer endTime;
+    private Integer startTiming;
+    private Integer endTiming;
     private Integer endR;
     private Integer endG;
     private Integer endB;

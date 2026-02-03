@@ -71,22 +71,16 @@ public class Track implements Serializable {
     /**
      * R
      */
-    @TableField("R")
-    @JsonProperty("R")
     private Integer r;
 
     /**
      * G
      */
-    @TableField("G")
-    @JsonProperty("G")
     private Integer g;
 
     /**
      * B
      */
-    @TableField("B")
-    @JsonProperty("B")
     private Integer b;
 
     @Version

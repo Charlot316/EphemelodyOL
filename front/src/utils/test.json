@@ -2,7 +2,8 @@
     "bpm": 350,
     "firstBeatDelay": 3530,
     "songId": 1,
-    "tracks": [{
+    "tracks": [
+        {
             "id": 0,
             "type": 1,
             "key": "d",
@@ -10,10 +11,11 @@
             "endTiming": 15118,
             "positionX": 0.2,
             "width": 0.06,
-            "R": 180,
-            "G": 238,
-            "B": 180,
-            "notes": [{
+            "r": 180,
+            "g": 238,
+            "b": 180,
+            "notes": [
+                {
                     "noteType": 0,
                     "key": "d",
                     "timing": 3530,
@@ -294,25 +296,28 @@
                     }
                 }
             ],
-            "moveOperations": [{
-                "trackId": 0,
-                "type": 1,
-                "startTime": 14630,
-                "endTime": 14630,
-                "endX": -1,
-                "endWidth": 0,
-                "endR": 160,
-                "endG": 160,
-                "endB": 160,
-                "background": "",
-                "startX": 0.2
-            }],
+            "moveOperations": [
+                {
+                    "trackId": 0,
+                    "type": 1,
+                    "startTiming": 14630,
+                    "endTiming": 14630,
+                    "endX": -1,
+                    "endWidth": 0,
+                    "endR": 160,
+                    "endG": 160,
+                    "endB": 160,
+                    "background": "",
+                    "startX": 0.2
+                }
+            ],
             "changeWidthOperations": [],
-            "changeColorOperations": [{
+            "changeColorOperations": [
+                {
                     "trackId": 0,
                     "type": 3,
-                    "startTime": 11969,
-                    "endTime": 11969,
+                    "startTiming": 11969,
+                    "endTiming": 11969,
                     "endX": 0,
                     "endWidth": 0,
                     "endR": 191,
@@ -326,8 +331,8 @@
                 {
                     "trackId": 0,
                     "type": 3,
-                    "startTime": 12144,
-                    "endTime": 12144,
+                    "startTiming": 12144,
+                    "endTiming": 12144,
                     "endX": 0,
                     "endWidth": 0,
                     "endR": 255,
@@ -341,8 +346,8 @@
                 {
                     "trackId": 0,
                     "type": 3,
-                    "startTime": 12319,
-                    "endTime": 12319,
+                    "startTiming": 12319,
+                    "endTiming": 12319,
                     "endX": 0,
                     "endWidth": 0,
                     "endR": 180,
@@ -370,10 +375,11 @@
                 "endTiming": 15118,
                 "positionX": 0.2,
                 "width": 0.06,
-                "R": 180,
-                "G": 238,
-                "B": 180,
-                "notes": [{
+                "r": 180,
+                "g": 238,
+                "b": 180,
+                "notes": [
+                    {
                         "noteType": 0,
                         "key": "d",
                         "timing": 3530
@@ -475,25 +481,28 @@
                         "timing": 14618
                     }
                 ],
-                "moveOperations": [{
-                    "trackId": 0,
-                    "type": 1,
-                    "startTime": 14630,
-                    "endTime": 14630,
-                    "endX": -1,
-                    "endWidth": 0,
-                    "endR": 160,
-                    "endG": 160,
-                    "endB": 160,
-                    "background": "",
-                    "startX": 0.2
-                }],
+                "moveOperations": [
+                    {
+                        "trackId": 0,
+                        "type": 1,
+                        "startTiming": 14630,
+                        "endTiming": 14630,
+                        "endX": -1,
+                        "endWidth": 0,
+                        "endR": 160,
+                        "endG": 160,
+                        "endB": 160,
+                        "background": "",
+                        "startX": 0.2
+                    }
+                ],
                 "changeWidthOperations": [],
-                "changeColorOperations": [{
+                "changeColorOperations": [
+                    {
                         "trackId": 0,
                         "type": 3,
-                        "startTime": 11969,
-                        "endTime": 11969,
+                        "startTiming": 11969,
+                        "endTiming": 11969,
                         "endX": 0,
                         "endWidth": 0,
                         "endR": 191,
@@ -507,8 +516,8 @@
                     {
                         "trackId": 0,
                         "type": 3,
-                        "startTime": 12144,
-                        "endTime": 12144,
+                        "startTiming": 12144,
+                        "endTiming": 12144,
                         "endX": 0,
                         "endWidth": 0,
                         "endR": 255,
@@ -522,8 +531,8 @@
                     {
                         "trackId": 0,
                         "type": 3,
-                        "startTime": 12319,
-                        "endTime": 12319,
+                        "startTiming": 12319,
+                        "endTiming": 12319,
                         "endX": 0,
                         "endWidth": 0,
                         "endR": 180,
@@ -554,10 +563,11 @@
             "endTiming": 15118,
             "positionX": 0.8,
             "width": 0.06,
-            "R": 180,
-            "G": 238,
-            "B": 180,
-            "notes": [{
+            "r": 180,
+            "g": 238,
+            "b": 180,
+            "notes": [
+                {
                     "basedTrack": 3,
                     "positionX": 0,
                     "positionY": 0.9248000000000003,
@@ -1052,25 +1062,28 @@
                     }
                 }
             ],
-            "moveOperations": [{
-                "trackId": 3,
-                "type": 1,
-                "startTime": 14630,
-                "endTime": 14630,
-                "endX": 2,
-                "endWidth": 0,
-                "endR": 160,
-                "endG": 160,
-                "endB": 160,
-                "background": "",
-                "startX": 0.8
-            }],
+            "moveOperations": [
+                {
+                    "trackId": 3,
+                    "type": 1,
+                    "startTiming": 14630,
+                    "endTiming": 14630,
+                    "endX": 2,
+                    "endWidth": 0,
+                    "endR": 160,
+                    "endG": 160,
+                    "endB": 160,
+                    "background": "",
+                    "startX": 0.8
+                }
+            ],
             "changeWidthOperations": [],
-            "changeColorOperations": [{
+            "changeColorOperations": [
+                {
                     "trackId": 3,
                     "type": 3,
-                    "startTime": 11969,
-                    "endTime": 11969,
+                    "startTiming": 11969,
+                    "endTiming": 11969,
                     "endX": 0,
                     "endWidth": 0,
                     "endR": 191,
@@ -1084,8 +1097,8 @@
                 {
                     "trackId": 3,
                     "type": 3,
-                    "startTime": 12144,
-                    "endTime": 12144,
+                    "startTiming": 12144,
+                    "endTiming": 12144,
                     "endX": 0,
                     "endWidth": 0,
                     "endR": 255,
@@ -1099,8 +1112,8 @@
                 {
                     "trackId": 3,
                     "type": 3,
-                    "startTime": 12319,
-                    "endTime": 12319,
+                    "startTiming": 12319,
+                    "endTiming": 12319,
                     "endX": 0,
                     "endWidth": 0,
                     "endR": 180,
@@ -1128,10 +1141,11 @@
                 "endTiming": 15118,
                 "positionX": 0.8,
                 "width": 0.06,
-                "R": 180,
-                "G": 238,
-                "B": 180,
-                "notes": [{
+                "r": 180,
+                "g": 238,
+                "b": 180,
+                "notes": [
+                    {
                         "basedTrack": 3,
                         "positionX": 0,
                         "positionY": 0.9248000000000003,
@@ -1360,25 +1374,28 @@
                         "currentTime": 0
                     }
                 ],
-                "moveOperations": [{
-                    "trackId": 3,
-                    "type": 1,
-                    "startTime": 14630,
-                    "endTime": 14630,
-                    "endX": 2,
-                    "endWidth": 0,
-                    "endR": 160,
-                    "endG": 160,
-                    "endB": 160,
-                    "background": "",
-                    "startX": 0.8
-                }],
+                "moveOperations": [
+                    {
+                        "trackId": 3,
+                        "type": 1,
+                        "startTiming": 14630,
+                        "endTiming": 14630,
+                        "endX": 2,
+                        "endWidth": 0,
+                        "endR": 160,
+                        "endG": 160,
+                        "endB": 160,
+                        "background": "",
+                        "startX": 0.8
+                    }
+                ],
                 "changeWidthOperations": [],
-                "changeColorOperations": [{
+                "changeColorOperations": [
+                    {
                         "trackId": 3,
                         "type": 3,
-                        "startTime": 11969,
-                        "endTime": 11969,
+                        "startTiming": 11969,
+                        "endTiming": 11969,
                         "endX": 0,
                         "endWidth": 0,
                         "endR": 191,
@@ -1392,8 +1409,8 @@
                     {
                         "trackId": 3,
                         "type": 3,
-                        "startTime": 12144,
-                        "endTime": 12144,
+                        "startTiming": 12144,
+                        "endTiming": 12144,
                         "endX": 0,
                         "endWidth": 0,
                         "endR": 255,
@@ -1407,8 +1424,8 @@
                     {
                         "trackId": 3,
                         "type": 3,
-                        "startTime": 12319,
-                        "endTime": 12319,
+                        "startTiming": 12319,
+                        "endTiming": 12319,
                         "endX": 0,
                         "endWidth": 0,
                         "endR": 180,
@@ -1439,10 +1456,11 @@
             "endTiming": 14081,
             "positionX": 0.4,
             "width": 0.06,
-            "R": 180,
-            "G": 238,
-            "B": 180,
-            "notes": [{
+            "r": 180,
+            "g": 238,
+            "b": 180,
+            "notes": [
+                {
                     "basedTrack": 1,
                     "positionX": 0,
                     "positionY": 0.9215999999999998,
@@ -1755,19 +1773,21 @@
                     }
                 }
             ],
-            "moveOperations": [{
-                "trackId": 1,
-                "type": 1,
-                "startTime": 14081,
-                "endTime": 14081,
-                "startX": 0.4,
-                "endX": -1,
-                "endWidth": 0,
-                "endR": 160,
-                "endG": 160,
-                "endB": 160,
-                "background": ""
-            }],
+            "moveOperations": [
+                {
+                    "trackId": 1,
+                    "type": 1,
+                    "startTiming": 14081,
+                    "endTiming": 14081,
+                    "startX": 0.4,
+                    "endX": -1,
+                    "endWidth": 0,
+                    "endR": 160,
+                    "endG": 160,
+                    "endB": 160,
+                    "background": ""
+                }
+            ],
             "changeWidthOperations": [],
             "changeColorOperations": [],
             "tempR": 180,
@@ -1786,10 +1806,11 @@
                 "endTiming": 14081,
                 "positionX": 0.4,
                 "width": 0.06,
-                "R": 180,
-                "G": 238,
-                "B": 180,
-                "notes": [{
+                "r": 180,
+                "g": 238,
+                "b": 180,
+                "notes": [
+                    {
                         "basedTrack": 1,
                         "positionX": 0,
                         "positionY": 0.9215999999999998,
@@ -1934,19 +1955,21 @@
                         "currentTime": 0
                     }
                 ],
-                "moveOperations": [{
-                    "trackId": 1,
-                    "type": 1,
-                    "startTime": 14081,
-                    "endTime": 14081,
-                    "startX": 0.4,
-                    "endX": -1,
-                    "endWidth": 0,
-                    "endR": 160,
-                    "endG": 160,
-                    "endB": 160,
-                    "background": ""
-                }],
+                "moveOperations": [
+                    {
+                        "trackId": 1,
+                        "type": 1,
+                        "startTiming": 14081,
+                        "endTiming": 14081,
+                        "startX": 0.4,
+                        "endX": -1,
+                        "endWidth": 0,
+                        "endR": 160,
+                        "endG": 160,
+                        "endB": 160,
+                        "background": ""
+                    }
+                ],
                 "changeWidthOperations": [],
                 "changeColorOperations": [],
                 "tempR": 180,
@@ -1968,10 +1991,11 @@
             "endTiming": 14404,
             "positionX": 0.6,
             "width": 0.06,
-            "R": 180,
-            "G": 238,
-            "B": 180,
-            "notes": [{
+            "r": 180,
+            "g": 238,
+            "b": 180,
+            "notes": [
+                {
                     "basedTrack": 2,
                     "positionX": 0,
                     "positionY": 0.9256000000000002,
@@ -2310,19 +2334,21 @@
                     }
                 }
             ],
-            "moveOperations": [{
-                "trackId": 2,
-                "type": 1,
-                "startTime": 14801,
-                "endTime": 14801,
-                "startX": 0.6,
-                "endX": 2,
-                "endWidth": 0,
-                "endR": 160,
-                "endG": 160,
-                "endB": 160,
-                "background": ""
-            }],
+            "moveOperations": [
+                {
+                    "trackId": 2,
+                    "type": 1,
+                    "startTiming": 14801,
+                    "endTiming": 14801,
+                    "startX": 0.6,
+                    "endX": 2,
+                    "endWidth": 0,
+                    "endR": 160,
+                    "endG": 160,
+                    "endB": 160,
+                    "background": ""
+                }
+            ],
             "changeWidthOperations": [],
             "changeColorOperations": [],
             "tempR": 180,
@@ -2341,10 +2367,11 @@
                 "endTiming": 14404,
                 "positionX": 0.6,
                 "width": 0.06,
-                "R": 180,
-                "G": 238,
-                "B": 180,
-                "notes": [{
+                "r": 180,
+                "g": 238,
+                "b": 180,
+                "notes": [
+                    {
                         "basedTrack": 2,
                         "positionX": 0,
                         "positionY": 0.9256000000000002,
@@ -2501,19 +2528,21 @@
                         "currentTime": 0
                     }
                 ],
-                "moveOperations": [{
-                    "trackId": 2,
-                    "type": 1,
-                    "startTime": 14801,
-                    "endTime": 14801,
-                    "startX": 0.6,
-                    "endX": 2,
-                    "endWidth": 0,
-                    "endR": 160,
-                    "endG": 160,
-                    "endB": 160,
-                    "background": ""
-                }],
+                "moveOperations": [
+                    {
+                        "trackId": 2,
+                        "type": 1,
+                        "startTiming": 14801,
+                        "endTiming": 14801,
+                        "startX": 0.6,
+                        "endX": 2,
+                        "endWidth": 0,
+                        "endR": 160,
+                        "endG": 160,
+                        "endB": 160,
+                        "background": ""
+                    }
+                ],
                 "changeWidthOperations": [],
                 "changeColorOperations": [],
                 "tempR": 180,
@@ -2535,15 +2564,16 @@
             "endTiming": 8808,
             "positionX": 0.1,
             "width": 0.03,
-            "R": 160,
-            "G": 160,
-            "B": 160,
+            "r": 160,
+            "g": 160,
+            "b": 160,
             "notes": [],
-            "moveOperations": [{
+            "moveOperations": [
+                {
                     "trackId": 4,
                     "type": 1,
-                    "startTime": 3530,
-                    "endTime": 3900,
+                    "startTiming": 3530,
+                    "endTiming": 3900,
                     "endX": 0.9,
                     "endWidth": 0,
                     "endR": 160,
@@ -2555,8 +2585,8 @@
                 {
                     "trackId": 4,
                     "type": 1,
-                    "startTime": 3900,
-                    "endTime": 4221,
+                    "startTiming": 3900,
+                    "endTiming": 4221,
                     "endX": 0.1,
                     "endWidth": 0,
                     "endR": 160,
@@ -2568,8 +2598,8 @@
                 {
                     "trackId": 4,
                     "type": 1,
-                    "startTime": 4221,
-                    "endTime": 4602,
+                    "startTiming": 4221,
+                    "endTiming": 4602,
                     "endX": 0.9,
                     "endWidth": 0,
                     "endR": 160,
@@ -2581,8 +2611,8 @@
                 {
                     "trackId": 4,
                     "type": 1,
-                    "startTime": 4602,
-                    "endTime": 4949,
+                    "startTiming": 4602,
+                    "endTiming": 4949,
                     "endX": 0.1,
                     "endWidth": 0,
                     "endR": 160,
@@ -2594,8 +2624,8 @@
                 {
                     "trackId": 4,
                     "type": 1,
-                    "startTime": 4949,
-                    "endTime": 5300,
+                    "startTiming": 4949,
+                    "endTiming": 5300,
                     "endX": 0.9,
                     "endWidth": 0,
                     "endR": 160,
@@ -2607,8 +2637,8 @@
                 {
                     "trackId": 4,
                     "type": 1,
-                    "startTime": 5300,
-                    "endTime": 5650,
+                    "startTiming": 5300,
+                    "endTiming": 5650,
                     "endX": 0.1,
                     "endWidth": 0,
                     "endR": 160,
@@ -2620,8 +2650,8 @@
                 {
                     "trackId": 4,
                     "type": 1,
-                    "startTime": 5650,
-                    "endTime": 6002,
+                    "startTiming": 5650,
+                    "endTiming": 6002,
                     "endX": 0.9,
                     "endWidth": 0,
                     "endR": 160,
@@ -2633,8 +2663,8 @@
                 {
                     "trackId": 4,
                     "type": 1,
-                    "startTime": 6002,
-                    "endTime": 6361,
+                    "startTiming": 6002,
+                    "endTiming": 6361,
                     "endX": 0.1,
                     "endWidth": 0,
                     "endR": 160,
@@ -2646,8 +2676,8 @@
                 {
                     "trackId": 4,
                     "type": 1,
-                    "startTime": 6361,
-                    "endTime": 6705,
+                    "startTiming": 6361,
+                    "endTiming": 6705,
                     "endX": 0.9,
                     "endWidth": 0,
                     "endR": 160,
@@ -2659,8 +2689,8 @@
                 {
                     "trackId": 4,
                     "type": 1,
-                    "startTime": 6705,
-                    "endTime": 7062,
+                    "startTiming": 6705,
+                    "endTiming": 7062,
                     "endX": 0.1,
                     "endWidth": 0,
                     "endR": 160,
@@ -2672,8 +2702,8 @@
                 {
                     "trackId": 4,
                     "type": 1,
-                    "startTime": 7062,
-                    "endTime": 7414,
+                    "startTiming": 7062,
+                    "endTiming": 7414,
                     "endX": 0.9,
                     "endWidth": 0,
                     "endR": 160,
@@ -2685,8 +2715,8 @@
                 {
                     "trackId": 4,
                     "type": 1,
-                    "startTime": 7414,
-                    "endTime": 7755,
+                    "startTiming": 7414,
+                    "endTiming": 7755,
                     "endX": 0.1,
                     "endWidth": 0,
                     "endR": 160,
@@ -2698,8 +2728,8 @@
                 {
                     "trackId": 4,
                     "type": 1,
-                    "startTime": 7755,
-                    "endTime": 8105,
+                    "startTiming": 7755,
+                    "endTiming": 8105,
                     "endX": 0.9,
                     "endWidth": 0,
                     "endR": 160,
@@ -2711,8 +2741,8 @@
                 {
                     "trackId": 4,
                     "type": 1,
-                    "startTime": 8105,
-                    "endTime": 8460,
+                    "startTiming": 8105,
+                    "endTiming": 8460,
                     "endX": 0.1,
                     "endWidth": 0,
                     "endR": 160,
@@ -2724,8 +2754,8 @@
                 {
                     "trackId": 4,
                     "type": 1,
-                    "startTime": 8460,
-                    "endTime": 8808,
+                    "startTiming": 8460,
+                    "endTiming": 8808,
                     "endX": 0.9,
                     "endWidth": 0,
                     "endR": 160,
@@ -2753,15 +2783,16 @@
                 "endTiming": 8808,
                 "positionX": 0.1,
                 "width": 0.03,
-                "R": 160,
-                "G": 160,
-                "B": 160,
+                "r": 160,
+                "g": 160,
+                "b": 160,
                 "notes": [],
-                "moveOperations": [{
+                "moveOperations": [
+                    {
                         "trackId": 4,
                         "type": 1,
-                        "startTime": 3530,
-                        "endTime": 3900,
+                        "startTiming": 3530,
+                        "endTiming": 3900,
                         "endX": 0.9,
                         "endWidth": 0,
                         "endR": 160,
@@ -2773,8 +2804,8 @@
                     {
                         "trackId": 4,
                         "type": 1,
-                        "startTime": 3900,
-                        "endTime": 4221,
+                        "startTiming": 3900,
+                        "endTiming": 4221,
                         "endX": 0.1,
                         "endWidth": 0,
                         "endR": 160,
@@ -2786,8 +2817,8 @@
                     {
                         "trackId": 4,
                         "type": 1,
-                        "startTime": 4221,
-                        "endTime": 4602,
+                        "startTiming": 4221,
+                        "endTiming": 4602,
                         "endX": 0.9,
                         "endWidth": 0,
                         "endR": 160,
@@ -2799,8 +2830,8 @@
                     {
                         "trackId": 4,
                         "type": 1,
-                        "startTime": 4602,
-                        "endTime": 4949,
+                        "startTiming": 4602,
+                        "endTiming": 4949,
                         "endX": 0.1,
                         "endWidth": 0,
                         "endR": 160,
@@ -2812,8 +2843,8 @@
                     {
                         "trackId": 4,
                         "type": 1,
-                        "startTime": 4949,
-                        "endTime": 5300,
+                        "startTiming": 4949,
+                        "endTiming": 5300,
                         "endX": 0.9,
                         "endWidth": 0,
                         "endR": 160,
@@ -2825,8 +2856,8 @@
                     {
                         "trackId": 4,
                         "type": 1,
-                        "startTime": 5300,
-                        "endTime": 5650,
+                        "startTiming": 5300,
+                        "endTiming": 5650,
                         "endX": 0.1,
                         "endWidth": 0,
                         "endR": 160,
@@ -2838,8 +2869,8 @@
                     {
                         "trackId": 4,
                         "type": 1,
-                        "startTime": 5650,
-                        "endTime": 6002,
+                        "startTiming": 5650,
+                        "endTiming": 6002,
                         "endX": 0.9,
                         "endWidth": 0,
                         "endR": 160,
@@ -2851,8 +2882,8 @@
                     {
                         "trackId": 4,
                         "type": 1,
-                        "startTime": 6002,
-                        "endTime": 6361,
+                        "startTiming": 6002,
+                        "endTiming": 6361,
                         "endX": 0.1,
                         "endWidth": 0,
                         "endR": 160,
@@ -2864,8 +2895,8 @@
                     {
                         "trackId": 4,
                         "type": 1,
-                        "startTime": 6361,
-                        "endTime": 6705,
+                        "startTiming": 6361,
+                        "endTiming": 6705,
                         "endX": 0.9,
                         "endWidth": 0,
                         "endR": 160,
@@ -2877,8 +2908,8 @@
                     {
                         "trackId": 4,
                         "type": 1,
-                        "startTime": 6705,
-                        "endTime": 7062,
+                        "startTiming": 6705,
+                        "endTiming": 7062,
                         "endX": 0.1,
                         "endWidth": 0,
                         "endR": 160,
@@ -2890,8 +2921,8 @@
                     {
                         "trackId": 4,
                         "type": 1,
-                        "startTime": 7062,
-                        "endTime": 7414,
+                        "startTiming": 7062,
+                        "endTiming": 7414,
                         "endX": 0.9,
                         "endWidth": 0,
                         "endR": 160,
@@ -2903,8 +2934,8 @@
                     {
                         "trackId": 4,
                         "type": 1,
-                        "startTime": 7414,
-                        "endTime": 7755,
+                        "startTiming": 7414,
+                        "endTiming": 7755,
                         "endX": 0.1,
                         "endWidth": 0,
                         "endR": 160,
@@ -2916,8 +2947,8 @@
                     {
                         "trackId": 4,
                         "type": 1,
-                        "startTime": 7755,
-                        "endTime": 8105,
+                        "startTiming": 7755,
+                        "endTiming": 8105,
                         "endX": 0.9,
                         "endWidth": 0,
                         "endR": 160,
@@ -2929,8 +2960,8 @@
                     {
                         "trackId": 4,
                         "type": 1,
-                        "startTime": 8105,
-                        "endTime": 8460,
+                        "startTiming": 8105,
+                        "endTiming": 8460,
                         "endX": 0.1,
                         "endWidth": 0,
                         "endR": 160,
@@ -2942,8 +2973,8 @@
                     {
                         "trackId": 4,
                         "type": 1,
-                        "startTime": 8460,
-                        "endTime": 8808,
+                        "startTiming": 8460,
+                        "endTiming": 8808,
                         "endX": 0.9,
                         "endWidth": 0,
                         "endR": 160,
@@ -2974,15 +3005,16 @@
             "endTiming": 10228,
             "positionX": 0.1,
             "width": 0.03,
-            "R": 160,
-            "G": 160,
-            "B": 160,
+            "r": 160,
+            "g": 160,
+            "b": 160,
             "notes": [],
-            "moveOperations": [{
+            "moveOperations": [
+                {
                     "trackId": 5,
                     "type": 1,
-                    "startTime": 9163,
-                    "endTime": 9514,
+                    "startTiming": 9163,
+                    "endTiming": 9514,
                     "endX": 0.9,
                     "endWidth": 0,
                     "endR": 160,
@@ -2994,8 +3026,8 @@
                 {
                     "trackId": 5,
                     "type": 1,
-                    "startTime": 9514,
-                    "endTime": 9879,
+                    "startTiming": 9514,
+                    "endTiming": 9879,
                     "endX": 0.85,
                     "endWidth": 0,
                     "endR": 160,
@@ -3007,8 +3039,8 @@
                 {
                     "trackId": 5,
                     "type": 1,
-                    "startTime": 9879,
-                    "endTime": 10053,
+                    "startTiming": 9879,
+                    "endTiming": 10053,
                     "endX": 0.8,
                     "endWidth": 0,
                     "endR": 160,
@@ -3020,8 +3052,8 @@
                 {
                     "trackId": 5,
                     "type": 1,
-                    "startTime": 10053,
-                    "endTime": 10228,
+                    "startTiming": 10053,
+                    "endTiming": 10228,
                     "endX": 0.9,
                     "endWidth": 0,
                     "endR": 160,
@@ -3049,15 +3081,16 @@
                 "endTiming": 10228,
                 "positionX": 0.1,
                 "width": 0.03,
-                "R": 160,
-                "G": 160,
-                "B": 160,
+                "r": 160,
+                "g": 160,
+                "b": 160,
                 "notes": [],
-                "moveOperations": [{
+                "moveOperations": [
+                    {
                         "trackId": 5,
                         "type": 1,
-                        "startTime": 9163,
-                        "endTime": 9514,
+                        "startTiming": 9163,
+                        "endTiming": 9514,
                         "endX": 0.9,
                         "endWidth": 0,
                         "endR": 160,
@@ -3069,8 +3102,8 @@
                     {
                         "trackId": 5,
                         "type": 1,
-                        "startTime": 9514,
-                        "endTime": 9879,
+                        "startTiming": 9514,
+                        "endTiming": 9879,
                         "endX": 0.85,
                         "endWidth": 0,
                         "endR": 160,
@@ -3082,8 +3115,8 @@
                     {
                         "trackId": 5,
                         "type": 1,
-                        "startTime": 9879,
-                        "endTime": 10053,
+                        "startTiming": 9879,
+                        "endTiming": 10053,
                         "endX": 0.8,
                         "endWidth": 0,
                         "endR": 160,
@@ -3095,8 +3128,8 @@
                     {
                         "trackId": 5,
                         "type": 1,
-                        "startTime": 10053,
-                        "endTime": 10228,
+                        "startTiming": 10053,
+                        "endTiming": 10228,
                         "endX": 0.9,
                         "endWidth": 0,
                         "endR": 160,
@@ -3127,15 +3160,16 @@
             "endTiming": 11624,
             "positionX": 0.9,
             "width": 0.03,
-            "R": 160,
-            "G": 160,
-            "B": 160,
+            "r": 160,
+            "g": 160,
+            "b": 160,
             "notes": [],
-            "moveOperations": [{
+            "moveOperations": [
+                {
                     "trackId": 6,
                     "type": 1,
-                    "startTime": 10568,
-                    "endTime": 10930,
+                    "startTiming": 10568,
+                    "endTiming": 10930,
                     "endX": 0.1,
                     "endWidth": 0,
                     "endR": 160,
@@ -3147,8 +3181,8 @@
                 {
                     "trackId": 6,
                     "type": 1,
-                    "startTime": 10930,
-                    "endTime": 11272,
+                    "startTiming": 10930,
+                    "endTiming": 11272,
                     "endX": 0.15,
                     "endWidth": 0,
                     "endR": 160,
@@ -3160,8 +3194,8 @@
                 {
                     "trackId": 6,
                     "type": 1,
-                    "startTime": 11272,
-                    "endTime": 11448,
+                    "startTiming": 11272,
+                    "endTiming": 11448,
                     "endX": 0.2,
                     "endWidth": 0,
                     "endR": 160,
@@ -3173,8 +3207,8 @@
                 {
                     "trackId": 6,
                     "type": 1,
-                    "startTime": 11448,
-                    "endTime": 11624,
+                    "startTiming": 11448,
+                    "endTiming": 11624,
                     "endX": 0.1,
                     "endWidth": 0,
                     "endR": 160,
@@ -3202,15 +3236,16 @@
                 "endTiming": 11624,
                 "positionX": 0.9,
                 "width": 0.03,
-                "R": 160,
-                "G": 160,
-                "B": 160,
+                "r": 160,
+                "g": 160,
+                "b": 160,
                 "notes": [],
-                "moveOperations": [{
+                "moveOperations": [
+                    {
                         "trackId": 6,
                         "type": 1,
-                        "startTime": 10568,
-                        "endTime": 10930,
+                        "startTiming": 10568,
+                        "endTiming": 10930,
                         "endX": 0.1,
                         "endWidth": 0,
                         "endR": 160,
@@ -3222,8 +3257,8 @@
                     {
                         "trackId": 6,
                         "type": 1,
-                        "startTime": 10930,
-                        "endTime": 11272,
+                        "startTiming": 10930,
+                        "endTiming": 11272,
                         "endX": 0.15,
                         "endWidth": 0,
                         "endR": 160,
@@ -3235,8 +3270,8 @@
                     {
                         "trackId": 6,
                         "type": 1,
-                        "startTime": 11272,
-                        "endTime": 11448,
+                        "startTiming": 11272,
+                        "endTiming": 11448,
                         "endX": 0.2,
                         "endWidth": 0,
                         "endR": 160,
@@ -3248,8 +3283,8 @@
                     {
                         "trackId": 6,
                         "type": 1,
-                        "startTime": 11448,
-                        "endTime": 11624,
+                        "startTiming": 11448,
+                        "endTiming": 11624,
                         "endX": 0.1,
                         "endWidth": 0,
                         "endR": 160,
@@ -3280,10 +3315,11 @@
             "endTiming": 16506,
             "positionX": -1,
             "width": 0.1,
-            "R": 160,
-            "G": 160,
-            "B": 160,
-            "notes": [{
+            "r": 160,
+            "g": 160,
+            "b": 160,
+            "notes": [
+                {
                     "basedTrack": 7,
                     "positionX": 0,
                     "positionY": 0.9207999999999998,
@@ -3440,11 +3476,12 @@
                     }
                 }
             ],
-            "moveOperations": [{
+            "moveOperations": [
+                {
                     "trackId": 7,
                     "type": 1,
-                    "startTime": 14081,
-                    "endTime": 14081,
+                    "startTiming": 14081,
+                    "endTiming": 14081,
                     "endX": 0.2,
                     "endWidth": 0,
                     "endR": 160,
@@ -3456,8 +3493,8 @@
                 {
                     "trackId": 7,
                     "type": 1,
-                    "startTime": 14788,
-                    "endTime": 15003,
+                    "startTiming": 14788,
+                    "endTiming": 15003,
                     "endX": 0.35,
                     "endWidth": 0,
                     "endR": 160,
@@ -3469,8 +3506,8 @@
                 {
                     "trackId": 7,
                     "type": 1,
-                    "startTime": 15003,
-                    "endTime": 15146,
+                    "startTiming": 15003,
+                    "endTiming": 15146,
                     "endX": 0.5,
                     "endWidth": 0,
                     "endR": 160,
@@ -3482,8 +3519,8 @@
                 {
                     "trackId": 7,
                     "type": 1,
-                    "startTime": 15146,
-                    "endTime": 15323,
+                    "startTiming": 15146,
+                    "endTiming": 15323,
                     "endX": 0.65,
                     "endWidth": 0,
                     "endR": 160,
@@ -3495,8 +3532,8 @@
                 {
                     "trackId": 7,
                     "type": 1,
-                    "startTime": 15323,
-                    "endTime": 15491,
+                    "startTiming": 15323,
+                    "endTiming": 15491,
                     "endX": 0.8,
                     "endWidth": 0,
                     "endR": 160,
@@ -3508,8 +3545,8 @@
                 {
                     "trackId": 7,
                     "type": 1,
-                    "startTime": 15491,
-                    "endTime": 15659,
+                    "startTiming": 15491,
+                    "endTiming": 15659,
                     "endX": 0.65,
                     "endWidth": 0,
                     "endR": 160,
@@ -3521,8 +3558,8 @@
                 {
                     "trackId": 7,
                     "type": 1,
-                    "startTime": 15659,
-                    "endTime": 15834,
+                    "startTiming": 15659,
+                    "endTiming": 15834,
                     "endX": 0.5,
                     "endWidth": 0,
                     "endR": 160,
@@ -3534,8 +3571,8 @@
                 {
                     "trackId": 7,
                     "type": 1,
-                    "startTime": 15834,
-                    "endTime": 16006,
+                    "startTiming": 15834,
+                    "endTiming": 16006,
                     "endX": 0.35,
                     "endWidth": 0,
                     "endR": 160,
@@ -3547,8 +3584,8 @@
                 {
                     "trackId": 7,
                     "type": 1,
-                    "startTime": 16006,
-                    "endTime": 16196,
+                    "startTiming": 16006,
+                    "endTiming": 16196,
                     "endX": 0.2,
                     "endWidth": 0,
                     "endR": 160,
@@ -3558,19 +3595,21 @@
                     "startX": 0.3518143585455693
                 }
             ],
-            "changeWidthOperations": [{
-                "trackId": 7,
-                "type": 2,
-                "startTime": 14618,
-                "endTime": 14788,
-                "endX": 0,
-                "endWidth": 0.05,
-                "endR": 160,
-                "endG": 160,
-                "endB": 160,
-                "background": "",
-                "startWidth": 0.1
-            }],
+            "changeWidthOperations": [
+                {
+                    "trackId": 7,
+                    "type": 2,
+                    "startTiming": 14618,
+                    "endTiming": 14788,
+                    "endX": 0,
+                    "endWidth": 0.05,
+                    "endR": 160,
+                    "endG": 160,
+                    "endB": 160,
+                    "background": "",
+                    "startWidth": 0.1
+                }
+            ],
             "changeColorOperations": [],
             "tempR": 160,
             "tempG": 160,
@@ -3588,10 +3627,11 @@
                 "endTiming": 16506,
                 "positionX": -1,
                 "width": 0.1,
-                "R": 160,
-                "G": 160,
-                "B": 160,
-                "notes": [{
+                "r": 160,
+                "g": 160,
+                "b": 160,
+                "notes": [
+                    {
                         "basedTrack": 7,
                         "positionX": 0,
                         "positionY": 0.9207999999999998,
@@ -3664,11 +3704,12 @@
                         "currentTime": 0
                     }
                 ],
-                "moveOperations": [{
+                "moveOperations": [
+                    {
                         "trackId": 7,
                         "type": 1,
-                        "startTime": 14081,
-                        "endTime": 14081,
+                        "startTiming": 14081,
+                        "endTiming": 14081,
                         "endX": 0.2,
                         "endWidth": 0,
                         "endR": 160,
@@ -3680,8 +3721,8 @@
                     {
                         "trackId": 7,
                         "type": 1,
-                        "startTime": 14788,
-                        "endTime": 15003,
+                        "startTiming": 14788,
+                        "endTiming": 15003,
                         "endX": 0.35,
                         "endWidth": 0,
                         "endR": 160,
@@ -3693,8 +3734,8 @@
                     {
                         "trackId": 7,
                         "type": 1,
-                        "startTime": 15003,
-                        "endTime": 15146,
+                        "startTiming": 15003,
+                        "endTiming": 15146,
                         "endX": 0.5,
                         "endWidth": 0,
                         "endR": 160,
@@ -3706,8 +3747,8 @@
                     {
                         "trackId": 7,
                         "type": 1,
-                        "startTime": 15146,
-                        "endTime": 15323,
+                        "startTiming": 15146,
+                        "endTiming": 15323,
                         "endX": 0.65,
                         "endWidth": 0,
                         "endR": 160,
@@ -3719,8 +3760,8 @@
                     {
                         "trackId": 7,
                         "type": 1,
-                        "startTime": 15323,
-                        "endTime": 15491,
+                        "startTiming": 15323,
+                        "endTiming": 15491,
                         "endX": 0.8,
                         "endWidth": 0,
                         "endR": 160,
@@ -3732,8 +3773,8 @@
                     {
                         "trackId": 7,
                         "type": 1,
-                        "startTime": 15491,
-                        "endTime": 15659,
+                        "startTiming": 15491,
+                        "endTiming": 15659,
                         "endX": 0.65,
                         "endWidth": 0,
                         "endR": 160,
@@ -3745,8 +3786,8 @@
                     {
                         "trackId": 7,
                         "type": 1,
-                        "startTime": 15659,
-                        "endTime": 15834,
+                        "startTiming": 15659,
+                        "endTiming": 15834,
                         "endX": 0.5,
                         "endWidth": 0,
                         "endR": 160,
@@ -3758,8 +3799,8 @@
                     {
                         "trackId": 7,
                         "type": 1,
-                        "startTime": 15834,
-                        "endTime": 16006,
+                        "startTiming": 15834,
+                        "endTiming": 16006,
                         "endX": 0.35,
                         "endWidth": 0,
                         "endR": 160,
@@ -3771,8 +3812,8 @@
                     {
                         "trackId": 7,
                         "type": 1,
-                        "startTime": 16006,
-                        "endTime": 16196,
+                        "startTiming": 16006,
+                        "endTiming": 16196,
                         "endX": 0.2,
                         "endWidth": 0,
                         "endR": 160,
@@ -3782,19 +3823,21 @@
                         "startX": 0.3518143585455693
                     }
                 ],
-                "changeWidthOperations": [{
-                    "trackId": 7,
-                    "type": 2,
-                    "startTime": 14618,
-                    "endTime": 14788,
-                    "endX": 0,
-                    "endWidth": 0.05,
-                    "endR": 160,
-                    "endG": 160,
-                    "endB": 160,
-                    "background": "",
-                    "startWidth": 0.1
-                }],
+                "changeWidthOperations": [
+                    {
+                        "trackId": 7,
+                        "type": 2,
+                        "startTiming": 14618,
+                        "endTiming": 14788,
+                        "endX": 0,
+                        "endWidth": 0.05,
+                        "endR": 160,
+                        "endG": 160,
+                        "endB": 160,
+                        "background": "",
+                        "startWidth": 0.1
+                    }
+                ],
                 "changeColorOperations": [],
                 "tempR": 160,
                 "tempG": 160,
@@ -3815,10 +3858,11 @@
             "endTiming": 20366,
             "positionX": -1,
             "width": 0.1,
-            "R": 160,
-            "G": 160,
-            "B": 160,
-            "notes": [{
+            "r": 160,
+            "g": 160,
+            "b": 160,
+            "notes": [
+                {
                     "basedTrack": 8,
                     "positionX": 0,
                     "positionY": 0.9240000000000013,
@@ -4001,11 +4045,12 @@
                     }
                 }
             ],
-            "moveOperations": [{
+            "moveOperations": [
+                {
                     "trackId": 8,
                     "type": 1,
-                    "startTime": 14254,
-                    "endTime": 14254,
+                    "startTiming": 14254,
+                    "endTiming": 14254,
                     "endX": 0.35,
                     "endWidth": 0,
                     "endR": 160,
@@ -4017,8 +4062,8 @@
                 {
                     "trackId": 8,
                     "type": 1,
-                    "startTime": 17491,
-                    "endTime": 17576,
+                    "startTiming": 17491,
+                    "endTiming": 17576,
                     "endX": 0.2,
                     "endWidth": 0,
                     "endR": 160,
@@ -4030,8 +4075,8 @@
                 {
                     "trackId": 8,
                     "type": 1,
-                    "startTime": 17931,
-                    "endTime": 18292,
+                    "startTiming": 17931,
+                    "endTiming": 18292,
                     "endX": 0.3,
                     "endWidth": 0,
                     "endR": 160,
@@ -4043,8 +4088,8 @@
                 {
                     "trackId": 8,
                     "type": 1,
-                    "startTime": 18292,
-                    "endTime": 19691,
+                    "startTiming": 18292,
+                    "endTiming": 19691,
                     "endX": 0.4,
                     "endWidth": 0,
                     "endR": 160,
@@ -4056,8 +4101,8 @@
                 {
                     "trackId": 8,
                     "type": 1,
-                    "startTime": 20230,
-                    "endTime": 20230,
+                    "startTiming": 20230,
+                    "endTiming": 20230,
                     "endX": -1,
                     "endWidth": 0,
                     "endR": 160,
@@ -4067,11 +4112,12 @@
                     "startX": 0.4
                 }
             ],
-            "changeWidthOperations": [{
+            "changeWidthOperations": [
+                {
                     "trackId": 8,
                     "type": 2,
-                    "startTime": 14618,
-                    "endTime": 14788,
+                    "startTiming": 14618,
+                    "endTiming": 14788,
                     "endX": 0,
                     "endWidth": 0.07,
                     "endR": 160,
@@ -4083,8 +4129,8 @@
                 {
                     "trackId": 8,
                     "type": 2,
-                    "startTime": 17491,
-                    "endTime": 17576,
+                    "startTiming": 17491,
+                    "endTiming": 17576,
                     "endX": 0,
                     "endWidth": 0.05,
                     "endR": 160,
@@ -4096,8 +4142,8 @@
                 {
                     "trackId": 8,
                     "type": 2,
-                    "startTime": 18292,
-                    "endTime": 19691,
+                    "startTiming": 18292,
+                    "endTiming": 19691,
                     "endX": 0,
                     "endWidth": 0.1,
                     "endR": 160,
@@ -4124,10 +4170,11 @@
                 "endTiming": 20366,
                 "positionX": -1,
                 "width": 0.1,
-                "R": 160,
-                "G": 160,
-                "B": 160,
-                "notes": [{
+                "r": 160,
+                "g": 160,
+                "b": 160,
+                "notes": [
+                    {
                         "basedTrack": 8,
                         "positionX": 0,
                         "positionY": 0.9240000000000013,
@@ -4212,11 +4259,12 @@
                         "currentTime": 0
                     }
                 ],
-                "moveOperations": [{
+                "moveOperations": [
+                    {
                         "trackId": 8,
                         "type": 1,
-                        "startTime": 14254,
-                        "endTime": 14254,
+                        "startTiming": 14254,
+                        "endTiming": 14254,
                         "endX": 0.35,
                         "endWidth": 0,
                         "endR": 160,
@@ -4228,8 +4276,8 @@
                     {
                         "trackId": 8,
                         "type": 1,
-                        "startTime": 17491,
-                        "endTime": 17576,
+                        "startTiming": 17491,
+                        "endTiming": 17576,
                         "endX": 0.2,
                         "endWidth": 0,
                         "endR": 160,
@@ -4241,8 +4289,8 @@
                     {
                         "trackId": 8,
                         "type": 1,
-                        "startTime": 17931,
-                        "endTime": 18292,
+                        "startTiming": 17931,
+                        "endTiming": 18292,
                         "endX": 0.3,
                         "endWidth": 0,
                         "endR": 160,
@@ -4254,8 +4302,8 @@
                     {
                         "trackId": 8,
                         "type": 1,
-                        "startTime": 18292,
-                        "endTime": 19691,
+                        "startTiming": 18292,
+                        "endTiming": 19691,
                         "endX": 0.4,
                         "endWidth": 0,
                         "endR": 160,
@@ -4267,8 +4315,8 @@
                     {
                         "trackId": 8,
                         "type": 1,
-                        "startTime": 20230,
-                        "endTime": 20230,
+                        "startTiming": 20230,
+                        "endTiming": 20230,
                         "endX": -1,
                         "endWidth": 0,
                         "endR": 160,
@@ -4278,11 +4326,12 @@
                         "startX": 0.4
                     }
                 ],
-                "changeWidthOperations": [{
+                "changeWidthOperations": [
+                    {
                         "trackId": 8,
                         "type": 2,
-                        "startTime": 14618,
-                        "endTime": 14788,
+                        "startTiming": 14618,
+                        "endTiming": 14788,
                         "endX": 0,
                         "endWidth": 0.07,
                         "endR": 160,
@@ -4294,8 +4343,8 @@
                     {
                         "trackId": 8,
                         "type": 2,
-                        "startTime": 17491,
-                        "endTime": 17576,
+                        "startTiming": 17491,
+                        "endTiming": 17576,
                         "endX": 0,
                         "endWidth": 0.05,
                         "endR": 160,
@@ -4307,8 +4356,8 @@
                     {
                         "trackId": 8,
                         "type": 2,
-                        "startTime": 18292,
-                        "endTime": 19691,
+                        "startTiming": 18292,
+                        "endTiming": 19691,
                         "endX": 0,
                         "endWidth": 0.1,
                         "endR": 160,
@@ -4338,10 +4387,11 @@
             "endTiming": 20717,
             "positionX": -1,
             "width": 0.1,
-            "R": 160,
-            "G": 160,
-            "B": 160,
-            "notes": [{
+            "r": 160,
+            "g": 160,
+            "b": 160,
+            "notes": [
+                {
                     "basedTrack": 9,
                     "positionX": 0,
                     "positionY": 0.9239999999999995,
@@ -4524,11 +4574,12 @@
                     }
                 }
             ],
-            "moveOperations": [{
+            "moveOperations": [
+                {
                     "trackId": 9,
                     "type": 1,
-                    "startTime": 14428,
-                    "endTime": 14428,
+                    "startTiming": 14428,
+                    "endTiming": 14428,
                     "endX": 0.5,
                     "endWidth": 0,
                     "endR": 160,
@@ -4540,8 +4591,8 @@
                 {
                     "trackId": 9,
                     "type": 1,
-                    "startTime": 17491,
-                    "endTime": 17576,
+                    "startTiming": 17491,
+                    "endTiming": 17576,
                     "endX": 0.2,
                     "endWidth": 0,
                     "endR": 160,
@@ -4553,8 +4604,8 @@
                 {
                     "trackId": 9,
                     "type": 1,
-                    "startTime": 17931,
-                    "endTime": 18292,
+                    "startTiming": 17931,
+                    "endTiming": 18292,
                     "endX": 0.5,
                     "endWidth": 0,
                     "endR": 160,
@@ -4566,8 +4617,8 @@
                 {
                     "trackId": 9,
                     "type": 1,
-                    "startTime": 18292,
-                    "endTime": 19691,
+                    "startTiming": 18292,
+                    "endTiming": 19691,
                     "endX": 0.6,
                     "endWidth": 0,
                     "endR": 160,
@@ -4579,8 +4630,8 @@
                 {
                     "trackId": 9,
                     "type": 1,
-                    "startTime": 20230,
-                    "endTime": 20230,
+                    "startTiming": 20230,
+                    "endTiming": 20230,
                     "endX": 2,
                     "endWidth": 0,
                     "endR": 160,
@@ -4590,11 +4641,12 @@
                     "startX": 0.6
                 }
             ],
-            "changeWidthOperations": [{
+            "changeWidthOperations": [
+                {
                     "trackId": 9,
                     "type": 2,
-                    "startTime": 14618,
-                    "endTime": 14788,
+                    "startTiming": 14618,
+                    "endTiming": 14788,
                     "endX": 0,
                     "endWidth": 0.07,
                     "endR": 160,
@@ -4606,8 +4658,8 @@
                 {
                     "trackId": 9,
                     "type": 2,
-                    "startTime": 17491,
-                    "endTime": 17576,
+                    "startTiming": 17491,
+                    "endTiming": 17576,
                     "endX": 0,
                     "endWidth": 0.05,
                     "endR": 160,
@@ -4619,8 +4671,8 @@
                 {
                     "trackId": 9,
                     "type": 2,
-                    "startTime": 18292,
-                    "endTime": 19691,
+                    "startTiming": 18292,
+                    "endTiming": 19691,
                     "endX": 0,
                     "endWidth": 0.1,
                     "endR": 160,
@@ -4647,10 +4699,11 @@
                 "endTiming": 20717,
                 "positionX": -1,
                 "width": 0.1,
-                "R": 160,
-                "G": 160,
-                "B": 160,
-                "notes": [{
+                "r": 160,
+                "g": 160,
+                "b": 160,
+                "notes": [
+                    {
                         "basedTrack": 9,
                         "positionX": 0,
                         "positionY": 0.9239999999999995,
@@ -4735,11 +4788,12 @@
                         "currentTime": 0
                     }
                 ],
-                "moveOperations": [{
+                "moveOperations": [
+                    {
                         "trackId": 9,
                         "type": 1,
-                        "startTime": 14428,
-                        "endTime": 14428,
+                        "startTiming": 14428,
+                        "endTiming": 14428,
                         "endX": 0.5,
                         "endWidth": 0,
                         "endR": 160,
@@ -4751,8 +4805,8 @@
                     {
                         "trackId": 9,
                         "type": 1,
-                        "startTime": 17491,
-                        "endTime": 17576,
+                        "startTiming": 17491,
+                        "endTiming": 17576,
                         "endX": 0.2,
                         "endWidth": 0,
                         "endR": 160,
@@ -4764,8 +4818,8 @@
                     {
                         "trackId": 9,
                         "type": 1,
-                        "startTime": 17931,
-                        "endTime": 18292,
+                        "startTiming": 17931,
+                        "endTiming": 18292,
                         "endX": 0.5,
                         "endWidth": 0,
                         "endR": 160,
@@ -4777,8 +4831,8 @@
                     {
                         "trackId": 9,
                         "type": 1,
-                        "startTime": 18292,
-                        "endTime": 19691,
+                        "startTiming": 18292,
+                        "endTiming": 19691,
                         "endX": 0.6,
                         "endWidth": 0,
                         "endR": 160,
@@ -4790,8 +4844,8 @@
                     {
                         "trackId": 9,
                         "type": 1,
-                        "startTime": 20230,
-                        "endTime": 20230,
+                        "startTiming": 20230,
+                        "endTiming": 20230,
                         "endX": 2,
                         "endWidth": 0,
                         "endR": 160,
@@ -4801,11 +4855,12 @@
                         "startX": 0.6
                     }
                 ],
-                "changeWidthOperations": [{
+                "changeWidthOperations": [
+                    {
                         "trackId": 9,
                         "type": 2,
-                        "startTime": 14618,
-                        "endTime": 14788,
+                        "startTiming": 14618,
+                        "endTiming": 14788,
                         "endX": 0,
                         "endWidth": 0.07,
                         "endR": 160,
@@ -4817,8 +4872,8 @@
                     {
                         "trackId": 9,
                         "type": 2,
-                        "startTime": 17491,
-                        "endTime": 17576,
+                        "startTiming": 17491,
+                        "endTiming": 17576,
                         "endX": 0,
                         "endWidth": 0.05,
                         "endR": 160,
@@ -4830,8 +4885,8 @@
                     {
                         "trackId": 9,
                         "type": 2,
-                        "startTime": 18292,
-                        "endTime": 19691,
+                        "startTiming": 18292,
+                        "endTiming": 19691,
                         "endX": 0,
                         "endWidth": 0.1,
                         "endR": 160,
@@ -4861,10 +4916,11 @@
             "endTiming": 26182,
             "positionX": -1,
             "width": 0.1,
-            "R": 160,
-            "G": 160,
-            "B": 160,
-            "notes": [{
+            "r": 160,
+            "g": 160,
+            "b": 160,
+            "notes": [
+                {
                     "basedTrack": 10,
                     "positionX": 0,
                     "positionY": 0.9231999999999996,
@@ -5047,11 +5103,12 @@
                     }
                 }
             ],
-            "moveOperations": [{
+            "moveOperations": [
+                {
                     "trackId": 10,
                     "type": 1,
-                    "startTime": 14618,
-                    "endTime": 14618,
+                    "startTiming": 14618,
+                    "endTiming": 14618,
                     "endX": 0.65,
                     "endWidth": 0,
                     "endR": 160,
@@ -5063,8 +5120,8 @@
                 {
                     "trackId": 10,
                     "type": 1,
-                    "startTime": 17491,
-                    "endTime": 17576,
+                    "startTiming": 17491,
+                    "endTiming": 17576,
                     "endX": 0.2,
                     "endWidth": 0,
                     "endR": 160,
@@ -5076,8 +5133,8 @@
                 {
                     "trackId": 10,
                     "type": 1,
-                    "startTime": 17931,
-                    "endTime": 18292,
+                    "startTiming": 17931,
+                    "endTiming": 18292,
                     "endX": 0.7,
                     "endWidth": 0,
                     "endR": 160,
@@ -5089,8 +5146,8 @@
                 {
                     "trackId": 10,
                     "type": 1,
-                    "startTime": 18292,
-                    "endTime": 19691,
+                    "startTiming": 18292,
+                    "endTiming": 19691,
                     "endX": 0.8,
                     "endWidth": 0,
                     "endR": 160,
@@ -5100,11 +5157,12 @@
                     "startX": 0.6958448753462605
                 }
             ],
-            "changeWidthOperations": [{
+            "changeWidthOperations": [
+                {
                     "trackId": 10,
                     "type": 2,
-                    "startTime": 14618,
-                    "endTime": 14788,
+                    "startTiming": 14618,
+                    "endTiming": 14788,
                     "endX": 0,
                     "endWidth": 0.07,
                     "endR": 160,
@@ -5116,8 +5174,8 @@
                 {
                     "trackId": 10,
                     "type": 2,
-                    "startTime": 17491,
-                    "endTime": 17576,
+                    "startTiming": 17491,
+                    "endTiming": 17576,
                     "endX": 0,
                     "endWidth": 0.05,
                     "endR": 160,
@@ -5129,8 +5187,8 @@
                 {
                     "trackId": 10,
                     "type": 2,
-                    "startTime": 18292,
-                    "endTime": 19691,
+                    "startTiming": 18292,
+                    "endTiming": 19691,
                     "endX": 0,
                     "endWidth": 0.1,
                     "endR": 160,
@@ -5142,8 +5200,8 @@
                 {
                     "trackId": 10,
                     "type": 2,
-                    "startTime": 20217,
-                    "endTime": 20568,
+                    "startTiming": 20217,
+                    "endTiming": 20568,
                     "endX": 0,
                     "endWidth": 0.07,
                     "endR": 160,
@@ -5155,8 +5213,8 @@
                 {
                     "trackId": 10,
                     "type": 2,
-                    "startTime": 25328,
-                    "endTime": 25685,
+                    "startTiming": 25328,
+                    "endTiming": 25685,
                     "endX": 0,
                     "endWidth": 0.05,
                     "endR": 160,
@@ -5166,21 +5224,23 @@
                     "startWidth": 0.07
                 }
             ],
-            "changeColorOperations": [{
-                "trackId": 10,
-                "type": 3,
-                "startTime": 25685,
-                "endTime": 25685,
-                "endX": 0,
-                "endWidth": 0,
-                "endR": 255,
-                "endG": 0,
-                "endB": 0,
-                "background": "",
-                "startR": 160,
-                "startG": 160,
-                "startB": 160
-            }],
+            "changeColorOperations": [
+                {
+                    "trackId": 10,
+                    "type": 3,
+                    "startTiming": 25685,
+                    "endTiming": 25685,
+                    "endX": 0,
+                    "endWidth": 0,
+                    "endR": 255,
+                    "endG": 0,
+                    "endB": 0,
+                    "background": "",
+                    "startR": 160,
+                    "startG": 160,
+                    "startB": 160
+                }
+            ],
             "tempR": 255,
             "tempG": 0,
             "tempB": 0,
@@ -5197,10 +5257,11 @@
                 "endTiming": 26182,
                 "positionX": -1,
                 "width": 0.1,
-                "R": 160,
-                "G": 160,
-                "B": 160,
-                "notes": [{
+                "r": 160,
+                "g": 160,
+                "b": 160,
+                "notes": [
+                    {
                         "basedTrack": 10,
                         "positionX": 0,
                         "positionY": 0.9231999999999996,
@@ -5285,11 +5346,12 @@
                         "currentTime": 0
                     }
                 ],
-                "moveOperations": [{
+                "moveOperations": [
+                    {
                         "trackId": 10,
                         "type": 1,
-                        "startTime": 14618,
-                        "endTime": 14618,
+                        "startTiming": 14618,
+                        "endTiming": 14618,
                         "endX": 0.65,
                         "endWidth": 0,
                         "endR": 160,
@@ -5301,8 +5363,8 @@
                     {
                         "trackId": 10,
                         "type": 1,
-                        "startTime": 17491,
-                        "endTime": 17576,
+                        "startTiming": 17491,
+                        "endTiming": 17576,
                         "endX": 0.2,
                         "endWidth": 0,
                         "endR": 160,
@@ -5314,8 +5376,8 @@
                     {
                         "trackId": 10,
                         "type": 1,
-                        "startTime": 17931,
-                        "endTime": 18292,
+                        "startTiming": 17931,
+                        "endTiming": 18292,
                         "endX": 0.7,
                         "endWidth": 0,
                         "endR": 160,
@@ -5327,8 +5389,8 @@
                     {
                         "trackId": 10,
                         "type": 1,
-                        "startTime": 18292,
-                        "endTime": 19691,
+                        "startTiming": 18292,
+                        "endTiming": 19691,
                         "endX": 0.8,
                         "endWidth": 0,
                         "endR": 160,
@@ -5338,11 +5400,12 @@
                         "startX": 0.6958448753462605
                     }
                 ],
-                "changeWidthOperations": [{
+                "changeWidthOperations": [
+                    {
                         "trackId": 10,
                         "type": 2,
-                        "startTime": 14618,
-                        "endTime": 14788,
+                        "startTiming": 14618,
+                        "endTiming": 14788,
                         "endX": 0,
                         "endWidth": 0.07,
                         "endR": 160,
@@ -5354,8 +5417,8 @@
                     {
                         "trackId": 10,
                         "type": 2,
-                        "startTime": 17491,
-                        "endTime": 17576,
+                        "startTiming": 17491,
+                        "endTiming": 17576,
                         "endX": 0,
                         "endWidth": 0.05,
                         "endR": 160,
@@ -5367,8 +5430,8 @@
                     {
                         "trackId": 10,
                         "type": 2,
-                        "startTime": 18292,
-                        "endTime": 19691,
+                        "startTiming": 18292,
+                        "endTiming": 19691,
                         "endX": 0,
                         "endWidth": 0.1,
                         "endR": 160,
@@ -5380,8 +5443,8 @@
                     {
                         "trackId": 10,
                         "type": 2,
-                        "startTime": 20217,
-                        "endTime": 20568,
+                        "startTiming": 20217,
+                        "endTiming": 20568,
                         "endX": 0,
                         "endWidth": 0.07,
                         "endR": 160,
@@ -5393,8 +5456,8 @@
                     {
                         "trackId": 10,
                         "type": 2,
-                        "startTime": 25328,
-                        "endTime": 25685,
+                        "startTiming": 25328,
+                        "endTiming": 25685,
                         "endX": 0,
                         "endWidth": 0.05,
                         "endR": 160,
@@ -5404,21 +5467,23 @@
                         "startWidth": 0.07
                     }
                 ],
-                "changeColorOperations": [{
-                    "trackId": 10,
-                    "type": 3,
-                    "startTime": 25685,
-                    "endTime": 25685,
-                    "endX": 0,
-                    "endWidth": 0,
-                    "endR": 255,
-                    "endG": 0,
-                    "endB": 0,
-                    "background": "",
-                    "startR": 160,
-                    "startG": 160,
-                    "startB": 160
-                }],
+                "changeColorOperations": [
+                    {
+                        "trackId": 10,
+                        "type": 3,
+                        "startTiming": 25685,
+                        "endTiming": 25685,
+                        "endX": 0,
+                        "endWidth": 0,
+                        "endR": 255,
+                        "endG": 0,
+                        "endB": 0,
+                        "background": "",
+                        "startR": 160,
+                        "startG": 160,
+                        "startB": 160
+                    }
+                ],
                 "tempR": 255,
                 "tempG": 0,
                 "tempB": 0,
@@ -5438,10 +5503,11 @@
             "endTiming": 40500,
             "positionX": 0.2,
             "width": 0.05,
-            "R": 160,
-            "G": 160,
-            "B": 160,
-            "notes": [{
+            "r": 160,
+            "g": 160,
+            "b": 160,
+            "notes": [
+                {
                     "basedTrack": 11,
                     "positionX": 0,
                     "positionY": 0.9215999999999998,
@@ -6066,11 +6132,12 @@
                     }
                 }
             ],
-            "moveOperations": [{
+            "moveOperations": [
+                {
                     "trackId": 11,
                     "type": 1,
-                    "startTime": 25685,
-                    "endTime": 26005,
+                    "startTiming": 25685,
+                    "endTiming": 26005,
                     "endX": 0.35,
                     "endWidth": 0,
                     "endR": 160,
@@ -6082,8 +6149,8 @@
                 {
                     "trackId": 11,
                     "type": 1,
-                    "startTime": 28720,
-                    "endTime": 28806,
+                    "startTiming": 28720,
+                    "endTiming": 28806,
                     "endX": 0.8,
                     "endWidth": 0,
                     "endR": 160,
@@ -6095,8 +6162,8 @@
                 {
                     "trackId": 11,
                     "type": 1,
-                    "startTime": 29164,
-                    "endTime": 29511,
+                    "startTiming": 29164,
+                    "endTiming": 29511,
                     "endX": 0.3,
                     "endWidth": 0,
                     "endR": 160,
@@ -6108,8 +6175,8 @@
                 {
                     "trackId": 11,
                     "type": 1,
-                    "startTime": 29511,
-                    "endTime": 30918,
+                    "startTiming": 29511,
+                    "endTiming": 30918,
                     "endX": 0.2,
                     "endWidth": 0,
                     "endR": 160,
@@ -6121,8 +6188,8 @@
                 {
                     "trackId": 11,
                     "type": 1,
-                    "startTime": 37236,
-                    "endTime": 38000,
+                    "startTiming": 37236,
+                    "endTiming": 38000,
                     "endX": 0.5,
                     "endWidth": 0,
                     "endR": 160,
@@ -6132,11 +6199,12 @@
                     "startX": 0.2
                 }
             ],
-            "changeWidthOperations": [{
+            "changeWidthOperations": [
+                {
                     "trackId": 11,
                     "type": 2,
-                    "startTime": 18292,
-                    "endTime": 19691,
+                    "startTiming": 18292,
+                    "endTiming": 19691,
                     "endX": 0,
                     "endWidth": 0.1,
                     "endR": 160,
@@ -6148,8 +6216,8 @@
                 {
                     "trackId": 11,
                     "type": 2,
-                    "startTime": 20217,
-                    "endTime": 20568,
+                    "startTiming": 20217,
+                    "endTiming": 20568,
                     "endX": 0,
                     "endWidth": 0.07,
                     "endR": 160,
@@ -6161,8 +6229,8 @@
                 {
                     "trackId": 11,
                     "type": 2,
-                    "startTime": 25328,
-                    "endTime": 25685,
+                    "startTiming": 25328,
+                    "endTiming": 25685,
                     "endX": 0,
                     "endWidth": 0.05,
                     "endR": 160,
@@ -6174,8 +6242,8 @@
                 {
                     "trackId": 11,
                     "type": 2,
-                    "startTime": 28720,
-                    "endTime": 28806,
+                    "startTiming": 28720,
+                    "endTiming": 28806,
                     "endX": 0,
                     "endWidth": 0.05,
                     "endR": 160,
@@ -6187,8 +6255,8 @@
                 {
                     "trackId": 11,
                     "type": 2,
-                    "startTime": 29511,
-                    "endTime": 30918,
+                    "startTiming": 29511,
+                    "endTiming": 30918,
                     "endX": 0,
                     "endWidth": 0.1,
                     "endR": 160,
@@ -6200,8 +6268,8 @@
                 {
                     "trackId": 11,
                     "type": 2,
-                    "startTime": 37236,
-                    "endTime": 38000,
+                    "startTiming": 37236,
+                    "endTiming": 38000,
                     "endX": 0,
                     "endWidth": 0.3,
                     "endR": 160,
@@ -6211,11 +6279,12 @@
                     "startWidth": 0.1
                 }
             ],
-            "changeColorOperations": [{
+            "changeColorOperations": [
+                {
                     "trackId": 11,
                     "type": 3,
-                    "startTime": 23569,
-                    "endTime": 23569,
+                    "startTiming": 23569,
+                    "endTiming": 23569,
                     "endX": 0,
                     "endWidth": 0,
                     "endR": 0,
@@ -6229,8 +6298,8 @@
                 {
                     "trackId": 11,
                     "type": 3,
-                    "startTime": 25685,
-                    "endTime": 25685,
+                    "startTiming": 25685,
+                    "endTiming": 25685,
                     "endX": 0,
                     "endWidth": 0,
                     "endR": 255,
@@ -6244,8 +6313,8 @@
                 {
                     "trackId": 11,
                     "type": 3,
-                    "startTime": 26005,
-                    "endTime": 26005,
+                    "startTiming": 26005,
+                    "endTiming": 26005,
                     "endX": 0,
                     "endWidth": 0,
                     "endR": 160,
@@ -6259,8 +6328,8 @@
                 {
                     "trackId": 11,
                     "type": 3,
-                    "startTime": 34606,
-                    "endTime": 34606,
+                    "startTiming": 34606,
+                    "endTiming": 34606,
                     "endX": 0,
                     "endWidth": 0,
                     "endR": 255,
@@ -6288,10 +6357,11 @@
                 "endTiming": 40500,
                 "positionX": 0.2,
                 "width": 0.05,
-                "R": 160,
-                "G": 160,
-                "B": 160,
-                "notes": [{
+                "r": 160,
+                "g": 160,
+                "b": 160,
+                "notes": [
+                    {
                         "basedTrack": 11,
                         "positionX": 0,
                         "positionY": 0.9215999999999998,
@@ -6580,11 +6650,12 @@
                         "currentTime": 0
                     }
                 ],
-                "moveOperations": [{
+                "moveOperations": [
+                    {
                         "trackId": 11,
                         "type": 1,
-                        "startTime": 25685,
-                        "endTime": 26005,
+                        "startTiming": 25685,
+                        "endTiming": 26005,
                         "endX": 0.35,
                         "endWidth": 0,
                         "endR": 160,
@@ -6596,8 +6667,8 @@
                     {
                         "trackId": 11,
                         "type": 1,
-                        "startTime": 28720,
-                        "endTime": 28806,
+                        "startTiming": 28720,
+                        "endTiming": 28806,
                         "endX": 0.8,
                         "endWidth": 0,
                         "endR": 160,
@@ -6609,8 +6680,8 @@
                     {
                         "trackId": 11,
                         "type": 1,
-                        "startTime": 29164,
-                        "endTime": 29511,
+                        "startTiming": 29164,
+                        "endTiming": 29511,
                         "endX": 0.3,
                         "endWidth": 0,
                         "endR": 160,
@@ -6622,8 +6693,8 @@
                     {
                         "trackId": 11,
                         "type": 1,
-                        "startTime": 29511,
-                        "endTime": 30918,
+                        "startTiming": 29511,
+                        "endTiming": 30918,
                         "endX": 0.2,
                         "endWidth": 0,
                         "endR": 160,
@@ -6635,8 +6706,8 @@
                     {
                         "trackId": 11,
                         "type": 1,
-                        "startTime": 37236,
-                        "endTime": 38000,
+                        "startTiming": 37236,
+                        "endTiming": 38000,
                         "endX": 0.5,
                         "endWidth": 0,
                         "endR": 160,
@@ -6646,11 +6717,12 @@
                         "startX": 0.2
                     }
                 ],
-                "changeWidthOperations": [{
+                "changeWidthOperations": [
+                    {
                         "trackId": 11,
                         "type": 2,
-                        "startTime": 18292,
-                        "endTime": 19691,
+                        "startTiming": 18292,
+                        "endTiming": 19691,
                         "endX": 0,
                         "endWidth": 0.1,
                         "endR": 160,
@@ -6662,8 +6734,8 @@
                     {
                         "trackId": 11,
                         "type": 2,
-                        "startTime": 20217,
-                        "endTime": 20568,
+                        "startTiming": 20217,
+                        "endTiming": 20568,
                         "endX": 0,
                         "endWidth": 0.07,
                         "endR": 160,
@@ -6675,8 +6747,8 @@
                     {
                         "trackId": 11,
                         "type": 2,
-                        "startTime": 25328,
-                        "endTime": 25685,
+                        "startTiming": 25328,
+                        "endTiming": 25685,
                         "endX": 0,
                         "endWidth": 0.05,
                         "endR": 160,
@@ -6688,8 +6760,8 @@
                     {
                         "trackId": 11,
                         "type": 2,
-                        "startTime": 28720,
-                        "endTime": 28806,
+                        "startTiming": 28720,
+                        "endTiming": 28806,
                         "endX": 0,
                         "endWidth": 0.05,
                         "endR": 160,
@@ -6701,8 +6773,8 @@
                     {
                         "trackId": 11,
                         "type": 2,
-                        "startTime": 29511,
-                        "endTime": 30918,
+                        "startTiming": 29511,
+                        "endTiming": 30918,
                         "endX": 0,
                         "endWidth": 0.1,
                         "endR": 160,
@@ -6714,8 +6786,8 @@
                     {
                         "trackId": 11,
                         "type": 2,
-                        "startTime": 37236,
-                        "endTime": 38000,
+                        "startTiming": 37236,
+                        "endTiming": 38000,
                         "endX": 0,
                         "endWidth": 0.3,
                         "endR": 160,
@@ -6725,11 +6797,12 @@
                         "startWidth": 0.1
                     }
                 ],
-                "changeColorOperations": [{
+                "changeColorOperations": [
+                    {
                         "trackId": 11,
                         "type": 3,
-                        "startTime": 23569,
-                        "endTime": 23569,
+                        "startTiming": 23569,
+                        "endTiming": 23569,
                         "endX": 0,
                         "endWidth": 0,
                         "endR": 0,
@@ -6743,8 +6816,8 @@
                     {
                         "trackId": 11,
                         "type": 3,
-                        "startTime": 25685,
-                        "endTime": 25685,
+                        "startTiming": 25685,
+                        "endTiming": 25685,
                         "endX": 0,
                         "endWidth": 0,
                         "endR": 255,
@@ -6758,8 +6831,8 @@
                     {
                         "trackId": 11,
                         "type": 3,
-                        "startTime": 26005,
-                        "endTime": 26005,
+                        "startTiming": 26005,
+                        "endTiming": 26005,
                         "endX": 0,
                         "endWidth": 0,
                         "endR": 160,
@@ -6773,8 +6846,8 @@
                     {
                         "trackId": 11,
                         "type": 3,
-                        "startTime": 34606,
-                        "endTime": 34606,
+                        "startTiming": 34606,
+                        "endTiming": 34606,
                         "endX": 0,
                         "endWidth": 0,
                         "endR": 255,
@@ -6805,22 +6878,11 @@
             "endTiming": 21244,
             "positionX": 0.5,
             "width": 0.05,
-            "R": 160,
-            "G": 160,
-            "B": 160,
-            "notes": [{
-                "basedTrack": 12,
-                "positionX": 0,
-                "positionY": 0.9215999999999998,
-                "noteType": 0,
-                "key": "d",
-                "timing": 20568,
-                "endTiming": 20718,
-                "length": 0,
-                "lastTime": 0,
-                "currentTime": 0,
-                "zIndex": 0,
-                "tempNote": {
+            "r": 160,
+            "g": 160,
+            "b": 160,
+            "notes": [
+                {
                     "basedTrack": 12,
                     "positionX": 0,
                     "positionY": 0.9215999999999998,
@@ -6831,14 +6893,28 @@
                     "length": 0,
                     "lastTime": 0,
                     "currentTime": 0,
-                    "zIndex": 0
+                    "zIndex": 0,
+                    "tempNote": {
+                        "basedTrack": 12,
+                        "positionX": 0,
+                        "positionY": 0.9215999999999998,
+                        "noteType": 0,
+                        "key": "d",
+                        "timing": 20568,
+                        "endTiming": 20718,
+                        "length": 0,
+                        "lastTime": 0,
+                        "currentTime": 0,
+                        "zIndex": 0
+                    }
                 }
-            }],
-            "moveOperations": [{
+            ],
+            "moveOperations": [
+                {
                     "trackId": 12,
                     "type": 1,
-                    "startTime": 19892,
-                    "endTime": 20568,
+                    "startTiming": 19892,
+                    "endTiming": 20568,
                     "endX": 0.2,
                     "endWidth": 0,
                     "endR": 160,
@@ -6850,8 +6926,8 @@
                 {
                     "trackId": 12,
                     "type": 1,
-                    "startTime": 20568,
-                    "endTime": 21244,
+                    "startTiming": 20568,
+                    "endTiming": 21244,
                     "endX": -0.1,
                     "endWidth": 0,
                     "endR": 160,
@@ -6879,26 +6955,29 @@
                 "endTiming": 21244,
                 "positionX": 0.5,
                 "width": 0.05,
-                "R": 160,
-                "G": 160,
-                "B": 160,
-                "notes": [{
-                    "basedTrack": 12,
-                    "positionX": 0,
-                    "positionY": 0.9215999999999998,
-                    "noteType": 0,
-                    "key": "d",
-                    "timing": 20568,
-                    "endTiming": 0,
-                    "length": 0,
-                    "lastTime": 0,
-                    "currentTime": 0
-                }],
-                "moveOperations": [{
+                "r": 160,
+                "g": 160,
+                "b": 160,
+                "notes": [
+                    {
+                        "basedTrack": 12,
+                        "positionX": 0,
+                        "positionY": 0.9215999999999998,
+                        "noteType": 0,
+                        "key": "d",
+                        "timing": 20568,
+                        "endTiming": 0,
+                        "length": 0,
+                        "lastTime": 0,
+                        "currentTime": 0
+                    }
+                ],
+                "moveOperations": [
+                    {
                         "trackId": 12,
                         "type": 1,
-                        "startTime": 19892,
-                        "endTime": 20568,
+                        "startTiming": 19892,
+                        "endTiming": 20568,
                         "endX": 0.2,
                         "endWidth": 0,
                         "endR": 160,
@@ -6910,8 +6989,8 @@
                     {
                         "trackId": 12,
                         "type": 1,
-                        "startTime": 20568,
-                        "endTime": 21244,
+                        "startTiming": 20568,
+                        "endTiming": 21244,
                         "endX": -0.1,
                         "endWidth": 0,
                         "endR": 160,
@@ -6942,22 +7021,11 @@
             "endTiming": 21421,
             "positionX": 0.5,
             "width": 0.05,
-            "R": 160,
-            "G": 160,
-            "B": 160,
-            "notes": [{
-                "basedTrack": 13,
-                "positionX": 0,
-                "positionY": 0.9223999999999979,
-                "noteType": 0,
-                "key": "k",
-                "timing": 20745,
-                "endTiming": 20895,
-                "length": 0,
-                "lastTime": 0,
-                "currentTime": 0,
-                "zIndex": 0,
-                "tempNote": {
+            "r": 160,
+            "g": 160,
+            "b": 160,
+            "notes": [
+                {
                     "basedTrack": 13,
                     "positionX": 0,
                     "positionY": 0.9223999999999979,
@@ -6968,14 +7036,28 @@
                     "length": 0,
                     "lastTime": 0,
                     "currentTime": 0,
-                    "zIndex": 0
+                    "zIndex": 0,
+                    "tempNote": {
+                        "basedTrack": 13,
+                        "positionX": 0,
+                        "positionY": 0.9223999999999979,
+                        "noteType": 0,
+                        "key": "k",
+                        "timing": 20745,
+                        "endTiming": 20895,
+                        "length": 0,
+                        "lastTime": 0,
+                        "currentTime": 0,
+                        "zIndex": 0
+                    }
                 }
-            }],
-            "moveOperations": [{
+            ],
+            "moveOperations": [
+                {
                     "trackId": 13,
                     "type": 1,
-                    "startTime": 20069,
-                    "endTime": 20745,
+                    "startTiming": 20069,
+                    "endTiming": 20745,
                     "endX": 0.8,
                     "endWidth": 0,
                     "endR": 160,
@@ -6987,8 +7069,8 @@
                 {
                     "trackId": 13,
                     "type": 1,
-                    "startTime": 20745,
-                    "endTime": 21421,
+                    "startTiming": 20745,
+                    "endTiming": 21421,
                     "endX": 1.1,
                     "endWidth": 0,
                     "endR": 160,
@@ -7016,26 +7098,29 @@
                 "endTiming": 21421,
                 "positionX": 0.5,
                 "width": 0.05,
-                "R": 160,
-                "G": 160,
-                "B": 160,
-                "notes": [{
-                    "basedTrack": 13,
-                    "positionX": 0,
-                    "positionY": 0.9223999999999979,
-                    "noteType": 0,
-                    "key": "k",
-                    "timing": 20745,
-                    "endTiming": 0,
-                    "length": 0,
-                    "lastTime": 0,
-                    "currentTime": 0
-                }],
-                "moveOperations": [{
+                "r": 160,
+                "g": 160,
+                "b": 160,
+                "notes": [
+                    {
+                        "basedTrack": 13,
+                        "positionX": 0,
+                        "positionY": 0.9223999999999979,
+                        "noteType": 0,
+                        "key": "k",
+                        "timing": 20745,
+                        "endTiming": 0,
+                        "length": 0,
+                        "lastTime": 0,
+                        "currentTime": 0
+                    }
+                ],
+                "moveOperations": [
+                    {
                         "trackId": 13,
                         "type": 1,
-                        "startTime": 20069,
-                        "endTime": 20745,
+                        "startTiming": 20069,
+                        "endTiming": 20745,
                         "endX": 0.8,
                         "endWidth": 0,
                         "endR": 160,
@@ -7047,8 +7132,8 @@
                     {
                         "trackId": 13,
                         "type": 1,
-                        "startTime": 20745,
-                        "endTime": 21421,
+                        "startTiming": 20745,
+                        "endTiming": 21421,
                         "endX": 1.1,
                         "endWidth": 0,
                         "endR": 160,
@@ -7079,22 +7164,11 @@
             "endTiming": 21591,
             "positionX": 0.5,
             "width": 0.05,
-            "R": 160,
-            "G": 160,
-            "B": 160,
-            "notes": [{
-                "basedTrack": 14,
-                "positionX": 0,
-                "positionY": 0.9224000000000014,
-                "noteType": 0,
-                "key": "d",
-                "timing": 20915,
-                "endTiming": 21065,
-                "length": 0,
-                "lastTime": 0,
-                "currentTime": 0,
-                "zIndex": 0,
-                "tempNote": {
+            "r": 160,
+            "g": 160,
+            "b": 160,
+            "notes": [
+                {
                     "basedTrack": 14,
                     "positionX": 0,
                     "positionY": 0.9224000000000014,
@@ -7105,14 +7179,28 @@
                     "length": 0,
                     "lastTime": 0,
                     "currentTime": 0,
-                    "zIndex": 0
+                    "zIndex": 0,
+                    "tempNote": {
+                        "basedTrack": 14,
+                        "positionX": 0,
+                        "positionY": 0.9224000000000014,
+                        "noteType": 0,
+                        "key": "d",
+                        "timing": 20915,
+                        "endTiming": 21065,
+                        "length": 0,
+                        "lastTime": 0,
+                        "currentTime": 0,
+                        "zIndex": 0
+                    }
                 }
-            }],
-            "moveOperations": [{
+            ],
+            "moveOperations": [
+                {
                     "trackId": 14,
                     "type": 1,
-                    "startTime": 20239,
-                    "endTime": 20915,
+                    "startTiming": 20239,
+                    "endTiming": 20915,
                     "endX": 0.2,
                     "endWidth": 0,
                     "endR": 160,
@@ -7124,8 +7212,8 @@
                 {
                     "trackId": 14,
                     "type": 1,
-                    "startTime": 20915,
-                    "endTime": 21591,
+                    "startTiming": 20915,
+                    "endTiming": 21591,
                     "endX": -0.1,
                     "endWidth": 0,
                     "endR": 160,
@@ -7153,26 +7241,29 @@
                 "endTiming": 21591,
                 "positionX": 0.5,
                 "width": 0.05,
-                "R": 160,
-                "G": 160,
-                "B": 160,
-                "notes": [{
-                    "basedTrack": 14,
-                    "positionX": 0,
-                    "positionY": 0.9224000000000014,
-                    "noteType": 0,
-                    "key": "d",
-                    "timing": 20915,
-                    "endTiming": 0,
-                    "length": 0,
-                    "lastTime": 0,
-                    "currentTime": 0
-                }],
-                "moveOperations": [{
+                "r": 160,
+                "g": 160,
+                "b": 160,
+                "notes": [
+                    {
+                        "basedTrack": 14,
+                        "positionX": 0,
+                        "positionY": 0.9224000000000014,
+                        "noteType": 0,
+                        "key": "d",
+                        "timing": 20915,
+                        "endTiming": 0,
+                        "length": 0,
+                        "lastTime": 0,
+                        "currentTime": 0
+                    }
+                ],
+                "moveOperations": [
+                    {
                         "trackId": 14,
                         "type": 1,
-                        "startTime": 20239,
-                        "endTime": 20915,
+                        "startTiming": 20239,
+                        "endTiming": 20915,
                         "endX": 0.2,
                         "endWidth": 0,
                         "endR": 160,
@@ -7184,8 +7275,8 @@
                     {
                         "trackId": 14,
                         "type": 1,
-                        "startTime": 20915,
-                        "endTime": 21591,
+                        "startTiming": 20915,
+                        "endTiming": 21591,
                         "endX": -0.1,
                         "endWidth": 0,
                         "endR": 160,
@@ -7216,22 +7307,11 @@
             "endTiming": 21946,
             "positionX": 0.5,
             "width": 0.05,
-            "R": 160,
-            "G": 160,
-            "B": 160,
-            "notes": [{
-                "basedTrack": 15,
-                "positionX": 0,
-                "positionY": 0.9248000000000012,
-                "noteType": 0,
-                "key": "k",
-                "timing": 21269,
-                "endTiming": 21419,
-                "length": 0,
-                "lastTime": 0,
-                "currentTime": 0,
-                "zIndex": 0,
-                "tempNote": {
+            "r": 160,
+            "g": 160,
+            "b": 160,
+            "notes": [
+                {
                     "basedTrack": 15,
                     "positionX": 0,
                     "positionY": 0.9248000000000012,
@@ -7242,14 +7322,28 @@
                     "length": 0,
                     "lastTime": 0,
                     "currentTime": 0,
-                    "zIndex": 0
+                    "zIndex": 0,
+                    "tempNote": {
+                        "basedTrack": 15,
+                        "positionX": 0,
+                        "positionY": 0.9248000000000012,
+                        "noteType": 0,
+                        "key": "k",
+                        "timing": 21269,
+                        "endTiming": 21419,
+                        "length": 0,
+                        "lastTime": 0,
+                        "currentTime": 0,
+                        "zIndex": 0
+                    }
                 }
-            }],
-            "moveOperations": [{
+            ],
+            "moveOperations": [
+                {
                     "trackId": 15,
                     "type": 1,
-                    "startTime": 20592,
-                    "endTime": 21269,
+                    "startTiming": 20592,
+                    "endTiming": 21269,
                     "endX": 0.8,
                     "endWidth": 0,
                     "endR": 160,
@@ -7261,8 +7355,8 @@
                 {
                     "trackId": 15,
                     "type": 1,
-                    "startTime": 21269,
-                    "endTime": 21946,
+                    "startTiming": 21269,
+                    "endTiming": 21946,
                     "endX": 1.1,
                     "endWidth": 0,
                     "endR": 160,
@@ -7290,26 +7384,29 @@
                 "endTiming": 21946,
                 "positionX": 0.5,
                 "width": 0.05,
-                "R": 160,
-                "G": 160,
-                "B": 160,
-                "notes": [{
-                    "basedTrack": 15,
-                    "positionX": 0,
-                    "positionY": 0.9248000000000012,
-                    "noteType": 0,
-                    "key": "k",
-                    "timing": 21269,
-                    "endTiming": 0,
-                    "length": 0,
-                    "lastTime": 0,
-                    "currentTime": 0
-                }],
-                "moveOperations": [{
+                "r": 160,
+                "g": 160,
+                "b": 160,
+                "notes": [
+                    {
+                        "basedTrack": 15,
+                        "positionX": 0,
+                        "positionY": 0.9248000000000012,
+                        "noteType": 0,
+                        "key": "k",
+                        "timing": 21269,
+                        "endTiming": 0,
+                        "length": 0,
+                        "lastTime": 0,
+                        "currentTime": 0
+                    }
+                ],
+                "moveOperations": [
+                    {
                         "trackId": 15,
                         "type": 1,
-                        "startTime": 20592,
-                        "endTime": 21269,
+                        "startTiming": 20592,
+                        "endTiming": 21269,
                         "endX": 0.8,
                         "endWidth": 0,
                         "endR": 160,
@@ -7321,8 +7418,8 @@
                     {
                         "trackId": 15,
                         "type": 1,
-                        "startTime": 21269,
-                        "endTime": 21946,
+                        "startTiming": 21269,
+                        "endTiming": 21946,
                         "endX": 1.1,
                         "endWidth": 0,
                         "endR": 160,
@@ -7353,22 +7450,11 @@
             "endTiming": 22135,
             "positionX": 0.5,
             "width": 0.05,
-            "R": 160,
-            "G": 160,
-            "B": 160,
-            "notes": [{
-                "basedTrack": 16,
-                "positionX": 0,
-                "positionY": 0.9223999999999997,
-                "noteType": 0,
-                "key": "d",
-                "timing": 21448,
-                "endTiming": 21598,
-                "length": 0,
-                "lastTime": 0,
-                "currentTime": 0,
-                "zIndex": 0,
-                "tempNote": {
+            "r": 160,
+            "g": 160,
+            "b": 160,
+            "notes": [
+                {
                     "basedTrack": 16,
                     "positionX": 0,
                     "positionY": 0.9223999999999997,
@@ -7379,14 +7465,28 @@
                     "length": 0,
                     "lastTime": 0,
                     "currentTime": 0,
-                    "zIndex": 0
+                    "zIndex": 0,
+                    "tempNote": {
+                        "basedTrack": 16,
+                        "positionX": 0,
+                        "positionY": 0.9223999999999997,
+                        "noteType": 0,
+                        "key": "d",
+                        "timing": 21448,
+                        "endTiming": 21598,
+                        "length": 0,
+                        "lastTime": 0,
+                        "currentTime": 0,
+                        "zIndex": 0
+                    }
                 }
-            }],
-            "moveOperations": [{
+            ],
+            "moveOperations": [
+                {
                     "trackId": 16,
                     "type": 1,
-                    "startTime": 20761,
-                    "endTime": 21448,
+                    "startTiming": 20761,
+                    "endTiming": 21448,
                     "endX": 0.2,
                     "endWidth": 0,
                     "endR": 160,
@@ -7398,8 +7498,8 @@
                 {
                     "trackId": 16,
                     "type": 1,
-                    "startTime": 21448,
-                    "endTime": 22135,
+                    "startTiming": 21448,
+                    "endTiming": 22135,
                     "endX": -0.1,
                     "endWidth": 0,
                     "endR": 160,
@@ -7427,26 +7527,29 @@
                 "endTiming": 22135,
                 "positionX": 0.5,
                 "width": 0.05,
-                "R": 160,
-                "G": 160,
-                "B": 160,
-                "notes": [{
-                    "basedTrack": 16,
-                    "positionX": 0,
-                    "positionY": 0.9223999999999997,
-                    "noteType": 0,
-                    "key": "d",
-                    "timing": 21448,
-                    "endTiming": 0,
-                    "length": 0,
-                    "lastTime": 0,
-                    "currentTime": 0
-                }],
-                "moveOperations": [{
+                "r": 160,
+                "g": 160,
+                "b": 160,
+                "notes": [
+                    {
+                        "basedTrack": 16,
+                        "positionX": 0,
+                        "positionY": 0.9223999999999997,
+                        "noteType": 0,
+                        "key": "d",
+                        "timing": 21448,
+                        "endTiming": 0,
+                        "length": 0,
+                        "lastTime": 0,
+                        "currentTime": 0
+                    }
+                ],
+                "moveOperations": [
+                    {
                         "trackId": 16,
                         "type": 1,
-                        "startTime": 20761,
-                        "endTime": 21448,
+                        "startTiming": 20761,
+                        "endTiming": 21448,
                         "endX": 0.2,
                         "endWidth": 0,
                         "endR": 160,
@@ -7458,8 +7561,8 @@
                     {
                         "trackId": 16,
                         "type": 1,
-                        "startTime": 21448,
-                        "endTime": 22135,
+                        "startTiming": 21448,
+                        "endTiming": 22135,
                         "endX": -0.1,
                         "endWidth": 0,
                         "endR": 160,
@@ -7490,22 +7593,11 @@
             "endTiming": 22308,
             "positionX": 0.5,
             "width": 0.05,
-            "R": 160,
-            "G": 160,
-            "B": 160,
-            "notes": [{
-                "basedTrack": 17,
-                "positionX": 0,
-                "positionY": 0.9207999999999998,
-                "noteType": 0,
-                "key": "k",
-                "timing": 21621,
-                "endTiming": 21771,
-                "length": 0,
-                "lastTime": 0,
-                "currentTime": 0,
-                "zIndex": 0,
-                "tempNote": {
+            "r": 160,
+            "g": 160,
+            "b": 160,
+            "notes": [
+                {
                     "basedTrack": 17,
                     "positionX": 0,
                     "positionY": 0.9207999999999998,
@@ -7516,14 +7608,28 @@
                     "length": 0,
                     "lastTime": 0,
                     "currentTime": 0,
-                    "zIndex": 0
+                    "zIndex": 0,
+                    "tempNote": {
+                        "basedTrack": 17,
+                        "positionX": 0,
+                        "positionY": 0.9207999999999998,
+                        "noteType": 0,
+                        "key": "k",
+                        "timing": 21621,
+                        "endTiming": 21771,
+                        "length": 0,
+                        "lastTime": 0,
+                        "currentTime": 0,
+                        "zIndex": 0
+                    }
                 }
-            }],
-            "moveOperations": [{
+            ],
+            "moveOperations": [
+                {
                     "trackId": 17,
                     "type": 1,
-                    "startTime": 20934,
-                    "endTime": 21621,
+                    "startTiming": 20934,
+                    "endTiming": 21621,
                     "endX": 0.8,
                     "endWidth": 0,
                     "endR": 160,
@@ -7535,8 +7641,8 @@
                 {
                     "trackId": 17,
                     "type": 1,
-                    "startTime": 21621,
-                    "endTime": 22308,
+                    "startTiming": 21621,
+                    "endTiming": 22308,
                     "endX": 1.1,
                     "endWidth": 0,
                     "endR": 160,
@@ -7564,26 +7670,29 @@
                 "endTiming": 22308,
                 "positionX": 0.5,
                 "width": 0.05,
-                "R": 160,
-                "G": 160,
-                "B": 160,
-                "notes": [{
-                    "basedTrack": 17,
-                    "positionX": 0,
-                    "positionY": 0.9207999999999998,
-                    "noteType": 0,
-                    "key": "k",
-                    "timing": 21621,
-                    "endTiming": 0,
-                    "length": 0,
-                    "lastTime": 0,
-                    "currentTime": 0
-                }],
-                "moveOperations": [{
+                "r": 160,
+                "g": 160,
+                "b": 160,
+                "notes": [
+                    {
+                        "basedTrack": 17,
+                        "positionX": 0,
+                        "positionY": 0.9207999999999998,
+                        "noteType": 0,
+                        "key": "k",
+                        "timing": 21621,
+                        "endTiming": 0,
+                        "length": 0,
+                        "lastTime": 0,
+                        "currentTime": 0
+                    }
+                ],
+                "moveOperations": [
+                    {
                         "trackId": 17,
                         "type": 1,
-                        "startTime": 20934,
-                        "endTime": 21621,
+                        "startTiming": 20934,
+                        "endTiming": 21621,
                         "endX": 0.8,
                         "endWidth": 0,
                         "endR": 160,
@@ -7595,8 +7704,8 @@
                     {
                         "trackId": 17,
                         "type": 1,
-                        "startTime": 21621,
-                        "endTime": 22308,
+                        "startTiming": 21621,
+                        "endTiming": 22308,
                         "endX": 1.1,
                         "endWidth": 0,
                         "endR": 160,
@@ -7627,10 +7736,11 @@
             "endTiming": 31945,
             "positionX": 0.4,
             "width": 0.05,
-            "R": 160,
-            "G": 160,
-            "B": 160,
-            "notes": [{
+            "r": 160,
+            "g": 160,
+            "b": 160,
+            "notes": [
+                {
                     "basedTrack": 18,
                     "positionX": 0,
                     "positionY": 0.9255999999999993,
@@ -7865,11 +7975,12 @@
                     }
                 }
             ],
-            "moveOperations": [{
+            "moveOperations": [
+                {
                     "trackId": 18,
                     "type": 1,
-                    "startTime": 25685,
-                    "endTime": 26005,
+                    "startTiming": 25685,
+                    "endTiming": 26005,
                     "endX": 0.5,
                     "endWidth": 0,
                     "endR": 160,
@@ -7881,8 +7992,8 @@
                 {
                     "trackId": 18,
                     "type": 1,
-                    "startTime": 28720,
-                    "endTime": 28806,
+                    "startTiming": 28720,
+                    "endTiming": 28806,
                     "endX": 0.8,
                     "endWidth": 0,
                     "endR": 160,
@@ -7894,8 +8005,8 @@
                 {
                     "trackId": 18,
                     "type": 1,
-                    "startTime": 29164,
-                    "endTime": 29511,
+                    "startTiming": 29164,
+                    "endTiming": 29511,
                     "endX": 0.5,
                     "endWidth": 0,
                     "endR": 160,
@@ -7907,8 +8018,8 @@
                 {
                     "trackId": 18,
                     "type": 1,
-                    "startTime": 29511,
-                    "endTime": 30918,
+                    "startTiming": 29511,
+                    "endTiming": 30918,
                     "endX": 0.4,
                     "endWidth": 0,
                     "endR": 160,
@@ -7920,8 +8031,8 @@
                 {
                     "trackId": 18,
                     "type": 1,
-                    "startTime": 31445,
-                    "endTime": 31445,
+                    "startTiming": 31445,
+                    "endTiming": 31445,
                     "endX": -0.1,
                     "endWidth": 0,
                     "endR": 160,
@@ -7931,11 +8042,12 @@
                     "startX": 0.4
                 }
             ],
-            "changeWidthOperations": [{
+            "changeWidthOperations": [
+                {
                     "trackId": 18,
                     "type": 2,
-                    "startTime": 28720,
-                    "endTime": 28806,
+                    "startTiming": 28720,
+                    "endTiming": 28806,
                     "endX": 0,
                     "endWidth": 0.05,
                     "endR": 160,
@@ -7947,8 +8059,8 @@
                 {
                     "trackId": 18,
                     "type": 2,
-                    "startTime": 29511,
-                    "endTime": 30918,
+                    "startTiming": 29511,
+                    "endTiming": 30918,
                     "endX": 0,
                     "endWidth": 0.1,
                     "endR": 160,
@@ -7958,11 +8070,12 @@
                     "startWidth": 0.05
                 }
             ],
-            "changeColorOperations": [{
+            "changeColorOperations": [
+                {
                     "trackId": 18,
                     "type": 3,
-                    "startTime": 23904,
-                    "endTime": 23904,
+                    "startTiming": 23904,
+                    "endTiming": 23904,
                     "endX": 0,
                     "endWidth": 0,
                     "endR": 0,
@@ -7976,8 +8089,8 @@
                 {
                     "trackId": 18,
                     "type": 3,
-                    "startTime": 25685,
-                    "endTime": 25685,
+                    "startTiming": 25685,
+                    "endTiming": 25685,
                     "endX": 0,
                     "endWidth": 0,
                     "endR": 255,
@@ -7991,8 +8104,8 @@
                 {
                     "trackId": 18,
                     "type": 3,
-                    "startTime": 26005,
-                    "endTime": 26005,
+                    "startTiming": 26005,
+                    "endTiming": 26005,
                     "endX": 0,
                     "endWidth": 0,
                     "endR": 160,
@@ -8020,10 +8133,11 @@
                 "endTiming": 31945,
                 "positionX": 0.4,
                 "width": 0.05,
-                "R": 160,
-                "G": 160,
-                "B": 160,
-                "notes": [{
+                "r": 160,
+                "g": 160,
+                "b": 160,
+                "notes": [
+                    {
                         "basedTrack": 18,
                         "positionX": 0,
                         "positionY": 0.9255999999999993,
@@ -8132,11 +8246,12 @@
                         "currentTime": 0
                     }
                 ],
-                "moveOperations": [{
+                "moveOperations": [
+                    {
                         "trackId": 18,
                         "type": 1,
-                        "startTime": 25685,
-                        "endTime": 26005,
+                        "startTiming": 25685,
+                        "endTiming": 26005,
                         "endX": 0.5,
                         "endWidth": 0,
                         "endR": 160,
@@ -8148,8 +8263,8 @@
                     {
                         "trackId": 18,
                         "type": 1,
-                        "startTime": 28720,
-                        "endTime": 28806,
+                        "startTiming": 28720,
+                        "endTiming": 28806,
                         "endX": 0.8,
                         "endWidth": 0,
                         "endR": 160,
@@ -8161,8 +8276,8 @@
                     {
                         "trackId": 18,
                         "type": 1,
-                        "startTime": 29164,
-                        "endTime": 29511,
+                        "startTiming": 29164,
+                        "endTiming": 29511,
                         "endX": 0.5,
                         "endWidth": 0,
                         "endR": 160,
@@ -8174,8 +8289,8 @@
                     {
                         "trackId": 18,
                         "type": 1,
-                        "startTime": 29511,
-                        "endTime": 30918,
+                        "startTiming": 29511,
+                        "endTiming": 30918,
                         "endX": 0.4,
                         "endWidth": 0,
                         "endR": 160,
@@ -8187,8 +8302,8 @@
                     {
                         "trackId": 18,
                         "type": 1,
-                        "startTime": 31445,
-                        "endTime": 31445,
+                        "startTiming": 31445,
+                        "endTiming": 31445,
                         "endX": -0.1,
                         "endWidth": 0,
                         "endR": 160,
@@ -8198,11 +8313,12 @@
                         "startX": 0.4
                     }
                 ],
-                "changeWidthOperations": [{
+                "changeWidthOperations": [
+                    {
                         "trackId": 18,
                         "type": 2,
-                        "startTime": 28720,
-                        "endTime": 28806,
+                        "startTiming": 28720,
+                        "endTiming": 28806,
                         "endX": 0,
                         "endWidth": 0.05,
                         "endR": 160,
@@ -8214,8 +8330,8 @@
                     {
                         "trackId": 18,
                         "type": 2,
-                        "startTime": 29511,
-                        "endTime": 30918,
+                        "startTiming": 29511,
+                        "endTiming": 30918,
                         "endX": 0,
                         "endWidth": 0.1,
                         "endR": 160,
@@ -8225,11 +8341,12 @@
                         "startWidth": 0.05
                     }
                 ],
-                "changeColorOperations": [{
+                "changeColorOperations": [
+                    {
                         "trackId": 18,
                         "type": 3,
-                        "startTime": 23904,
-                        "endTime": 23904,
+                        "startTiming": 23904,
+                        "endTiming": 23904,
                         "endX": 0,
                         "endWidth": 0,
                         "endR": 0,
@@ -8243,8 +8360,8 @@
                     {
                         "trackId": 18,
                         "type": 3,
-                        "startTime": 25685,
-                        "endTime": 25685,
+                        "startTiming": 25685,
+                        "endTiming": 25685,
                         "endX": 0,
                         "endWidth": 0,
                         "endR": 255,
@@ -8258,8 +8375,8 @@
                     {
                         "trackId": 18,
                         "type": 3,
-                        "startTime": 26005,
-                        "endTime": 26005,
+                        "startTiming": 26005,
+                        "endTiming": 26005,
                         "endX": 0,
                         "endWidth": 0,
                         "endR": 160,
@@ -8290,10 +8407,11 @@
             "endTiming": 31587,
             "positionX": 0.6,
             "width": 0.05,
-            "R": 160,
-            "G": 160,
-            "B": 160,
-            "notes": [{
+            "r": 160,
+            "g": 160,
+            "b": 160,
+            "notes": [
+                {
                     "basedTrack": 19,
                     "positionX": 0,
                     "positionY": 0.9248000000000012,
@@ -8580,11 +8698,12 @@
                     }
                 }
             ],
-            "moveOperations": [{
+            "moveOperations": [
+                {
                     "trackId": 19,
                     "type": 1,
-                    "startTime": 25685,
-                    "endTime": 26005,
+                    "startTiming": 25685,
+                    "endTiming": 26005,
                     "endX": 0.65,
                     "endWidth": 0,
                     "endR": 160,
@@ -8596,8 +8715,8 @@
                 {
                     "trackId": 19,
                     "type": 1,
-                    "startTime": 28720,
-                    "endTime": 28806,
+                    "startTiming": 28720,
+                    "endTiming": 28806,
                     "endX": 0.8,
                     "endWidth": 0,
                     "endR": 160,
@@ -8609,8 +8728,8 @@
                 {
                     "trackId": 19,
                     "type": 1,
-                    "startTime": 29164,
-                    "endTime": 29511,
+                    "startTiming": 29164,
+                    "endTiming": 29511,
                     "endX": 0.7,
                     "endWidth": 0,
                     "endR": 160,
@@ -8622,8 +8741,8 @@
                 {
                     "trackId": 19,
                     "type": 1,
-                    "startTime": 29511,
-                    "endTime": 30918,
+                    "startTiming": 29511,
+                    "endTiming": 30918,
                     "endX": 0.6,
                     "endWidth": 0,
                     "endR": 160,
@@ -8635,8 +8754,8 @@
                 {
                     "trackId": 19,
                     "type": 1,
-                    "startTime": 31445,
-                    "endTime": 31445,
+                    "startTiming": 31445,
+                    "endTiming": 31445,
                     "endX": 1.1,
                     "endWidth": 0,
                     "endR": 160,
@@ -8646,11 +8765,12 @@
                     "startX": 0.6
                 }
             ],
-            "changeWidthOperations": [{
+            "changeWidthOperations": [
+                {
                     "trackId": 19,
                     "type": 2,
-                    "startTime": 28720,
-                    "endTime": 28806,
+                    "startTiming": 28720,
+                    "endTiming": 28806,
                     "endX": 0,
                     "endWidth": 0.05,
                     "endR": 160,
@@ -8662,8 +8782,8 @@
                 {
                     "trackId": 19,
                     "type": 2,
-                    "startTime": 29511,
-                    "endTime": 30918,
+                    "startTiming": 29511,
+                    "endTiming": 30918,
                     "endX": 0,
                     "endWidth": 0.1,
                     "endR": 160,
@@ -8673,11 +8793,12 @@
                     "startWidth": 0.05
                 }
             ],
-            "changeColorOperations": [{
+            "changeColorOperations": [
+                {
                     "trackId": 19,
                     "type": 3,
-                    "startTime": 24432,
-                    "endTime": 24432,
+                    "startTiming": 24432,
+                    "endTiming": 24432,
                     "endX": 0,
                     "endWidth": 0,
                     "endR": 255,
@@ -8691,8 +8812,8 @@
                 {
                     "trackId": 19,
                     "type": 3,
-                    "startTime": 24782,
-                    "endTime": 24782,
+                    "startTiming": 24782,
+                    "endTiming": 24782,
                     "endX": 0,
                     "endWidth": 0,
                     "endR": 0,
@@ -8706,8 +8827,8 @@
                 {
                     "trackId": 19,
                     "type": 3,
-                    "startTime": 25134,
-                    "endTime": 25134,
+                    "startTiming": 25134,
+                    "endTiming": 25134,
                     "endX": 0,
                     "endWidth": 0,
                     "endR": 255,
@@ -8721,8 +8842,8 @@
                 {
                     "trackId": 19,
                     "type": 3,
-                    "startTime": 25328,
-                    "endTime": 25328,
+                    "startTiming": 25328,
+                    "endTiming": 25328,
                     "endX": 0,
                     "endWidth": 0,
                     "endR": 0,
@@ -8736,8 +8857,8 @@
                 {
                     "trackId": 19,
                     "type": 3,
-                    "startTime": 25685,
-                    "endTime": 25685,
+                    "startTiming": 25685,
+                    "endTiming": 25685,
                     "endX": 0,
                     "endWidth": 0,
                     "endR": 255,
@@ -8751,8 +8872,8 @@
                 {
                     "trackId": 19,
                     "type": 3,
-                    "startTime": 26005,
-                    "endTime": 26005,
+                    "startTiming": 26005,
+                    "endTiming": 26005,
                     "endX": 0,
                     "endWidth": 0,
                     "endR": 160,
@@ -8780,10 +8901,11 @@
                 "endTiming": 31587,
                 "positionX": 0.6,
                 "width": 0.05,
-                "R": 160,
-                "G": 160,
-                "B": 160,
-                "notes": [{
+                "r": 160,
+                "g": 160,
+                "b": 160,
+                "notes": [
+                    {
                         "basedTrack": 19,
                         "positionX": 0,
                         "positionY": 0.9248000000000012,
@@ -8916,11 +9038,12 @@
                         "currentTime": 0
                     }
                 ],
-                "moveOperations": [{
+                "moveOperations": [
+                    {
                         "trackId": 19,
                         "type": 1,
-                        "startTime": 25685,
-                        "endTime": 26005,
+                        "startTiming": 25685,
+                        "endTiming": 26005,
                         "endX": 0.65,
                         "endWidth": 0,
                         "endR": 160,
@@ -8932,8 +9055,8 @@
                     {
                         "trackId": 19,
                         "type": 1,
-                        "startTime": 28720,
-                        "endTime": 28806,
+                        "startTiming": 28720,
+                        "endTiming": 28806,
                         "endX": 0.8,
                         "endWidth": 0,
                         "endR": 160,
@@ -8945,8 +9068,8 @@
                     {
                         "trackId": 19,
                         "type": 1,
-                        "startTime": 29164,
-                        "endTime": 29511,
+                        "startTiming": 29164,
+                        "endTiming": 29511,
                         "endX": 0.7,
                         "endWidth": 0,
                         "endR": 160,
@@ -8958,8 +9081,8 @@
                     {
                         "trackId": 19,
                         "type": 1,
-                        "startTime": 29511,
-                        "endTime": 30918,
+                        "startTiming": 29511,
+                        "endTiming": 30918,
                         "endX": 0.6,
                         "endWidth": 0,
                         "endR": 160,
@@ -8971,8 +9094,8 @@
                     {
                         "trackId": 19,
                         "type": 1,
-                        "startTime": 31445,
-                        "endTime": 31445,
+                        "startTiming": 31445,
+                        "endTiming": 31445,
                         "endX": 1.1,
                         "endWidth": 0,
                         "endR": 160,
@@ -8982,11 +9105,12 @@
                         "startX": 0.6
                     }
                 ],
-                "changeWidthOperations": [{
+                "changeWidthOperations": [
+                    {
                         "trackId": 19,
                         "type": 2,
-                        "startTime": 28720,
-                        "endTime": 28806,
+                        "startTiming": 28720,
+                        "endTiming": 28806,
                         "endX": 0,
                         "endWidth": 0.05,
                         "endR": 160,
@@ -8998,8 +9122,8 @@
                     {
                         "trackId": 19,
                         "type": 2,
-                        "startTime": 29511,
-                        "endTime": 30918,
+                        "startTiming": 29511,
+                        "endTiming": 30918,
                         "endX": 0,
                         "endWidth": 0.1,
                         "endR": 160,
@@ -9009,11 +9133,12 @@
                         "startWidth": 0.05
                     }
                 ],
-                "changeColorOperations": [{
+                "changeColorOperations": [
+                    {
                         "trackId": 19,
                         "type": 3,
-                        "startTime": 24432,
-                        "endTime": 24432,
+                        "startTiming": 24432,
+                        "endTiming": 24432,
                         "endX": 0,
                         "endWidth": 0,
                         "endR": 255,
@@ -9027,8 +9152,8 @@
                     {
                         "trackId": 19,
                         "type": 3,
-                        "startTime": 24782,
-                        "endTime": 24782,
+                        "startTiming": 24782,
+                        "endTiming": 24782,
                         "endX": 0,
                         "endWidth": 0,
                         "endR": 0,
@@ -9042,8 +9167,8 @@
                     {
                         "trackId": 19,
                         "type": 3,
-                        "startTime": 25134,
-                        "endTime": 25134,
+                        "startTiming": 25134,
+                        "endTiming": 25134,
                         "endX": 0,
                         "endWidth": 0,
                         "endR": 255,
@@ -9057,8 +9182,8 @@
                     {
                         "trackId": 19,
                         "type": 3,
-                        "startTime": 25328,
-                        "endTime": 25328,
+                        "startTiming": 25328,
+                        "endTiming": 25328,
                         "endX": 0,
                         "endWidth": 0,
                         "endR": 0,
@@ -9072,8 +9197,8 @@
                     {
                         "trackId": 19,
                         "type": 3,
-                        "startTime": 25685,
-                        "endTime": 25685,
+                        "startTiming": 25685,
+                        "endTiming": 25685,
                         "endX": 0,
                         "endWidth": 0,
                         "endR": 255,
@@ -9087,8 +9212,8 @@
                     {
                         "trackId": 19,
                         "type": 3,
-                        "startTime": 26005,
-                        "endTime": 26005,
+                        "startTiming": 26005,
+                        "endTiming": 26005,
                         "endX": 0,
                         "endWidth": 0,
                         "endR": 160,
@@ -9119,10 +9244,11 @@
             "endTiming": 27735,
             "positionX": 0.8,
             "width": 0.05,
-            "R": 160,
-            "G": 160,
-            "B": 160,
-            "notes": [{
+            "r": 160,
+            "g": 160,
+            "b": 160,
+            "notes": [
+                {
                     "basedTrack": 20,
                     "positionX": 0,
                     "positionY": 0.9223999999999997,
@@ -9279,11 +9405,12 @@
                     }
                 }
             ],
-            "moveOperations": [{
+            "moveOperations": [
+                {
                     "trackId": 20,
                     "type": 1,
-                    "startTime": 26005,
-                    "endTime": 26182,
+                    "startTiming": 26005,
+                    "endTiming": 26182,
                     "endX": 0.65,
                     "endWidth": 0,
                     "endR": 160,
@@ -9295,8 +9422,8 @@
                 {
                     "trackId": 20,
                     "type": 1,
-                    "startTime": 26182,
-                    "endTime": 26355,
+                    "startTiming": 26182,
+                    "endTiming": 26355,
                     "endX": 0.5,
                     "endWidth": 0,
                     "endR": 160,
@@ -9308,8 +9435,8 @@
                 {
                     "trackId": 20,
                     "type": 1,
-                    "startTime": 26355,
-                    "endTime": 26534,
+                    "startTiming": 26355,
+                    "endTiming": 26534,
                     "endX": 0.35,
                     "endWidth": 0,
                     "endR": 160,
@@ -9321,8 +9448,8 @@
                 {
                     "trackId": 20,
                     "type": 1,
-                    "startTime": 26534,
-                    "endTime": 26709,
+                    "startTiming": 26534,
+                    "endTiming": 26709,
                     "endX": 0.2,
                     "endWidth": 0,
                     "endR": 160,
@@ -9334,8 +9461,8 @@
                 {
                     "trackId": 20,
                     "type": 1,
-                    "startTime": 26709,
-                    "endTime": 26884,
+                    "startTiming": 26709,
+                    "endTiming": 26884,
                     "endX": 0.35,
                     "endWidth": 0,
                     "endR": 160,
@@ -9347,8 +9474,8 @@
                 {
                     "trackId": 20,
                     "type": 1,
-                    "startTime": 26884,
-                    "endTime": 27058,
+                    "startTiming": 26884,
+                    "endTiming": 27058,
                     "endX": 0.5,
                     "endWidth": 0,
                     "endR": 160,
@@ -9360,8 +9487,8 @@
                 {
                     "trackId": 20,
                     "type": 1,
-                    "startTime": 27058,
-                    "endTime": 27235,
+                    "startTiming": 27058,
+                    "endTiming": 27235,
                     "endX": 0.65,
                     "endWidth": 0,
                     "endR": 160,
@@ -9373,8 +9500,8 @@
                 {
                     "trackId": 20,
                     "type": 1,
-                    "startTime": 27235,
-                    "endTime": 27416,
+                    "startTiming": 27235,
+                    "endTiming": 27416,
                     "endX": 0.8,
                     "endWidth": 0,
                     "endR": 160,
@@ -9402,10 +9529,11 @@
                 "endTiming": 27735,
                 "positionX": 0.8,
                 "width": 0.05,
-                "R": 160,
-                "G": 160,
-                "B": 160,
-                "notes": [{
+                "r": 160,
+                "g": 160,
+                "b": 160,
+                "notes": [
+                    {
                         "basedTrack": 20,
                         "positionX": 0,
                         "positionY": 0.9223999999999997,
@@ -9478,11 +9606,12 @@
                         "currentTime": 0
                     }
                 ],
-                "moveOperations": [{
+                "moveOperations": [
+                    {
                         "trackId": 20,
                         "type": 1,
-                        "startTime": 26005,
-                        "endTime": 26182,
+                        "startTiming": 26005,
+                        "endTiming": 26182,
                         "endX": 0.65,
                         "endWidth": 0,
                         "endR": 160,
@@ -9494,8 +9623,8 @@
                     {
                         "trackId": 20,
                         "type": 1,
-                        "startTime": 26182,
-                        "endTime": 26355,
+                        "startTiming": 26182,
+                        "endTiming": 26355,
                         "endX": 0.5,
                         "endWidth": 0,
                         "endR": 160,
@@ -9507,8 +9636,8 @@
                     {
                         "trackId": 20,
                         "type": 1,
-                        "startTime": 26355,
-                        "endTime": 26534,
+                        "startTiming": 26355,
+                        "endTiming": 26534,
                         "endX": 0.35,
                         "endWidth": 0,
                         "endR": 160,
@@ -9520,8 +9649,8 @@
                     {
                         "trackId": 20,
                         "type": 1,
-                        "startTime": 26534,
-                        "endTime": 26709,
+                        "startTiming": 26534,
+                        "endTiming": 26709,
                         "endX": 0.2,
                         "endWidth": 0,
                         "endR": 160,
@@ -9533,8 +9662,8 @@
                     {
                         "trackId": 20,
                         "type": 1,
-                        "startTime": 26709,
-                        "endTime": 26884,
+                        "startTiming": 26709,
+                        "endTiming": 26884,
                         "endX": 0.35,
                         "endWidth": 0,
                         "endR": 160,
@@ -9546,8 +9675,8 @@
                     {
                         "trackId": 20,
                         "type": 1,
-                        "startTime": 26884,
-                        "endTime": 27058,
+                        "startTiming": 26884,
+                        "endTiming": 27058,
                         "endX": 0.5,
                         "endWidth": 0,
                         "endR": 160,
@@ -9559,8 +9688,8 @@
                     {
                         "trackId": 20,
                         "type": 1,
-                        "startTime": 27058,
-                        "endTime": 27235,
+                        "startTiming": 27058,
+                        "endTiming": 27235,
                         "endX": 0.65,
                         "endWidth": 0,
                         "endR": 160,
@@ -9572,8 +9701,8 @@
                     {
                         "trackId": 20,
                         "type": 1,
-                        "startTime": 27235,
-                        "endTime": 27416,
+                        "startTiming": 27235,
+                        "endTiming": 27416,
                         "endX": 0.8,
                         "endWidth": 0,
                         "endR": 160,
@@ -9604,10 +9733,11 @@
             "endTiming": 37569,
             "positionX": 0.8,
             "width": 0.05,
-            "R": 160,
-            "G": 160,
-            "B": 160,
-            "notes": [{
+            "r": 160,
+            "g": 160,
+            "b": 160,
+            "notes": [
+                {
                     "basedTrack": 21,
                     "positionX": 0,
                     "positionY": 0.9239999999999995,
@@ -10025,34 +10155,38 @@
                 }
             ],
             "moveOperations": [],
-            "changeWidthOperations": [{
-                "trackId": 21,
-                "type": 2,
-                "startTime": 29511,
-                "endTime": 30918,
-                "endX": 0,
-                "endWidth": 0.1,
-                "endR": 160,
-                "endG": 160,
-                "endB": 160,
-                "background": "",
-                "startWidth": 0.05
-            }],
-            "changeColorOperations": [{
-                "trackId": 21,
-                "type": 3,
-                "startTime": 35112,
-                "endTime": 35112,
-                "endX": 0,
-                "endWidth": 0,
-                "endR": 255,
-                "endG": 0,
-                "endB": 0,
-                "background": "",
-                "startR": 160,
-                "startG": 160,
-                "startB": 160
-            }],
+            "changeWidthOperations": [
+                {
+                    "trackId": 21,
+                    "type": 2,
+                    "startTiming": 29511,
+                    "endTiming": 30918,
+                    "endX": 0,
+                    "endWidth": 0.1,
+                    "endR": 160,
+                    "endG": 160,
+                    "endB": 160,
+                    "background": "",
+                    "startWidth": 0.05
+                }
+            ],
+            "changeColorOperations": [
+                {
+                    "trackId": 21,
+                    "type": 3,
+                    "startTiming": 35112,
+                    "endTiming": 35112,
+                    "endX": 0,
+                    "endWidth": 0,
+                    "endR": 255,
+                    "endG": 0,
+                    "endB": 0,
+                    "background": "",
+                    "startR": 160,
+                    "startG": 160,
+                    "startB": 160
+                }
+            ],
             "tempR": 255,
             "tempG": 0,
             "tempB": 0,
@@ -10069,10 +10203,11 @@
                 "endTiming": 37569,
                 "positionX": 0.8,
                 "width": 0.05,
-                "R": 160,
-                "G": 160,
-                "B": 160,
-                "notes": [{
+                "r": 160,
+                "g": 160,
+                "b": 160,
+                "notes": [
+                    {
                         "basedTrack": 21,
                         "positionX": 0,
                         "positionY": 0.9239999999999995,
@@ -10266,24 +10401,27 @@
                     }
                 ],
                 "moveOperations": [],
-                "changeWidthOperations": [{
-                    "trackId": 21,
-                    "type": 2,
-                    "startTime": 29511,
-                    "endTime": 30918,
-                    "endX": 0,
-                    "endWidth": 0.1,
-                    "endR": 160,
-                    "endG": 160,
-                    "endB": 160,
-                    "background": "",
-                    "startWidth": 0.05
-                }],
-                "changeColorOperations": [{
+                "changeWidthOperations": [
+                    {
+                        "trackId": 21,
+                        "type": 2,
+                        "startTiming": 29511,
+                        "endTiming": 30918,
+                        "endX": 0,
+                        "endWidth": 0.1,
+                        "endR": 160,
+                        "endG": 160,
+                        "endB": 160,
+                        "background": "",
+                        "startWidth": 0.05
+                    }
+                ],
+                "changeColorOperations": [
+                    {
                         "trackId": 21,
                         "type": 3,
-                        "startTime": 26005,
-                        "endTime": 26005,
+                        "startTiming": 26005,
+                        "endTiming": 26005,
                         "endX": 0,
                         "endWidth": 0,
                         "endR": 160,
@@ -10294,8 +10432,8 @@
                     {
                         "trackId": 21,
                         "type": 3,
-                        "startTime": 35112,
-                        "endTime": 35112,
+                        "startTiming": 35112,
+                        "endTiming": 35112,
                         "endX": 0,
                         "endWidth": 0,
                         "endR": 255,
@@ -10326,22 +10464,11 @@
             "endTiming": 37236,
             "positionX": 0.5,
             "width": 0.1,
-            "R": 160,
-            "G": 160,
-            "B": 160,
-            "notes": [{
-                "basedTrack": 22,
-                "positionX": 0,
-                "positionY": 0.926400000000001,
-                "noteType": 1,
-                "key": "f",
-                "timing": 35613,
-                "endTiming": 35812,
-                "length": 0.14472727272727273,
-                "lastTime": 0,
-                "currentTime": 0,
-                "zIndex": 0,
-                "tempNote": {
+            "r": 160,
+            "g": 160,
+            "b": 160,
+            "notes": [
+                {
                     "basedTrack": 22,
                     "positionX": 0,
                     "positionY": 0.926400000000001,
@@ -10352,26 +10479,41 @@
                     "length": 0.14472727272727273,
                     "lastTime": 0,
                     "currentTime": 0,
-                    "zIndex": 0
+                    "zIndex": 0,
+                    "tempNote": {
+                        "basedTrack": 22,
+                        "positionX": 0,
+                        "positionY": 0.926400000000001,
+                        "noteType": 1,
+                        "key": "f",
+                        "timing": 35613,
+                        "endTiming": 35812,
+                        "length": 0.14472727272727273,
+                        "lastTime": 0,
+                        "currentTime": 0,
+                        "zIndex": 0
+                    }
                 }
-            }],
+            ],
             "moveOperations": [],
             "changeWidthOperations": [],
-            "changeColorOperations": [{
-                "trackId": 22,
-                "type": 3,
-                "startTime": 35613,
-                "endTime": 35613,
-                "endX": 0,
-                "endWidth": 0,
-                "endR": 255,
-                "endG": 0,
-                "endB": 0,
-                "background": "",
-                "startR": 160,
-                "startG": 160,
-                "startB": 160
-            }],
+            "changeColorOperations": [
+                {
+                    "trackId": 22,
+                    "type": 3,
+                    "startTiming": 35613,
+                    "endTiming": 35613,
+                    "endX": 0,
+                    "endWidth": 0,
+                    "endR": 255,
+                    "endG": 0,
+                    "endB": 0,
+                    "background": "",
+                    "startR": 160,
+                    "startG": 160,
+                    "startB": 160
+                }
+            ],
             "tempR": 255,
             "tempG": 0,
             "tempB": 0,
@@ -10388,38 +10530,42 @@
                 "endTiming": 37236,
                 "positionX": 0.5,
                 "width": 0.1,
-                "R": 160,
-                "G": 160,
-                "B": 160,
-                "notes": [{
-                    "basedTrack": 22,
-                    "positionX": 0,
-                    "positionY": 0.926400000000001,
-                    "noteType": 1,
-                    "key": "f",
-                    "timing": 35613,
-                    "endTiming": 35812,
-                    "length": 0.14472727272727273,
-                    "lastTime": 0,
-                    "currentTime": 0
-                }],
+                "r": 160,
+                "g": 160,
+                "b": 160,
+                "notes": [
+                    {
+                        "basedTrack": 22,
+                        "positionX": 0,
+                        "positionY": 0.926400000000001,
+                        "noteType": 1,
+                        "key": "f",
+                        "timing": 35613,
+                        "endTiming": 35812,
+                        "length": 0.14472727272727273,
+                        "lastTime": 0,
+                        "currentTime": 0
+                    }
+                ],
                 "moveOperations": [],
                 "changeWidthOperations": [],
-                "changeColorOperations": [{
-                    "trackId": 22,
-                    "type": 3,
-                    "startTime": 35613,
-                    "endTime": 35613,
-                    "endX": 0,
-                    "endWidth": 0,
-                    "endR": 255,
-                    "endG": 0,
-                    "endB": 0,
-                    "background": "",
-                    "startR": 160,
-                    "startG": 160,
-                    "startB": 160
-                }],
+                "changeColorOperations": [
+                    {
+                        "trackId": 22,
+                        "type": 3,
+                        "startTiming": 35613,
+                        "endTiming": 35613,
+                        "endX": 0,
+                        "endWidth": 0,
+                        "endR": 255,
+                        "endG": 0,
+                        "endB": 0,
+                        "background": "",
+                        "startR": 160,
+                        "startG": 160,
+                        "startB": 160
+                    }
+                ],
                 "tempR": 255,
                 "tempG": 0,
                 "tempB": 0,
@@ -10435,116 +10581,117 @@
     "songLength": 42500,
     "defaultBackground": "http://pic.mcatk.com/charlot-pictures/netsuai-0.jpg",
     "songUrl": "http://47.113.89.104:8090/1.wav",
-    "changeBackgroundOperations": [{
-            "startTime": 17576,
+    "changeBackgroundOperations": [
+        {
+            "startTiming": 17576,
             "background": "http://pic.mcatk.com/charlot-pictures/netsuai-black.jpg",
             "index": 0,
-            "endTime": 17931,
+            "endTiming": 17931,
             "edit": false
         },
         {
-            "startTime": 17931,
+            "startTiming": 17931,
             "background": "http://pic.mcatk.com/charlot-pictures/netsuai-0.jpg",
             "index": 1,
-            "endTime": 23569,
+            "endTiming": 23569,
             "edit": false
         },
         {
-            "startTime": 23569,
+            "startTiming": 23569,
             "background": "http://pic.mcatk.com/charlot-pictures/netsuai-1.jpg",
             "index": 2,
-            "endTime": 23904,
+            "endTiming": 23904,
             "edit": false
         },
         {
-            "startTime": 23904,
+            "startTiming": 23904,
             "background": "http://pic.mcatk.com/charlot-pictures/netsuai-2.jpg",
             "index": 3,
-            "endTime": 24432,
+            "endTiming": 24432,
             "edit": false
         },
         {
-            "startTime": 24432,
+            "startTiming": 24432,
             "background": "http://pic.mcatk.com/charlot-pictures/netsuai-3.jpg",
             "index": 4,
-            "endTime": 24782,
+            "endTiming": 24782,
             "edit": false
         },
         {
-            "startTime": 24782,
+            "startTiming": 24782,
             "background": "http://pic.mcatk.com/charlot-pictures/netsuai-4.jpg",
             "index": 5,
-            "endTime": 25134,
+            "endTiming": 25134,
             "edit": false
         },
         {
-            "startTime": 25134,
+            "startTiming": 25134,
             "background": "http://pic.mcatk.com/charlot-pictures/netsuai-5.jpg",
             "index": 6,
-            "endTime": 25328,
+            "endTiming": 25328,
             "edit": false
         },
         {
-            "startTime": 25328,
+            "startTiming": 25328,
             "background": "http://pic.mcatk.com/charlot-pictures/netsuai-6.jpg",
             "index": 7,
-            "endTime": 25685,
+            "endTiming": 25685,
             "edit": false
         },
         {
-            "startTime": 25685,
+            "startTiming": 25685,
             "background": "http://pic.mcatk.com/charlot-pictures/netsuai-7.jpg",
             "index": 8,
-            "endTime": 26005,
+            "endTiming": 26005,
             "edit": false
         },
         {
-            "startTime": 26005,
+            "startTiming": 26005,
             "background": "http://pic.mcatk.com/charlot-pictures/netsuai-0.jpg",
             "index": 9,
-            "endTime": 28806,
+            "endTiming": 28806,
             "edit": false
         },
         {
-            "startTime": 28806,
+            "startTiming": 28806,
             "background": "http://pic.mcatk.com/charlot-pictures/netsuai-black.jpg",
             "index": 10,
-            "endTime": 29164,
+            "endTiming": 29164,
             "edit": false
         },
         {
-            "startTime": 29164,
+            "startTiming": 29164,
             "background": "http://pic.mcatk.com/charlot-pictures/netsuai-0.jpg",
             "index": 11,
-            "endTime": 34606,
+            "endTiming": 34606,
             "edit": false
         },
         {
-            "startTime": 34606,
+            "startTiming": 34606,
             "background": "http://pic.mcatk.com/charlot-pictures/netsuai-8.jpg",
             "index": 12,
-            "endTime": 35112,
+            "endTiming": 35112,
             "edit": false
         },
         {
-            "startTime": 35112,
+            "startTiming": 35112,
             "background": "http://pic.mcatk.com/charlot-pictures/netsuai-9.jpg",
             "index": 13,
-            "endTime": 35613,
+            "endTiming": 35613,
             "edit": false
         },
         {
-            "startTime": 35613,
+            "startTiming": 35613,
             "background": "http://pic.mcatk.com/charlot-pictures/netsuai-10.jpg",
             "index": 14,
-            "endTime": 36012,
+            "endTiming": 36012,
             "edit": false
         },
         {
-            "startTime": 36012,
+            "startTiming": 36012,
             "background": "http://pic.mcatk.com/charlot-pictures/netsuai-0.jpg",
             "index": 15,
-            "endTime": 43500,
+            "endTiming": 43500,
             "edit": false
         }
     ],

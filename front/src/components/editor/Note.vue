@@ -218,7 +218,7 @@ const checkKey = (rule, value, callback) => {
   else callback(new Error("按键必须是单个字母"));
 };
 
-const checkStartTime = (rule, value, callback) => {
+const checkStartTiming = (rule, value, callback) => {
   if (value !== 0 && !value) return callback(new Error("开始时机不能为空"));
   const val = parseFloat(value);
   if (isNaN(val)) callback(new Error("请输入数字值"));
@@ -228,7 +228,7 @@ const checkStartTime = (rule, value, callback) => {
   else callback();
 };
 
-const checkEndTime = (rule, value, callback) => {
+const checkEndTiming = (rule, value, callback) => {
   if (value !== 0 && !value) return callback(new Error("结束时机不能为空"));
   const val = parseFloat(value);
   if (isNaN(val)) callback(new Error("请输入数字值"));
@@ -242,8 +242,8 @@ const checkEndTime = (rule, value, callback) => {
 const rules = {
   noteType: [{ required: true, message: "请选择音符类别", trigger: "blur" }],
   key: [{ required: true, validator: checkKey, trigger: "blur" }],
-  timing: [{ required: true, validator: checkStartTime, trigger: "blur" }],
-  endTiming: [{ required: true, validator: checkEndTime, trigger: "blur" }],
+  timing: [{ required: true, validator: checkStartTiming, trigger: "blur" }],
+  endTiming: [{ required: true, validator: checkEndTiming, trigger: "blur" }],
 };
 
 const left = computed(() => {
@@ -316,8 +316,8 @@ const collectSnapPoints = (currentNote) => {
       ['moveOperations', 'changeWidthOperations', 'changeColorOperations'].forEach(key => {
         if (track[key]) {
           track[key].forEach(op => {
-            if (op.startTime !== undefined) points.push(op.startTime);
-            if (op.endTime !== undefined) points.push(op.endTime);
+            if (op.startTiming !== undefined) points.push(op.startTiming);
+            if (op.endTiming !== undefined) points.push(op.endTiming);
           });
         }
       });
@@ -325,8 +325,8 @@ const collectSnapPoints = (currentNote) => {
   }
   if (props.chart.changeBackgroundOperations) {
     props.chart.changeBackgroundOperations.forEach(op => {
-      if (op.startTime !== undefined) points.push(op.startTime);
-      if (op.endTime !== undefined) points.push(op.endTime);
+      if (op.startTiming !== undefined) points.push(op.startTiming);
+      if (op.endTiming !== undefined) points.push(op.endTiming);
     });
   }
   if (props.chart.bpm > 0) {

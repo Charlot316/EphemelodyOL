@@ -28,7 +28,7 @@
         </div>
         <div class="timing-row">
           <span class="label">时机</span>
-          <span class="value">{{ operation.startTime }}</span>
+          <span class="value">{{ operation.startTiming }}</span>
         </div>
       </div>
     </div>
@@ -37,12 +37,12 @@
       <div class="form-grid">
         <div class="form-item full">
           <label>触发时机</label>
-          <input type="number" v-model.number="tempOperation.startTime" class="custom-input" @keydown.enter="saveOperation" />
+          <input type="number" v-model.number="tempOperation.startTiming" class="custom-input" @keydown.enter="saveOperation" />
         </div>
 
         <div class="form-item half">
           <label>结束时机 (可选)</label>
-          <input type="number" v-model.number="tempOperation.endTime" class="custom-input" placeholder="留空则持续至下一个" @keydown.enter="saveOperation" />
+          <input type="number" v-model.number="tempOperation.endTiming" class="custom-input" placeholder="留空则持续至下一个" @keydown.enter="saveOperation" />
         </div>
 
         <div class="form-item full">
@@ -53,14 +53,14 @@
         <div class="form-item full">
           <label>更换背景</label>
           <div class="upload-area">
-             <label class="upload-btn" :class="{ disabled: !tempOperation.startTime }">
+             <label class="upload-btn" :class="{ disabled: !tempOperation.startTiming }">
                 <input 
                   type="file" 
                   accept="image/*" 
                   @change="handleFileChange" 
-                  :disabled="!tempOperation.startTime"
+                  :disabled="!tempOperation.startTiming"
                 />
-                <span>{{ !tempOperation.startTime ? '请先填写时机' : '点击上传本地图片' }}</span>
+                <span>{{ !tempOperation.startTiming ? '请先填写时机' : '点击上传本地图片' }}</span>
              </label>
           </div>
         </div>
@@ -88,11 +88,11 @@ const tempOperation = reactive({});
 const currentClass = computed(() => {
   let cls = props.operation.edit ? "edit " : "not-edit ";
   const { currentTime } = props.global;
-  const { startTime, endTime } = props.operation;
+  const { startTiming, endTiming } = props.operation;
   
-  if (currentTime > startTime && currentTime < (endTime || Infinity)) {
+  if (currentTime > startTiming && currentTime < (endTiming || Infinity)) {
     cls += "current-operation ";
-  } else if (currentTime > (endTime || Infinity)) {
+  } else if (currentTime > (endTiming || Infinity)) {
     cls += "passed-operation ";
   } else {
     cls += "to-come-operation ";
@@ -122,7 +122,7 @@ const handleFileChange = async (event) => {
   const formData = new FormData();
   formData.append('background', file);
   formData.append('songId', props.chart.songId);
-  formData.append('startTime', tempOperation.startTime);
+  formData.append('startTiming', tempOperation.startTiming);
 
   try {
     const response = await axios.post('/api/chart/uploadBackground', formData, {
@@ -141,12 +141,12 @@ const handleFileChange = async (event) => {
 };
 
 const saveOperation = () => {
-  if (tempOperation.startTime === undefined || tempOperation.startTime === '') {
+  if (tempOperation.startTiming === undefined || tempOperation.startTiming === '') {
     ElNotification({ title: "错误", message: "请填写时机", type: "error" });
     return;
   }
   
-  if (tempOperation.endTime === "") tempOperation.endTime = null;
+  if (tempOperation.endTiming === "") tempOperation.endTiming = null;
   Object.assign(props.operation, tempOperation);
   props.operation.edit = false;
 

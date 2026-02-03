@@ -9,5 +9,6 @@ public class NoteDTO {
     private Integer noteType;
     private String key;
     private Integer timing;
+    @com.fasterxml.jackson.annotation.JsonAlias("endTime")
     private Integer endTiming;
 }

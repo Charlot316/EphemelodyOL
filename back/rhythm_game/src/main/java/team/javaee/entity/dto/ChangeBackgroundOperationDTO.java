@@ -6,8 +6,10 @@ import lombok.Data;
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ChangeBackgroundOperationDTO {
-    private Integer startTime;
-    private Integer endTime;
+    @com.fasterxml.jackson.annotation.JsonAlias("startTime")
+    private Integer startTiming;
+    @com.fasterxml.jackson.annotation.JsonAlias("endTime")
+    private Integer endTiming;
     private String background;
     private Integer assetId;
 }

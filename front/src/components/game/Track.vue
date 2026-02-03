@@ -96,12 +96,12 @@ const binaryGetCurrentIndex = (currentTime, path) => {
   let mid = Math.floor((right + left) / 2);
   while (right > left) {
     if (
-      path[mid].startTime <= currentTime &&
-      path[mid].endTime >= currentTime
+      path[mid].startTiming <= currentTime &&
+      path[mid].endTiming >= currentTime
     ) {
       return mid;
     }
-    if (path[mid].startTime > currentTime) {
+    if (path[mid].startTiming > currentTime) {
       right = mid - 1;
     } else {
       left = mid + 1;
@@ -116,7 +116,7 @@ const getPositionX = () => {
   if (positionXPath.value.length === 0) return myTrack.positionX || 0;
   
   let currentX = positionXPath.value[positionXIndex.value];
-  if (!currentX || !(currentTime <= currentX.endTime && currentTime >= currentX.startTime)) {
+  if (!currentX || !(currentTime <= currentX.endTiming && currentTime >= currentX.startTiming)) {
     positionXIndex.value = binaryGetCurrentIndex(currentTime, positionXPath.value);
     currentX = positionXPath.value[positionXIndex.value];
   }
@@ -131,7 +131,7 @@ const getWidth = () => {
   if (widthPath.value.length === 0) return myTrack.width || 0;
 
   let currentWidth = widthPath.value[widthIndex.value];
-  if (!currentWidth || !(currentTime <= currentWidth.endTime && currentTime >= currentWidth.startTime)) {
+  if (!currentWidth || !(currentTime <= currentWidth.endTiming && currentTime >= currentWidth.startTiming)) {
     widthIndex.value = binaryGetCurrentIndex(currentTime, widthPath.value);
     currentWidth = widthPath.value[widthIndex.value];
   }
@@ -143,15 +143,15 @@ const getWidth = () => {
 
 const getRGB = () => {
   const currentTime = myglobal.currentTime;
-  if (RGBPath.value.length === 0) return [myTrack.R || 0, myTrack.G || 0, myTrack.B || 0];
+  if (RGBPath.value.length === 0) return [myTrack.r || 0, myTrack.g || 0, myTrack.b || 0];
 
   let currentRGB = RGBPath.value[RGBIndex.value];
-  if (!currentRGB || !(currentTime <= currentRGB.endTime && currentTime >= currentRGB.startTime)) {
+  if (!currentRGB || !(currentTime <= currentRGB.endTiming && currentTime >= currentRGB.startTiming)) {
     RGBIndex.value = binaryGetCurrentIndex(currentTime, RGBPath.value);
     currentRGB = RGBPath.value[RGBIndex.value];
   }
   if (!currentRGB) return [0, 0, 0];
-  if (currentRGB.type == 0) return [currentRGB.R, currentRGB.G, currentRGB.B];
+  if (currentRGB.type == 0) return [currentRGB.r, currentRGB.g, currentRGB.b];
   if (currentRGB.type == 1) {
     return [
       currentRGB.Rk * currentTime + currentRGB.Rb,
@@ -634,28 +634,28 @@ const generateWidthPath = () => {
   if (length == 0) {
     end = myTrack.endTiming - animationTime;
   } else {
-    myTrack.changeWidthOperations.sort((a, b) => a.startTime - b.startTime);
-    end = myTrack.changeWidthOperations[0].startTime;
+    myTrack.changeWidthOperations.sort((a, b) => a.startTiming - b.startTiming);
+    end = myTrack.changeWidthOperations[0].startTiming;
   }
-  widthPath.value.push({ type: 0, width: 0, startTime: 0, endTime: start });
-  widthPath.value.push({ type: 0, width: myTrack.width, startTime: start, endTime: end });
+  widthPath.value.push({ type: 0, width: 0, startTiming: 0, endTiming: start });
+  widthPath.value.push({ type: 0, width: myTrack.width, startTiming: start, endTiming: end });
 
   for (let i = 0; i < length; i++) {
     let operation = myTrack.changeWidthOperations[i];
-    start = operation.startTime;
-    end = operation.endTime;
-    if (operation.startTime != operation.endTime) {
-      let k = (operation.endWidth - operation.startWidth) / (operation.endTime - operation.startTime);
-      let b = operation.endWidth - k * operation.endTime;
-      widthPath.value.push({ type: 1, k, b, startTime: start, endTime: end });
+    start = operation.startTiming;
+    end = operation.endTiming;
+    if (operation.startTiming != operation.endTiming) {
+      let k = (operation.endWidth - operation.startWidth) / (operation.endTiming - operation.startTiming);
+      let b = operation.endWidth - k * operation.endTiming;
+      widthPath.value.push({ type: 1, k, b, startTiming: start, endTiming: end });
     }
     if (i != length - 1) {
       let nextOperation = myTrack.changeWidthOperations[i + 1];
-      if (end < nextOperation.startTime) {
-        widthPath.value.push({ type: 0, width: operation.endWidth, startTime: end, endTime: nextOperation.startTime });
+      if (end < nextOperation.startTiming) {
+        widthPath.value.push({ type: 0, width: operation.endWidth, startTiming: end, endTiming: nextOperation.startTiming });
       }
     } else {
-      widthPath.value.push({ type: 0, width: operation.endWidth, startTime: end, endTime: myTrack.endTiming });
+      widthPath.value.push({ type: 0, width: operation.endWidth, startTiming: end, endTiming: myTrack.endTiming });
     }
   }
 };
@@ -669,27 +669,27 @@ const generatePositionXPath = () => {
   if (length == 0) {
     end = myTrack.endTiming;
   } else {
-    myTrack.moveOperations.sort((a, b) => a.startTime - b.startTime);
-    end = myTrack.moveOperations[0].startTime;
+    myTrack.moveOperations.sort((a, b) => a.startTiming - b.startTiming);
+    end = myTrack.moveOperations[0].startTiming;
   }
-  positionXPath.value.push({ type: 0, positionX: myTrack.positionX, startTime: 0, endTime: end });
+  positionXPath.value.push({ type: 0, positionX: myTrack.positionX, startTiming: 0, endTiming: end });
   for (let i = 0; i < length; i++) {
     let operation = myTrack.moveOperations[i];
-    start = operation.startTime;
-    end = operation.endTime;
-    if (operation.startTime != operation.endTime) {
-      let k = (operation.endX - operation.startX) / (operation.endTime - operation.startTime);
-      let b = operation.endX - k * operation.endTime;
-      positionXPath.value.push({ type: 1, k, b, startTime: start, endTime: end });
+    start = operation.startTiming;
+    end = operation.endTiming;
+    if (operation.startTiming != operation.endTiming) {
+      let k = (operation.endX - operation.startX) / (operation.endTiming - operation.startTiming);
+      let b = operation.endX - k * operation.endTiming;
+      positionXPath.value.push({ type: 1, k, b, startTiming: start, endTiming: end });
     }
     if (i != length - 1) {
       let nextOperation = myTrack.moveOperations[i + 1];
-      if (end < nextOperation.startTime) {
-        positionXPath.value.push({ type: 0, positionX: operation.endX, startTime: end, endTime: nextOperation.startTime });
+      if (end < nextOperation.startTiming) {
+        positionXPath.value.push({ type: 0, positionX: operation.endX, startTiming: end, endTiming: nextOperation.startTiming });
       }
     } else {
       if (end < myTrack.endTiming) {
-        positionXPath.value.push({ type: 0, positionX: operation.endX, startTime: end, endTime: myTrack.endTiming });
+        positionXPath.value.push({ type: 0, positionX: operation.endX, startTiming: end, endTiming: myTrack.endTiming });
       }
     }
   }
@@ -704,31 +704,31 @@ const generateRGBPath = () => {
   if (length == 0) {
     end = myTrack.endTiming;
   } else {
-    myTrack.changeColorOperations.sort((a, b) => a.startTime - b.startTime);
-    end = myTrack.changeColorOperations[0].startTime;
+    myTrack.changeColorOperations.sort((a, b) => a.startTiming - b.startTiming);
+    end = myTrack.changeColorOperations[0].startTiming;
   }
-  RGBPath.value.push({ type: 0, R: myTrack.R, G: myTrack.G, B: myTrack.B, startTime: 0, endTime: end });
+  RGBPath.value.push({ type: 0, r: myTrack.r, g: myTrack.g, b: myTrack.b, startTiming: 0, endTiming: end });
   for (let i = 0; i < length; i++) {
     let operation = myTrack.changeColorOperations[i];
-    start = operation.startTime;
-    end = operation.endTime;
-    if (operation.startTime != operation.endTime) {
-      let Rk = (operation.endR - operation.startR) / (operation.endTime - operation.startTime);
-      let Rb = operation.endR - Rk * operation.endTime;
-      let Gk = (operation.endG - operation.startG) / (operation.endTime - operation.startTime);
-      let Gb = operation.endG - Gk * operation.endTime;
-      let Bk = (operation.endB - operation.startB) / (operation.endTime - operation.startTime);
-      let Bb = operation.endB - Bk * operation.endTime;
-      RGBPath.value.push({ type: 1, Rk, Rb, Gk, Gb, Bk, Bb, startTime: start, endTime: end });
+    start = operation.startTiming;
+    end = operation.endTiming;
+    if (operation.startTiming != operation.endTiming) {
+      let Rk = (operation.endR - operation.startR) / (operation.endTiming - operation.startTiming);
+      let Rb = operation.endR - Rk * operation.endTiming;
+      let Gk = (operation.endG - operation.startG) / (operation.endTiming - operation.startTiming);
+      let Gb = operation.endG - Gk * operation.endTiming;
+      let Bk = (operation.endB - operation.startB) / (operation.endTiming - operation.startTiming);
+      let Bb = operation.endB - Bk * operation.endTiming;
+      RGBPath.value.push({ type: 1, Rk, Rb, Gk, Gb, Bk, Bb, startTiming: start, endTiming: end });
     }
     if (i != length - 1) {
       let nextOperation = myTrack.changeColorOperations[i + 1];
-      if (end < nextOperation.startTime) {
-        RGBPath.value.push({ type: 0, R: operation.endR, G: operation.endG, B: operation.endB, startTime: end, endTime: nextOperation.startTime });
+      if (end < nextOperation.startTiming) {
+        RGBPath.value.push({ type: 0, R: operation.endR, G: operation.endG, B: operation.endB, startTiming: end, endTiming: nextOperation.startTiming });
       }
     } else {
       if (end < myTrack.endTiming) {
-        RGBPath.value.push({ type: 0, R: operation.endR, G: operation.endG, B: operation.endB, startTime: end, endTime: myTrack.endTiming });
+        RGBPath.value.push({ type: 0, R: operation.endR, G: operation.endG, B: operation.endB, startTiming: end, endTiming: myTrack.endTiming });
       }
     }
   }

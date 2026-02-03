@@ -133,7 +133,7 @@ const checkKey = (rule, value, callback) => {
   else callback(new Error("按键必须是单个字母"));
 };
 
-const checkStartTime = (rule, value, callback) => {
+const checkStartTiming = (rule, value, callback) => {
   if (value !== 0 && !value) return callback(new Error("开始时机不能为空"));
   const val = parseFloat(value);
   if (isNaN(val)) callback(new Error("请输入数字值"));
@@ -143,7 +143,7 @@ const checkStartTime = (rule, value, callback) => {
   else callback();
 };
 
-const checkEndTime = (rule, value, callback) => {
+const checkEndTiming = (rule, value, callback) => {
   if (value !== 0 && !value) return callback(new Error("结束时机不能为空"));
   const val = parseFloat(value);
   if (isNaN(val)) callback(new Error("请输入数字值"));
@@ -155,8 +155,8 @@ const checkEndTime = (rule, value, callback) => {
 const rules = {
   type: [{ required: true, message: "请选择轨道类别", trigger: "blur" }],
   key: [{ required: true, validator: checkKey, trigger: "blur" }],
-  startTiming: [{ required: true, validator: checkStartTime, trigger: "blur" }],
-  endTiming: [{ required: true, validator: checkEndTime, trigger: "blur" }],
+  startTiming: [{ required: true, validator: checkStartTiming, trigger: "blur" }],
+  endTiming: [{ required: true, validator: checkEndTiming, trigger: "blur" }],
   width: [{ required: true, message: "宽度不能为空", trigger: "blur" }],
   positionX: [{ required: true, message: "横坐标不能为空", trigger: "blur" }],
   color: [{ required: true, message: "请选择颜色", trigger: "blur" }],
@@ -197,9 +197,9 @@ const hexToRgb = (hex) => {
 const onColorChange = () => {
   const rgb = hexToRgb(tempTrack.hexColor);
   if (rgb) {
-    tempTrack.R = rgb.r;
-    tempTrack.G = rgb.g;
-    tempTrack.B = rgb.b;
+    tempTrack.r = rgb.r;
+    tempTrack.g = rgb.g;
+    tempTrack.b = rgb.b;
   }
 };
 
@@ -209,7 +209,7 @@ const startEdit = () => {
   document.querySelector("#trackCard" + props.track.index)?.scrollIntoView({ behavior: "auto" });
   Object.assign(tempTrack, JSON.parse(JSON.stringify(props.track)));
   tempTrack.key = tempTrack.key?.toUpperCase();
-  tempTrack.hexColor = rgbToHex(props.track.R, props.track.G, props.track.B);
+  tempTrack.hexColor = rgbToHex(props.track.r, props.track.g, props.track.b);
 };
 
 const handleCurrentTrack = () => {
@@ -243,7 +243,7 @@ onMounted(() => {
   }
   // Initialize tempTrack to avoid empty inputs before first edit
   Object.assign(tempTrack, JSON.parse(JSON.stringify(props.track)));
-  tempTrack.hexColor = rgbToHex(props.track.R, props.track.G, props.track.B);
+  tempTrack.hexColor = rgbToHex(props.track.r, props.track.g, props.track.b);
 });
 </script>
 

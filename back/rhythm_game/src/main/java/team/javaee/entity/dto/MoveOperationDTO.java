@@ -6,8 +6,10 @@ import lombok.Data;
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MoveOperationDTO {
-    private Integer startTime;
-    private Integer endTime;
+    @com.fasterxml.jackson.annotation.JsonAlias("startTime")
+    private Integer startTiming;
+    @com.fasterxml.jackson.annotation.JsonAlias({ "endTime", "timing" })
+    private Integer endTiming;
     private Float endX;
     private Float startX;
 }

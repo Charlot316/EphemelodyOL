@@ -3,25 +3,35 @@
 -- Host: localhost    Database: rhythm_game
 -- ------------------------------------------------------
 -- Server version	8.0.29
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!50503 SET NAMES utf8mb4 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */
+;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */
+;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */
+;
+/*!50503 SET NAMES utf8mb4 */
+;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */
+;
+/*!40103 SET TIME_ZONE='+00:00' */
+;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */
+;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */
+;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */
+;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */
+;
 --
 -- Table structure for table `best_record`
 --
 
 DROP TABLE IF EXISTS `best_record`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */
+;
+/*!50503 SET character_set_client = utf8mb4 */
+;
 CREATE TABLE `best_record` (
   `id` int NOT NULL AUTO_INCREMENT COMMENT 'id',
   `song_id` int NOT NULL COMMENT '歌曲ID',
@@ -37,41 +47,45 @@ CREATE TABLE `best_record` (
   `create_time` datetime NOT NULL,
   `update_time` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
+) ENGINE = InnoDB AUTO_INCREMENT = 19 DEFAULT CHARSET = utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */
+;
 --
 -- Table structure for table `change_background_operation`
 --
 
 DROP TABLE IF EXISTS `change_background_operation`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */
+;
+/*!50503 SET character_set_client = utf8mb4 */
+;
 CREATE TABLE `change_background_operation` (
   `id` int NOT NULL AUTO_INCREMENT COMMENT 'id',
   `song_id` int NOT NULL COMMENT '歌曲ID',
-  `start_time` int NOT NULL COMMENT '操作开始时间',
+  `start_timing` int NOT NULL COMMENT '操作开始时间',
   `background` varchar(255) NOT NULL COMMENT '存放需要更换的背景的路径',
   `version` int NOT NULL DEFAULT '1',
   `create_time` datetime NOT NULL,
   `update_time` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=488 DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
+) ENGINE = InnoDB AUTO_INCREMENT = 488 DEFAULT CHARSET = utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */
+;
 --
 -- Table structure for table `change_color_operation`
 --
 
 DROP TABLE IF EXISTS `change_color_operation`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */
+;
+/*!50503 SET character_set_client = utf8mb4 */
+;
 CREATE TABLE `change_color_operation` (
   `id` int NOT NULL AUTO_INCREMENT COMMENT 'id',
   `song_id` int NOT NULL COMMENT '歌曲id',
   `based_track` int NOT NULL COMMENT '所存在的轨道的编号',
-  `start_time` int NOT NULL COMMENT '操作开始时间',
-  `end_time` int NOT NULL COMMENT '操作结束时间',
+  `start_timing` int NOT NULL COMMENT '操作开始时间',
+  `end_timing` int NOT NULL COMMENT '操作结束时间',
   `start_r` int NOT NULL COMMENT '操作的起始R',
   `start_g` int NOT NULL COMMENT '操作的起始G',
   `start_b` int NOT NULL COMMENT '操作的起始B',
@@ -82,60 +96,66 @@ CREATE TABLE `change_color_operation` (
   `create_time` datetime NOT NULL,
   `update_time` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=522 DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
+) ENGINE = InnoDB AUTO_INCREMENT = 522 DEFAULT CHARSET = utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */
+;
 --
 -- Table structure for table `change_width_operation`
 --
 
 DROP TABLE IF EXISTS `change_width_operation`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */
+;
+/*!50503 SET character_set_client = utf8mb4 */
+;
 CREATE TABLE `change_width_operation` (
   `id` int NOT NULL AUTO_INCREMENT COMMENT 'id',
   `song_id` int NOT NULL COMMENT '歌曲id',
   `based_track` int NOT NULL COMMENT '所存在的轨道的编号',
-  `start_time` int NOT NULL COMMENT '操作开始时间',
-  `end_time` int NOT NULL COMMENT '操作结束时间',
+  `start_timing` int NOT NULL COMMENT '操作开始时间',
+  `end_timing` int NOT NULL COMMENT '操作结束时间',
   `start_width` float NOT NULL COMMENT '操作的起始宽度',
   `end_width` float NOT NULL COMMENT '操作的目的宽度',
   `version` int NOT NULL DEFAULT '1',
   `create_time` datetime NOT NULL,
   `update_time` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=323 DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
+) ENGINE = InnoDB AUTO_INCREMENT = 323 DEFAULT CHARSET = utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */
+;
 --
 -- Table structure for table `move_operation`
 --
 
 DROP TABLE IF EXISTS `move_operation`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */
+;
+/*!50503 SET character_set_client = utf8mb4 */
+;
 CREATE TABLE `move_operation` (
   `id` int NOT NULL AUTO_INCREMENT COMMENT 'id',
   `song_id` int NOT NULL COMMENT '歌曲ID',
   `based_track` int NOT NULL COMMENT '所存在的轨道的编号',
-  `start_time` int NOT NULL COMMENT '操作开始时间',
-  `end_time` int NOT NULL COMMENT '操作结束时间',
+  `start_timing` int NOT NULL COMMENT '操作开始时间',
+  `end_timing` int NOT NULL COMMENT '操作结束时间',
   `start_x` float NOT NULL COMMENT '操作的起始坐标',
   `end_x` float NOT NULL COMMENT '操作的目的坐标',
   `version` int NOT NULL DEFAULT '1',
   `create_time` datetime NOT NULL,
   `update_time` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1224 DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
+) ENGINE = InnoDB AUTO_INCREMENT = 1224 DEFAULT CHARSET = utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */
+;
 --
 -- Table structure for table `note`
 --
 
 DROP TABLE IF EXISTS `note`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */
+;
+/*!50503 SET character_set_client = utf8mb4 */
+;
 CREATE TABLE `note` (
   `id` int NOT NULL AUTO_INCREMENT COMMENT 'id',
   `song_id` int NOT NULL COMMENT '歌曲ID',
@@ -148,16 +168,18 @@ CREATE TABLE `note` (
   `create_time` datetime NOT NULL,
   `update_time` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3741 DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
+) ENGINE = InnoDB AUTO_INCREMENT = 3741 DEFAULT CHARSET = utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */
+;
 --
 -- Table structure for table `recent_record`
 --
 
 DROP TABLE IF EXISTS `recent_record`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */
+;
+/*!50503 SET character_set_client = utf8mb4 */
+;
 CREATE TABLE `recent_record` (
   `id` int NOT NULL AUTO_INCREMENT COMMENT 'id',
   `song_id` int NOT NULL COMMENT '歌曲ID',
@@ -173,16 +195,18 @@ CREATE TABLE `recent_record` (
   `create_time` datetime NOT NULL,
   `update_time` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=50 DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
+) ENGINE = InnoDB AUTO_INCREMENT = 50 DEFAULT CHARSET = utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */
+;
 --
 -- Table structure for table `song`
 --
 
 DROP TABLE IF EXISTS `song`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */
+;
+/*!50503 SET character_set_client = utf8mb4 */
+;
 CREATE TABLE `song` (
   `id` int NOT NULL AUTO_INCREMENT COMMENT '歌曲id',
   `song_name` varchar(255) NOT NULL COMMENT '歌曲名称',
@@ -205,16 +229,18 @@ CREATE TABLE `song` (
   `create_time` datetime NOT NULL,
   `update_time` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
+) ENGINE = InnoDB AUTO_INCREMENT = 14 DEFAULT CHARSET = utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */
+;
 --
 -- Table structure for table `track`
 --
 
 DROP TABLE IF EXISTS `track`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */
+;
+/*!50503 SET character_set_client = utf8mb4 */
+;
 CREATE TABLE `track` (
   `id` int NOT NULL AUTO_INCREMENT COMMENT 'id',
   `song_id` int NOT NULL COMMENT '歌曲id',
@@ -224,23 +250,25 @@ CREATE TABLE `track` (
   `end_timing` int NOT NULL COMMENT '轨道的消失时间',
   `position_x` float NOT NULL COMMENT '轨道横坐标',
   `width` float NOT NULL COMMENT '宽度',
-  `R` int NOT NULL COMMENT 'R',
-  `G` int NOT NULL COMMENT 'G',
-  `B` int NOT NULL COMMENT 'B',
+  `r` int NOT NULL COMMENT 'R',
+  `g` int NOT NULL COMMENT 'G',
+  `b` int NOT NULL COMMENT 'B',
   `version` int NOT NULL DEFAULT '1',
   `create_time` datetime NOT NULL,
   `update_time` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=382 DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
+) ENGINE = InnoDB AUTO_INCREMENT = 382 DEFAULT CHARSET = utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */
+;
 --
 -- Table structure for table `user`
 --
 
 DROP TABLE IF EXISTS `user`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */
+;
+/*!50503 SET character_set_client = utf8mb4 */
+;
 CREATE TABLE `user` (
   `user_id` varchar(255) NOT NULL COMMENT '用户id',
   `username` varchar(255) NOT NULL COMMENT '用户名',
@@ -252,16 +280,23 @@ CREATE TABLE `user` (
   `create_time` datetime NOT NULL,
   `update_time` datetime NOT NULL,
   PRIMARY KEY (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
-
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */
+;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */
+;
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */
+;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */
+;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */
+;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */
+;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */
+;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */
+;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */
+;
 -- Dump completed on 2026-01-30 13:54:02

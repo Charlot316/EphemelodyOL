@@ -39,12 +39,12 @@ public class ChangeBackgroundOperation implements Serializable {
     /**
      * 操作开始时间
      */
-    private Integer startTime;
+    private Integer startTiming;
 
     /**
      * 操作结束时间
      */
-    private Integer endTime;
+    private Integer endTiming;
 
     /**
      * 存放需要更换的背景的路径

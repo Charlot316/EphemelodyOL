@@ -141,6 +141,7 @@ const resize = () => {
   }
 };
 
+const sortTrack = () => {
   if (chart.value.tracks) {
     chart.value.tracks.sort((a, b) => a.startTiming - b.startTiming);
     
@@ -152,6 +153,7 @@ const resize = () => {
     chart.value.notesCount = count;
     console.log('[PlayInterface] Calculated notesCount:', count);
   }
+};
 
 const getChart = async () => {
   try {

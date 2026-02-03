@@ -5,8 +5,8 @@ import lombok.Data;
 @Data
 public class ChangeBackgroundOperationsVO {
     private Integer id;
-    private Integer startTime;
-    private Integer endTime;
+    private Integer startTiming;
+    private Integer endTiming;
     private String background;
     private Integer assetId;
 }
