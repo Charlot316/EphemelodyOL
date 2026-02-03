@@ -366,7 +366,18 @@ export function useChartEditor(route, router) {
       chartGot.value = true;
       displayStart.value = 0;
       if (chart.songLength > 0) migrateBackgroundOperations();
+      
+      // Force sort everything from DB to ensure consistency
+      if (chart.tracks) {
+        chart.tracks.forEach(track => {
+          if (track.notes) track.notes.sort((a, b) => a.timing - b.timing);
+          if (track.moveOperations) track.moveOperations.sort((a, b) => a.startTime - b.startTime);
+          if (track.changeWidthOperations) track.changeWidthOperations.sort((a, b) => a.startTime - b.startTime);
+          if (track.changeColorOperations) track.changeColorOperations.sort((a, b) => a.startTime - b.startTime);
+        });
+      }
       sortTrack();
+
       if (!chart.bpm || chart.bpm === 0) {
         globalSettingsCallback?.();
         ElNotification({ type: "warning", title: "提示", message: "请设置节拍" });

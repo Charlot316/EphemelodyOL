@@ -36,9 +36,9 @@
                 <el-icon><Aim /></el-icon>
               </el-button>
             </el-tooltip>
-            <el-tooltip :content="autoScroll ? '锁定轴' : '自由轴'" placement="top">
+            <el-tooltip :content="autoScroll ? '关闭跟随' : '自动跟随'" placement="top">
               <el-button link :class="['tool-btn-minimal', { 'is-active': autoScroll }]" @click="autoScroll = !autoScroll">
-                <el-icon><Compass /></el-icon>
+                <el-icon><VideoPlay /></el-icon>
               </el-button>
             </el-tooltip>
           </div>
@@ -569,15 +569,18 @@ watch(scrollLeft, (newVal) => {
 
 watch(() => props.global.currentTime, (newVal) => {
   if (autoScroll.value) {
-    const tracks = props.chart.tracks;
-    for (let i = 0; i < tracks.length; i++) {
-        const trackElem = document.querySelector("#trackCardPanel" + tracks[i].index);
-        if (trackElem) {
-          trackElem.scrollIntoView({ 
-            behavior: "smooth",
-            block: "center"
-          });
-        }
+    const rightElem = document.getElementById("footer-right-scroll");
+    if (rightElem) {
+      const rect = rightElem.getBoundingClientRect();
+      const currentX = (newVal / displayAreaTime.value) * (props.global.documentWidth - props.siderWidth);
+      // Center the view on the playhead
+      const targetScroll = currentX - (rect.width / 2);
+      
+      rightElem.scrollLeft = targetScroll;
+      
+      // Also sync background timeline
+      const bgTimelineScroll = document.querySelector(".bg-timeline-right");
+      if (bgTimelineScroll) bgTimelineScroll.scrollLeft = targetScroll;
     }
   }
 });
