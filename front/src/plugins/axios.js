@@ -7,9 +7,29 @@ import axios from "axios"
 // axios.defaults.headers.common['Authorization'] = AUTH_TOKEN
 // axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
 
+// 根据当前访问的域名动态决定后端 API 地址
+const getBaseURL = () => {
+    const hostname = window.location.hostname;
+    console.log('[Axios] hostname:', hostname);
+    console.log('[Axios] origin:', window.location.origin);
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        // 本地开发环境，后端现在也有 /api 前缀
+        const url = 'http://localhost:8090/api';
+        console.log('[Axios] Using LOCAL baseURL:', url);
+        return url;
+    } else {
+        // 通过 Cloudflare Tunnel 访问，使用当前域名 + /api 路径
+        const url = window.location.origin + '/api';
+        console.log('[Axios] Using REMOTE baseURL:', url);
+        return url;
+    }
+};
+
+console.log('[Axios] Initializing with baseURL:', getBaseURL());
+
 let config = {
     //baseURL: "http://47.113.89.104:8090",
-    baseURL: "http://localhost:8090",
+    baseURL: getBaseURL(),
     timeout: 60 * 1000, // Timeout
     withCredentials: true, // Check cross-site Access-Control
 };

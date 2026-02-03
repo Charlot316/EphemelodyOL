@@ -25,6 +25,7 @@ mybatis-plus:
 server:
   port: 8090
   servlet:
+    context-path: /api  # 为所有接口添加 /api 前缀，配合 Cloudflare Tunnel 路径转发
     encoding:
       charset: UTF-8
       force: true
