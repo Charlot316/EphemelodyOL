@@ -179,4 +179,13 @@ defineExpose({
   top: -200px;
   animation: scoreboard-container-upward 0.5s ease-out;
 }
+
+.play-container {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+}
 </style>

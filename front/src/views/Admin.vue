@@ -51,7 +51,7 @@
                 <h4 class="song-title">{{ item.songName }}</h4>
                 <p class="song-artist">{{ item.songWriter }}</p>
                 <div class="status-tags">
-                  <el-tag size="mini" :type="getStatusType(item.status)" effect="dark">
+                  <el-tag size="small" :type="getStatusType(item.status)" effect="dark">
                     {{ getStatusLabel(item.status) }}
                   </el-tag>
                   <span class="constant">CONSTANT: {{ item.chartConstant }}</span>
@@ -61,8 +61,8 @@
 
             <div class="card-actions">
               <el-button-group>
-                <el-button type="primary" icon="el-icon-setting" size="medium" @click="getEdit(item.songId, item)"></el-button>
-                <el-button type="danger" icon="el-icon-delete" size="medium" @click="deleteSong(item.songId)"></el-button>
+                <el-button type="primary" icon="el-icon-setting" @click="getEdit(item.songId, item)"></el-button>
+                <el-button type="danger" icon="el-icon-delete" @click="deleteSong(item.songId)"></el-button>
               </el-button-group>
             </div>
           </div>
@@ -207,6 +207,7 @@ export default {
       selectedSongId: "",
       selectedSong: {},
       value: false,
+      assetVisible: false,
     };
   },
   created() {
