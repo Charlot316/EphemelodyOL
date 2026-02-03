@@ -21,7 +21,7 @@
 
         <el-dropdown trigger="hover" @command="handleCommand">
           <div class="user-profile" @click="$router.push('/profile')">
-            <template v-if="$store.state.islogin">
+            <template v-if="$store.state.islogin && $store.state.user">
               <Icon />
               <span class="username-display">{{ $store.state.user.username }}</span>
             </template>
@@ -83,6 +83,7 @@ export default {
 .header-container {
   padding: 15px 40px;
   width: 100%;
+  box-sizing: border-box;
 }
 
 .header-content {
@@ -91,7 +92,9 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  align-items: center;
   border-radius: 20px;
+  background: rgba(255, 255, 255, 0.05); /* Fallback */
 }
 
 .header-logo {

@@ -2,7 +2,7 @@
   <router-link :to="{ path: '/home' }">
     <div class="icon-container" style="cursor:pointer;">
       <div class="icon-info">
-        <div class="user-name">{{ $store.state.user.username }}</div>
+        <div class="user-name">{{ $store.state.user ? $store.state.user.username : '' }}</div>
         <div class="potential">{{ potential }}</div>
       </div>
       <div>
@@ -28,7 +28,8 @@ export default {
   },
   computed: {
     potential() {
-      return parseFloat(this.$store.state.user.potential).toFixed(2);
+      if (!this.$store.state.user) return "0.00";
+      return parseFloat(this.$store.state.user.potential || 0).toFixed(2);
     },
   },
   created() {},
