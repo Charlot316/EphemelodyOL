@@ -86,6 +86,7 @@ export default {
   box-sizing: border-box;
   position: relative;
   z-index: 100;
+  flex-shrink: 0;
 }
 
 .header-content {
