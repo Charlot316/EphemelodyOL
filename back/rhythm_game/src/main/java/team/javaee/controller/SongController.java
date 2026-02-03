@@ -1,6 +1,5 @@
 package team.javaee.controller;
 
-
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -8,6 +7,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import team.javaee.common.Normal;
 import team.javaee.common.config.ReturnResponse;
+import team.javaee.entity.domain.Song;
+import team.javaee.entity.domain.SongAsset;
 import team.javaee.entity.dto.*;
 import team.javaee.entity.vo.BackgroundVO;
 import team.javaee.entity.vo.ImageVO;
@@ -17,7 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * <p>
- *  前端控制器
+ * 前端控制器
  * </p>
  *
  * @author nwh
@@ -48,19 +49,22 @@ public class SongController {
 
     @ApiOperation("上传歌曲封面")
     @PostMapping("uploadSongCover")
-    public ReturnResponse<ImageVO> uploadSongCover(HttpServletRequest request, @RequestParam("file") MultipartFile file, @RequestParam("songId") Integer songId) {
+    public ReturnResponse<ImageVO> uploadSongCover(HttpServletRequest request, @RequestParam("file") MultipartFile file,
+            @RequestParam("songId") Integer songId) {
         return songService.uploadSongCover(file, songId, request);
     }
 
     @ApiOperation("上传歌曲默认背景")
     @PostMapping("uploadDefaultBackground")
-    public ReturnResponse<ImageVO> uploadDefaultBackground(HttpServletRequest request,  @RequestParam("file") MultipartFile file, @RequestParam("songId") Integer songId) {
+    public ReturnResponse<ImageVO> uploadDefaultBackground(HttpServletRequest request,
+            @RequestParam("file") MultipartFile file, @RequestParam("songId") Integer songId) {
         return songService.uploadDefaultBackground(file, songId, request);
     }
 
     @ApiOperation("上传音频")
     @PostMapping("uploadSong")
-    public ReturnResponse<String> uploadSong(HttpServletRequest request, @RequestParam("file") MultipartFile file, @RequestParam("songId") Integer songId) {
+    public ReturnResponse<String> uploadSong(HttpServletRequest request, @RequestParam("file") MultipartFile file,
+            @RequestParam("songId") Integer songId) {
         return songService.uploadSong(file, songId, request);
     }
 
@@ -72,8 +76,21 @@ public class SongController {
 
     @ApiOperation("新增歌曲背景")
     @PostMapping("uploadBackground")
-    public ReturnResponse<BackgroundVO> uploadBackground(HttpServletRequest request, @RequestBody UploadBackgroundDTO uploadBackgroundDTO) {
+    public ReturnResponse<BackgroundVO> uploadBackground(HttpServletRequest request,
+            @RequestBody UploadBackgroundDTO uploadBackgroundDTO) {
         return songService.uploadBackground(uploadBackgroundDTO, request);
     }
-}
 
+    @ApiOperation("上传资源素材")
+    @PostMapping("uploadAsset")
+    public ReturnResponse<SongAsset> uploadAsset(HttpServletRequest request, @RequestParam("file") MultipartFile file,
+            @RequestParam("songId") Integer songId, @RequestParam("type") String type) {
+        return songService.uploadAsset(file, songId, type, request);
+    }
+
+    @ApiOperation("删除资源素材")
+    @PostMapping("deleteAsset")
+    public ReturnResponse<String> deleteAsset(@RequestBody SongAsset asset) {
+        return songService.deleteAsset(asset.getId());
+    }
+}

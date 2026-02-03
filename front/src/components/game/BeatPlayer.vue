@@ -1,15 +1,18 @@
 <template>
   <div class="beat-player-container" :id="playerId">
     <!-- 背景图层 -->
-    <div v-for="image in imagePath" :key="image.url + image.startTime">
+    <div class="background-base">
+      <img :src="normalizeUrl(chart.defaultBackground)" class="background-image" alt="default-bg" />
+    </div>
+    <div v-for="(op, index) in chart.changeBackgroundOperations" :key="index">
       <img
-        :src="image.url"
+        :src="normalizeUrl(op.background)"
         v-show="
-          global.currentTime >= image.startTime &&
-          global.currentTime <= image.endTime
+          global.currentTime >= op.startTime &&
+          global.currentTime <= (op.endTime || 0)
         "
-        @load="handleImageLoaded"
-        class="background-image"
+        class="background-image background-overlay"
+        alt="op-bg"
       />
     </div>
 
@@ -226,35 +229,7 @@ const repaint = () => {
 };
 
 const generateImagePath = () => {
-  imagePath.value = [];
-  const ops = props.chart.changeBackgroundOperations || [];
-  const songLen = props.chart.songLength || 100000; // Default large if unknown
-  
-  let end = ops.length === 0 ? songLen : (ops.sort((a,b) => a.startTime - b.startTime), ops[0].startTime || songLen);
-  
-  imagePath.value.push({ 
-    url: normalizeUrl(props.chart.defaultBackground), 
-    startTime: 0, 
-    endTime: end 
-  });
-  
-  ops.forEach((op, i) => {
-    const start = op.startTime;
-    if (i !== ops.length - 1) {
-      const nextStart = ops[i+1].startTime;
-      imagePath.value.push({ 
-        url: normalizeUrl(op.background), 
-        startTime: start, 
-        endTime: nextStart 
-      });
-    } else {
-      imagePath.value.push({ 
-        url: normalizeUrl(op.background), 
-        startTime: start, 
-        endTime: songLen + 1000 
-      });
-    }
-  });
+  // Now handled directly in template for simplicity and fallback logic
 };
 
 const resetTrackStates = () => {
@@ -470,8 +445,12 @@ defineExpose({
   top: 0;
   width: 100%;
   height: 100%;
-  object-fit: fill;
+  object-fit: cover; /* Changed from fill to cover for better look */
   pointer-events: none;
+}
+
+.background-overlay {
+  z-index: 1;
 }
 
 .judgment-line-container {

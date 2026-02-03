@@ -67,6 +67,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Autowired
     private RecentRecordMapper recentRecordMapper;
 
+    @Autowired
+    private SongAssetMapper songAssetMapper;
+
     @Value("${web.upload-path}")
     private String uploadPath;
 
@@ -443,6 +446,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                             .map(dto -> {
                                 ChangeBackgroundOperationsVO vo = new ChangeBackgroundOperationsVO();
                                 vo.setStartTime(dto.getStartTime());
+                                vo.setEndTime(dto.getEndTime());
                                 vo.setBackground(dto.getBackground());
                                 return vo;
                             }).collect(Collectors.toList());
@@ -527,6 +531,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 ChangeBackgroundOperationsVO changeBackgroundOperation = new ChangeBackgroundOperationsVO();
                 changeBackgroundOperation.setId(item.getId());
                 changeBackgroundOperation.setStartTime(item.getStartTime());
+                changeBackgroundOperation.setEndTime(item.getEndTime());
                 changeBackgroundOperation.setBackground(item.getBackground());
                 changeBackgroundOperations.add(changeBackgroundOperation);
             }
@@ -619,6 +624,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 tracksVOList.add(tracksVO);
             }
             singleSongVO.setTracks(tracksVOList);
+
+            // Fetch Assets
+            QueryWrapper<SongAsset> assetWrapper = new QueryWrapper<>();
+            assetWrapper.eq("song_id", Integer.valueOf(songId));
+            singleSongVO.setAssets(songAssetMapper.selectList(assetWrapper));
+
             return ReturnResponse.OK(singleSongVO);
         } catch (Exception e) {
             e.printStackTrace();

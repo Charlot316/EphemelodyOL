@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -58,6 +59,9 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
 
     @Autowired
     private RecentRecordMapper recentRecordMapper;
+
+    @Autowired
+    private SongAssetMapper songAssetMapper;
 
     @Value("${web.upload-path}")
     private String uploadPath;
@@ -317,6 +321,47 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
             changeWidthOperationMapper.delete(new QueryWrapper<ChangeWidthOperation>().eq("song_id", songId));
             recentRecordMapper.delete(new QueryWrapper<RecentRecord>().eq("song_id", songId));
             bestRecordMapper.delete(new QueryWrapper<BestRecord>().eq("song_id", songId));
+            return ReturnResponse.OK("删除成功");
+        } catch (Exception e) {
+            return ReturnResponse.systemException(ReturnStatus.BUSINESS_EXCEPTION);
+        }
+    }
+
+    @Override
+    public ReturnResponse<SongAsset> uploadAsset(MultipartFile file, Integer songId, String type,
+            HttpServletRequest request) {
+        try {
+            String subFolder = type.equals("image") ? "image/assets/" : "assets/";
+            String realPath = uploadPath + subFolder;
+            File folder = new File(realPath);
+            if (!folder.exists())
+                folder.mkdirs();
+
+            String oldName = file.getOriginalFilename();
+            String newName = UUID.randomUUID().toString() + oldName.substring(oldName.lastIndexOf("."));
+            file.transferTo(new File(folder, newName));
+
+            String url = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + "/"
+                    + subFolder + newName;
+
+            SongAsset asset = new SongAsset();
+            asset.setSongId(songId);
+            asset.setName(oldName);
+            asset.setType(type);
+            asset.setUrl(url);
+            songAssetMapper.insert(asset);
+
+            return ReturnResponse.OK(asset);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ReturnResponse.systemException(ReturnStatus.BUSINESS_EXCEPTION);
+        }
+    }
+
+    @Override
+    public ReturnResponse<String> deleteAsset(Integer id) {
+        try {
+            songAssetMapper.deleteById(id);
             return ReturnResponse.OK("删除成功");
         } catch (Exception e) {
             return ReturnResponse.systemException(ReturnStatus.BUSINESS_EXCEPTION);

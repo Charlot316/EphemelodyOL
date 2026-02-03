@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 import team.javaee.common.config.ReturnResponse;
 import team.javaee.entity.domain.Song;
+import team.javaee.entity.domain.SongAsset;
 import com.baomidou.mybatisplus.extension.service.IService;
 import team.javaee.entity.dto.*;
 import team.javaee.entity.vo.BackgroundVO;
@@ -15,7 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * <p>
- *  服务类
+ * 服务类
  * </p>
  *
  * @author nwh
@@ -30,13 +31,16 @@ public interface SongService extends IService<Song> {
     ReturnResponse<String> editChartInfo(EditChartDTO editChartDTO);
 
     // 上传歌曲封面
-    ReturnResponse<ImageVO> uploadSongCover(@Param("file") MultipartFile file, @Param("songId") Integer songId, HttpServletRequest request);
+    ReturnResponse<ImageVO> uploadSongCover(@Param("file") MultipartFile file, @Param("songId") Integer songId,
+            HttpServletRequest request);
 
     // 上传歌曲默认背景
-    ReturnResponse<ImageVO> uploadDefaultBackground(@Param("file") MultipartFile file, @Param("songId") Integer songId, HttpServletRequest request);
+    ReturnResponse<ImageVO> uploadDefaultBackground(@Param("file") MultipartFile file, @Param("songId") Integer songId,
+            HttpServletRequest request);
 
     // 上传音频
-    ReturnResponse<String> uploadSong(@Param("file") MultipartFile file, @Param("songId") Integer songId, HttpServletRequest request);
+    ReturnResponse<String> uploadSong(@Param("file") MultipartFile file, @Param("songId") Integer songId,
+            HttpServletRequest request);
 
     // 修改谱面具体内容
     ReturnResponse<String> editChartContent(ChartContentDTO chartContentDTO);
@@ -52,4 +56,10 @@ public interface SongService extends IService<Song> {
 
     // 删除谱面
     ReturnResponse<String> deleteChart(SongDTO songDTO);
+
+    // 上传资源素材
+    ReturnResponse<SongAsset> uploadAsset(MultipartFile file, Integer songId, String type, HttpServletRequest request);
+
+    // 删除资源素材
+    ReturnResponse<String> deleteAsset(Integer id);
 }

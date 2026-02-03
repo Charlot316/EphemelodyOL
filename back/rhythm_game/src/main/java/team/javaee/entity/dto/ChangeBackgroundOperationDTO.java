@@ -7,5 +7,6 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ChangeBackgroundOperationDTO {
     private Integer startTime;
+    private Integer endTime;
     private String background;
 }

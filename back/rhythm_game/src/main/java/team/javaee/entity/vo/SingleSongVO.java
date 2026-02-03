@@ -2,6 +2,7 @@ package team.javaee.entity.vo;
 
 import io.swagger.models.auth.In;
 import lombok.Data;
+import team.javaee.entity.domain.SongAsset;
 
 import java.util.List;
 
@@ -22,4 +23,5 @@ public class SingleSongVO {
     private Integer firstBeatDelay;
     private List<ChangeBackgroundOperationsVO> changeBackgroundOperations;
     private List<TracksVO> tracks;
+    private List<SongAsset> assets;
 }

@@ -22,6 +22,7 @@ export function useChartEditor(route, router) {
     songUrl: "",
     songCover: "",
     difficulty: 0,
+    assets: [],
   });
 
   const displayStart = ref(0);
@@ -36,15 +37,46 @@ export function useChartEditor(route, router) {
   });
 
   const setIndex = () => {
-    chart.tracks.forEach((t, i) => (t.index = i));
+    chart.tracks?.forEach((t, i) => (t.index = i));
     chart.changeBackgroundOperations?.forEach((op, i) => (op.index = i));
+  };
+
+  const migrateBackgroundOperations = () => {
+    if (!chart.changeBackgroundOperations || chart.changeBackgroundOperations.length === 0) return;
+
+    // 1. Sort by startTime
+    chart.changeBackgroundOperations.sort((a, b) => a.startTime - b.startTime);
+
+    // 2. Fill EndTime (Legacy Migration)
+    for (let i = 0; i < chart.changeBackgroundOperations.length; i++) {
+      const current = chart.changeBackgroundOperations[i];
+      const next = chart.changeBackgroundOperations[i + 1];
+      
+      if (next) {
+        current.endTime = next.startTime;
+      } else {
+        // Last one ends at song length or far in future if unknown
+        current.endTime = chart.songLength || (current.startTime + 5000);
+      }
+    }
+
+    // 3. Merging/Cleanup Logic: Remove if background equals default
+    // We do this AFTER calculating endTimes so the gap remains correct
+    if (chart.defaultBackground) {
+      chart.changeBackgroundOperations = chart.changeBackgroundOperations.filter(op => {
+        // Normalizing URLs might be needed, but simple string compare for now
+        return op.background !== chart.defaultBackground;
+      });
+    }
+
+    setIndex();
   };
 
   const sortTrack = (timeSort = true) => {
     if (timeSort) {
-      chart.tracks.sort((a, b) => a.startTiming - b.startTiming);
+      chart.tracks?.sort((a, b) => a.startTiming - b.startTiming);
     } else {
-      chart.tracks.sort((a, b) => a.positionX - b.positionX);
+      chart.tracks?.sort((a, b) => a.positionX - b.positionX);
     }
     setIndex();
   };
@@ -59,6 +91,12 @@ export function useChartEditor(route, router) {
       Object.assign(chart, res.data);
       chartGot.value = true;
       displayStart.value = 0;
+      
+      // Delay migration until audio loaded if songLength is 0
+      if (chart.songLength > 0) {
+        migrateBackgroundOperations();
+      }
+      
       sortTrack();
       
       if (!chart.bpm || chart.bpm === 0) {
@@ -87,6 +125,8 @@ export function useChartEditor(route, router) {
   const onAudioLoaded = (audioEl) => {
     chart.songLength = Math.round(1000 * audioEl.duration);
     displayEnd.value = chart.songLength;
+    // Perform migration now that we have the song length
+    migrateBackgroundOperations();
   };
 
   return {
@@ -100,6 +140,7 @@ export function useChartEditor(route, router) {
     sortTrack,
     getChart,
     saveChart,
-    onAudioLoaded
+    onAudioLoaded,
+    migrateBackgroundOperations
   };
 }
