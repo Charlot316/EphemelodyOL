@@ -443,6 +443,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
                     // 映射 ChangeBackgroundOperations
                     if (content.getChangeBackgroundOperations() != null) {
+                        // 从数据库查询所有背景操作以获取 ID
+                        QueryWrapper<ChangeBackgroundOperation> bgWrapper = new QueryWrapper<>();
+                        bgWrapper.eq("song_id", songId);
+                        List<ChangeBackgroundOperation> dbBackgroundOps = changeBackgroundOperationMapper
+                                .selectList(bgWrapper);
+
                         List<ChangeBackgroundOperationsVO> backgroundOps = content.getChangeBackgroundOperations()
                                 .stream()
                                 .map(dto -> {
@@ -450,6 +456,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                                     vo.setStartTiming(dto.getStartTiming());
                                     vo.setEndTiming(dto.getEndTiming());
                                     vo.setAssetId(dto.getAssetId());
+
+                                    // 尝试从数据库匹配对应的操作以获取 ID
+                                    dbBackgroundOps.stream()
+                                            .filter(dbOp -> dbOp.getStartTiming().equals(dto.getStartTiming())
+                                                    && dbOp.getEndTiming().equals(dto.getEndTiming())
+                                                    && (dbOp.getAssetId() != null
+                                                            && dbOp.getAssetId().equals(dto.getAssetId())))
+                                            .findFirst()
+                                            .ifPresent(dbOp -> vo.setId(dbOp.getId()));
+
                                     return vo;
                                 }).collect(Collectors.toList());
                         singleSongVO.setChangeBackgroundOperations(backgroundOps);
