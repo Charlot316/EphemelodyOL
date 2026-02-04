@@ -478,9 +478,7 @@ const paintTrack = async () => {
 };
 
 const addCount = (param) => {
-  if (param.type != "lost") {
-    myTrack.judges.push(param);
-  }
+  myTrack.judges.push(param);
   emit("addCount", param);
 };
 
