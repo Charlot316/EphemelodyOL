@@ -209,12 +209,14 @@ const checkOverlap = (start, end, excludeOp) => {
 };
 
 const handleSegmentClick = (e, index) => {
+  console.log('🖱️ [BG] handleSegmentClick', { index, currentNoteType: props.global.currentNoteType });
   if (props.global.currentNoteType === 3) {
     deleteOp(index);
     return;
   }
   selectedIndex.value = index;
   const op = props.chart.changeBackgroundOperations[index];
+  console.log('🖱️ [BG] Starting drag for op:', op);
   startDragOp(e, op);
 };
 
@@ -301,6 +303,12 @@ const deleteOp = (index) => {
 
 // Dragging Handlers
 const startDragOp = (e, op) => {
+  console.log('🎯 [BG] startDragOp called', {
+    op,
+    clientX: props.global.clientX,
+    startTiming: op.startTiming,
+    endTiming: op.endTiming
+  });
   draggingOp.value = op;
   dragType.value = 'move';
   dragStartX.value = props.global.clientX;
@@ -308,6 +316,7 @@ const startDragOp = (e, op) => {
   dragStartEndTiming.value = op.endTiming || (op.startTiming + 2000);
 
   snapPoints.value = collectSnapPoints(op);
+  console.log('✅ [BG] Drag initialized', { draggingOp: draggingOp.value, dragType: dragType.value });
 };
 
 const startResizeLeft = (e, op) => {
@@ -334,6 +343,7 @@ const onMouseMove = () => {
   if (draggingOp.value) {
     const deltaX = props.global.clientX - dragStartX.value;
     const deltaTime = Math.round((deltaX / (props.global.documentWidth - props.global.siderWidth)) * props.displayAreaTime);
+    console.log('🚀 [BG] onMouseMove', { deltaX, deltaTime, dragType: dragType.value });
 
     if (dragType.value === 'move') {
       const duration = dragStartEndTiming.value - dragStartStartTiming.value;
@@ -372,6 +382,7 @@ const onMouseMove = () => {
 };
 
 const onMouseUp = () => {
+  console.log('🛑 [BG] onMouseUp', { draggingOp: draggingOp.value });
   if (draggingOp.value) {
     props.chart.changeBackgroundOperations.sort((a, b) => a.startTiming - b.startTiming);
 
