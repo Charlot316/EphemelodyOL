@@ -197,14 +197,30 @@ const getBackgroundUrl = (op) => {
 };
 
 const checkOverlap = (start, end, excludeOp) => {
+  console.log('🔍 [BG] checkOverlap called', { start, end, excludeOpId: excludeOp?.id });
+  console.log('📋 [BG] All operations:', props.chart.changeBackgroundOperations.map(op => ({
+    id: op.id,
+    start: op.startTiming,
+    end: op.endTiming,
+    isExcluded: op === excludeOp
+  })));
+  
   for (const op of props.chart.changeBackgroundOperations) {
     if (op === excludeOp) continue;
     const opEnd = op.endTiming || (op.startTiming + 2000);
     // Strict overlap check
     if (start < opEnd && end > op.startTiming) {
+      console.warn('❌ [BG] Overlap detected with op:', { 
+        opId: op.id, 
+        opStart: op.startTiming, 
+        opEnd, 
+        newStart: start, 
+        newEnd: end 
+      });
       return true;
     }
   }
+  console.log('✅ [BG] No overlap detected');
   return false;
 };
 
