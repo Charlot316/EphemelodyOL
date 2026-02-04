@@ -4,7 +4,7 @@
       <img
         :src="user.playerIcon"
         class="img1"
-        onerror="onerror=null;src='https://img0.baidu.com/it/u=3730772664,138405132&fm=26&fmt=auto'"
+        @error="handleImageError"
       />
     </div>
     <div class="icon-info">
@@ -54,7 +54,11 @@ export default {
       return "";
     },
   },
-  methods: {},
+  methods: {
+    handleImageError(e) {
+      e.target.src = require('@/assets/img/user.jpg');
+    }
+  },
   watch: {
     user() {
       this.myUser = this.user;

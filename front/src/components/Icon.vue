@@ -36,7 +36,7 @@ export default {
   created() {},
   methods: {
     handleImageError(e) {
-      e.target.src = 'https://img0.baidu.com/it/u=3730772664,138405132&fm=26&fmt=auto';
+      e.target.src = require('@/assets/img/user.jpg');
     }
   },
   watch: {},
