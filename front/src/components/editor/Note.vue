@@ -1,19 +1,10 @@
 <template>
   <div
     @click="selfClicked"
-    @contextmenu.prevent.stop="openDeleteMenu"
+    @contextmenu.prevent.stop="startEdit"
     :style="noteStyle"
     @mousedown="setZIndex"
   >
-    <!-- Delete Context Menu -->
-    <div
-      v-if="deleteMenuVisible"
-      class="delete-context-menu"
-      :style="{ left: '10px', top: '10px' }"
-      @mousedown.stop
-    >
-      <div class="delete-menu-item" @click="deleteNote">删除</div>
-    </div>
 
     <el-popover
       v-model:visible="edit"
@@ -440,6 +431,10 @@ const deleteSelf = () => {
   props.note.isDeleting = true;
   if (syncAction) syncAction("DELETE_NOTE", props.note.id);
   // Removal will be handled by WebSocket message from useChartEditor
+  // Also clear global selection if this was selected
+  if (props.global.currentNote === props.note) {
+    props.global.currentNote = null;
+  }
 };
 
 const deleteNote = () => {
@@ -453,14 +448,14 @@ const deleteNote = () => {
 };
 
 const selfClicked = () => {
-  // 如果刚刚拖拽过，不打开编辑弹窗
+  // Only handle deletion mode or simple selection (handled by mousedown z-index)
+  // Edit mode is now triggered by context menu
   if (hasDragged.value) {
     hasDragged.value = false;
     return;
   }
   
   if (props.currentNoteType === 3) deleteSelf();
-  else if (props.enableEdit) startEdit();
 };
 
 watch(() => props.global.mouseUp, () => {
@@ -505,14 +500,7 @@ watch(() => props.global.mouseUp, () => {
       }
     }
   }
-  deleteMenuVisible.value = false;
 });
-
-const deleteMenuVisible = ref(false);
-const openDeleteMenu = () => {
-  if (props.note.isDeleting) return;
-  deleteMenuVisible.value = true;
-};
 
 watch(() => props.global.mouseMove, () => {
   if (canMove.value) {

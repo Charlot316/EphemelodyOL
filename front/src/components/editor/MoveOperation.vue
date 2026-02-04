@@ -1,19 +1,10 @@
 <template>
   <div
     @click="selfClicked"
-    @contextmenu.prevent.stop="openDeleteMenu"
+    @contextmenu.prevent.stop="startEdit"
     :style="opStyle"
     @mousedown="setZIndex"
   >
-    <!-- Delete Context Menu -->
-    <div
-      v-if="deleteMenuVisible"
-      class="delete-context-menu"
-      :style="{ left: '10px', top: '10px' }"
-      @mousedown.stop
-    >
-      <div class="delete-menu-item" @click="deleteOperation">删除</div>
-    </div>
 
     <el-popover
       v-model:visible="edit"
@@ -381,6 +372,10 @@ const deleteSelf = () => {
   if (props.operation.isDeleting) return;
   props.operation.isDeleting = true;
   if (syncAction) syncAction("DELETE_MOVE_OP", props.operation.id);
+  
+  if (props.global.currentOperation === props.operation) {
+    props.global.currentOperation = null;
+  }
 };
 
 const deleteOperation = () => {
@@ -395,7 +390,6 @@ const deleteOperation = () => {
 
 const selfClicked = () => {
   if (props.currentNoteType === 3) deleteSelf();
-  else if (props.enableEdit) startEdit();
 };
 
 watch(() => props.global.mouseUp, () => {
@@ -439,14 +433,7 @@ watch(() => props.global.mouseUp, () => {
       }
     }
   }
-  deleteMenuVisible.value = false;
 });
-
-const deleteMenuVisible = ref(false);
-const openDeleteMenu = () => {
-  if (props.operation.isDeleting) return;
-  deleteMenuVisible.value = true;
-};
 
 watch(() => props.global.mouseMove, () => {
   if (canMove.value) {

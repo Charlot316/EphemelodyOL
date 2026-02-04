@@ -1,69 +1,40 @@
 <template>
   <div class="workspace-root select" :class="{ 'is-fullscreen': isEditorFullscreen }">
     <!-- 顶部状态栏 (可选/隐藏) -->
-    
+
     <div class="main-layout" :style="layoutStyle">
       <!-- 1. 侧边栏: 资产与菜单 -->
       <transition name="panel-slide">
-          <aside 
-            v-if="menuOpened" 
-            class="panel-sider glass-panel" 
-            :style="{ width: global.siderWidth + 'px', gridRow: 1 }"
-          >
-          
-          <MenuPanel
-            :Height="global.documentHeight - footerHeight"
-            :footerHeight="footerHeight"
-            :global="global"
-            :chart="chart"
-          />
+        <aside v-if="menuOpened" class="panel-sider glass-panel"
+          :style="{ width: global.siderWidth + 'px', gridRow: 1 }">
+
+          <MenuPanel :Height="global.documentHeight - footerHeight" :footerHeight="footerHeight" :global="global"
+            :chart="chart" />
           <div class="resizer-v right" @mousedown="startResizingSider"></div>
         </aside>
       </transition>
 
       <!-- 2. 预览区 -->
-      <main 
-        class="panel-preview glass-panel" 
-        :style="{ gridRow: 1, width: '100%' }"
-      >
-        
+      <main class="panel-preview glass-panel" :style="{ gridRow: 1, width: '100%' }">
+
         <div class="player-wrapper">
-          <BeatPlayer
-            ref="playerRef"
-            :chart="chart"
-            :global="global"
-            mode="edit"
+          <BeatPlayer ref="playerRef" :chart="chart" :global="global" mode="edit"
             :selectedTrackId="currentSelectTrack ? (currentSelectTrack.trackId || currentSelectTrack.index) : null"
-            :displayRange="[displayStart, displayEnd]"
-            :volume="volume"
-            @track-click="handleTrackClick"
-            @audio-loaded="onAudioLoaded"
-            @toggle-fullscreen="handleToggleFullscreen"
-            :isFullscreen="isEditorFullscreen"
-            playerId="editor-player"
-          />
+            :displayRange="[displayStart, displayEnd]" :volume="volume" @track-click="handleTrackClick"
+            @audio-loaded="onAudioLoaded" @toggle-fullscreen="handleToggleFullscreen" :isFullscreen="isEditorFullscreen"
+            playerId="editor-player" />
         </div>
       </main>
 
-      <footer 
-        class="panel-footer glass-panel" 
-        :style="{ 
-          height: footerHeight + 'px', 
-          gridColumn: '1 / 3',
-          gridRow: 2
-        }"
-      >
+      <footer class="panel-footer glass-panel" :style="{
+        height: footerHeight + 'px',
+        gridColumn: '1 / 3',
+        gridRow: 2
+      }">
         <div class="resizer-h top" @mousedown="startResizingFooter"></div>
-        <Footer
-          :chart="chart"
-          :global="global"
-          :siderWidth="global.siderWidth"
-          @currentTrack="handleCurrentTrack"
-          @open-settings="globalSetting = true"
-          @toggle-fullscreen="handleToggleFullscreen"
-          @restart="playerRef.value?.reStart()"
-          @seek-delta="handleSeekDelta"
-        />
+        <Footer :chart="chart" :global="global" :siderWidth="global.siderWidth" @currentTrack="handleCurrentTrack"
+          @open-settings="globalSetting = true" @toggle-fullscreen="handleToggleFullscreen"
+          @restart="playerRef.value?.reStart()" @seek-delta="handleSeekDelta" />
       </footer>
     </div>
 
@@ -72,27 +43,29 @@
     <el-dialog v-model="globalSetting" @close="checkbpm" width="650px" title="全局设置" custom-class="glass-dialog">
       <el-form :model="form" label-width="200px" style="padding: 20px;">
         <el-form-item label="BPM / Interval (ms)">
-            <el-input-number v-model="chart.bpm" :min="0.1" :step="0.01" controls-position="right" style="width: 100%;" />
+          <el-input-number v-model="chart.bpm" :min="0.1" :step="0.01" controls-position="right" style="width: 100%;" />
         </el-form-item>
         <el-form-item label="First Beat (ms)">
-            <el-input-number v-model="chart.firstBeatDelay" :step="1" controls-position="right" style="width: 100%;" />
+          <el-input-number v-model="chart.firstBeatDelay" :step="1" controls-position="right" style="width: 100%;" />
         </el-form-item>
         <el-divider content-position="left">Auxiliary / Manual</el-divider>
         <el-form-item label="Total Beats">
-            <el-input-number v-model="chart.beatsCount" :min="0" :step="1" controls-position="right" style="width: 100%;" />
+          <el-input-number v-model="chart.beatsCount" :min="0" :step="1" controls-position="right"
+            style="width: 100%;" />
         </el-form-item>
         <el-form-item label="Last Beat (ms)">
-            <el-input-number v-model="chart.lastBeatDelay" :step="1" controls-position="right" style="width: 100%;" />
+          <el-input-number v-model="chart.lastBeatDelay" :step="1" controls-position="right" style="width: 100%;" />
         </el-form-item>
         <el-form-item>
-            <el-button @click="ManualCalculatebpm">Manual Calc BPM</el-button>
+          <el-button @click="ManualCalculatebpm">Manual Calc BPM</el-button>
         </el-form-item>
         <el-form-item label="音量">
           <el-input-number v-model="volume" :min="0" :max="100" @change="changeVolume" />
         </el-form-item>
         <el-form-item label="Note Speed (ms)">
-           <el-slider v-model="global.remainingTime" :min="100" :max="2000" :step="50" style="width: 200px; display: inline-block; margin-right: 15px; vertical-align: middle;" />
-           <el-input-number v-model="global.remainingTime" :min="100" :max="2000" :step="50" controls-position="right" />
+          <el-slider v-model="global.remainingTime" :min="100" :max="2000" :step="50"
+            style="width: 200px; display: inline-block; margin-right: 15px; vertical-align: middle;" />
+          <el-input-number v-model="global.remainingTime" :min="100" :max="2000" :step="50" controls-position="right" />
         </el-form-item>
         <el-form-item label="微调步长 (ms)">
           <el-input-number v-model="timeStep" :min="1" :max="100" />
@@ -171,7 +144,7 @@ const global = reactive({
   keyIsHold: {},
   keyUsed: {},
   reCalculateChartMaker: false,
-  siderWidth: 300, 
+  siderWidth: 300,
   remainingTime: 1000,
   finalY: 0.8,
   lostTime: 150,
@@ -184,7 +157,7 @@ const menuOpened = ref(true);
 const volume = ref(store.state.volume || 100);
 const currentSelectTrack = ref(null);
 const globalSetting = ref(false);
-const footerHeight = ref(400); 
+const footerHeight = ref(400);
 const form = reactive({});
 
 const playerActions = {
@@ -278,7 +251,7 @@ onMounted(() => {
     global.documentWidth = document.documentElement.clientWidth;
     playerRef.value?.resize();
   };
-  
+
   updateDimensions();
   window.addEventListener('resize', updateDimensions);
 
@@ -288,6 +261,34 @@ onMounted(() => {
   });
 
   window.onkeydown = (e) => {
+    // Delete shortcut: Command/Ctrl + Delete/Backspace
+    if ((e.metaKey || e.ctrlKey) && (e.key === 'Backspace' || e.key === 'Delete')) {
+      e.preventDefault();
+
+      if (global.currentNote) {
+        if (global.currentNote.isDeleting) return;
+        global.currentNote.isDeleting = true;
+        if (syncAction) syncAction("DELETE_NOTE", global.currentNote.id);
+        global.currentNote = null;
+        ElNotification({ title: "删除成功", message: "已删除选中音符", type: "success", duration: 1000, showClose: false });
+      } else if (global.currentOperation) {
+        if (global.currentOperation.isDeleting) return;
+        global.currentOperation.isDeleting = true;
+
+        let type = "";
+        if (global.currentOperation.startX !== undefined) type = "DELETE_MOVE_OP";
+        else if (global.currentOperation.startWidth !== undefined) type = "DELETE_WIDTH_OP";
+        else if (global.currentOperation.startR !== undefined) type = "DELETE_COLOR_OP";
+
+        if (type && syncAction) {
+          syncAction(type, global.currentOperation.id);
+          global.currentOperation = null;
+          ElNotification({ title: "删除成功", message: "已删除选中操作", type: "success", duration: 1000, showClose: false });
+        }
+      }
+      return;
+    }
+
     if (e.key === "ArrowLeft") {
       global.currentTime = Math.max(0, global.currentTime - timeStep.value);
       handleTimeChange();
@@ -371,6 +372,7 @@ onMounted(() => {
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   cursor: grab;
 }
+
 .handle-actions {
   margin-left: auto;
   display: flex;
@@ -395,7 +397,10 @@ onMounted(() => {
   z-index: 100;
   transition: background 0.2s;
 }
-.resizer-v:hover { background: #409eff; }
+
+.resizer-v:hover {
+  background: #409eff;
+}
 
 .panel-preview {
   grid-column: 2;
@@ -427,16 +432,25 @@ onMounted(() => {
   z-index: 100;
   transition: background 0.2s;
 }
-.resizer-h.bottom { top: -2px; }
-.resizer-h.top { bottom: -2px; }
-.resizer-h:hover { background: #409eff; }
+
+.resizer-h.bottom {
+  top: -2px;
+}
+
+.resizer-h.top {
+  bottom: -2px;
+}
+
+.resizer-h:hover {
+  background: #409eff;
+}
 
 .global-time-slider {
   position: absolute;
   height: 40px;
   right: 0;
   padding: 0 20px;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(10px);
   z-index: 8;
   display: flex;
@@ -457,24 +471,36 @@ onMounted(() => {
   width: 50px;
   height: 50px;
   font-size: 24px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 .is-fullscreen .panel-preview {
   position: fixed;
-  top: 0; left: 0;
-  width: 100vw; height: 100vh;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
   z-index: 9999;
 }
 
-.panel-slide-enter-active, .panel-slide-leave-active { transition: transform 0.3s; }
-.panel-slide-enter-from, .panel-slide-leave-to { transform: translateX(-100%); }
+.panel-slide-enter-active,
+.panel-slide-leave-active {
+  transition: transform 0.3s;
+}
+
+.panel-slide-enter-from,
+.panel-slide-leave-to {
+  transform: translateX(-100%);
+}
 
 @media (max-width: 768px) {
   .main-layout {
     grid-template-columns: 1fr !important;
     grid-template-rows: auto 1fr auto !important;
   }
-  .panel-sider { display: none; }
+
+  .panel-sider {
+    display: none;
+  }
 }
 </style>
