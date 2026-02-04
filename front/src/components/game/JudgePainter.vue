@@ -3,7 +3,7 @@ import { defineProps, watch } from 'vue';
 
 const colorOpacity = 0.04;
 const judgeSize = 300;
-const judgeAnimationTime = 300;
+const judgeAnimationTime = 400;
 
 const props = defineProps({
   Y: Number,
@@ -29,20 +29,20 @@ const colorList = [
 // Old particles init removed
 
 const particles = [];
-// Initialize particles - EVEN MORE and LARGER for exaggerated effect
-for (let i = 0; i < 50; i++) {
+// Initialize particles - REDUCED and CONTAINED
+for (let i = 0; i < 25; i++) {
   const angle = Math.random() * Math.PI * 2;
-  // Faster speed range: 0.4 to 1.2
-  const speed = Math.random() * 0.8 + 0.4;
+  // Slower speed range: 0.2 to 0.6 (was 0.4 to 1.2)
+  const speed = Math.random() * 0.4 + 0.2;
   particles.push({
     vx: Math.cos(angle) * speed,
     vy: Math.sin(angle) * speed,
-    // Much larger size variation: 4 to 16 pixels
-    size: Math.random() * 12 + 4,
-    offset: Math.random() * 20,
+    // Size: 3 to 10 pixels (slightly reduced max)
+    size: Math.random() * 7 + 3,
+    offset: Math.random() * 10, // Reduced offset
     life: Math.random() * 0.6 + 0.4,
-    // More aggressive expansion
-    growth: Math.random() * 0.4 + 0.2
+    // Slower expansion
+    growth: Math.random() * 0.2 + 0.1
   });
 }
 
@@ -81,7 +81,9 @@ const paintJudge = (judge) => {
   // === 1. Draw Diamond Particles (Expanding) ===
   const alpha = Math.max(0, 1 - dt / duration);
   painter.globalAlpha = alpha;
-  painter.fillStyle = `rgba(${baseColor}, 0.9)`; // Brighter particles
+  // Use strokeStyle instead of fillStyle for outlined particles
+  painter.strokeStyle = `rgba(${baseColor}, 0.9)`;
+  painter.lineWidth = 1.5; // Stroke width for particles
 
   particles.forEach(p => {
     // Physics
@@ -102,7 +104,8 @@ const paintJudge = (judge) => {
       painter.lineTo(x, y + halfSize);
       painter.lineTo(x - halfSize, y);
       painter.closePath();
-      painter.fill();
+      // STROKE instead of FILL
+      painter.stroke();
     }
   });
   painter.globalAlpha = 1.0;
@@ -127,7 +130,7 @@ const paintJudge = (judge) => {
     painter.closePath();
 
     // Thicker line: Increased from 4 to 8
-    painter.lineWidth = 10 * ringAlpha;
+    painter.lineWidth = 16 * ringAlpha;
     painter.strokeStyle = `rgba(${baseColor}, ${ringAlpha})`;
     painter.stroke();
 
@@ -142,7 +145,7 @@ const paintJudge = (judge) => {
       painter.closePath();
 
       // Thicker echo line too
-      painter.lineWidth = 6 * ringAlpha;
+      painter.lineWidth = 8 * ringAlpha;
       painter.strokeStyle = `rgba(${baseColor}, ${ringAlpha * 0.5})`;
       painter.stroke();
     }
