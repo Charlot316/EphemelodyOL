@@ -541,40 +541,44 @@ const displayTracks = computed(() => {
   const tracks = props.chart.tracks;
   if (!tracks) return [];
   
-  // 显式引用以确保在 currentTime 变化时重新计算
   const currentTime = props.global.currentTime;
 
   return [...tracks].sort((a, b) => {
     if (props.global.timeSort) {
-      // 模式1: 按时间排序 (startTiming)
-      if (a.startTiming !== b.startTiming) {
-        return a.startTiming - b.startTiming;
-      }
+      if (a.startTiming !== b.startTiming) return a.startTiming - b.startTiming;
     } else {
-      // 模式2: 坐标排序 (带有实时状态权重的三级排序)
-      // Level 1: 出场优先级 (已经开始或正在进行的优先)
-      const aStarted = currentTime >= a.startTiming;
-      const bStarted = currentTime >= b.startTiming;
+      // 模式2: 坐标排序 (状态权重四级排序)
       
-      if (aStarted !== bStarted) {
-        return aStarted ? -1 : 1;
-      }
-      
-      if (aStarted) {
-        // Level 2: 已出场的按坐标 X 排序
+      // 获取轨道当前相对于播放进度的状态权重
+      // 0: 进行中 (正在屏幕上) - 最高优先级
+      // 1: 待出场 (还没到时间) - 次高优先级
+      // 2: 已过期 (已经结束) - 最低优先级
+      const getStatusWeight = (t) => {
+        if (currentTime >= t.startTiming && currentTime <= t.endTiming) return 0;
+        if (currentTime < t.startTiming) return 1;
+        return 2;
+      };
+
+      const weightA = getStatusWeight(a);
+      const weightB = getStatusWeight(b);
+
+      if (weightA !== weightB) return weightA - weightB;
+
+      // 权重相同时的逻辑
+      if (weightA === 0) {
+        // 正在进行的：按坐标排序
         const posXA = a.positionX || 0;
         const posXB = b.positionX || 0;
         if (posXA !== posXB) return posXA - posXB;
       } else {
-        // Level 2: 未出场的先按进入时间排序
+        // 待出场或已过期的：按时间排序
         if (a.startTiming !== b.startTiming) return a.startTiming - b.startTiming;
-        // Level 3: 时间相同时按坐标 X 排序
+        if (a.endTiming !== b.endTiming) return a.endTiming - b.endTiming;
         const posXA = a.positionX || 0;
         const posXB = b.positionX || 0;
         if (posXA !== posXB) return posXA - posXB;
       }
     }
-    // 稳定键：ID 或 索引
     return (a.id || 0) - (b.id || 0) || (a.index || 0) - (b.index || 0);
   });
 });
