@@ -186,7 +186,7 @@ public class ChartWebSocketHandler extends TextWebSocketHandler {
                     break;
                 case "DELETE_NOTE":
                     // Integer noteId = (Integer) msg.getPayload(); // Original line
-                    noteMapper.deleteById((Integer) msg.getPayload()); // Simplified
+                    noteMapper.deleteById(objectMapper.convertValue(msg.getPayload(), Integer.class)); // Simplified
                     resultPayload = msg.getPayload(); // Simplified
                     break;
                 case "ADD_TRACK":
@@ -201,7 +201,7 @@ public class ChartWebSocketHandler extends TextWebSocketHandler {
                     resultPayload = ut;
                     break;
                 case "DELETE_TRACK":
-                    int tid = (Integer) msg.getPayload(); // Changed var name
+                    int tid = objectMapper.convertValue(msg.getPayload(), Integer.class); // Changed var name
                     // Cascading delete notes and operations for this track
                     noteMapper.delete(new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<Note>()
                             .eq("based_track", tid)); // Simplified
@@ -229,7 +229,7 @@ public class ChartWebSocketHandler extends TextWebSocketHandler {
                     resultPayload = uMo;
                     break;
                 case "DELETE_MOVE_OP":
-                    moveOperationMapper.deleteById((Integer) msg.getPayload());
+                    moveOperationMapper.deleteById(objectMapper.convertValue(msg.getPayload(), Integer.class));
                     resultPayload = msg.getPayload();
                     break;
 
@@ -246,7 +246,7 @@ public class ChartWebSocketHandler extends TextWebSocketHandler {
                     resultPayload = uWo;
                     break;
                 case "DELETE_WIDTH_OP":
-                    changeWidthOperationMapper.deleteById((Integer) msg.getPayload());
+                    changeWidthOperationMapper.deleteById(objectMapper.convertValue(msg.getPayload(), Integer.class));
                     resultPayload = msg.getPayload();
                     break;
 
@@ -263,7 +263,7 @@ public class ChartWebSocketHandler extends TextWebSocketHandler {
                     resultPayload = uCo;
                     break;
                 case "DELETE_COLOR_OP":
-                    changeColorOperationMapper.deleteById((Integer) msg.getPayload());
+                    changeColorOperationMapper.deleteById(objectMapper.convertValue(msg.getPayload(), Integer.class));
                     resultPayload = msg.getPayload();
                     break;
 
@@ -282,7 +282,8 @@ public class ChartWebSocketHandler extends TextWebSocketHandler {
                     resultPayload = uBo;
                     break;
                 case "DELETE_BG_OP":
-                    changeBackgroundOperationMapper.deleteById((Integer) msg.getPayload());
+                    changeBackgroundOperationMapper
+                            .deleteById(objectMapper.convertValue(msg.getPayload(), Integer.class));
                     resultPayload = msg.getPayload();
                     break;
             }
