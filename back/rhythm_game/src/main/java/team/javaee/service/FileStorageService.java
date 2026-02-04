@@ -20,4 +20,6 @@ public interface FileStorageService {
      * @param fileUrl 文件的公开访问 URL
      */
     void deleteFile(String fileUrl);
+
+    boolean exists(String fileUrl);
 }

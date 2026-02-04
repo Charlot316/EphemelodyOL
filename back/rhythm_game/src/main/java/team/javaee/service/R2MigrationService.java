@@ -46,6 +46,9 @@ public class R2MigrationService {
     @Value("${web.upload-path}")
     private String uploadPath;
 
+    @Value("${cloudflare.r2.public-url}")
+    private String publicUrl;
+
     public void migrateAll() {
         log.info("开始多线程全量迁移任务 (优化本地路径查找)...");
         ExecutorService executor = Executors.newFixedThreadPool(10); // 10线程并发
@@ -103,9 +106,9 @@ public class R2MigrationService {
         List<Song> songs = songMapper.selectList(null);
         for (Song song : songs) {
             try {
-                String newCover = processAndMigrate(song.getSongCover(), "covers");
-                String newBg = processAndMigrate(song.getDefaultBackground(), "backgrounds");
-                String newUrl = processAndMigrate(song.getSongUrl(), "mp3");
+                String newCover = processAndMigrate(song.getSongCover(), "covers", song.getId());
+                String newBg = processAndMigrate(song.getDefaultBackground(), "backgrounds", song.getId());
+                String newUrl = processAndMigrate(song.getSongUrl(), "mp3", song.getId());
 
                 songMapper.update(null, new com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<Song>()
                         .set(Song::getSongCover, newCover)
@@ -121,7 +124,7 @@ public class R2MigrationService {
     private void migrateSongAssets() {
         List<SongAsset> assets = songAssetMapper.selectList(null);
         for (SongAsset asset : assets) {
-            asset.setUrl(processAndMigrate(asset.getUrl(), "assets"));
+            asset.setUrl(processAndMigrate(asset.getUrl(), "assets", asset.getSongId()));
             songAssetMapper.updateById(asset);
         }
     }
@@ -130,7 +133,7 @@ public class R2MigrationService {
         List<User> users = userMapper.selectList(null);
         for (User user : users) {
             try {
-                String newIcon = processAndMigrate(user.getIcon(), "avatars");
+                String newIcon = processAndMigrate(user.getIcon(), "avatars", null);
                 if (newIcon != null && !newIcon.equals(user.getIcon())) {
                     userMapper.update(null,
                             new com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<User>()
@@ -143,19 +146,19 @@ public class R2MigrationService {
         }
     }
 
-    private String processAndMigrate(String urlStr, String prefix) {
-        // 允许重新迁移的情况：URL 为空、已是 R2 地址但不是 UUID 格式（说明是之前的错误手工修复地址）
+    private String processAndMigrate(String urlStr, String prefix, String songId) {
         if (urlStr == null || urlStr.isEmpty()) {
             return urlStr;
         }
 
-        // 如果已经是 R2 地址，且看起来已经是 UUID 格式（36位横杠），则跳过
-        if (urlStr.contains("images.heycharlot.com")) {
-            String lastPart = urlStr.substring(urlStr.lastIndexOf("/") + 1);
-            if (lastPart.contains("-") && lastPart.length() >= 36) {
-                return urlStr;
+        String publicHost = "images.heycharlot.com";
+
+        // 如果已经是 R2 地址，检查是否 404
+        if (urlStr.contains(publicHost)) {
+            if (fileStorageService.exists(urlStr)) {
+                return urlStr; // 资源存在，跳过
             }
-            log.info("检测到非规范 R2 地址，将尝试重新迁移: {}", urlStr);
+            log.warn("发现 R2 资源丢失 (404)，尝试从本地找回: {}", urlStr);
         }
 
         Path tempFile = null;
@@ -164,42 +167,45 @@ public class R2MigrationService {
             if (fileName.contains("?"))
                 fileName = fileName.substring(0, fileName.indexOf("?"));
 
-            // 优先查找本地静态资源目录 (核心优化)
-            File localFile = findLocalFile(fileName, urlStr);
+            // 增强的本地查找逻辑
+            File localFile = findLocalFileRobust(urlStr, prefix, songId);
 
             if (localFile != null && localFile.exists()) {
                 log.info("【本地读取】找到资源: {} -> {}", fileName, localFile.getAbsolutePath());
                 tempFile = Files.createTempFile("migrate_local_", fileName);
                 Files.copy(localFile.toPath(), tempFile, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-            } else if (urlStr.startsWith("http")) {
+            } else if (urlStr.startsWith("http") && !urlStr.contains(publicHost)) {
                 log.info("【网络下载】正在从远程获取: {}", urlStr);
                 tempFile = downloadFile(urlStr);
             }
 
             if (tempFile == null) {
-                log.warn("无法定位资源: {}", urlStr);
+                log.error("无法定位资源 Source: {} (Song: {})", urlStr, songId);
                 return urlStr;
             }
 
             String contentType = Files.probeContentType(tempFile);
             if (contentType == null || contentType.equals("application/octet-stream")) {
-                if (fileName.toLowerCase().endsWith(".wav"))
+                String fn = tempFile.getFileName().toString().toLowerCase();
+                if (fn.endsWith(".wav"))
                     contentType = "audio/wav";
-                else if (fileName.toLowerCase().endsWith(".mp3"))
+                else if (fn.endsWith(".mp3"))
                     contentType = "audio/mpeg";
-                else if (fileName.toLowerCase().endsWith(".m4a"))
+                else if (fn.endsWith(".m4a"))
                     contentType = "audio/mp4";
-                else if (fileName.toLowerCase().endsWith(".jpg") || fileName.toLowerCase().endsWith(".jpeg"))
+                else if (fn.endsWith(".jpg") || fn.endsWith(".jpeg"))
                     contentType = "image/jpeg";
-                else if (fileName.toLowerCase().endsWith(".png"))
+                else if (fn.endsWith(".png"))
                     contentType = "image/png";
-                else if (fileName.toLowerCase().endsWith(".mp4"))
+                else if (fn.endsWith(".mp4"))
                     contentType = "video/mp4";
+                else if (fn.endsWith(".webp"))
+                    contentType = "image/webp";
             }
 
             MultipartFile multipartFile = new MockMultipartFile(fileName, tempFile, contentType);
             String newUrl = fileStorageService.uploadFile(multipartFile, prefix);
-            log.info("【迁移成功】{} -> {}", fileName, newUrl);
+            log.info("【迁移/修复成功】{} -> {}", urlStr, newUrl);
             return newUrl;
         } catch (Exception e) {
             log.error("【迁移失败】" + urlStr + " | 错误: " + e.getMessage());
@@ -211,6 +217,56 @@ public class R2MigrationService {
             } catch (IOException ignored) {
             }
         }
+    }
+
+    private File findLocalFileRobust(String originalUrl, String prefix, String songId) {
+        // 基本查找
+        String fileName = originalUrl.substring(originalUrl.lastIndexOf("/") + 1);
+        File f = findLocalFile(fileName, originalUrl);
+        if (f != null)
+            return f;
+
+        // 特定映射查找 (针对 R2 丢失的情况)
+        if (songId != null) {
+            java.util.Map<String, String> idToName = new java.util.HashMap<>();
+            idToName.put("9b52ceee-01bf-11f1-a4ca-20296da6fcfc", "netsuai");
+            idToName.put("9b52d18c-01bf-11f1-a4ca-20296da6fcfc", "world-execute-me");
+            idToName.put("9b52d25e-01bf-11f1-a4ca-20296da6fcfc", "aegle");
+            idToName.put("9b52d2c2-01bf-11f1-a4ca-20296da6fcfc", "koinouta");
+            idToName.put("9b52d312-01bf-11f1-a4ca-20296da6fcfc", "yts");
+
+            java.util.Map<String, String> newToOld = new java.util.HashMap<>();
+            newToOld.put("9b52ceee-01bf-11f1-a4ca-20296da6fcfc", "4");
+            newToOld.put("9b52d18c-01bf-11f1-a4ca-20296da6fcfc", "6");
+            newToOld.put("9b52d25e-01bf-11f1-a4ca-20296da6fcfc", "7");
+            newToOld.put("9b52d2c2-01bf-11f1-a4ca-20296da6fcfc", "8");
+            newToOld.put("9b52d312-01bf-11f1-a4ca-20296da6fcfc", "9");
+            newToOld.put("9b52d36c-01bf-11f1-a4ca-20296da6fcfc", "10");
+            newToOld.put("9b52d3bc-01bf-11f1-a4ca-20296da6fcfc", "11");
+            newToOld.put("9b52d40c-01bf-11f1-a4ca-20296da6fcfc", "12");
+            newToOld.put("9b52d45c-01bf-11f1-a4ca-20296da6fcfc", "13");
+
+            String shortName = idToName.get(songId);
+            String oldId = newToOld.get(songId);
+
+            String[] candidates = null;
+            if ("covers".equals(prefix)) {
+                candidates = new String[] { shortName + "-cover.jpg", oldId + ".jpg", shortName + ".jpg" };
+            } else if ("backgrounds".equals(prefix)) {
+                candidates = new String[] { shortName + "-0.jpg", shortName + "-0.PNG", oldId + ".jpg" };
+            } else if ("mp3".equals(prefix)) {
+                candidates = new String[] { oldId + ".wav", oldId + ".mp3", oldId + ".m4a" };
+            }
+
+            if (candidates != null) {
+                for (String c : candidates) {
+                    File found = findLocalFile(c, c);
+                    if (found != null)
+                        return found;
+                }
+            }
+        }
+        return null;
     }
 
     private File findLocalFile(String fileName, String originalUrl) {

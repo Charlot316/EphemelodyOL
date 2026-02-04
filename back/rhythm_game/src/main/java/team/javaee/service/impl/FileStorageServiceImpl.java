@@ -189,4 +189,29 @@ public class FileStorageServiceImpl implements FileStorageService {
             log.error("从 R2 删除对象失败: {}", key, e);
         }
     }
+
+    @Override
+    public boolean exists(String fileUrl) {
+        if (fileUrl == null || !fileUrl.startsWith(publicUrl)) {
+            return false;
+        }
+        String key = fileUrl.replace(publicUrl, "");
+        if (key.startsWith("/")) {
+            key = key.substring(1);
+        }
+        try {
+            software.amazon.awssdk.services.s3.model.HeadObjectRequest headObjectRequest = software.amazon.awssdk.services.s3.model.HeadObjectRequest
+                    .builder()
+                    .bucket(bucketName)
+                    .key(key)
+                    .build();
+            s3Client.headObject(headObjectRequest);
+            return true;
+        } catch (software.amazon.awssdk.services.s3.model.NoSuchKeyException e) {
+            return false;
+        } catch (Exception e) {
+            log.warn("无法检查文件是否存在: {}", fileUrl, e);
+            return false;
+        }
+    }
 }
