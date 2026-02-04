@@ -21,13 +21,13 @@ public interface ChartCollaboratorMapper extends BaseMapper<ChartCollaborator> {
      * 查询用户在指定谱面的协作权限
      */
     @Select("SELECT * FROM chart_collaborator WHERE song_id = #{songId} AND user_id = #{userId} AND status = 1")
-    ChartCollaborator getActiveCollaboration(@Param("songId") Integer songId, @Param("userId") String userId);
+    ChartCollaborator getActiveCollaboration(@Param("songId") String songId, @Param("userId") String userId);
 
     /**
      * 查询谱面的所有协作者
      */
     @Select("SELECT * FROM chart_collaborator WHERE song_id = #{songId} AND status = 1")
-    List<ChartCollaborator> getCollaboratorsBySongId(@Param("songId") Integer songId);
+    List<ChartCollaborator> getCollaboratorsBySongId(@Param("songId") String songId);
 
     /**
      * 查询用户待处理的邀请

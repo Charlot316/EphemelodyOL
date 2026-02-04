@@ -31,7 +31,7 @@ public class ChartCollaborator implements Serializable {
     /**
      * 歌曲ID
      */
-    private Integer songId;
+    private String songId;
 
     /**
      * 协作者用户ID

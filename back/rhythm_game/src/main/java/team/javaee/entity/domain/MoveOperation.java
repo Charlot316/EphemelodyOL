@@ -34,7 +34,7 @@ public class MoveOperation implements Serializable {
     /**
      * 歌曲ID
      */
-    private Integer songId;
+    private String songId;
 
     /**
      * 所存在的轨道的编号

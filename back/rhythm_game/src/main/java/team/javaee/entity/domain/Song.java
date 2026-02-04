@@ -28,8 +28,8 @@ public class Song implements Serializable {
     /**
      * 歌曲id
      */
-    @TableId(value = "id", type = IdType.AUTO)
-    private Integer id;
+    @TableId(value = "id", type = IdType.ASSIGN_UUID)
+    private String id;
 
     /**
      * 歌曲名称

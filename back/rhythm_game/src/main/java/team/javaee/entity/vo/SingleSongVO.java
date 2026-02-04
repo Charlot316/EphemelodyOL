@@ -9,7 +9,7 @@ import java.util.List;
 @Data
 public class SingleSongVO {
     private String songName;
-    private Integer songId;
+    private String songId;
     private String uploader;
     private String songWriter;
     private String songCover;

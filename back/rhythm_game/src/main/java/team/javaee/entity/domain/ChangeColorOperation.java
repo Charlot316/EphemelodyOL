@@ -34,7 +34,7 @@ public class ChangeColorOperation implements Serializable {
     /**
      * 歌曲id
      */
-    private Integer songId;
+    private String songId;
 
     /**
      * 所存在的轨道的编号

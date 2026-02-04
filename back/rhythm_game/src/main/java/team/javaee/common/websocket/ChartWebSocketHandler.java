@@ -41,14 +41,14 @@ public class ChartWebSocketHandler extends TextWebSocketHandler {
     private ChangeBackgroundOperationMapper changeBackgroundOperationMapper;
 
     // Room management: songId -> sessions
-    private static final Map<Integer, Set<WebSocketSession>> rooms = new ConcurrentHashMap<>();
-    private static final Map<WebSocketSession, Integer> sessionToRoom = new ConcurrentHashMap<>();
+    private static final Map<String, Set<WebSocketSession>> rooms = new ConcurrentHashMap<>();
+    private static final Map<WebSocketSession, String> sessionToRoom = new ConcurrentHashMap<>();
     private static final Map<WebSocketSession, String> sessionToUser = new ConcurrentHashMap<>();
     private static final Map<WebSocketSession, String> sessionToUserId = new ConcurrentHashMap<>();
 
     // Track publishing and reset consensus
-    private static final Map<Integer, PublishConsensus> pendingConsensus = new ConcurrentHashMap<>();
-    private static final Map<Integer, PublishConsensus> pendingResetConsensus = new ConcurrentHashMap<>();
+    private static final Map<String, PublishConsensus> pendingConsensus = new ConcurrentHashMap<>();
+    private static final Map<String, PublishConsensus> pendingResetConsensus = new ConcurrentHashMap<>();
 
     private static class PublishConsensus {
         WebSocketSession initiator; // Changed from String initiatorSessionId
@@ -60,7 +60,7 @@ public class ChartWebSocketHandler extends TextWebSocketHandler {
     @Data
     public static class ChartMessage {
         private String type; // JOIN, ADD_NOTE, UPDATE_NOTE, DELETE_NOTE, etc.
-        private Integer songId;
+        private String songId;
         private Object payload;
         private String clientId; // For ghosting resolution
     }
@@ -71,7 +71,7 @@ public class ChartWebSocketHandler extends TextWebSocketHandler {
         // Just connected, wait for JOIN message (Initial setup handled by JOIN message)
     }
 
-    private void broadcastOnlineStatus(Integer songId) {
+    private void broadcastOnlineStatus(String songId) {
         Set<WebSocketSession> sessions = rooms.get(songId);
         if (sessions == null)
             return;
@@ -95,7 +95,7 @@ public class ChartWebSocketHandler extends TextWebSocketHandler {
     protected void handleTextMessage(@org.springframework.lang.NonNull WebSocketSession session,
             @org.springframework.lang.NonNull TextMessage message) throws Exception {
         ChartMessage msg = objectMapper.readValue(message.getPayload(), ChartMessage.class);
-        Integer songId = msg.getSongId();
+        String songId = msg.getSongId();
 
         if ("JOIN".equals(msg.getType())) {
             URI uri = session.getUri();
@@ -261,7 +261,7 @@ public class ChartWebSocketHandler extends TextWebSocketHandler {
         broadcast(songId, msg.getType() + "_ACK", resultPayload, msg.getClientId(), session);
     }
 
-    private void handleResetRequest(WebSocketSession session, Integer songId) throws IOException {
+    private void handleResetRequest(WebSocketSession session, String songId) throws IOException {
         Set<WebSocketSession> sessions = rooms.get(songId);
         if (sessions == null)
             return;
@@ -281,7 +281,7 @@ public class ChartWebSocketHandler extends TextWebSocketHandler {
         }
     }
 
-    private void handleResetVote(WebSocketSession session, Integer songId, Boolean agree) throws IOException {
+    private void handleResetVote(WebSocketSession session, String songId, Boolean agree) throws IOException {
         PublishConsensus consensus = pendingResetConsensus.get(songId);
         if (consensus == null)
             return;
@@ -300,7 +300,7 @@ public class ChartWebSocketHandler extends TextWebSocketHandler {
         }
     }
 
-    private void handlePublishRequest(WebSocketSession session, Integer songId) throws IOException {
+    private void handlePublishRequest(WebSocketSession session, String songId) throws IOException {
         Set<WebSocketSession> sessions = rooms.get(songId);
         if (sessions == null)
             return;
@@ -320,7 +320,7 @@ public class ChartWebSocketHandler extends TextWebSocketHandler {
         }
     }
 
-    private void handlePublishVote(WebSocketSession session, Integer songId, Boolean agree) throws IOException {
+    private void handlePublishVote(WebSocketSession session, String songId, Boolean agree) throws IOException {
         PublishConsensus consensus = pendingConsensus.get(songId);
         if (consensus == null)
             return;
@@ -339,7 +339,7 @@ public class ChartWebSocketHandler extends TextWebSocketHandler {
         }
     }
 
-    private void broadcast(Integer songId, String type, Object payload, String clientId, WebSocketSession exclude) {
+    private void broadcast(String songId, String type, Object payload, String clientId, WebSocketSession exclude) {
         Set<WebSocketSession> sessions = rooms.get(songId);
         if (sessions == null)
             return;
@@ -365,7 +365,7 @@ public class ChartWebSocketHandler extends TextWebSocketHandler {
         }
     }
 
-    private void broadcastToOthers(Integer songId, String type, Object payload, WebSocketSession initiator) {
+    private void broadcastToOthers(String songId, String type, Object payload, WebSocketSession initiator) {
         broadcast(songId, type, payload, null, initiator);
     }
 
@@ -384,7 +384,7 @@ public class ChartWebSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionClosed(@org.springframework.lang.NonNull WebSocketSession session,
             @org.springframework.lang.NonNull CloseStatus status) {
-        Integer songId = sessionToRoom.remove(session);
+        String songId = sessionToRoom.remove(session);
         sessionToUser.remove(session);
         sessionToUserId.remove(session);
         if (songId != null) {

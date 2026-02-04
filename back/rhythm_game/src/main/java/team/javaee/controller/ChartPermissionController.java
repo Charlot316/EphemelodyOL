@@ -40,7 +40,7 @@ public class ChartPermissionController {
      */
     @GetMapping("/check/{songId}")
     public ReturnResponse<Object> checkPermission(
-            @PathVariable Integer songId,
+            @PathVariable String songId,
             HttpServletRequest request) {
 
         User currentUser = (User) request.getSession().getAttribute("user");
@@ -72,7 +72,7 @@ public class ChartPermissionController {
      */
     @PostMapping("/invite")
     public ReturnResponse<String> inviteCollaborator(
-            @RequestParam Integer songId,
+            @RequestParam String songId,
             @RequestParam String targetUsername,
             @RequestParam(defaultValue = "1") Integer permissionType,
             HttpServletRequest request) {
@@ -146,7 +146,7 @@ public class ChartPermissionController {
      */
     @DeleteMapping("/remove")
     public ReturnResponse<String> removeCollaborator(
-            @RequestParam Integer songId,
+            @RequestParam String songId,
             @RequestParam String targetUserId,
             HttpServletRequest request) {
 
@@ -174,7 +174,7 @@ public class ChartPermissionController {
      */
     @GetMapping("/collaborators/{songId}")
     public ReturnResponse<Object> getCollaborators(
-            @PathVariable Integer songId,
+            @PathVariable String songId,
             HttpServletRequest request) {
 
         User currentUser = (User) request.getSession().getAttribute("user");

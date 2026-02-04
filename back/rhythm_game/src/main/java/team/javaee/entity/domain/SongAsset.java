@@ -17,7 +17,7 @@ public class SongAsset implements Serializable {
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    private Integer songId;
+    private String songId;
 
     private String name;
 

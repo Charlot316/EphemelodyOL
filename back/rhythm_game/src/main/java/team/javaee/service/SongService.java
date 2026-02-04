@@ -25,22 +25,22 @@ import javax.servlet.http.HttpServletRequest;
 public interface SongService extends IService<Song> {
 
         // 新增谱面
-        ReturnResponse<Integer> newChart(NewChartDTO newChartDTO);
+        ReturnResponse<String> newChart(NewChartDTO newChartDTO);
 
         // 修改谱面
         ReturnResponse<String> editChartInfo(EditChartDTO editChartDTO);
 
         // 上传歌曲封面
-        ReturnResponse<ImageVO> uploadSongCover(@Param("file") MultipartFile file, @Param("songId") Integer songId,
+        ReturnResponse<ImageVO> uploadSongCover(@Param("file") MultipartFile file, @Param("songId") String songId,
                         HttpServletRequest request);
 
         // 上传歌曲默认背景
         ReturnResponse<ImageVO> uploadDefaultBackground(@Param("file") MultipartFile file,
-                        @Param("songId") Integer songId,
+                        @Param("songId") String songId,
                         HttpServletRequest request);
 
         // 上传音频
-        ReturnResponse<String> uploadSong(@Param("file") MultipartFile file, @Param("songId") Integer songId,
+        ReturnResponse<String> uploadSong(@Param("file") MultipartFile file, @Param("songId") String songId,
                         HttpServletRequest request);
 
         // 修改谱面具体内容
@@ -60,17 +60,17 @@ public interface SongService extends IService<Song> {
         ReturnResponse<String> deleteChart(SongDTO songDTO);
 
         // 上传资源素材
-        ReturnResponse<SongAsset> uploadAsset(MultipartFile file, Integer songId, String type,
+        ReturnResponse<SongAsset> uploadAsset(MultipartFile file, String songId, String type,
                         HttpServletRequest request);
 
         // 删除资源素材
         ReturnResponse<String> deleteAsset(Integer id);
 
         // 从 JSON 重置数据库
-        ReturnResponse<String> resetChartFromJSON(Integer songId);
+        ReturnResponse<String> resetChartFromJSON(String songId);
 
         // 获取谱面详情 (包含轨道和音符)
-        ReturnResponse<ChartContentDTO> getChart(Integer songId);
+        ReturnResponse<ChartContentDTO> getChart(String songId);
 
         // 强制同步所有 DB 到 JSON
         ReturnResponse<String> forceSyncAll();

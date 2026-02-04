@@ -35,7 +35,7 @@ public class RecentRecord implements Serializable {
     /**
      * 歌曲ID
      */
-    private Integer songId;
+    private String songId;
 
     /**
      * 玩家ID
@@ -90,7 +90,7 @@ public class RecentRecord implements Serializable {
 
     }
 
-    public RecentRecord(Integer songId, String userId, Integer score, Integer pure, Integer far, Integer lost, Integer combo, Double potential, LocalDateTime time) {
+    public RecentRecord(String songId, String userId, Integer score, Integer pure, Integer far, Integer lost, Integer combo, Double potential, LocalDateTime time) {
         this.songId = songId;
         this.userId = userId;
         this.score = score;

@@ -7,6 +7,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SongUploadDTO {
-    private Integer songId;
+    private String songId;
     private MultipartFile file;
 }

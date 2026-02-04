@@ -77,7 +77,7 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
     private ObjectMapper objectMapper;
 
     @Override
-    public ReturnResponse<Integer> newChart(NewChartDTO newChartDTO) {
+    public ReturnResponse<String> newChart(NewChartDTO newChartDTO) {
         try {
             Song song = new Song();
             song.setSongName(newChartDTO.getSongName());
@@ -127,7 +127,7 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
     }
 
     @Override
-    public ReturnResponse<ImageVO> uploadSongCover(MultipartFile file, Integer songId, HttpServletRequest request) {
+    public ReturnResponse<ImageVO> uploadSongCover(MultipartFile file, String songId, HttpServletRequest request) {
         try {
             String url = fileStorageService.uploadFile(file, "covers");
             Song song = songMapper.selectById(songId);
@@ -145,7 +145,7 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
     }
 
     @Override
-    public ReturnResponse<ImageVO> uploadDefaultBackground(MultipartFile file, Integer songId,
+    public ReturnResponse<ImageVO> uploadDefaultBackground(MultipartFile file, String songId,
             HttpServletRequest request) {
         try {
             String url = fileStorageService.uploadFile(file, "backgrounds");
@@ -164,7 +164,7 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
     }
 
     @Override
-    public ReturnResponse<String> uploadSong(MultipartFile file, Integer songId, HttpServletRequest request) {
+    public ReturnResponse<String> uploadSong(MultipartFile file, String songId, HttpServletRequest request) {
         try {
             String url = fileStorageService.uploadFile(file, "mp3");
             Song song = songMapper.selectById(songId);
@@ -182,7 +182,7 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
     @Override
     public ReturnResponse<String> editChartContent(ChartContentDTO chartContentDTO) {
         try {
-            Integer songId = chartContentDTO.getSongId();
+            String songId = chartContentDTO.getSongId();
             byte[] jsonBytes = objectMapper.writeValueAsBytes(chartContentDTO);
             String url = fileStorageService.uploadFile(jsonBytes, "charts/" + songId + ".json", "application/json");
             log.info("谱面 JSON 已同步至 R2: {}", url);
@@ -273,8 +273,27 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
     @Override
     public ReturnResponse<String> deleteChart(SongDTO songDTO) {
         try {
-            Integer songId = Integer.parseInt(songDTO.getSongId());
+            String songId = songDTO.getSongId();
+            Song song = songMapper.selectById(songId);
+            if (song != null) {
+                // 删除 R2 上的相关资源
+                fileStorageService.deleteFile(song.getSongCover());
+                fileStorageService.deleteFile(song.getDefaultBackground());
+                fileStorageService.deleteFile(song.getSongUrl());
+                // 删除谱面 JSON (需要构建 R2 URL)
+                String chartJsonUrl = publicUrl + (publicUrl.endsWith("/") ? "" : "/") + "ephemelody/charts/" + songId
+                        + ".json";
+                fileStorageService.deleteFile(chartJsonUrl);
+            }
+
+            // 删除关联的 SongAsset 文件 (R2)
+            List<SongAsset> assets = songAssetMapper.selectList(new QueryWrapper<SongAsset>().eq("song_id", songId));
+            for (SongAsset asset : assets) {
+                fileStorageService.deleteFile(asset.getUrl());
+            }
+
             songMapper.deleteById(songId);
+            songAssetMapper.delete(new QueryWrapper<SongAsset>().eq("song_id", songId)); // 这一行也是新增的，确保数据库也删干净
             trackMapper.delete(new QueryWrapper<Track>().eq("song_id", songId));
             moveOperationMapper.delete(new QueryWrapper<MoveOperation>().eq("song_id", songId));
             noteMapper.delete(new QueryWrapper<Note>().eq("song_id", songId));
@@ -285,12 +304,13 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
             bestRecordMapper.delete(new QueryWrapper<BestRecord>().eq("song_id", songId));
             return ReturnResponse.OK("删除成功");
         } catch (Exception e) {
+            log.error("删除谱面失败", e);
             return ReturnResponse.systemException(ReturnStatus.BUSINESS_EXCEPTION);
         }
     }
 
     @Override
-    public ReturnResponse<SongAsset> uploadAsset(MultipartFile file, Integer songId, String type,
+    public ReturnResponse<SongAsset> uploadAsset(MultipartFile file, String songId, String type,
             HttpServletRequest request) {
         try {
             String url = fileStorageService.uploadFile(file, "assets");
@@ -323,7 +343,7 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
 
     @Override
     @org.springframework.transaction.annotation.Transactional
-    public ReturnResponse<String> resetChartFromJSON(Integer songId) {
+    public ReturnResponse<String> resetChartFromJSON(String songId) {
         try {
             String r2Url = publicUrl + (publicUrl.endsWith("/") ? "" : "/") + "ephemelody/charts/" + songId + ".json";
             ChartContentDTO content = null;
@@ -410,7 +430,7 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
     }
 
     @Override
-    public ReturnResponse<ChartContentDTO> getChart(Integer songId) {
+    public ReturnResponse<ChartContentDTO> getChart(String songId) {
         try {
             String r2Url = publicUrl + (publicUrl.endsWith("/") ? "" : "/") + "ephemelody/charts/" + songId + ".json";
             try {

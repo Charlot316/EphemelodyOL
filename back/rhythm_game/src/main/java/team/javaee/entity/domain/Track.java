@@ -35,7 +35,7 @@ public class Track implements Serializable {
     /**
      * 歌曲id
      */
-    private Integer songId;
+    private String songId;
 
     /**
      * o-虚轨 1-实轨

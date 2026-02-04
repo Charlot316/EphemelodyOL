@@ -2,27 +2,37 @@
 
 ## 📋 前置要求
 
-- ✅ Java 8 或更高版本
+- ✅ Java 17+ (推荐 Java 17 LTS 或 Java 18)
 - ✅ Maven 3.6+
 - ✅ MySQL 5.7+ 或 8.0+
+- ✅ Cloudflare R2 对象存储 (或其他 S3 兼容存储)
+- ✅ 系统依赖: `ffmpeg` 和 `webp` (cwebp) 工具
 - ✅ 已配置好的 `.env` 文件（项目根目录）
 
 ## 🔧 环境配置
 
 ### 1. 检查 `.env` 文件
 
-确保项目根目录下的 `.env` 文件包含以下配置：
+确保项目根目录下的 `.env` 文件包含以下配置（**请勿将包含真实密钥的文件提交到 Git**）：
 
 ```bash
 # MySQL Database Configuration
 DB_URL="jdbc:mysql://localhost:3306/rhythm_game?useSSL=false&useUnicode=true&characterEncoding=utf-8&severTimezone=GMT%2B8&allowPublicKeyRetrieval=true"
-DB_USERNAME="root"
-DB_PASSWORD="Ephemelody@2026"
+DB_USERNAME="your_db_username"
+DB_PASSWORD="your_db_password"
+
+# Cloudflare R2 Configuration (S3 Compatible)
+R2_ENDPOINT="https://<ACCOUNT_ID>.r2.cloudflarestorage.com"
+R2_ACCESS_KEY_ID="your_access_key_id"
+R2_SECRET_ACCESS_KEY="your_secret_access_key"
+R2_BUCKET_NAME="your_bucket_name"
+R2_PUBLIC_URL="https://your-public-url.com"
 ```
 
 ### 2. 数据库准备
 
-确保 MySQL 服务正在运行，并且 `rhythm_game` 数据库已创建：
+确保 MySQL 服务正在运行，并且 `rhythm_game` 数据库已创建。
+> 注意：项目已迁移至 UUID 主键，旧的整数 ID 数据将不再兼容。请确保使用最新的数据库结构。
 
 ```bash
 # 登录 MySQL
@@ -37,239 +47,87 @@ exit;
 
 ## 🎯 快速启动
 
-### 方式一：使用启动脚本（推荐）
+### 方式一：本地 Maven 启动
+
+1.  **安装系统依赖**
+    *   macOS: `brew install ffmpeg webp`
+    *   Ubuntu/Debian: `sudo apt-get install ffmpeg webp`
+
+2.  **启动应用**
+    在 `back/rhythm_game` 目录下：
 
 ```bash
-cd back/rhythm_game
-./start.sh
+# 加载环境变量并启动
+export $(cat ../../.env | grep -v '^#' | xargs) && mvn spring-boot:run
 ```
 
-启动脚本会自动：
-1. ✅ 加载环境变量
-2. ✅ 询问是否执行数据库迁移
-3. ✅ 编译项目
-4. ✅ 启动应用
+### 方式二：Docker 部署（推荐）
 
-### 方式二：手动启动
+项目根目录已包含 `Dockerfile`，支持一键构建运行。
 
-#### 步骤 1: 执行数据库迁移
+1.  **构建镜像**
 
-```bash
-# 在 back/rhythm_game 目录下
-mysql -u root -p < db_migration.sql
-```
+    在项目根目录 (`EphemelodyOL/`) 执行：
 
-输入密码后，脚本会创建以下新表：
-- `chart_collaborator` - 谱面协作者表
-- `chart_permission_log` - 权限操作日志表
+    ```bash
+    docker build -t ephemelody-backend .
+    ```
 
-**注意：** 此脚本使用 `CREATE TABLE IF NOT EXISTS`，不会影响现有数据。
+    > 注意：Dockerfile 已包含 ffmpeg 和 webp 依赖的安装。
 
-#### 步骤 2: 编译项目
+2.  **运行容器**
 
-```bash
-cd back/rhythm_game
+    ```bash
+    docker run -d \
+      --name ephemelody-backend \
+      -p 8090:8090 \
+      --env-file .env \
+      ephemelody-backend
+    ```
 
-# 加载环境变量
-export $(cat ../../.env | grep -v '^#' | xargs)
+3.  **查看日志**
 
-# 编译（跳过测试）
-mvn clean package -DskipTests
-```
+    ```bash
+    docker logs -f ephemelody-backend
+    ```
 
-#### 步骤 3: 启动应用
+## 🔄 资源迁移说明
 
-```bash
-# 使用环境变量启动
-java -jar target/*.jar \
-  -Dspring.datasource.url=$DB_URL \
-  -Dspring.datasource.username=$DB_USERNAME \
-  -Dspring.datasource.password=$DB_PASSWORD
-```
+本项目已全面迁移至 **Cloudflare R2** 云存储，并不再依赖本地 `data` 目录。
+*   所有静态资源（封面、背景、音频、谱面 JSON）均存储在 R2 Bucket 中。
+*   上传/删除谱面会自动同步 R2 上的文件。
+*   数据库中的 `song_id` 已变更为 **UUID** 字符串格式。
 
-## 📊 验证部署
-
-### 1. 检查应用是否启动
-
-访问健康检查端点（如果有）：
-```bash
-curl http://localhost:8080/actuator/health
-```
-
-### 2. 验证数据库表
-
-```bash
-mysql -u root -p rhythm_game
-
-# 查看新创建的表
-SHOW TABLES LIKE 'chart_%';
-
-# 查看表结构
-DESC chart_collaborator;
-DESC chart_permission_log;
-```
-
-### 3. 测试权限 API
-
-```bash
-# 检查权限（需要先登录）
-curl -X GET http://localhost:8080/chart/permission/check/1 \
-  -H "Cookie: JSESSIONID=your_session_id"
-```
-
-## 🔍 故障排查
-
-### 问题 1: 数据库连接失败
-
-**症状：** 启动时报错 `Communications link failure`
-
-**解决方案：**
-1. 检查 MySQL 服务是否运行：`brew services list | grep mysql`
-2. 验证 `.env` 中的数据库配置
-3. 测试连接：`mysql -u root -p -h localhost`
-
-### 问题 2: 端口被占用
-
-**症状：** `Port 8080 is already in use`
-
-**解决方案：**
-```bash
-# 查找占用端口的进程
-lsof -i :8080
-
-# 杀死进程
-kill -9 <PID>
-```
-
-### 问题 3: Maven 编译失败
-
-**症状：** 依赖下载失败或编译错误
-
-**解决方案：**
-```bash
-# 清理 Maven 缓存
-mvn clean
-
-# 强制更新依赖
-mvn clean install -U
-
-# 如果还有问题，删除本地仓库缓存
-rm -rf ~/.m2/repository
-```
-
-## 📝 日志查看
-
-### 应用日志
-
-默认情况下，日志会输出到控制台。如需查看历史日志：
-
-```bash
-# 如果使用 nohup 后台运行
-tail -f nohup.out
-
-# 如果配置了日志文件
-tail -f logs/spring.log
-```
-
-### 数据库日志
-
-```bash
-# MySQL 错误日志
-tail -f /usr/local/var/mysql/*.err
-
-# 慢查询日志（如果启用）
-tail -f /usr/local/var/mysql/*-slow.log
-```
-
-## 🔄 更新部署
-
-当代码更新后：
-
-```bash
-# 停止当前运行的应用（Ctrl+C 或 kill）
-
-# 重新运行启动脚本
-./start.sh
-```
+如果是从旧版本升级，请确保执行了 R2 迁移脚本（通过 API `/api/admin/migration/r2`）。
 
 ## 🛡️ 生产环境建议
 
-### 1. 使用 systemd 服务（Linux）
-
-创建 `/etc/systemd/system/ephemelody.service`：
-
-```ini
-[Unit]
-Description=EphemelodyOL Backend Service
-After=mysql.service
-
-[Service]
-Type=simple
-User=your_user
-WorkingDirectory=/path/to/back/rhythm_game
-EnvironmentFile=/path/to/.env
-ExecStart=/usr/bin/java -jar target/rhythm_game.jar
-Restart=on-failure
-
-[Install]
-WantedBy=multi-user.target
-```
-
-启动服务：
-```bash
-sudo systemctl enable ephemelody
-sudo systemctl start ephemelody
-sudo systemctl status ephemelody
-```
-
-### 2. 使用 Docker（推荐）
-
-创建 `Dockerfile`：
-
-```dockerfile
-FROM openjdk:8-jdk-alpine
-WORKDIR /app
-COPY target/*.jar app.jar
-EXPOSE 8080
-ENTRYPOINT ["java","-jar","app.jar"]
-```
-
-构建和运行：
-```bash
-docker build -t ephemelody-backend .
-docker run -d -p 8080:8080 --env-file ../../.env ephemelody-backend
-```
-
-### 3. 配置反向代理（Nginx）
+### Nginx 反向代理配置
 
 ```nginx
 server {
     listen 80;
     server_name your-domain.com;
 
+    # API 接口转发
     location /api/ {
-        proxy_pass http://localhost:8080/;
+        proxy_pass http://localhost:8090/api/;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     }
 
-    location /ws/ {
-        proxy_pass http://localhost:8080/ws/;
+    # WebSocket 转发 (多人游戏必须)
+    location /api/ws/ {
+        proxy_pass http://localhost:8090/api/ws/;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
+        proxy_read_timeout 3600s; # 延长超时时间以保持连接
     }
 }
 ```
 
 ## 📞 支持
 
-如遇到问题，请检查：
-1. 📖 [完整文档](../docs/CHART_PERMISSION_SYSTEM.md)
-2. 🐛 [Issue Tracker](https://github.com/your-repo/issues)
-3. 💬 联系开发团队
-
----
-
-**最后更新**: 2026-02-03  
-**版本**: 1.0.0
+如遇到问题，请检查后端日志输出或联系开发负责人。

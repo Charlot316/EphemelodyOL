@@ -34,7 +34,7 @@ public class ChangeBackgroundOperation implements Serializable {
     /**
      * 歌曲ID
      */
-    private Integer songId;
+    private String songId;
 
     /**
      * 操作开始时间

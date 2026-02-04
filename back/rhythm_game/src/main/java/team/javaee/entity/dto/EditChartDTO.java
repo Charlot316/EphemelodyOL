@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class EditChartDTO {
-    private Integer songId;
+    private String songId;
     private String uploaderId;
     private String songName;
     private String songWriter;

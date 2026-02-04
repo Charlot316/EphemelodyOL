@@ -34,7 +34,7 @@ public class BestRecord implements Serializable {
     /**
      * 歌曲ID
      */
-    private Integer songId;
+    private String songId;
 
     /**
      * 玩家ID
@@ -88,7 +88,7 @@ public class BestRecord implements Serializable {
     public BestRecord() {
     }
 
-    public BestRecord(Integer songId, String userId, Integer score, Integer pure, Integer far, Integer lost,
+    public BestRecord(String songId, String userId, Integer score, Integer pure, Integer far, Integer lost,
             Integer combo, Float potential, LocalDateTime time) {
         this.songId = songId;
         this.userId = userId;

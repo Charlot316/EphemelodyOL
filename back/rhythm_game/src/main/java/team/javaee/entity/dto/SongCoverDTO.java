@@ -8,6 +8,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SongCoverDTO {
-    private Integer songId;
+    private String songId;
     private MultipartFile file;
 }

@@ -32,7 +32,7 @@ public class SongController {
 
     @ApiOperation("新增谱面")
     @PostMapping("newChart")
-    public ReturnResponse<Integer> newChart(HttpServletRequest request, @RequestBody NewChartDTO newChartDTO) {
+    public ReturnResponse<String> newChart(HttpServletRequest request, @RequestBody NewChartDTO newChartDTO) {
         String userId = Normal.getUserIdByCookie(request);
         newChartDTO.setUploaderId(userId);
         return songService.newChart(newChartDTO);
@@ -49,21 +49,21 @@ public class SongController {
     @ApiOperation("上传歌曲封面")
     @PostMapping("uploadSongCover")
     public ReturnResponse<ImageVO> uploadSongCover(HttpServletRequest request, @RequestParam("file") MultipartFile file,
-            @RequestParam("songId") Integer songId) {
+            @RequestParam("songId") String songId) {
         return songService.uploadSongCover(file, songId, request);
     }
 
     @ApiOperation("上传歌曲默认背景")
     @PostMapping("uploadDefaultBackground")
     public ReturnResponse<ImageVO> uploadDefaultBackground(HttpServletRequest request,
-            @RequestParam("file") MultipartFile file, @RequestParam("songId") Integer songId) {
+            @RequestParam("file") MultipartFile file, @RequestParam("songId") String songId) {
         return songService.uploadDefaultBackground(file, songId, request);
     }
 
     @ApiOperation("上传音频")
     @PostMapping("uploadSong")
     public ReturnResponse<String> uploadSong(HttpServletRequest request, @RequestParam("file") MultipartFile file,
-            @RequestParam("songId") Integer songId) {
+            @RequestParam("songId") String songId) {
         return songService.uploadSong(file, songId, request);
     }
 
@@ -83,7 +83,7 @@ public class SongController {
     @ApiOperation("上传资源素材")
     @PostMapping("uploadAsset")
     public ReturnResponse<SongAsset> uploadAsset(HttpServletRequest request, @RequestParam("file") MultipartFile file,
-            @RequestParam("songId") Integer songId, @RequestParam("type") String type) {
+            @RequestParam("songId") String songId, @RequestParam("type") String type) {
         return songService.uploadAsset(file, songId, type, request);
     }
 
@@ -95,7 +95,7 @@ public class SongController {
 
     @ApiOperation("重置谱面到上次发布的JSON状态")
     @PostMapping("resetChart")
-    public ReturnResponse<String> resetChart(@RequestParam("songId") Integer songId) {
+    public ReturnResponse<String> resetChart(@RequestParam("songId") String songId) {
         return songService.resetChartFromJSON(songId);
     }
 

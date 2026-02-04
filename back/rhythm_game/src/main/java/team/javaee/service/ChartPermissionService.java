@@ -22,7 +22,7 @@ public interface ChartPermissionService extends IService<ChartCollaborator> {
      * @param uploaderId 谱面上传者ID
      * @return 是否有编辑权限
      */
-    boolean hasEditPermission(Integer songId, String userId, Integer isAdmin, String uploaderId);
+    boolean hasEditPermission(String songId, String userId, Integer isAdmin, String uploaderId);
 
     /**
      * 邀请协作者
@@ -33,7 +33,7 @@ public interface ChartPermissionService extends IService<ChartCollaborator> {
      * @param permissionType 权限类型
      * @return 是否邀请成功
      */
-    boolean inviteCollaborator(Integer songId, String inviterId, String targetUserId, Integer permissionType);
+    boolean inviteCollaborator(String songId, String inviterId, String targetUserId, Integer permissionType);
 
     /**
      * 接受邀请
@@ -61,7 +61,7 @@ public interface ChartPermissionService extends IService<ChartCollaborator> {
      * @param targetUserId 目标用户ID
      * @return 是否移除成功
      */
-    boolean removeCollaborator(Integer songId, String operatorId, String targetUserId);
+    boolean removeCollaborator(String songId, String operatorId, String targetUserId);
 
     /**
      * 获取谱面的所有协作者
@@ -69,7 +69,7 @@ public interface ChartPermissionService extends IService<ChartCollaborator> {
      * @param songId 歌曲ID
      * @return 协作者列表
      */
-    List<ChartCollaborator> getCollaborators(Integer songId);
+    List<ChartCollaborator> getCollaborators(String songId);
 
     /**
      * 获取用户待处理的邀请

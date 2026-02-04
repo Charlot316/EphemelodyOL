@@ -35,7 +35,7 @@ public class Note implements Serializable {
     /**
      * 歌曲ID
      */
-    private Integer songId;
+    private String songId;
 
     /**
      * 音符所存在的轨道的编号

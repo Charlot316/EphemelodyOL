@@ -31,6 +31,7 @@ public class PlayServiceImpl implements PlayService {
     private BestRecordMapper bestRecordMapper;
     @Autowired
     private RecentRecordMapper recentRecordMapper;
+
     @Override
     public ReturnResponse<ChartInfVO> getChartInfo(String userId, SongDTO songDTO) {
         try {
@@ -49,8 +50,7 @@ public class PlayServiceImpl implements PlayService {
             songInfVO.setUploader(uploader);
 
             BestRecord myBestRecord = bestRecordMapper.selectOne(
-                    new QueryWrapper<BestRecord>().eq("user_id", userId).eq("song_id", songId)
-            );
+                    new QueryWrapper<BestRecord>().eq("user_id", userId).eq("song_id", songId));
             if (myBestRecord != null) {
                 myRecordVO.setBestScore(myBestRecord.getScore());
                 myRecordVO.setRanking(bestRecordMapper.getRank(userId, songId));
@@ -115,38 +115,40 @@ public class PlayServiceImpl implements PlayService {
                 potential = chartConstant + 1 + (double) (score - 9800000) / 200000;
             } else {
                 double tmp = (double) (score - 9500000) / 300000;
-                potential = chartConstant + tmp < 0.0f ?  0.0f : chartConstant + tmp;
+                potential = chartConstant + tmp < 0.0f ? 0.0f : chartConstant + tmp;
             }
             PlayResultVO playResultVO = new PlayResultVO();
             BestRecord myBestRecord = bestRecordMapper.selectOne(
-                    new QueryWrapper<BestRecord>().eq("user_id", userId).eq("song_id", songId)
-            );
+                    new QueryWrapper<BestRecord>().eq("user_id", userId).eq("song_id", songId));
             if (myBestRecord == null) {
                 playResultVO.setFormerBestScore(0);
-                bestRecordMapper.insert(new BestRecord(Integer.parseInt(songId), userId, score, pure, far, lost, combo, (float) potential, LocalDateTime.now()));
+                bestRecordMapper.insert(new BestRecord(songId, userId, score, pure, far, lost, combo, (float) potential,
+                        LocalDateTime.now()));
             } else {
                 playResultVO.setFormerBestScore(myBestRecord.getScore());
                 if (score >= myBestRecord.getScore()) {
                     bestRecordMapper.delete(new QueryWrapper<BestRecord>().eq("user_id", userId).eq("song_id", songId));
-                    bestRecordMapper.insert(new BestRecord(Integer.parseInt(songId), userId, score, pure, far, lost, combo, (float) potential, LocalDateTime.now()));
+                    bestRecordMapper.insert(new BestRecord(songId, userId, score, pure, far, lost, combo,
+                            (float) potential, LocalDateTime.now()));
                 }
             }
             if (song.getStatus() == 2) {
-                if (recentRecordMapper.selectList(new QueryWrapper<RecentRecord>().eq("user_id", userId).eq("song_id", songId)).size() >= 10) {
+                if (recentRecordMapper
+                        .selectList(new QueryWrapper<RecentRecord>().eq("user_id", userId).eq("song_id", songId))
+                        .size() >= 10) {
                     recentRecordMapper.deleteById(
-                            recentRecordMapper.selectList(new QueryWrapper<RecentRecord>().eq("user_id", userId).eq("song_id", songId).orderByAsc("create_time")).get(0).getId()
-                    );
+                            recentRecordMapper.selectList(new QueryWrapper<RecentRecord>().eq("user_id", userId)
+                                    .eq("song_id", songId).orderByAsc("create_time")).get(0).getId());
                 }
                 recentRecordMapper.insert(
-                        new RecentRecord(Integer.parseInt(songId), userId, score, pure, far, lost, combo, potential, LocalDateTime.now())
-                );
+                        new RecentRecord(songId, userId, score, pure, far, lost, combo, potential,
+                                LocalDateTime.now()));
             }
 
             List<RecentRecord> recentRecords = recentRecordMapper.selectList(
-                    new QueryWrapper<RecentRecord>().orderByDesc("create_time").eq("user_id", userId)
-            );
+                    new QueryWrapper<RecentRecord>().orderByDesc("create_time").eq("user_id", userId));
             List<RecentRecord> tenRecentRecords = new ArrayList<>();
-            List<Integer> recentSongs = new ArrayList<>();
+            List<String> recentSongs = new ArrayList<>();
             for (RecentRecord recentRecord : recentRecords) {
                 if (!recentSongs.contains(recentRecord.getSongId())) {
                     recentSongs.add(recentRecord.getSongId());
@@ -155,9 +157,11 @@ public class PlayServiceImpl implements PlayService {
                     break;
                 }
             }
-            for (Integer recentSongId : recentSongs) {
+            for (String recentSongId : recentSongs) {
                 tenRecentRecords.add(recentRecordMapper.selectList(
-                        new QueryWrapper<RecentRecord>().eq("song_id", recentSongId).eq("user_id", userId).orderByDesc("score")).get(0));
+                        new QueryWrapper<RecentRecord>().eq("song_id", recentSongId).eq("user_id", userId)
+                                .orderByDesc("score"))
+                        .get(0));
             }
             recordSort(tenRecentRecords);
             for (int i = 0; i < 5; i++) {
@@ -186,7 +190,7 @@ public class PlayServiceImpl implements PlayService {
             public int compare(RecentRecord o1, RecentRecord o2) {
                 if (o1.getPotential() > o2.getPotential()) {
                     return -1;
-                } else if (o1.getPotential() < o2.getPotential()){
+                } else if (o1.getPotential() < o2.getPotential()) {
                     return 1;
                 } else {
                     return 0;

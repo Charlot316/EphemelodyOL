@@ -34,7 +34,7 @@ public class WidthOperation implements Serializable {
     /**
      * 歌曲id
      */
-    private Integer songId;
+    private String songId;
 
     /**
      * 对应轨道

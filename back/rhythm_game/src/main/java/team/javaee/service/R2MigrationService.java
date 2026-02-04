@@ -68,21 +68,33 @@ public class R2MigrationService {
     }
 
     private void migrateCharts() {
+        log.info("开始迁移谱面 JSON...");
+        java.util.Map<String, String> oldToNew = new java.util.HashMap<>();
+        oldToNew.put("4", "9b52ceee-01bf-11f1-a4ca-20296da6fcfc");
+        oldToNew.put("6", "9b52d18c-01bf-11f1-a4ca-20296da6fcfc");
+        oldToNew.put("7", "9b52d25e-01bf-11f1-a4ca-20296da6fcfc");
+        oldToNew.put("8", "9b52d2c2-01bf-11f1-a4ca-20296da6fcfc");
+        oldToNew.put("9", "9b52d312-01bf-11f1-a4ca-20296da6fcfc");
+        oldToNew.put("10", "9b52d36c-01bf-11f1-a4ca-20296da6fcfc");
+        oldToNew.put("11", "9b52d3bc-01bf-11f1-a4ca-20296da6fcfc");
+        oldToNew.put("12", "9b52d40c-01bf-11f1-a4ca-20296da6fcfc");
+        oldToNew.put("13", "9b52d45c-01bf-11f1-a4ca-20296da6fcfc");
+
         File chartsFolder = new File(uploadPath + "charts/");
         if (!chartsFolder.exists())
             return;
 
-        File[] files = chartsFolder.listFiles((dir, name) -> name.endsWith(".json"));
-        if (files == null)
-            return;
-
-        for (File file : files) {
-            try {
-                byte[] content = Files.readAllBytes(file.toPath());
-                String r2Url = fileStorageService.uploadFile(content, "charts/" + file.getName(), "application/json");
-                log.info("【谱面】迁移成功: {} -> {}", file.getName(), r2Url);
-            } catch (Exception e) {
-                log.error("【谱面】迁移失败: " + file.getName(), e);
+        for (java.util.Map.Entry<String, String> entry : oldToNew.entrySet()) {
+            File file = new File(chartsFolder, entry.getKey() + ".json");
+            if (file.exists()) {
+                try {
+                    byte[] content = Files.readAllBytes(file.toPath());
+                    String r2Url = fileStorageService.uploadFile(content, "charts/" + entry.getValue() + ".json",
+                            "application/json");
+                    log.info("【谱面】迁移成功 (UUID 映射): {} -> {}", file.getName(), r2Url);
+                } catch (Exception e) {
+                    log.error("【谱面】迁移失败: " + file.getName(), e);
+                }
             }
         }
     }

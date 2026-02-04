@@ -409,7 +409,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         try {
             String songId = songDTO.getSongId();
             QueryWrapper<Song> songWrapper = new QueryWrapper<>();
-            songWrapper.eq("id", Integer.valueOf(songId));
+            songWrapper.eq("id", songId);
             Song song = songMapper.selectOne(songWrapper);
             SingleSongVO singleSongVO = new SingleSongVO();
             singleSongVO.setSongName(song.getSongName());

@@ -25,7 +25,7 @@ public class ChartPermissionServiceImpl extends ServiceImpl<ChartCollaboratorMap
     private ChartCollaboratorMapper collaboratorMapper;
 
     @Override
-    public boolean hasEditPermission(Integer songId, String userId, Integer isAdmin, String uploaderId) {
+    public boolean hasEditPermission(String songId, String userId, Integer isAdmin, String uploaderId) {
         // 1. 超级管理员有权限
         if (isAdmin != null && isAdmin == 1) {
             return true;
@@ -43,7 +43,7 @@ public class ChartPermissionServiceImpl extends ServiceImpl<ChartCollaboratorMap
 
     @Override
     @Transactional
-    public boolean inviteCollaborator(Integer songId, String inviterId, String targetUserId, Integer permissionType) {
+    public boolean inviteCollaborator(String songId, String inviterId, String targetUserId, Integer permissionType) {
         // 检查是否已存在邀请
         QueryWrapper<ChartCollaborator> wrapper = new QueryWrapper<>();
         wrapper.eq("song_id", songId)
@@ -97,7 +97,7 @@ public class ChartPermissionServiceImpl extends ServiceImpl<ChartCollaboratorMap
 
     @Override
     @Transactional
-    public boolean removeCollaborator(Integer songId, String operatorId, String targetUserId) {
+    public boolean removeCollaborator(String songId, String operatorId, String targetUserId) {
         QueryWrapper<ChartCollaborator> wrapper = new QueryWrapper<>();
         wrapper.eq("song_id", songId)
                 .eq("user_id", targetUserId);
@@ -105,7 +105,7 @@ public class ChartPermissionServiceImpl extends ServiceImpl<ChartCollaboratorMap
     }
 
     @Override
-    public List<ChartCollaborator> getCollaborators(Integer songId) {
+    public List<ChartCollaborator> getCollaborators(String songId) {
         return collaboratorMapper.getCollaboratorsBySongId(songId);
     }
 
