@@ -457,14 +457,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                                     vo.setEndTiming(dto.getEndTiming());
                                     vo.setAssetId(dto.getAssetId());
 
-                                    // 尝试从数据库匹配对应的操作以获取 ID
+                                    // 尝试从数据库匹配对应的操作以获取 ID 和 assetId
+                                    // 只根据 timing 匹配，因为 JSON 中的 assetId 可能是 null
                                     dbBackgroundOps.stream()
                                             .filter(dbOp -> dbOp.getStartTiming().equals(dto.getStartTiming())
-                                                    && dbOp.getEndTiming().equals(dto.getEndTiming())
-                                                    && (dbOp.getAssetId() != null
-                                                            && dbOp.getAssetId().equals(dto.getAssetId())))
+                                                    && dbOp.getEndTiming() != null
+                                                    && dbOp.getEndTiming().equals(dto.getEndTiming()))
                                             .findFirst()
-                                            .ifPresent(dbOp -> vo.setId(dbOp.getId()));
+                                            .ifPresent(dbOp -> {
+                                                vo.setId(dbOp.getId());
+                                                // 如果 JSON 中的 assetId 是 null，从数据库补充
+                                                if (vo.getAssetId() == null && dbOp.getAssetId() != null) {
+                                                    vo.setAssetId(dbOp.getAssetId());
+                                                }
+                                            });
 
                                     return vo;
                                 }).collect(Collectors.toList());
