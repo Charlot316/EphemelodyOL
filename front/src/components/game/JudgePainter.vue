@@ -109,27 +109,28 @@ const paintJudge = (judge) => {
   const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
   const easedProgress = easeOutCubic(progress);
   
-  const baseRadius = 120 * scaleFactor; // Size adjustment
+  const baseRadius = 120 * scaleFactor; 
   const currentRadius = easedProgress * baseRadius;
-  const ringAlpha = Math.max(0, 1 - easedProgress); // Fade out
+  const ringAlpha = Math.max(0, 1 - easedProgress); 
   
   if (ringAlpha > 0.01) {
     const halfR = currentRadius;
     painter.beginPath();
-    // Diamond shape centered at props.middle, props.Y
+    
     painter.moveTo(props.middle, props.Y - halfR);
     painter.lineTo(props.middle + halfR, props.Y);
     painter.lineTo(props.middle, props.Y + halfR);
     painter.lineTo(props.middle - halfR, props.Y);
     painter.closePath();
     
-    painter.lineWidth = 4 * ringAlpha;
+    // Thicker line: Increased from 4 to 8
+    painter.lineWidth = 10 * ringAlpha; 
     painter.strokeStyle = `rgba(${baseColor}, ${ringAlpha})`;
     painter.stroke();
 
-    // Inner Diamond (Echo) - slightly smaller/delayed
+    // Inner Diamond (Echo)
     if (progress > 0.05) {
-      const delayR = currentRadius * 0.7;
+      const delayR = currentRadius * 0.75; // Slightly closer
       painter.beginPath();
       painter.moveTo(props.middle, props.Y - delayR);
       painter.lineTo(props.middle + delayR, props.Y);
@@ -137,31 +138,14 @@ const paintJudge = (judge) => {
       painter.lineTo(props.middle - delayR, props.Y);
       painter.closePath();
       
-      painter.lineWidth = 2 * ringAlpha;
+      // Thicker echo line too
+      painter.lineWidth = 6 * ringAlpha;
       painter.strokeStyle = `rgba(${baseColor}, ${ringAlpha * 0.5})`;
       painter.stroke();
     }
   }
-
-  // === 3. Center Flash (Diamond Shape) ===
-  if (dt < duration * 0.3) {
-    const flashProgress = dt / (duration * 0.3);
-    const flashAlpha = 1 - flashProgress;
-    const flashSize = (40 * scaleFactor) * (1 - flashProgress);
-    
-    painter.globalCompositeOperation = "lighter";
-    painter.fillStyle = `rgba(${baseColor}, ${flashAlpha})`; // Solid flash
-    
-    painter.beginPath();
-    painter.moveTo(props.middle, props.Y - flashSize);
-    painter.lineTo(props.middle + flashSize, props.Y);
-    painter.lineTo(props.middle, props.Y + flashSize);
-    painter.lineTo(props.middle - flashSize, props.Y);
-    painter.closePath();
-    painter.fill();
-    
-    painter.globalCompositeOperation = "source-over";
-  }
+  
+  // Removed Center Flash Block
 };
 
 watch(() => props.global.currentTime, () => {
