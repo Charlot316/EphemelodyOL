@@ -446,10 +446,10 @@ export function useChartEditor(route, router) {
       const { data: res } = await Axios.post("/chart/editChartContent", chart);
       if (res.code !== 0) {
         ElNotification({ title: "失败", message: "谱面发布失败！", type: "error" });
-        return;
+      } else {
+        ElNotification({ title: "成功", message: "谱面发布成功（游玩文件已生成）！", type: "success" });
+        if (back) router.push("/admin");
       }
-      ElNotification({ title: "成功", message: "谱面发布成功（游玩文件已生成）！", type: "success" });
-      if (back) router.push("/admin");
     } catch (err) {
       ElNotification({ title: "错误", message: "网络异常", type: "error" });
     } finally {
