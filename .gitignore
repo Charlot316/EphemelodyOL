@@ -32,3 +32,4 @@ pnpm-debug.log*
 .env.local
 CREDENTIALS.md
 *.log
+server_log*.txt
