@@ -26,16 +26,19 @@ const colorList = [
   "rgba(0,0,0," + colorOpacity + ")",
 ];
 
+// Old particles init removed
+
 const particles = [];
-// Initialize particles
-for (let i = 0; i < 16; i++) {
+// Initialize particles - MORE particles for better effect
+for (let i = 0; i < 20; i++) {
   const angle = Math.random() * Math.PI * 2;
-  const speed = Math.random() * 0.2 + 0.1;
+  const speed = Math.random() * 0.4 + 0.2; // Faster
   particles.push({
     vx: Math.cos(angle) * speed,
     vy: Math.sin(angle) * speed,
     size: Math.random() * 3 + 2,
-    offset: Math.random() * 20
+    offset: Math.random() * 10,
+    life: Math.random() * 0.5 + 0.5 // Random life variation
   });
 }
 
@@ -44,114 +47,111 @@ const paintJudge = (judge) => {
   if (!painter) return;
   
   let currentTime = props.global.currentTime;
-  let size = 0;
-  let width = 0;
   
   if (currentTime < judge.timing) currentTime = judge.timing;
   const dt = currentTime - judge.timing;
   
-  // Main Shape Logic
-  if (dt < judgeAnimationTime * 0.75) {
-    size = ((0.9 * judgeSize) / (judgeAnimationTime * 0.75)) * dt;
-    width = 40;
-  } else if (dt < judgeAnimationTime) {
-    const k = (0.4 * judgeSize) / judgeAnimationTime;
-    const b = judgeSize - k * (judge.timing + judgeAnimationTime);
-    size = k * currentTime + b;
-    width = (40 / (judgeAnimationTime * 0.25)) * (judge.timing + judgeAnimationTime - currentTime);
-  } else {
-    size = 0;
-    width = 0;
-  }
-  
-  if (judge.type === "far") {
-    size *= 0.6;
-  } else if (judge.type === "lost") {
-    size *= 0.4; // Smaller for lost
-  }
+  // Animation duration
+  const duration = judgeAnimationTime; 
+  if (dt > duration) return;
 
-  // Draw Particles
-  if (dt > 0 && dt < judgeAnimationTime) {
-    const alpha = 1 - dt / judgeAnimationTime;
-    painter.globalAlpha = alpha;
-    
-    let particleColor = "rgba(255, 255, 255, 0.8)";
-    if (judge.type === "pure") particleColor = "rgba(255, 215, 0, 0.8)";
-    else if (judge.type === "far") particleColor = "rgba(100, 149, 237, 0.8)";
-    else if (judge.type === "lost") particleColor = "rgba(255, 69, 0, 0.8)";
-    
-    painter.fillStyle = particleColor;
-    
-    particles.forEach(p => {
-      // Add some outward movement logic
-      const moveDist = p.offset + (Math.sqrt(p.vx*p.vx + p.vy*p.vy) * dt * 1.5); 
-      const x = props.middle + Math.cos(Math.atan2(p.vy, p.vx)) * moveDist;
-      const y = props.Y + Math.sin(Math.atan2(p.vy, p.vx)) * moveDist;
-      
-      painter.beginPath();
-      // painter.arc(x, y, p.size, 0, Math.PI * 2);
-      painter.fillRect(x - p.size/2, y - p.size/2, p.size, p.size);
-      painter.fill();
-    });
-    painter.globalAlpha = 1.0;
-  }
-
-  // Draw Main Diamond
-  // Skip main diamond for lost if we only want particles, but user said "range smaller" so keep it.
-  painter.beginPath();
-  painter.moveTo(props.middle, props.Y - size);
-  painter.lineTo(props.middle + size, props.Y);
-  painter.lineTo(props.middle, props.Y + size);
-  painter.lineTo(props.middle - size, props.Y);
-  painter.lineTo(props.middle, props.Y - size);
-  painter.closePath();
+  // Base Color determination
+  let baseColor = "255, 255, 255"; // RGB string for easier alpha manipulation
+  let strokeColor = "rgba(255, 255, 255, 0.8)";
   
   if (judge.type === "pure") {
-    const gradient = painter.createLinearGradient(
-      props.middle - size,
-      props.Y - size,
-      props.middle + size,
-      props.Y + size
-    );
-    colorList.forEach((color, i) => {
-      if (i <= 10) gradient.addColorStop(i / 10, color);
-    });
-    painter.strokeStyle = gradient;
+    baseColor = "255, 215, 0"; // Gold
+    strokeColor = "rgba(255, 215, 0, 0.8)";
   } else if (judge.type === "far") {
-    painter.strokeStyle = `rgba(100,149,237,${colorOpacity})`;
+    baseColor = "100, 149, 237"; // Blue
+    strokeColor = "rgba(100, 149, 237, 0.8)";
   } else if (judge.type === "lost") {
-    painter.strokeStyle = `rgba(255,69,0,${colorOpacity})`;
+    baseColor = "255, 69, 0"; // Red
+    strokeColor = "rgba(255, 69, 0, 0.8)";
   }
+
+  // === 1. Draw Particles (Enhanced) ===
+  const alpha = Math.max(0, 1 - dt / duration);
+  painter.globalAlpha = alpha;
+  painter.fillStyle = `rgba(${baseColor}, 0.8)`;
   
-  painter.globalCompositeOperation = "lighter";
-  for (let temp = 2; temp < width; temp++) {
-    painter.lineWidth = temp / 2;
-    temp++; 
+  particles.forEach(p => {
+    // Physics: Simple friction/drag
+    const drag = 0.95; 
+    const moveDist = p.offset + (Math.sqrt(p.vx*p.vx + p.vy*p.vy) * dt * 2.0); // Faster expansion
+    
+    // Add some random wobble or curl? Keep simple for now but fast.
+    const x = props.middle + Math.cos(Math.atan2(p.vy, p.vx)) * moveDist;
+    const y = props.Y + Math.sin(Math.atan2(p.vy, p.vx)) * moveDist; 
+    
+    // Size shrinks over time
+    const currentSize = p.size * alpha * p.life;
+    
+    if (currentSize > 0) {
+      painter.beginPath();
+      // Using rect for "digital/pixel" feel, or arc for "sparkle"
+      // painter.fillRect(x - currentSize/2, y - currentSize/2, currentSize, currentSize);
+      painter.arc(x, y, currentSize / 1.5, 0, Math.PI * 2);
+      painter.fill();
+    }
+  });
+  painter.globalAlpha = 1.0;
+
+  // === 2. Draw Ripple / Shockwave (Replacing Diamond) ===
+  // A fast expanding ring that fades out
+  // Time: 0 -> duration
+  // Radius: 0 -> maxRadius
+  // Opacity: 1 -> 0
+  
+  const progress = dt / duration;
+  const easeOutQuad = t => t * (2 - t); // Easing for smoother expansion
+  const easedProgress = easeOutQuad(progress);
+  
+  const maxRadius = 100; // Adjust based on track width if needed
+  const currentRadius = easedProgress * maxRadius;
+  const ringAlpha = Math.max(0, 1 - easedProgress); // Fade out
+  
+  if (ringAlpha > 0.01) {
+    painter.beginPath();
+    painter.arc(props.middle, props.Y, currentRadius, 0, Math.PI * 2);
+    painter.lineWidth = 4 * ringAlpha; // Thinner as it expands
+    painter.strokeStyle = `rgba(${baseColor}, ${ringAlpha})`;
     painter.stroke();
+    
+    // Optional: Second smaller ring for "echo" effect, slightly delayed
+    if (progress > 0.1) {
+      const delayProgress = (dt - duration * 0.1) / (duration * 0.9);
+      const easedDelay = easeOutQuad(delayProgress);
+      const delayRadius = easedDelay * (maxRadius * 0.8);
+      const delayAlpha = Math.max(0, (1 - easedDelay) * 0.5);
+      
+      painter.beginPath();
+      painter.arc(props.middle, props.Y, delayRadius, 0, Math.PI * 2);
+      painter.lineWidth = 2 * delayAlpha;
+      painter.strokeStyle = `rgba(${baseColor}, ${delayAlpha})`;
+      painter.stroke();
+    }
   }
-  
-  // Outer/Inner Glow/Detail
-  painter.beginPath();
-  const scale = 1.5;
-  painter.moveTo(props.middle, props.Y - scale * size);
-  painter.lineTo(props.middle + scale * size, props.Y);
-  painter.lineTo(props.middle, props.Y + scale * size);
-  painter.lineTo(props.middle - scale * size, props.Y);
-  painter.lineTo(props.middle, props.Y - scale * size);
-  painter.closePath();
-  
-  if (judge.type === "lost") {
-     painter.strokeStyle = `rgba(255,69,0,${0.2 * colorOpacity})`;
-  } else {
-     painter.strokeStyle = `rgba(255,255,255,${0.2 * colorOpacity})`;
+
+  // === 3. Center Flash (Impact) ===
+  // A brief flash at the center point at the very beginning
+  if (dt < duration * 0.3) {
+    const flashProgress = dt / (duration * 0.3);
+    const flashAlpha = 1 - flashProgress;
+    const flashSize = 30 * (1 - flashProgress); // Shrinks rapidly
+    
+    // Glow
+    const gradient = painter.createRadialGradient(props.middle, props.Y, 0, props.middle, props.Y, flashSize);
+    gradient.addColorStop(0, `rgba(255, 255, 255, ${flashAlpha})`);
+    gradient.addColorStop(1, `rgba(${baseColor}, 0)`);
+    
+    painter.globalCompositeOperation = "lighter"; // Additive blending for glow
+    painter.fillStyle = gradient;
+    painter.beginPath();
+    painter.arc(props.middle, props.Y, flashSize, 0, Math.PI * 2);
+    painter.fill();
+    painter.globalCompositeOperation = "source-over";
   }
-  
-  for (let temp = 2; temp < 3 * width; temp++) {
-    painter.lineWidth = temp;
-    painter.stroke();
-    temp += 5;
-  }
-  painter.globalCompositeOperation = "source-over";
 };
 
 watch(() => props.global.currentTime, () => {

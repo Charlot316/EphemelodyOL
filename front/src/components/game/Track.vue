@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-for="(judge, index) in myTrack.judges" :key="index">
+    <div v-for="judge in myTrack.judges" :key="judge.id">
       <judge-painter :middle="middle" :Y="Y" :global="global" :judge="judge" />
     </div>
   </div>
@@ -19,6 +19,14 @@ const emit = defineEmits(["addCount"]);
 
 const myTrack = props.Track;
 const myglobal = props.global;
+// ... (保留中间代码不变) ...
+
+const addCount = (param) => {
+  // 添加唯一ID，防止Vue复用组件导致动画打断
+  param.id = Date.now() + Math.random();
+  myTrack.judges.push(param);
+  emit("addCount", param);
+};
 
 const lengthForBlackPoint = 10;
 const widthPath = ref([]);
@@ -477,10 +485,8 @@ const paintTrack = async () => {
   }
 };
 
-const addCount = (param) => {
-  myTrack.judges.push(param);
-  emit("addCount", param);
-};
+// Old addCount removed
+
 
 const addNoteCount = () => {
   if (myTrack.currentNote < myTrack.notes.length - 1) {
