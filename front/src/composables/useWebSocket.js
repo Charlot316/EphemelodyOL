@@ -55,6 +55,7 @@ export function useWebSocket(songId, onMessageReceived) {
         send("PONG", null);
         return;
       }
+      console.log("WebSocket Received:", msg.type, msg.payload);
       onMessageReceived(msg);
     };
 
@@ -83,6 +84,7 @@ export function useWebSocket(songId, onMessageReceived) {
       payload,
       clientId
     };
+    if (type !== 'PONG') console.log("WebSocket Send:", type, payload);
     socket.value.send(JSON.stringify(msg));
   };
 
