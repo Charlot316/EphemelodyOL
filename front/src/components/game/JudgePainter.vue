@@ -29,36 +29,38 @@ const colorList = [
 // Old particles init removed
 
 const particles = [];
-// Initialize particles - MORE particles
-for (let i = 0; i < 30; i++) {
+// Initialize particles - EVEN MORE and LARGER for exaggerated effect
+for (let i = 0; i < 50; i++) {
   const angle = Math.random() * Math.PI * 2;
-  const speed = Math.random() * 0.5 + 0.3; // Faster
+  // Faster speed range: 0.4 to 1.2
+  const speed = Math.random() * 0.8 + 0.4;
   particles.push({
     vx: Math.cos(angle) * speed,
     vy: Math.sin(angle) * speed,
-    // Larger and more varied size: 3 to 10 pixels range
-    size: Math.random() * 7 + 3, 
+    // Much larger size variation: 4 to 16 pixels
+    size: Math.random() * 12 + 4,
     offset: Math.random() * 20,
-    life: Math.random() * 0.6 + 0.4, // Random life
-    growth: Math.random() * 0.2 + 0.1 // Growth rate for diamond particles
+    life: Math.random() * 0.6 + 0.4,
+    // More aggressive expansion
+    growth: Math.random() * 0.4 + 0.2
   });
 }
 
 const paintJudge = (judge) => {
   const painter = props.global.judgePainter;
   if (!painter) return;
-  
+
   let currentTime = props.global.currentTime;
-  
+
   if (currentTime < judge.timing) currentTime = judge.timing;
   const dt = currentTime - judge.timing;
-  
+
   // Animation duration
-  const duration = judgeAnimationTime; 
+  const duration = judgeAnimationTime;
   if (dt > duration) return;
 
   // Base Color determination
-  let baseColor = "255, 255, 255"; 
+  let baseColor = "255, 255, 255";
   let strokeColor = "rgba(255, 255, 255, 0.8)";
   let scaleFactor = 1.0;
 
@@ -80,13 +82,13 @@ const paintJudge = (judge) => {
   const alpha = Math.max(0, 1 - dt / duration);
   painter.globalAlpha = alpha;
   painter.fillStyle = `rgba(${baseColor}, 0.9)`; // Brighter particles
-  
+
   particles.forEach(p => {
     // Physics
-    const moveDist = p.offset + (Math.sqrt(p.vx*p.vx + p.vy*p.vy) * dt * 2.5); // Fast expansion
+    const moveDist = p.offset + (Math.sqrt(p.vx * p.vx + p.vy * p.vy) * dt * 2.5); // Fast expansion
     const x = props.middle + Math.cos(Math.atan2(p.vy, p.vx)) * moveDist;
-    const y = props.Y + Math.sin(Math.atan2(p.vy, p.vx)) * moveDist; 
-    
+    const y = props.Y + Math.sin(Math.atan2(p.vy, p.vx)) * moveDist;
+
     // Size grows then possibly shrinks or fades
     // Let's make them expand diamonds
     const currentSize = (p.size + p.growth * dt * 0.1) * alpha * p.life;
@@ -109,23 +111,23 @@ const paintJudge = (judge) => {
   const progress = dt / duration;
   const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
   const easedProgress = easeOutCubic(progress);
-  
-  const baseRadius = 120 * scaleFactor; 
+
+  const baseRadius = 120 * scaleFactor;
   const currentRadius = easedProgress * baseRadius;
-  const ringAlpha = Math.max(0, 1 - easedProgress); 
-  
+  const ringAlpha = Math.max(0, 1 - easedProgress);
+
   if (ringAlpha > 0.01) {
     const halfR = currentRadius;
     painter.beginPath();
-    
+
     painter.moveTo(props.middle, props.Y - halfR);
     painter.lineTo(props.middle + halfR, props.Y);
     painter.lineTo(props.middle, props.Y + halfR);
     painter.lineTo(props.middle - halfR, props.Y);
     painter.closePath();
-    
+
     // Thicker line: Increased from 4 to 8
-    painter.lineWidth = 10 * ringAlpha; 
+    painter.lineWidth = 10 * ringAlpha;
     painter.strokeStyle = `rgba(${baseColor}, ${ringAlpha})`;
     painter.stroke();
 
@@ -138,14 +140,14 @@ const paintJudge = (judge) => {
       painter.lineTo(props.middle, props.Y + delayR);
       painter.lineTo(props.middle - delayR, props.Y);
       painter.closePath();
-      
+
       // Thicker echo line too
       painter.lineWidth = 6 * ringAlpha;
       painter.strokeStyle = `rgba(${baseColor}, ${ringAlpha * 0.5})`;
       painter.stroke();
     }
   }
-  
+
   // Removed Center Flash Block
 };
 
