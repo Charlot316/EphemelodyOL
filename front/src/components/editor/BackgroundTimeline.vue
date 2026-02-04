@@ -96,6 +96,7 @@
       </el-form>
       <template #footer>
         <span class="dialog-footer">
+          <el-button type="danger" @click="deleteCurrentOp" style="float: left;">删除此段</el-button>
           <el-button @click="editDialogVisible = false">取消</el-button>
           <el-button type="primary" @click="saveEdit">确定</el-button>
         </span>
@@ -262,6 +263,13 @@ const saveEdit = () => {
   
   editDialogVisible.value = false;
   props.global.reCalculateChartMaker = !props.global.reCalculateChartMaker;
+};
+
+const deleteCurrentOp = () => {
+  if (selectedIndex.value === -1) return;
+  deleteOp(selectedIndex.value);
+  editDialogVisible.value = false;
+  selectedIndex.value = -1;
 };
 
 const deleteOp = (index) => {
