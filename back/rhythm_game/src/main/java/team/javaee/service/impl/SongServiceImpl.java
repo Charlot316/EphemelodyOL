@@ -358,12 +358,12 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
             if (content == null)
                 return ReturnResponse.packageObject("找不到 JSON 备份", ReturnStatus.FAILURE);
 
-            trackMapper.delete(new QueryWrapper<Track>().eq("song_id", songId));
             noteMapper.delete(new QueryWrapper<Note>().eq("song_id", songId));
             moveOperationMapper.delete(new QueryWrapper<MoveOperation>().eq("song_id", songId));
             changeWidthOperationMapper.delete(new QueryWrapper<ChangeWidthOperation>().eq("song_id", songId));
             changeColorOperationMapper.delete(new QueryWrapper<ChangeColorOperation>().eq("song_id", songId));
             changeBackgroundOperationMapper.delete(new QueryWrapper<ChangeBackgroundOperation>().eq("song_id", songId));
+            trackMapper.delete(new QueryWrapper<Track>().eq("song_id", songId));
 
             Map<Integer, Integer> trackMap = new HashMap<>();
             if (content.getTracks() != null) {
