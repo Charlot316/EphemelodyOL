@@ -559,6 +559,7 @@ const handleDrop = (e) => {
   height: 100%;
   object-fit: cover;
   opacity: 0.8;
+  pointer-events: none;
 }
 
 .segment-info {
@@ -570,6 +571,7 @@ const handleDrop = (e) => {
   padding: 1px 3px;
   border-radius: 2px;
   color: #eee;
+  pointer-events: none;
 }
 
 .resize-handle {
