@@ -1,4 +1,5 @@
 #!/bin/bash
+cd "$(dirname "$0")"
 
 # 加载环境变量
 export $(cat .env | grep -v '^#' | xargs)

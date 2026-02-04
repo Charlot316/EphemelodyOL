@@ -429,6 +429,76 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
         }
     }
 
+    private ChartContentDTO generateChartFromDB(String songId) {
+        Song song = songMapper.selectById(songId);
+        if (song == null)
+            return null;
+
+        ChartContentDTO dto = new ChartContentDTO();
+        dto.setSongId(songId);
+        dto.setBpm(song.getBpm());
+        dto.setFirstBeatDelay(song.getFirstBeatDelay());
+
+        List<Track> tracks = trackMapper.selectList(new QueryWrapper<Track>().eq("song_id", songId));
+        List<TrackDTO> trackDtos = new ArrayList<>();
+        for (Track t : tracks) {
+            TrackDTO td = new TrackDTO();
+            td.setStartTiming(t.getStartTiming());
+            td.setEndTiming(t.getEndTiming());
+            td.setKey(t.getKeyX());
+            td.setType(t.getType());
+            td.setR(t.getR());
+            td.setG(t.getG());
+            td.setB(t.getB());
+            td.setWidth(t.getWidth());
+            td.setPositionX(t.getPositionX());
+
+            List<Note> notes = noteMapper.selectList(new QueryWrapper<Note>().eq("based_track", t.getId()));
+            List<NoteDTO> nDtos = new ArrayList<>();
+            for (Note n : notes) {
+                NoteDTO nd = new NoteDTO();
+                nd.setKey(n.getKeyX());
+                nd.setTiming(n.getTiming());
+                nd.setNoteType(n.getNoteType());
+                nd.setEndTiming(n.getEndTiming());
+                nDtos.add(nd);
+            }
+            td.setNotes(nDtos);
+
+            // MoveOperations
+            List<MoveOperation> moves = moveOperationMapper
+                    .selectList(new QueryWrapper<MoveOperation>().eq("based_track", t.getId()));
+            List<MoveOperationDTO> moveDtos = new ArrayList<>();
+            for (MoveOperation mo : moves) {
+                MoveOperationDTO md = new MoveOperationDTO();
+                md.setStartTiming(mo.getStartTiming());
+                md.setEndTiming(mo.getEndTiming());
+                md.setStartX(mo.getStartX());
+                md.setEndX(mo.getEndX());
+                moveDtos.add(md);
+            }
+            td.setMoveOperations(moveDtos);
+
+            trackDtos.add(td);
+        }
+        dto.setTracks(trackDtos);
+
+        // ChangeBackgroundOperations
+        List<ChangeBackgroundOperation> bgOps = changeBackgroundOperationMapper
+                .selectList(new QueryWrapper<ChangeBackgroundOperation>().eq("song_id", songId));
+        List<ChangeBackgroundOperationDTO> bgDtos = new ArrayList<>();
+        for (ChangeBackgroundOperation op : bgOps) {
+            ChangeBackgroundOperationDTO bd = new ChangeBackgroundOperationDTO();
+            bd.setStartTiming(op.getStartTiming());
+            bd.setEndTiming(op.getEndTiming());
+            bd.setAssetId(op.getAssetId()); // Use String ID from DB
+            bgDtos.add(bd);
+        }
+        dto.setChangeBackgroundOperations(bgDtos);
+
+        return dto;
+    }
+
     @Override
     public ReturnResponse<ChartContentDTO> getChart(String songId) {
         try {
@@ -436,49 +506,13 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
             try {
                 return ReturnResponse.OK(objectMapper.readValue(new URL(r2Url), ChartContentDTO.class));
             } catch (IOException e) {
-                File localFile = new File(uploadPath + "charts/" + songId + ".json");
-                if (localFile.exists())
-                    return ReturnResponse.OK(objectMapper.readValue(localFile, ChartContentDTO.class));
-            }
-
-            Song song = songMapper.selectById(songId);
-            if (song == null)
-                return ReturnResponse.packageObject(null, ReturnStatus.NO_DATA);
-
-            ChartContentDTO dto = new ChartContentDTO();
-            dto.setSongId(songId);
-            dto.setBpm(song.getBpm());
-            dto.setFirstBeatDelay(song.getFirstBeatDelay());
-
-            List<Track> tracks = trackMapper.selectList(new QueryWrapper<Track>().eq("song_id", songId));
-            List<TrackDTO> trackDtos = new ArrayList<>();
-            for (Track t : tracks) {
-                TrackDTO td = new TrackDTO();
-                td.setStartTiming(t.getStartTiming());
-                td.setEndTiming(t.getEndTiming());
-                td.setKey(t.getKeyX());
-                td.setType(t.getType());
-                td.setR(t.getR());
-                td.setG(t.getG());
-                td.setB(t.getB());
-                td.setWidth(t.getWidth());
-                td.setPositionX(t.getPositionX());
-
-                List<Note> notes = noteMapper.selectList(new QueryWrapper<Note>().eq("based_track", t.getId()));
-                List<NoteDTO> nDtos = new ArrayList<>();
-                for (Note n : notes) {
-                    NoteDTO nd = new NoteDTO();
-                    nd.setKey(n.getKeyX());
-                    nd.setTiming(n.getTiming());
-                    nd.setNoteType(n.getNoteType());
-                    nd.setEndTiming(n.getEndTiming());
-                    nDtos.add(nd);
+                // If R2 read fails, try to generate from DB
+                ChartContentDTO dto = generateChartFromDB(songId);
+                if (dto != null) {
+                    return ReturnResponse.OK(dto);
                 }
-                td.setNotes(nDtos);
-                trackDtos.add(td);
             }
-            dto.setTracks(trackDtos);
-            return ReturnResponse.OK(dto);
+            return ReturnResponse.packageObject(null, ReturnStatus.NO_DATA);
         } catch (Exception e) {
             log.error("获取谱面失败", e);
             return ReturnResponse.systemException(ReturnStatus.BUSINESS_EXCEPTION);
@@ -490,9 +524,10 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
         try {
             List<Song> songs = songMapper.selectList(null);
             for (Song song : songs) {
-                ReturnResponse<ChartContentDTO> res = getChart(song.getId());
-                if (res.isSuccess()) {
-                    editChartContent(res.getData());
+                // 强制从数据库重新生成 JSON，以确保资源 ID (assetId) 是最新的 UUID
+                ChartContentDTO dto = generateChartFromDB(song.getId());
+                if (dto != null) {
+                    editChartContent(dto);
                 }
             }
             return ReturnResponse.OK("全量同步完成");
