@@ -353,10 +353,17 @@ const onMouseMove = () => {
       newStart = getSnappedTime(newStart, snapPoints.value);
       let newEnd = newStart + duration;
 
-      if (!checkOverlap(newStart, newEnd, draggingOp.value)) {
+      const hasOverlap = checkOverlap(newStart, newEnd, draggingOp.value);
+      console.log('📍 [BG] Move check:', { newStart, newEnd, hasOverlap, oldStart: draggingOp.value.startTiming });
+      
+      if (!hasOverlap) {
         draggingOp.value.startTiming = newStart;
         draggingOp.value.endTiming = newEnd;
+        console.log('✨ [BG] Position updated!', { newStart, newEnd });
+      } else {
+        console.warn('⚠️ [BG] Move blocked by overlap');
       }
+
 
     } else if (dragType.value === 'left') {
       let newStart = dragStartStartTiming.value + deltaTime;
