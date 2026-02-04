@@ -49,12 +49,16 @@ export function useChartEditor(route, router) {
         onlineUsers.value = payload.users;
         break;
       case "PUBLISH_READY_SOLO":
+        console.log('📢 [PUBLISH] Received PUBLISH_READY_SOLO, showing confirmation dialog');
         ElMessageBox.confirm("确定发布谱面吗？发布后将持久化归档，之前的操作将无法撤回。", "系统提示", {
           confirmButtonText: "确定发布",
           cancelButtonText: "取消",
           type: "warning"
         }).then(() => {
+          console.log('✅ [PUBLISH] User confirmed, calling executeFinalSave');
           executeFinalSave(true);
+        }).catch(() => {
+          console.log('❌ [PUBLISH] User cancelled');
         });
         break;
       case "PUBLISH_PROPOSAL":
