@@ -36,7 +36,8 @@ for (let i = 0; i < 30; i++) {
   particles.push({
     vx: Math.cos(angle) * speed,
     vy: Math.sin(angle) * speed,
-    size: Math.random() * 3 + 2, // Base size
+    // Larger and more varied size: 3 to 10 pixels range
+    size: Math.random() * 7 + 3, 
     offset: Math.random() * 20,
     life: Math.random() * 0.6 + 0.4, // Random life
     growth: Math.random() * 0.2 + 0.1 // Growth rate for diamond particles
