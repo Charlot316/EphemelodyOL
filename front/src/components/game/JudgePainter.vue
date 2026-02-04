@@ -29,16 +29,17 @@ const colorList = [
 // Old particles init removed
 
 const particles = [];
-// Initialize particles - MORE particles for better effect
-for (let i = 0; i < 20; i++) {
+// Initialize particles - MORE particles
+for (let i = 0; i < 30; i++) {
   const angle = Math.random() * Math.PI * 2;
-  const speed = Math.random() * 0.4 + 0.2; // Faster
+  const speed = Math.random() * 0.5 + 0.3; // Faster
   particles.push({
     vx: Math.cos(angle) * speed,
     vy: Math.sin(angle) * speed,
-    size: Math.random() * 3 + 2,
-    offset: Math.random() * 10,
-    life: Math.random() * 0.5 + 0.5 // Random life variation
+    size: Math.random() * 3 + 2, // Base size
+    offset: Math.random() * 20,
+    life: Math.random() * 0.6 + 0.4, // Random life
+    growth: Math.random() * 0.2 + 0.1 // Growth rate for diamond particles
   });
 }
 
@@ -56,100 +57,109 @@ const paintJudge = (judge) => {
   if (dt > duration) return;
 
   // Base Color determination
-  let baseColor = "255, 255, 255"; // RGB string for easier alpha manipulation
+  let baseColor = "255, 255, 255"; 
   let strokeColor = "rgba(255, 255, 255, 0.8)";
-  
+  let scaleFactor = 1.0;
+
   if (judge.type === "pure") {
     baseColor = "255, 215, 0"; // Gold
     strokeColor = "rgba(255, 215, 0, 0.8)";
+    scaleFactor = 1.4; // Largest
   } else if (judge.type === "far") {
     baseColor = "100, 149, 237"; // Blue
     strokeColor = "rgba(100, 149, 237, 0.8)";
+    scaleFactor = 1.0; // Normal
   } else if (judge.type === "lost") {
     baseColor = "255, 69, 0"; // Red
     strokeColor = "rgba(255, 69, 0, 0.8)";
+    scaleFactor = 0.6; // Smallest
   }
 
-  // === 1. Draw Particles (Enhanced) ===
+  // === 1. Draw Diamond Particles (Expanding) ===
   const alpha = Math.max(0, 1 - dt / duration);
   painter.globalAlpha = alpha;
-  painter.fillStyle = `rgba(${baseColor}, 0.8)`;
+  painter.fillStyle = `rgba(${baseColor}, 0.9)`; // Brighter particles
   
   particles.forEach(p => {
-    // Physics: Simple friction/drag
-    const drag = 0.95; 
-    const moveDist = p.offset + (Math.sqrt(p.vx*p.vx + p.vy*p.vy) * dt * 2.0); // Faster expansion
-    
-    // Add some random wobble or curl? Keep simple for now but fast.
+    // Physics
+    const moveDist = p.offset + (Math.sqrt(p.vx*p.vx + p.vy*p.vy) * dt * 2.5); // Fast expansion
     const x = props.middle + Math.cos(Math.atan2(p.vy, p.vx)) * moveDist;
     const y = props.Y + Math.sin(Math.atan2(p.vy, p.vx)) * moveDist; 
     
-    // Size shrinks over time
-    const currentSize = p.size * alpha * p.life;
-    
+    // Size grows then possibly shrinks or fades
+    // Let's make them expand diamonds
+    const currentSize = (p.size + p.growth * dt * 0.1) * alpha * p.life;
+    const halfSize = currentSize / 2;
+
     if (currentSize > 0) {
       painter.beginPath();
-      // Using rect for "digital/pixel" feel, or arc for "sparkle"
-      // painter.fillRect(x - currentSize/2, y - currentSize/2, currentSize, currentSize);
-      painter.arc(x, y, currentSize / 1.5, 0, Math.PI * 2);
+      // Draw Diamond Shape
+      painter.moveTo(x, y - halfSize);
+      painter.lineTo(x + halfSize, y);
+      painter.lineTo(x, y + halfSize);
+      painter.lineTo(x - halfSize, y);
+      painter.closePath();
       painter.fill();
     }
   });
   painter.globalAlpha = 1.0;
 
-  // === 2. Draw Ripple / Shockwave (Replacing Diamond) ===
-  // A fast expanding ring that fades out
-  // Time: 0 -> duration
-  // Radius: 0 -> maxRadius
-  // Opacity: 1 -> 0
-  
+  // === 2. Draw Main Expanding Diamond ===
   const progress = dt / duration;
-  const easeOutQuad = t => t * (2 - t); // Easing for smoother expansion
-  const easedProgress = easeOutQuad(progress);
+  const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
+  const easedProgress = easeOutCubic(progress);
   
-  const maxRadius = 100; // Adjust based on track width if needed
-  const currentRadius = easedProgress * maxRadius;
+  const baseRadius = 120 * scaleFactor; // Size adjustment
+  const currentRadius = easedProgress * baseRadius;
   const ringAlpha = Math.max(0, 1 - easedProgress); // Fade out
   
   if (ringAlpha > 0.01) {
+    const halfR = currentRadius;
     painter.beginPath();
-    painter.arc(props.middle, props.Y, currentRadius, 0, Math.PI * 2);
-    painter.lineWidth = 4 * ringAlpha; // Thinner as it expands
+    // Diamond shape centered at props.middle, props.Y
+    painter.moveTo(props.middle, props.Y - halfR);
+    painter.lineTo(props.middle + halfR, props.Y);
+    painter.lineTo(props.middle, props.Y + halfR);
+    painter.lineTo(props.middle - halfR, props.Y);
+    painter.closePath();
+    
+    painter.lineWidth = 4 * ringAlpha;
     painter.strokeStyle = `rgba(${baseColor}, ${ringAlpha})`;
     painter.stroke();
-    
-    // Optional: Second smaller ring for "echo" effect, slightly delayed
-    if (progress > 0.1) {
-      const delayProgress = (dt - duration * 0.1) / (duration * 0.9);
-      const easedDelay = easeOutQuad(delayProgress);
-      const delayRadius = easedDelay * (maxRadius * 0.8);
-      const delayAlpha = Math.max(0, (1 - easedDelay) * 0.5);
-      
+
+    // Inner Diamond (Echo) - slightly smaller/delayed
+    if (progress > 0.05) {
+      const delayR = currentRadius * 0.7;
       painter.beginPath();
-      painter.arc(props.middle, props.Y, delayRadius, 0, Math.PI * 2);
-      painter.lineWidth = 2 * delayAlpha;
-      painter.strokeStyle = `rgba(${baseColor}, ${delayAlpha})`;
+      painter.moveTo(props.middle, props.Y - delayR);
+      painter.lineTo(props.middle + delayR, props.Y);
+      painter.lineTo(props.middle, props.Y + delayR);
+      painter.lineTo(props.middle - delayR, props.Y);
+      painter.closePath();
+      
+      painter.lineWidth = 2 * ringAlpha;
+      painter.strokeStyle = `rgba(${baseColor}, ${ringAlpha * 0.5})`;
       painter.stroke();
     }
   }
 
-  // === 3. Center Flash (Impact) ===
-  // A brief flash at the center point at the very beginning
+  // === 3. Center Flash (Diamond Shape) ===
   if (dt < duration * 0.3) {
     const flashProgress = dt / (duration * 0.3);
     const flashAlpha = 1 - flashProgress;
-    const flashSize = 30 * (1 - flashProgress); // Shrinks rapidly
+    const flashSize = (40 * scaleFactor) * (1 - flashProgress);
     
-    // Glow
-    const gradient = painter.createRadialGradient(props.middle, props.Y, 0, props.middle, props.Y, flashSize);
-    gradient.addColorStop(0, `rgba(255, 255, 255, ${flashAlpha})`);
-    gradient.addColorStop(1, `rgba(${baseColor}, 0)`);
+    painter.globalCompositeOperation = "lighter";
+    painter.fillStyle = `rgba(${baseColor}, ${flashAlpha})`; // Solid flash
     
-    painter.globalCompositeOperation = "lighter"; // Additive blending for glow
-    painter.fillStyle = gradient;
     painter.beginPath();
-    painter.arc(props.middle, props.Y, flashSize, 0, Math.PI * 2);
+    painter.moveTo(props.middle, props.Y - flashSize);
+    painter.lineTo(props.middle + flashSize, props.Y);
+    painter.lineTo(props.middle, props.Y + flashSize);
+    painter.lineTo(props.middle - flashSize, props.Y);
+    painter.closePath();
     painter.fill();
+    
     painter.globalCompositeOperation = "source-over";
   }
 };
