@@ -177,6 +177,7 @@ const global = reactive({
   lostTime: 150,
   pureTime: 50,
   farTime: 100,
+  timeSort: true,
 });
 
 const menuOpened = ref(true);

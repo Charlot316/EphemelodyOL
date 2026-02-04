@@ -25,7 +25,19 @@ export function useWebSocket(songId, onMessageReceived) {
         userId = user.id || user.userId || user.username; 
     }
 
-    const url = `${protocol}//${window.location.hostname}:8090/ws/chart?songId=${songId}&username=${encodeURIComponent(username)}&userId=${userId}`;
+    let socketUrl = '';
+    const hostname = window.location.hostname;
+    
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        // 本地环境，直接连后端端口 8090，并带上 /api 前缀
+        socketUrl = `${protocol}//${hostname}:8090/api/ws/chart`;
+    } else {
+        // 远程环境（如 Cloudflare Tunnel），统一种过 /api 路径转发到后端
+        // 路径由原来的 /ws/chart 改为 /api/ws/chart
+        socketUrl = `${protocol}//${window.location.host}/api/ws/chart`;
+    }
+
+    const url = `${socketUrl}?songId=${songId}&username=${encodeURIComponent(username)}&userId=${userId}`;
     
     socket.value = new WebSocket(url);
 

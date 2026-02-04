@@ -334,11 +334,16 @@ export function useChartEditor(route, router) {
   };
 
   const sortTrack = (byTime = true) => {
-    if (byTime) {
-      chart.tracks?.sort((a, b) => a.startTiming - b.startTiming);
-    } else {
-      chart.tracks?.sort((a, b) => (a.positionX || 0) - (b.positionX || 0));
-    }
+    chart.tracks?.sort((a, b) => {
+      if (byTime) {
+        if (a.startTiming !== b.startTiming) return a.startTiming - b.startTiming;
+      } else {
+        const posXA = a.positionX || 0;
+        const posXB = b.positionX || 0;
+        if (posXA !== posXB) return posXA - posXB;
+      }
+      return (a.id || 0) - (b.id || 0) || (a.index || 0) - (b.index || 0);
+    });
     setIndex();
   };
 
