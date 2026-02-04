@@ -51,6 +51,10 @@ export function useWebSocket(songId, onMessageReceived) {
 
     socket.value.onmessage = (event) => {
       const msg = JSON.parse(event.data);
+      if (msg.type === "PING") {
+        send("PONG", null);
+        return;
+      }
       onMessageReceived(msg);
     };
 
@@ -75,7 +79,7 @@ export function useWebSocket(songId, onMessageReceived) {
     }
     const msg = {
       type,
-      songId: parseInt(songId),
+      songId: songId,
       payload,
       clientId
     };

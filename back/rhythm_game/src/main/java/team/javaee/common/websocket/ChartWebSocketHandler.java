@@ -14,10 +14,39 @@ import team.javaee.mapper.*;
 import java.io.IOException;
 import java.net.URI;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.*; // Added for heartbeat scheduler
 
 @Component
 public class ChartWebSocketHandler extends TextWebSocketHandler {
+
+    // Heartbeat tracking
+    private final Map<WebSocketSession, Long> lastHeartbeat = new ConcurrentHashMap<>();
+    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+
+    public ChartWebSocketHandler() {
+        // Heartbeat check every 30 seconds
+        scheduler.scheduleAtFixedRate(() -> {
+            long now = System.currentTimeMillis();
+            for (WebSocketSession session : lastHeartbeat.keySet()) {
+                if (session.isOpen()) {
+                    try {
+                        // Send PING
+                        ChartMessage ping = new ChartMessage();
+                        ping.setType("PING");
+                        session.sendMessage(new TextMessage(objectMapper.writeValueAsString(ping)));
+
+                        // Check timeout (60s)
+                        Long last = lastHeartbeat.get(session);
+                        if (last != null && (now - last > 60000)) {
+                            session.close(CloseStatus.SESSION_NOT_RELIABLE);
+                        }
+                    } catch (IOException e) {
+                        // Ignore
+                    }
+                }
+            }
+        }, 30, 30, TimeUnit.SECONDS);
+    }
 
     // Changed from @Autowired to direct instantiation as per provided code edit
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -67,8 +96,8 @@ public class ChartWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(@org.springframework.lang.NonNull WebSocketSession session)
-            throws Exception { // Added throws Exception
-        // Just connected, wait for JOIN message (Initial setup handled by JOIN message)
+            throws Exception {
+        lastHeartbeat.put(session, System.currentTimeMillis());
     }
 
     private void broadcastOnlineStatus(String songId) {
@@ -94,7 +123,13 @@ public class ChartWebSocketHandler extends TextWebSocketHandler {
     @Override
     protected void handleTextMessage(@org.springframework.lang.NonNull WebSocketSession session,
             @org.springframework.lang.NonNull TextMessage message) throws Exception {
+        lastHeartbeat.put(session, System.currentTimeMillis());
+
         ChartMessage msg = objectMapper.readValue(message.getPayload(), ChartMessage.class);
+        if ("PONG".equals(msg.getType())) {
+            return;
+        }
+
         String songId = msg.getSongId();
 
         if ("JOIN".equals(msg.getType())) {
@@ -384,6 +419,7 @@ public class ChartWebSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionClosed(@org.springframework.lang.NonNull WebSocketSession session,
             @org.springframework.lang.NonNull CloseStatus status) {
+        lastHeartbeat.remove(session);
         String songId = sessionToRoom.remove(session);
         sessionToUser.remove(session);
         sessionToUserId.remove(session);
