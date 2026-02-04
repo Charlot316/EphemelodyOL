@@ -295,12 +295,11 @@ onMounted(() => {
       global.currentTime = Math.min(chart.songLength, global.currentTime + timeStep.value);
       handleTimeChange();
       e.preventDefault();
-      togglePlay();
     } else if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
       if (e.shiftKey) {
-        commandHistory.redo();
+        history.redo();
       } else {
-        commandHistory.undo();
+        history.undo();
       }
       e.preventDefault();
     }

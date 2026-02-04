@@ -483,6 +483,7 @@ const rightScroll = () => {
 };
 
 const rightClick = (e) => {
+  if (e.button !== 0) return;
   const rightElem = document.getElementById("footer-right-scroll");
   if (!rightElem) return;
   const rect = rightElem.getBoundingClientRect();
