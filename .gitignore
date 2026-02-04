@@ -34,3 +34,4 @@ CREDENTIALS.md
 *.log
 server_log*.txt
 /back/rhythm_game/src/main/resources/static/
+back/rhythm_game/chart_debug.json
