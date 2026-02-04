@@ -347,13 +347,26 @@ public class ChartWebSocketHandler extends TextWebSocketHandler {
     }
 
     private void handlePublishRequest(WebSocketSession session, String songId) throws IOException {
+        log.info("📢 [PUBLISH] handlePublishRequest called for songId: {}", songId);
         Set<WebSocketSession> sessions = rooms.get(songId);
-        if (sessions == null)
+        log.info("📋 [PUBLISH] Current sessions in room: {}", sessions != null ? sessions.size() : "null");
+
+        if (sessions == null) {
+            log.warn("⚠️ [PUBLISH] Room not found for songId: {}, creating new room and sending PUBLISH_READY_SOLO",
+                    songId);
+            // 房间不存在，创建房间并添加当前会话
+            sessions = new HashSet<>();
+            sessions.add(session);
+            rooms.put(songId, sessions);
+            sendToSession(session, "PUBLISH_READY_SOLO", null, null);
             return;
+        }
 
         if (sessions.size() <= 1) {
+            log.info("✅ [PUBLISH] Solo mode (sessions <= 1), sending PUBLISH_READY_SOLO");
             sendToSession(session, "PUBLISH_READY_SOLO", null, null);
         } else {
+            log.info("👥 [PUBLISH] Multi-user mode, initiating consensus vote");
             PublishConsensus consensus = new PublishConsensus();
             consensus.initiator = session;
             consensus.initiatorName = sessionToUser.getOrDefault(session, "匿名");
