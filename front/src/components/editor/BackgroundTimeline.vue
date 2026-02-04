@@ -17,7 +17,7 @@
     </div>
 
     <!-- 右侧滚动部分 -->
-    <div class="bg-timeline-right" @scroll="handleScroll" ref="scrollRef">
+    <div class="bg-timeline-right" @scroll="handleScroll" ref="scrollRef" @mousemove="onMouseMove">
       <div class="bg-track-content"
         :style="{ width: (chart.songLength / displayAreaTime) * (global.documentWidth - global.siderWidth) + 'px' }"
         @dragover.prevent @drop="handleDrop">
@@ -28,21 +28,21 @@
           </div>
 
           <!-- 背景操作片段 -->
-          <div v-for="(op, index) in chart.changeBackgroundOperations" :key="index" class="bg-segment" :style="{
-            left: (op.startTiming / displayAreaTime) * (global.documentWidth - global.siderWidth) + 'px',
-            width: (((op.endTiming || (op.startTiming + 2000)) - op.startTiming) / displayAreaTime) * (global.documentWidth - global.siderWidth) + 'px'
-          }" @mousedown.stop="props.global.currentNoteType === 3 ? deleteOp(index) : startDragOp($event, op)">
+          <div v-for="(op, index) in chart.changeBackgroundOperations" :key="index" class="bg-segment" 
+            :class="{ selected: selectedIndex === index }"
+            :style="{
+              left: (op.startTiming / displayAreaTime) * (global.documentWidth - global.siderWidth) + 'px',
+              width: (((op.endTiming || (op.startTiming + 2000)) - op.startTiming) / displayAreaTime) * (global.documentWidth - global.siderWidth) + 'px'
+            }" 
+            @mousedown.stop="handleSegmentClick($event, index)" 
+            @contextmenu.prevent="handleRightClick($event, index)">
+            
             <!-- Resize Handles -->
             <div class="resize-handle left" @mousedown.stop="startResizeLeft($event, op)"></div>
             <div class="resize-handle right" @mousedown.stop="startResizeRight($event, op)"></div>
 
             <img :src="getBackgroundUrl(op)" alt="bg" @dragstart.prevent />
             <div class="segment-info">{{ op.startTiming }}ms</div>
-            <div class="segment-actions">
-              <el-icon class="delete-icon" @click.stop="deleteOp(index)">
-                <Delete />
-              </el-icon>
-            </div>
           </div>
 
           <!-- Time Indicators -->
@@ -70,12 +70,42 @@
         </div>
       </div>
     </div>
+
+    <!-- 背景段编辑弹窗 -->
+    <el-dialog v-model="editDialogVisible" title="编辑背景操作" width="450px" append-to-body custom-class="glass-dialog">
+      <el-form v-if="editingOp" :model="editingOp" label-width="100px">
+        <el-form-item label="开始时间">
+          <el-input-number v-model="editingOp.startTiming" :min="0" :max="chart.songLength" />
+        </el-form-item>
+        <el-form-item label="结束时间">
+          <el-input-number v-model="editingOp.endTiming" :min="editingOp.startTiming" :max="chart.songLength" />
+        </el-form-item>
+        <el-form-item label="背景URL">
+          <el-input v-model="editingOp.background" placeholder="输入背景图片URL" />
+        </el-form-item>
+        <el-form-item label="资产ID">
+          <el-select v-model="editingOp.assetId" clearable placeholder="选择已上传资产">
+            <el-option v-for="asset in chart.assets" :key="asset.id" :label="asset.name" :value="asset.id">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <img :src="normalizeUrl(asset.url)" style="width: 24px; height: 16px; object-fit: cover;" />
+                <span>{{ asset.name }}</span>
+              </div>
+            </el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="editDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="saveEdit">确定</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
-
 <script setup>
-import { ref, defineProps, defineEmits, watch, inject } from 'vue';
+import { ref, defineProps, defineEmits, watch, inject, onMounted, onBeforeUnmount } from 'vue';
 import { Picture, ArrowDown, ArrowUp, Delete } from '@element-plus/icons-vue';
 import { ElNotification } from 'element-plus';
 
@@ -93,6 +123,10 @@ const syncAction = inject('syncAction');
 
 const isCollapsed = ref(false);
 const scrollRef = ref(null);
+const selectedIndex = ref(-1);
+const editDialogVisible = ref(false);
+const editingOp = ref(null);
+const originalOpData = ref(null);
 
 // Dragging state
 const draggingOp = ref(null);
@@ -119,24 +153,6 @@ const collectSnapPoints = (currentOp) => {
         track.notes.forEach(n => {
           if (n.timing !== undefined) points.push(n.timing);
           if (n.endTiming !== undefined) points.push(n.endTiming);
-        });
-      }
-      if (track.moveOperations) {
-        track.moveOperations.forEach(o => {
-          if (o.startTiming !== undefined) points.push(o.startTiming);
-          if (o.endTiming !== undefined) points.push(o.endTiming);
-        });
-      }
-      if (track.changeWidthOperations) {
-        track.changeWidthOperations.forEach(o => {
-          if (o.startTiming !== undefined) points.push(o.startTiming);
-          if (o.endTiming !== undefined) points.push(o.endTiming);
-        });
-      }
-      if (track.changeColorOperations) {
-        track.changeColorOperations.forEach(o => {
-          if (o.startTiming !== undefined) points.push(o.startTiming);
-          if (o.endTiming !== undefined) points.push(o.endTiming);
         });
       }
     });
@@ -175,7 +191,7 @@ const normalizeUrl = (url) => {
 
 const getBackgroundUrl = (op) => {
   if (op.assetId && props.chart.assets) {
-    const asset = props.chart.assets.find(a => a.id === op.assetId);
+    const asset = props.chart.assets.find(a => Number(a.id) === Number(op.assetId));
     if (asset) return normalizeUrl(asset.url);
   }
   return normalizeUrl(op.background);
@@ -191,6 +207,61 @@ const checkOverlap = (start, end, excludeOp) => {
     }
   }
   return false;
+};
+
+const handleSegmentClick = (e, index) => {
+  if (props.global.currentNoteType === 3) {
+    deleteOp(index);
+    return;
+  }
+  selectedIndex.value = index;
+  const op = props.chart.changeBackgroundOperations[index];
+  startDragOp(e, op);
+};
+
+const handleRightClick = (e, index) => {
+  selectedIndex.value = index;
+  const op = props.chart.changeBackgroundOperations[index];
+  
+  // Open Edit Dialog
+  editingOp.value = JSON.parse(JSON.stringify(op));
+  originalOpData.value = op;
+  editDialogVisible.value = true;
+};
+
+const saveEdit = () => {
+  if (!editingOp.value || !originalOpData.value) return;
+  
+  const op = originalOpData.value;
+  const oldData = JSON.parse(JSON.stringify(op));
+  const newData = editingOp.value;
+  
+  // Apply changes
+  Object.assign(op, newData);
+  props.chart.changeBackgroundOperations.sort((a, b) => a.startTiming - b.startTiming);
+  
+  if (syncAction) syncAction("UPDATE_BG_OP", op);
+  
+  if (commandHistory) {
+    commandHistory.pushCommand({
+      description: 'Edit BG Op',
+      undo: () => {
+        Object.assign(op, oldData);
+        props.chart.changeBackgroundOperations.sort((a, b) => a.startTiming - b.startTiming);
+        if (syncAction) syncAction("UPDATE_BG_OP", op);
+        props.global.reCalculateChartMaker = !props.global.reCalculateChartMaker;
+      },
+      redo: () => {
+        Object.assign(op, newData);
+        props.chart.changeBackgroundOperations.sort((a, b) => a.startTiming - b.startTiming);
+        if (syncAction) syncAction("UPDATE_BG_OP", op);
+        props.global.reCalculateChartMaker = !props.global.reCalculateChartMaker;
+      }
+    });
+  }
+  
+  editDialogVisible.value = false;
+  props.global.reCalculateChartMaker = !props.global.reCalculateChartMaker;
 };
 
 const deleteOp = (index) => {
@@ -249,7 +320,7 @@ const startResizeRight = (e, op) => {
   snapPoints.value = collectSnapPoints(op);
 };
 
-watch(() => props.global.mouseMove, () => {
+const onMouseMove = () => {
   if (draggingOp.value) {
     const deltaX = props.global.clientX - dragStartX.value;
     const deltaTime = Math.round((deltaX / (props.global.documentWidth - props.global.siderWidth)) * props.displayAreaTime);
@@ -288,9 +359,9 @@ watch(() => props.global.mouseMove, () => {
       }
     }
   }
-});
+};
 
-watch(() => props.global.mouseUp, () => {
+const onMouseUp = () => {
   if (draggingOp.value) {
     props.chart.changeBackgroundOperations.sort((a, b) => a.startTiming - b.startTiming);
 
@@ -330,6 +401,14 @@ watch(() => props.global.mouseUp, () => {
     snapPoints.value = [];
     props.global.reCalculateChartMaker = !props.global.reCalculateChartMaker;
   }
+};
+
+onMounted(() => {
+  window.addEventListener('mouseup', onMouseUp);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('mouseup', onMouseUp);
 });
 
 const toggleCollapse = () => {
@@ -456,6 +535,11 @@ const handleDrop = (e) => {
   z-index: 10;
 }
 
+.bg-segment.selected {
+  border: 2px solid #409eff;
+  box-shadow: 0 0 8px rgba(64, 158, 255, 0.5);
+}
+
 .bg-segment:active {
   cursor: grabbing;
 }
@@ -476,26 +560,6 @@ const handleDrop = (e) => {
   padding: 1px 3px;
   border-radius: 2px;
   color: #eee;
-}
-
-.segment-actions {
-  position: absolute;
-  top: 2px;
-  right: 2px;
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-
-.bg-segment:hover .segment-actions {
-  opacity: 1;
-}
-
-.delete-icon {
-  background: rgba(245, 108, 108, 0.8);
-  color: white;
-  padding: 3px;
-  border-radius: 50%;
-  font-size: 12px;
 }
 
 .resize-handle {

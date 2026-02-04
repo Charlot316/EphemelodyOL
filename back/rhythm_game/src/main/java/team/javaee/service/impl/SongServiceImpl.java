@@ -440,6 +440,8 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
         dto.setFirstBeatDelay(song.getFirstBeatDelay());
 
         List<Track> tracks = trackMapper.selectList(new QueryWrapper<Track>().eq("song_id", songId));
+        log.info("从数据库生成谱面 [{}], 找到 {} 条轨道", song.getSongName(), tracks.size());
+
         List<TrackDTO> trackDtos = new ArrayList<>();
         for (Track t : tracks) {
             TrackDTO td = new TrackDTO();
@@ -479,6 +481,38 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
             }
             td.setMoveOperations(moveDtos);
 
+            // WidthOperations
+            List<ChangeWidthOperation> widths = changeWidthOperationMapper
+                    .selectList(new QueryWrapper<ChangeWidthOperation>().eq("based_track", t.getId()));
+            List<ChangeWidthOperationDTO> widthDtos = new ArrayList<>();
+            for (ChangeWidthOperation wo : widths) {
+                ChangeWidthOperationDTO wd = new ChangeWidthOperationDTO();
+                wd.setStartTiming(wo.getStartTiming());
+                wd.setEndTiming(wo.getEndTiming());
+                wd.setStartWidth(wo.getStartWidth());
+                wd.setEndWidth(wo.getEndWidth());
+                widthDtos.add(wd);
+            }
+            td.setChangeWidthOperations(widthDtos);
+
+            // ColorOperations
+            List<ChangeColorOperation> colors = changeColorOperationMapper
+                    .selectList(new QueryWrapper<ChangeColorOperation>().eq("based_track", t.getId()));
+            List<ChangeColorOperationDTO> colorDtos = new ArrayList<>();
+            for (ChangeColorOperation co : colors) {
+                ChangeColorOperationDTO cd = new ChangeColorOperationDTO();
+                cd.setStartTiming(co.getStartTiming());
+                cd.setEndTiming(co.getEndTiming());
+                cd.setStartR(co.getStartR());
+                cd.setStartG(co.getStartG());
+                cd.setStartB(co.getStartB());
+                cd.setEndR(co.getEndR());
+                cd.setEndG(co.getEndG());
+                cd.setEndB(co.getEndB());
+                colorDtos.add(cd);
+            }
+            td.setChangeColorOperations(colorDtos);
+
             trackDtos.add(td);
         }
         dto.setTracks(trackDtos);
@@ -491,10 +525,14 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
             ChangeBackgroundOperationDTO bd = new ChangeBackgroundOperationDTO();
             bd.setStartTiming(op.getStartTiming());
             bd.setEndTiming(op.getEndTiming());
-            bd.setAssetId(op.getAssetId()); // Use String ID from DB
+            bd.setAssetId(op.getAssetId());
             bgDtos.add(bd);
         }
         dto.setChangeBackgroundOperations(bgDtos);
+
+        // Assets
+        List<SongAsset> assets = songAssetMapper.selectList(new QueryWrapper<SongAsset>().eq("song_id", songId));
+        dto.setAssets(assets);
 
         return dto;
     }

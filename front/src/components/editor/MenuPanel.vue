@@ -32,6 +32,11 @@
         <div class="asset-preview">
           <img :src="asset.url" alt="asset" />
           <div class="asset-overlay">
+            <el-button type="primary" size="small" circle @click="copyUrl(asset)">
+              <el-icon>
+                <Link />
+              </el-icon>
+            </el-button>
             <el-button type="danger" size="small" circle @click="deleteAsset(asset)">
               <el-icon>
                 <Delete />
@@ -52,7 +57,7 @@
 
 <script setup>
 import { defineProps } from 'vue';
-import { Picture, Plus, Files, Delete } from '@element-plus/icons-vue';
+import { Picture, Plus, Files, Delete, Link } from '@element-plus/icons-vue';
 import { ElMessageBox, ElNotification } from 'element-plus';
 import { Axios } from '@/plugins/axios';
 
@@ -69,6 +74,14 @@ const handleUploadSuccess = (response) => {
   } else {
     ElNotification({ title: '失败', message: response.message, type: 'error' });
   }
+};
+
+const copyUrl = (asset) => {
+  navigator.clipboard.writeText(asset.url).then(() => {
+    ElNotification({ title: '成功', message: '链接已复制到剪贴板', type: 'success' });
+  }).catch(() => {
+    ElNotification({ title: '错误', message: '复制失败', type: 'error' });
+  });
 };
 
 const deleteAsset = (asset) => {
