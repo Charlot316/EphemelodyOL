@@ -205,6 +205,11 @@ const checkOverlap = (start, end, excludeOp) => {
     isExcluded: op === excludeOp
   })));
   
+  // 临时禁用重叠检查 - 允许背景操作重叠
+  console.log('⚠️ [BG] Overlap check disabled - allowing all moves');
+  return false;
+  
+  /* 原始重叠检查逻辑
   for (const op of props.chart.changeBackgroundOperations) {
     if (op === excludeOp) continue;
     const opEnd = op.endTiming || (op.startTiming + 2000);
@@ -222,6 +227,7 @@ const checkOverlap = (start, end, excludeOp) => {
   }
   console.log('✅ [BG] No overlap detected');
   return false;
+  */
 };
 
 const handleSegmentClick = (e, index) => {
