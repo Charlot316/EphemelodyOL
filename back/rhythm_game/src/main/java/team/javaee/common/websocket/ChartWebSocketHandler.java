@@ -10,6 +10,8 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import team.javaee.entity.domain.*;
 import team.javaee.mapper.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
@@ -18,6 +20,8 @@ import java.util.concurrent.*; // Added for heartbeat scheduler
 
 @Component
 public class ChartWebSocketHandler extends TextWebSocketHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(ChartWebSocketHandler.class);
 
     // Heartbeat tracking
     private final Map<WebSocketSession, Long> lastHeartbeat = new ConcurrentHashMap<>();
@@ -176,6 +180,10 @@ public class ChartWebSocketHandler extends TextWebSocketHandler {
                 case "ADD_NOTE":
                     Note n = objectMapper.convertValue(msg.getPayload(), Note.class); // Changed var name
                     n.setSongId(songId);
+                    // basedTrack should already be in payload, but verify it exists
+                    if (n.getBasedTrack() == null) {
+                        throw new IllegalArgumentException("basedTrack is required for ADD_NOTE");
+                    }
                     noteMapper.insert(n);
                     resultPayload = n;
                     break;
@@ -282,8 +290,10 @@ public class ChartWebSocketHandler extends TextWebSocketHandler {
                     resultPayload = uBo;
                     break;
                 case "DELETE_BG_OP":
-                    changeBackgroundOperationMapper
-                            .deleteById(objectMapper.convertValue(msg.getPayload(), Integer.class));
+                    Integer bgOpId = objectMapper.convertValue(msg.getPayload(), Integer.class);
+                    log.info("🗑️ [DELETE_BG_OP] 准备删除背景操作 ID: {}, songId: {}", bgOpId, songId);
+                    int deletedRows = changeBackgroundOperationMapper.deleteById(bgOpId);
+                    log.info("✅ [DELETE_BG_OP] 删除完成，影响行数: {}, ID: {}", deletedRows, bgOpId);
                     resultPayload = msg.getPayload();
                     break;
             }

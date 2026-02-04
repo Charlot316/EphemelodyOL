@@ -1,66 +1,33 @@
 <template>
-  <div
-    @click="selfClicked"
-    @contextmenu.prevent.stop="startEdit"
-    :style="noteStyle"
-    @mousedown="setZIndex"
-  >
+  <div @click="selfClicked" @contextmenu.prevent.stop="startEdit" :style="noteStyle" @mousedown="setZIndex">
 
-    <el-popover
-      v-model:visible="edit"
-      placement="top"
-      :width="320"
-      trigger="manual"
-      popper-class="note-editor-popover"
-    >
+    <el-popover v-model:visible="edit" placement="top" :width="320" trigger="manual" popper-class="note-editor-popover">
       <div class="note-edit-container">
         <div class="note-edit-header">
           <span class="edit-title">编辑音符</span>
           <div class="header-actions">
-            <el-button
-              circle
-              size="small"
-              class="action-btn delete"
-              @click="deleteNote"
-              title="删除音符"
-            >
-              <el-icon><Delete /></el-icon>
+            <el-button circle size="small" class="action-btn delete" @click="deleteNote" title="删除音符">
+              <el-icon>
+                <Delete />
+              </el-icon>
             </el-button>
-            <el-button
-              circle
-              size="small"
-              class="action-btn cancel"
-              @click="edit = false"
-              title="取消更改"
-            >
-              <el-icon><CircleClose /></el-icon>
+            <el-button circle size="small" class="action-btn cancel" @click="edit = false" title="取消更改">
+              <el-icon>
+                <CircleClose />
+              </el-icon>
             </el-button>
-            <el-button
-              circle
-              size="small"
-              class="action-btn save"
-              @click="saveNote"
-              title="发布音符"
-            >
-              <el-icon><CircleCheck /></el-icon>
+            <el-button circle size="small" class="action-btn save" @click="saveNote" title="发布音符">
+              <el-icon>
+                <CircleCheck />
+              </el-icon>
             </el-button>
           </div>
         </div>
 
-        <el-form
-          :model="tempNote"
-          :rules="rules"
-          ref="formRef"
-          label-position="left"
-          @submit.prevent="saveNote"
-          class="note-edit-form"
-        >
+        <el-form :model="tempNote" :rules="rules" ref="formRef" label-position="left" @submit.prevent="saveNote"
+          class="note-edit-form">
           <el-form-item label="音符类别" prop="noteType">
-            <el-radio-group
-              v-model="tempNote.noteType"
-              size="small"
-              class="custom-radio-group"
-            >
+            <el-radio-group v-model="tempNote.noteType" size="small" class="custom-radio-group">
               <el-radio-button :value="0">短键</el-radio-button>
               <el-radio-button :value="1">长键</el-radio-button>
               <el-radio-button :value="2">滑键</el-radio-button>
@@ -69,38 +36,23 @@
 
           <el-form-item label="对应按键" prop="key">
             <div class="input-with-tip">
-              <el-input
-                :disabled="track.type == 1"
-                @keydown.enter="saveNote"
-                v-model="tempNote.key"
-                placeholder="A-Z"
-                class="custom-input small-input"
-              />
+              <el-input :disabled="track.type == 1" @keydown.enter="saveNote" v-model="tempNote.key" placeholder="A-Z"
+                class="custom-input small-input" />
               <el-tooltip content="设置音符触发的按键" placement="top">
-                <el-icon class="input-tip"><QuestionFilled /></el-icon>
+                <el-icon class="input-tip">
+                  <QuestionFilled />
+                </el-icon>
               </el-tooltip>
             </div>
           </el-form-item>
 
           <el-form-item label="触发时机" prop="timing">
-            <el-input-number
-              v-model="tempNote.timing"
-              :controls="false"
-              class="custom-input-number"
-            />
+            <el-input-number v-model="tempNote.timing" :controls="false" class="custom-input-number" />
             <span class="unit-text">ms</span>
           </el-form-item>
 
-          <el-form-item
-            label="结束时机"
-            prop="endTiming"
-            v-if="tempNote.noteType == 1"
-          >
-            <el-input-number
-              v-model="tempNote.endTiming"
-              :controls="false"
-              class="custom-input-number"
-            />
+          <el-form-item label="结束时机" prop="endTiming" v-if="tempNote.noteType == 1">
+            <el-input-number v-model="tempNote.endTiming" :controls="false" class="custom-input-number" />
             <span class="unit-text">ms</span>
           </el-form-item>
         </el-form>
@@ -108,61 +60,42 @@
       <template #reference>
         <div>
           <div v-if="note.noteType == 0">
-            <el-image
-              @dragstart.prevent
-              @mousedown="longNoteCanMove"
-              style="width:40px;height:40px;user-select:none;cursor: move;"
-              :src="hitNoteImage"
-            />
+            <el-image @dragstart.prevent @mousedown="longNoteCanMove"
+              style="width:40px;height:40px;user-select:none;cursor: move;" :src="hitNoteImage" />
           </div>
           <div v-if="note.noteType == 1">
-            <div
-              @mousedown="longNoteCanMove"
-              :style="{
-                userSelect: 'none',
-                height: '38px',
-                position: 'absolute',
-                background: 'rgb(22, 22, 14)',
-                cursor: 'move',
-                width:
-                  ((note.endTiming - note.timing) / displayAreaTime) *
-                  (global.documentWidth - global.siderWidth) +
-                  'px',
-                left: '20px',
-                top: '1px',
-              }"
-            ></div>
-            <el-image
-              @dragstart.prevent
-              @mousedown="startLeftMove"
+            <div @mousedown="longNoteCanMove" :style="{
+              userSelect: 'none',
+              height: '38px',
+              position: 'absolute',
+              background: 'rgb(22, 22, 14)',
+              cursor: 'move',
+              width:
+                ((note.endTiming - note.timing) / displayAreaTime) *
+                (global.documentWidth - global.siderWidth) +
+                'px',
+              left: '20px',
+              top: '1px',
+            }"></div>
+            <el-image @dragstart.prevent @mousedown="startLeftMove"
               style="width:40px;height:40px;position:absolute;left:0;top:0;user-select: none;cursor:w-resize;"
-              :src="hitNoteLeftImage"
-            />
-            <el-image
-              @dragstart.prevent
-              @mousedown="startRightMove"
-              :style="{
-                userSelect: 'none',
-                height: '40px',
-                width: '40px',
-                position: 'absolute',
-                cursor: 'e-resize',
-                left:
-                  ((note.endTiming - note.timing) / displayAreaTime) *
-                    (global.documentWidth - global.siderWidth) +
-                  'px',
-                top: '0px',
-              }"
-              :src="hitNoteRightImage"
-            />
+              :src="hitNoteLeftImage" />
+            <el-image @dragstart.prevent @mousedown="startRightMove" :style="{
+              userSelect: 'none',
+              height: '40px',
+              width: '40px',
+              position: 'absolute',
+              cursor: 'e-resize',
+              left:
+                ((note.endTiming - note.timing) / displayAreaTime) *
+                (global.documentWidth - global.siderWidth) +
+                'px',
+              top: '0px',
+            }" :src="hitNoteRightImage" />
           </div>
           <div v-if="note.noteType == 2">
-            <el-image
-              @mousedown="longNoteCanMove"
-              @dragstart.prevent
-              style="width:40px;height:40px;cursor: move;"
-              :src="slideNoteImage"
-            />
+            <el-image @mousedown="longNoteCanMove" @dragstart.prevent style="width:40px;height:40px;cursor: move;"
+              :src="slideNoteImage" />
           </div>
         </div>
       </template>
@@ -400,13 +333,13 @@ const saveNote = () => {
       const oldState = JSON.parse(JSON.stringify(props.note));
       const newState = JSON.parse(JSON.stringify(tempNote));
       newState.key = newState.key.toUpperCase();
-      
+
       Object.assign(props.note, newState);
       edit.value = false;
       updateTrack();
 
       if (syncAction) syncAction("UPDATE_NOTE", props.note);
-      
+
       if (commandHistory) {
         commandHistory.pushCommand({
           description: 'Edit Note',
@@ -429,7 +362,12 @@ const saveNote = () => {
 const deleteSelf = () => {
   if (props.note.isDeleting) return;
   props.note.isDeleting = true;
-  if (syncAction) syncAction("DELETE_NOTE", props.note.id);
+  if (props.note.id) {
+    if (syncAction) syncAction("DELETE_NOTE", props.note.id);
+  } else {
+    // Local note logic here if needed
+    console.warn("Deleting note without ID:", props.note);
+  }
   // Removal will be handled by WebSocket message from useChartEditor
   // Also clear global selection if this was selected
   if (props.global.currentNote === props.note) {
@@ -444,7 +382,7 @@ const deleteNote = () => {
     type: "warning",
   }).then(() => {
     deleteSelf();
-  }).catch(() => {});
+  }).catch(() => { });
 };
 
 const selfClicked = () => {
@@ -454,7 +392,7 @@ const selfClicked = () => {
     hasDragged.value = false;
     return;
   }
-  
+
   if (props.currentNoteType === 3) deleteSelf();
 };
 
@@ -464,37 +402,37 @@ watch(() => props.global.mouseUp, () => {
     leftMove.value = false;
     rightMove.value = false;
     snapPoints.value = [];
-    
-    props.track.notes.sort((a,b) => a.timing - b.timing);
+
+    props.track.notes.sort((a, b) => a.timing - b.timing);
     updateTrack();
 
     const finalStart = props.note.timing;
     const finalEnd = props.note.endTiming;
-    
+
     if (finalStart !== dragStartTiming.value || finalEnd !== dragEndTiming.value) {
       const oldS = dragStartTiming.value;
       const oldE = dragEndTiming.value;
 
       if (syncAction) syncAction("UPDATE_NOTE", props.note);
-      
+
       if (commandHistory) {
         commandHistory.pushCommand({
           description: 'Move Note',
           undo: () => {
-             props.note.timing = oldS;
-             props.note.endTiming = oldE;
-             props.track.notes.sort((a,b) => a.timing - b.timing);
-             if (syncAction) syncAction("UPDATE_NOTE", props.note);
-             updateTrack();
-             updateTemp();
+            props.note.timing = oldS;
+            props.note.endTiming = oldE;
+            props.track.notes.sort((a, b) => a.timing - b.timing);
+            if (syncAction) syncAction("UPDATE_NOTE", props.note);
+            updateTrack();
+            updateTemp();
           },
           redo: () => {
-             props.note.timing = finalStart;
-             props.note.endTiming = finalEnd;
-             props.track.notes.sort((a,b) => a.timing - b.timing);
-             if (syncAction) syncAction("UPDATE_NOTE", props.note);
-             updateTrack();
-             updateTemp();
+            props.note.timing = finalStart;
+            props.note.endTiming = finalEnd;
+            props.track.notes.sort((a, b) => a.timing - b.timing);
+            if (syncAction) syncAction("UPDATE_NOTE", props.note);
+            updateTrack();
+            updateTemp();
           }
         });
       }
@@ -505,25 +443,25 @@ watch(() => props.global.mouseUp, () => {
 watch(() => props.global.mouseMove, () => {
   if (canMove.value) {
     const deltaX = props.global.clientX - dragStartX.value;
-    
+
     // 检测是否发生了实际的拖拽（移动距离超过 5px）
     if (!hasDragged.value && Math.abs(props.global.clientX - mouseDownX.value) > 5) {
       hasDragged.value = true;
     }
-    
+
     const deltaTime = Math.round((deltaX / (props.global.documentWidth - props.global.siderWidth)) * props.displayAreaTime);
     const duration = dragEndTiming.value - dragStartTiming.value;
     let newStart = dragStartTiming.value + deltaTime;
     newStart = getSnappedTime(newStart, snapPoints.value);
     let newEnd = newStart + duration;
     if (newStart < props.track.startTiming) {
-       newStart = props.track.startTiming;
-       newEnd = newStart + duration;
+      newStart = props.track.startTiming;
+      newEnd = newStart + duration;
     }
     if (newEnd > props.track.endTiming) {
-       newEnd = props.track.endTiming;
-       newStart = newEnd - duration;
-       if (newStart < props.track.startTiming) newStart = props.track.startTiming;
+      newEnd = props.track.endTiming;
+      newStart = newEnd - duration;
+      if (newStart < props.track.startTiming) newStart = props.track.startTiming;
     }
     if (!checkOverlap(newStart, newEnd, props.note)) {
       props.note.timing = newStart;
@@ -532,29 +470,29 @@ watch(() => props.global.mouseMove, () => {
     }
   } else if (leftMove.value) {
     const deltaX = props.global.clientX - dragStartX.value;
-    
+
     // 检测是否发生了实际的拖拽
     if (!hasDragged.value && Math.abs(props.global.clientX - mouseDownX.value) > 5) {
       hasDragged.value = true;
     }
-    
+
     const deltaTime = Math.round((deltaX / (props.global.documentWidth - props.global.siderWidth)) * props.displayAreaTime);
     let newStart = dragStartTiming.value + deltaTime;
     newStart = getSnappedTime(newStart, snapPoints.value);
     if (newStart < props.track.startTiming) newStart = props.track.startTiming;
-    if (newStart >= props.note.endTiming - 50) newStart = props.note.endTiming - 50; 
+    if (newStart >= props.note.endTiming - 50) newStart = props.note.endTiming - 50;
     if (!checkOverlap(newStart, props.note.endTiming, props.note)) {
       props.note.timing = newStart;
       updateTemp();
     }
   } else if (rightMove.value) {
     const deltaX = props.global.clientX - dragStartX.value;
-    
+
     // 检测是否发生了实际的拖拽
     if (!hasDragged.value && Math.abs(props.global.clientX - mouseDownX.value) > 5) {
       hasDragged.value = true;
     }
-    
+
     const deltaTime = Math.round((deltaX / (props.global.documentWidth - props.global.siderWidth)) * props.displayAreaTime);
     let newEnd = dragEndTiming.value + deltaTime;
     newEnd = getSnappedTime(newEnd, snapPoints.value);
@@ -619,9 +557,20 @@ onMounted(() => {
   transform: translateY(-2px);
 }
 
-.action-btn.delete:hover { border-color: #f56c6c !important; color: #f56c6c !important; }
-.action-btn.cancel:hover { border-color: #909399 !important; color: #909399 !important; }
-.action-btn.save:hover { border-color: #67c23a !important; color: #67c23a !important; }
+.action-btn.delete:hover {
+  border-color: #f56c6c !important;
+  color: #f56c6c !important;
+}
+
+.action-btn.cancel:hover {
+  border-color: #909399 !important;
+  color: #909399 !important;
+}
+
+.action-btn.save:hover {
+  border-color: #67c23a !important;
+  color: #67c23a !important;
+}
 
 .note-edit-form :deep(.el-form-item__label) {
   color: rgba(255, 255, 255, 0.7) !important;

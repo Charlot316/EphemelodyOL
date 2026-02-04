@@ -55,7 +55,13 @@ export function useWebSocket(songId, onMessageReceived) {
         send("PONG", null);
         return;
       }
-      console.log("WebSocket Received:", msg.type, msg.payload);
+      const timestamp = new Date().toLocaleTimeString('zh-CN', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit', fractionalSecondDigits: 3 });
+      console.log(`[${timestamp}] 📥 WebSocket 接收:`, {
+        type: msg.type,
+        payload: msg.payload,
+        clientId: msg.clientId,
+        fullMessage: msg
+      });
       onMessageReceived(msg);
     };
 
@@ -75,7 +81,7 @@ export function useWebSocket(songId, onMessageReceived) {
 
   const send = (type, payload, clientId = null) => {
     if (!socket.value || socket.value.readyState !== WebSocket.OPEN) {
-      console.warn('Socket not connected, cannot send:', type);
+      console.warn('⚠️ WebSocket 未连接，无法发送消息:', type);
       return;
     }
     const msg = {
@@ -84,7 +90,15 @@ export function useWebSocket(songId, onMessageReceived) {
       payload,
       clientId
     };
-    if (type !== 'PONG') console.log("WebSocket Send:", type, payload);
+    const timestamp = new Date().toLocaleTimeString('zh-CN', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit', fractionalSecondDigits: 3 });
+    if (type !== 'PONG') {
+      console.log(`[${timestamp}] 📤 WebSocket 发送:`, {
+        type,
+        payload,
+        clientId,
+        fullMessage: msg
+      });
+    }
     socket.value.send(JSON.stringify(msg));
   };
 

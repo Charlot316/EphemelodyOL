@@ -2,15 +2,12 @@
   <div :class="[currentClass, 'track-row-container']">
     <div class="glass-card" @dblclick="handleCurrentTrack">
       <!-- Spatial Indicator Bar (Spatial Preview) -->
-      <div
-        v-if="global.currentTime > track.startTiming && global.currentTime < track.endTiming"
-        class="spatial-indicator"
-        :style="{
+      <div v-if="global.currentTime > track.startTiming && global.currentTime < track.endTiming"
+        class="spatial-indicator" :style="{
           left: (track.tempPositionX - track.tempWidth) * 160 + 75 + 'px',
           width: 2 * track.tempWidth * 160 + 'px',
           background: `rgba(${track.tempR}, ${track.tempG}, ${track.tempB}, 0.6)`
-        }"
-      ></div>
+        }"></div>
 
       <div class="card-header">
         <div class="thumbnail-container">
@@ -24,27 +21,23 @@
           <div class="title-row">
             <div class="track-index">轨道 {{ track.index + 1 }}</div>
             <div class="action-buttons">
-              <button
-                class="icon-btn"
-                :title="track.showInTimeline ? '轴上隐藏' : '轴上显示'"
-                @click.stop="track.showInTimeline = !track.showInTimeline"
-                :class="{ 'dimmed': !track.showInTimeline }"
-              >
+              <button class="icon-btn" :title="track.showInTimeline ? '轴上隐藏' : '轴上显示'"
+                @click.stop="track.showInTimeline = !track.showInTimeline" :class="{ 'dimmed': !track.showInTimeline }">
                 <component :is="track.showInTimeline ? 'View' : 'Hide'" class="svg-icon" />
               </button>
-              
+
               <button v-if="!track.edit" class="icon-btn" @click.stop="startEdit" title="编辑">
                 <Setting class="svg-icon" />
               </button>
-              
+
               <button v-if="track.edit && !track.isNew" class="icon-btn" @click.stop="track.edit = false" title="取消">
                 <CircleClose class="svg-icon" />
               </button>
-              
+
               <button v-if="track.edit" class="icon-btn save" @click.stop="saveTrack" title="发布">
                 <CircleCheck class="svg-icon" />
               </button>
-              
+
             </div>
           </div>
           <div class="timing-info">
@@ -77,7 +70,8 @@
 
           <div class="form-item">
             <label>开始时机 (ms)</label>
-            <input type="number" v-model.number="tempTrack.startTiming" class="custom-input" @keydown.enter="saveTrack" />
+            <input type="number" v-model.number="tempTrack.startTiming" class="custom-input"
+              @keydown.enter="saveTrack" />
           </div>
 
           <div class="form-item">
@@ -87,19 +81,21 @@
 
           <div class="form-item">
             <label>横坐标 (X-Offset)</label>
-            <input type="number" step="0.01" v-model.number="tempTrack.positionX" class="custom-input" @keydown.enter="saveTrack" />
+            <input type="number" step="0.01" v-model.number="tempTrack.positionX" class="custom-input"
+              @keydown.enter="saveTrack" />
           </div>
 
           <div class="form-item">
             <label>宽度 (Width)</label>
-            <input type="number" step="0.01" v-model.number="tempTrack.width" class="custom-input" @keydown.enter="saveTrack" />
+            <input type="number" step="0.01" v-model.number="tempTrack.width" class="custom-input"
+              @keydown.enter="saveTrack" />
           </div>
 
           <div class="form-item">
             <label>主题色彩</label>
             <div class="color-picker-row">
-               <input type="color" v-model="tempTrack.hexColor" class="custom-color-input" @change="onColorChange" />
-               <input type="text" v-model="tempTrack.hexColor" class="custom-input hex-input" @change="onColorChange" />
+              <input type="color" v-model="tempTrack.hexColor" class="custom-color-input" @change="onColorChange" />
+              <input type="text" v-model="tempTrack.hexColor" class="custom-input hex-input" @change="onColorChange" />
             </div>
           </div>
         </div>
@@ -166,13 +162,13 @@ const currentClass = computed(() => {
   let cls = props.track.edit ? "edit-track " : "not-edit-track ";
   const { currentTime } = props.global;
   const { startTiming, endTiming } = props.track;
-  
+
   if (currentTime > startTiming && currentTime < endTiming) cls += "current-track ";
   else if (currentTime > endTiming) cls += "passed-track ";
   else cls += "to-come-track ";
 
   if (props.track.isPending || props.track.isDeleting) cls += "pending-track ";
-  
+
   return cls;
 });
 
@@ -223,16 +219,25 @@ const saveTrack = () => {
     ElNotification({ title: "错误", message: "按键必须为单个字母", type: "error" });
     return;
   }
-  
+
   Object.assign(props.track, tempTrack);
   props.track.key = props.track.key.toUpperCase();
   props.track.edit = false;
-  
-  if (syncAction) syncAction("UPDATE_TRACK", props.track);
-  
-  if (props.track.isNew) emit("editStatus", true);
-  props.track.isNew = false;
-  
+
+  if (props.track.isNew) {
+    // New track: use ADD_TRACK with clientId
+    const uuid = inject('uuid');
+    const clientId = uuid();
+    props.track.clientId = clientId;
+    props.track.isPending = true;
+    if (syncAction) syncAction("ADD_TRACK", props.track, clientId);
+    emit("editStatus", true);
+    props.track.isNew = false;
+  } else {
+    // Existing track: use UPDATE_TRACK
+    if (syncAction) syncAction("UPDATE_TRACK", props.track);
+  }
+
   updateTrack();
 };
 
@@ -278,7 +283,8 @@ onMounted(() => {
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
-  overflow: visible; /* Crucial for spatial indicator */
+  overflow: visible;
+  /* Crucial for spatial indicator */
 }
 
 .track-row-container:hover .glass-card {
@@ -308,7 +314,7 @@ onMounted(() => {
   z-index: 100;
   pointer-events: none;
   border-radius: 1px;
-  box-shadow: 0 0 8px rgba(255,255,255,0.3);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
 }
 
 .card-header {
@@ -326,7 +332,7 @@ onMounted(() => {
   overflow: hidden;
   flex-shrink: 0;
   background: #111;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
 .thumbnail-img {
@@ -352,8 +358,8 @@ onMounted(() => {
   color: white;
   font-size: 26px;
   font-weight: 900;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.8);
-  background: rgba(0,0,0,0.15);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.15);
 }
 
 .info-side {
@@ -383,7 +389,7 @@ onMounted(() => {
 }
 
 .icon-btn {
-  background: rgba(255,255,255,0.03);
+  background: rgba(255, 255, 255, 0.03);
   border: none;
   cursor: pointer;
   padding: 5px;
@@ -396,13 +402,21 @@ onMounted(() => {
 }
 
 .icon-btn:hover {
-  background: rgba(255,255,255,0.1);
+  background: rgba(255, 255, 255, 0.1);
   color: #fff;
 }
 
-.icon-btn.delete:hover { color: #ff5e5e; }
-.icon-btn.save:hover { color: #2ecc71; }
-.icon-btn.dimmed { opacity: 0.3; }
+.icon-btn.delete:hover {
+  color: #ff5e5e;
+}
+
+.icon-btn.save:hover {
+  color: #2ecc71;
+}
+
+.icon-btn.dimmed {
+  opacity: 0.3;
+}
 
 .svg-icon {
   width: 15px;
@@ -427,7 +441,7 @@ onMounted(() => {
 .edit-form-scrollable {
   margin-top: 14px;
   padding-top: 14px;
-  border-top: 1px solid rgba(255,255,255,0.08);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
   height: calc(100% - 75px);
   overflow-y: auto;
   overflow-x: hidden;
@@ -438,7 +452,7 @@ onMounted(() => {
 }
 
 .edit-form-scrollable::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.1);
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 2px;
 }
 
@@ -513,10 +527,19 @@ onMounted(() => {
   flex-shrink: 0;
 }
 
-.custom-color-input::-webkit-color-swatch-wrapper { padding: 0; }
-.custom-color-input::-webkit-color-swatch { border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 6px; }
+.custom-color-input::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
 
-.hex-input { font-family: monospace; font-size: 11px; }
+.custom-color-input::-webkit-color-swatch {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+}
+
+.hex-input {
+  font-family: monospace;
+  font-size: 11px;
+}
 
 /* Animation overrides */
 .animate__animated {

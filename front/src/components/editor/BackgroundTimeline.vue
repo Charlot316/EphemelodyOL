@@ -28,15 +28,13 @@
           </div>
 
           <!-- 背景操作片段 -->
-          <div v-for="(op, index) in chart.changeBackgroundOperations" :key="index" class="bg-segment" 
-            :class="{ selected: selectedIndex === index }"
-            :style="{
+          <div v-for="(op, index) in chart.changeBackgroundOperations" :key="index" class="bg-segment"
+            :class="{ selected: selectedIndex === index }" :style="{
               left: (op.startTiming / displayAreaTime) * (global.documentWidth - global.siderWidth) + 'px',
               width: (((op.endTiming || (op.startTiming + 2000)) - op.startTiming) / displayAreaTime) * (global.documentWidth - global.siderWidth) + 'px'
-            }" 
-            @mousedown.stop="handleSegmentClick($event, index)" 
+            }" @mousedown.stop="handleSegmentClick($event, index)"
             @contextmenu.prevent="handleRightClick($event, index)">
-            
+
             <!-- Resize Handles -->
             <div class="resize-handle left" @mousedown.stop="startResizeLeft($event, op)"></div>
             <div class="resize-handle right" @mousedown.stop="startResizeRight($event, op)"></div>
@@ -223,7 +221,7 @@ const handleSegmentClick = (e, index) => {
 const handleRightClick = (e, index) => {
   selectedIndex.value = index;
   const op = props.chart.changeBackgroundOperations[index];
-  
+
   // Open Edit Dialog
   editingOp.value = JSON.parse(JSON.stringify(op));
   originalOpData.value = op;
@@ -232,17 +230,17 @@ const handleRightClick = (e, index) => {
 
 const saveEdit = () => {
   if (!editingOp.value || !originalOpData.value) return;
-  
+
   const op = originalOpData.value;
   const oldData = JSON.parse(JSON.stringify(op));
   const newData = editingOp.value;
-  
+
   // Apply changes
   Object.assign(op, newData);
   props.chart.changeBackgroundOperations.sort((a, b) => a.startTiming - b.startTiming);
-  
+
   if (syncAction) syncAction("UPDATE_BG_OP", op);
-  
+
   if (commandHistory) {
     commandHistory.pushCommand({
       description: 'Edit BG Op',
@@ -260,7 +258,7 @@ const saveEdit = () => {
       }
     });
   }
-  
+
   editDialogVisible.value = false;
   props.global.reCalculateChartMaker = !props.global.reCalculateChartMaker;
 };
@@ -276,7 +274,11 @@ const deleteOp = (index) => {
   const op = props.chart.changeBackgroundOperations[index];
   props.chart.changeBackgroundOperations.splice(index, 1);
 
-  if (syncAction) syncAction("DELETE_BG_OP", op.id);
+  if (op.id) {
+    if (syncAction) syncAction("DELETE_BG_OP", op.id);
+  } else {
+    console.warn("[BG] Deleting item without ID (local only):", op);
+  }
 
   if (commandHistory) {
     commandHistory.pushCommand({
