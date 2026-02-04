@@ -197,48 +197,24 @@ const getBackgroundUrl = (op) => {
 };
 
 const checkOverlap = (start, end, excludeOp) => {
-  console.log('🔍 [BG] checkOverlap called', { start, end, excludeOpId: excludeOp?.id });
-  console.log('📋 [BG] All operations:', props.chart.changeBackgroundOperations.map(op => ({
-    id: op.id,
-    start: op.startTiming,
-    end: op.endTiming,
-    isExcluded: op === excludeOp
-  })));
-  
-  // 临时禁用重叠检查 - 允许背景操作重叠
-  console.log('⚠️ [BG] Overlap check disabled - allowing all moves');
-  return false;
-  
-  /* 原始重叠检查逻辑
   for (const op of props.chart.changeBackgroundOperations) {
     if (op === excludeOp) continue;
     const opEnd = op.endTiming || (op.startTiming + 2000);
     // Strict overlap check
     if (start < opEnd && end > op.startTiming) {
-      console.warn('❌ [BG] Overlap detected with op:', { 
-        opId: op.id, 
-        opStart: op.startTiming, 
-        opEnd, 
-        newStart: start, 
-        newEnd: end 
-      });
       return true;
     }
   }
-  console.log('✅ [BG] No overlap detected');
   return false;
-  */
 };
 
 const handleSegmentClick = (e, index) => {
-  console.log('🖱️ [BG] handleSegmentClick', { index, currentNoteType: props.global.currentNoteType });
   if (props.global.currentNoteType === 3) {
     deleteOp(index);
     return;
   }
   selectedIndex.value = index;
   const op = props.chart.changeBackgroundOperations[index];
-  console.log('🖱️ [BG] Starting drag for op:', op);
   startDragOp(e, op);
 };
 
@@ -325,12 +301,6 @@ const deleteOp = (index) => {
 
 // Dragging Handlers
 const startDragOp = (e, op) => {
-  console.log('🎯 [BG] startDragOp called', {
-    op,
-    clientX: props.global.clientX,
-    startTiming: op.startTiming,
-    endTiming: op.endTiming
-  });
   draggingOp.value = op;
   dragType.value = 'move';
   dragStartX.value = props.global.clientX;
@@ -338,7 +308,6 @@ const startDragOp = (e, op) => {
   dragStartEndTiming.value = op.endTiming || (op.startTiming + 2000);
 
   snapPoints.value = collectSnapPoints(op);
-  console.log('✅ [BG] Drag initialized', { draggingOp: draggingOp.value, dragType: dragType.value });
 };
 
 const startResizeLeft = (e, op) => {
@@ -365,7 +334,6 @@ const onMouseMove = () => {
   if (draggingOp.value) {
     const deltaX = props.global.clientX - dragStartX.value;
     const deltaTime = Math.round((deltaX / (props.global.documentWidth - props.global.siderWidth)) * props.displayAreaTime);
-    console.log('🚀 [BG] onMouseMove', { deltaX, deltaTime, dragType: dragType.value });
 
     if (dragType.value === 'move') {
       const duration = dragStartEndTiming.value - dragStartStartTiming.value;
@@ -375,17 +343,10 @@ const onMouseMove = () => {
       newStart = getSnappedTime(newStart, snapPoints.value);
       let newEnd = newStart + duration;
 
-      const hasOverlap = checkOverlap(newStart, newEnd, draggingOp.value);
-      console.log('📍 [BG] Move check:', { newStart, newEnd, hasOverlap, oldStart: draggingOp.value.startTiming });
-      
-      if (!hasOverlap) {
+      if (!checkOverlap(newStart, newEnd, draggingOp.value)) {
         draggingOp.value.startTiming = newStart;
         draggingOp.value.endTiming = newEnd;
-        console.log('✨ [BG] Position updated!', { newStart, newEnd });
-      } else {
-        console.warn('⚠️ [BG] Move blocked by overlap');
       }
-
 
     } else if (dragType.value === 'left') {
       let newStart = dragStartStartTiming.value + deltaTime;
@@ -411,7 +372,6 @@ const onMouseMove = () => {
 };
 
 const onMouseUp = () => {
-  console.log('🛑 [BG] onMouseUp', { draggingOp: draggingOp.value });
   if (draggingOp.value) {
     props.chart.changeBackgroundOperations.sort((a, b) => a.startTiming - b.startTiming);
 

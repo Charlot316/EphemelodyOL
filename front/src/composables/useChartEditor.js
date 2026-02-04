@@ -435,13 +435,16 @@ export function useChartEditor(route, router) {
   };
 
   let isPublishing = false; // 防止重复发布
+  console.log('🔧 [PUBLISH] isPublishing initialized:', isPublishing);
 
   const executeFinalSave = async (back) => {
+    console.log('📢 [PUBLISH] executeFinalSave called, isPublishing:', isPublishing);
     if (isPublishing) {
       console.warn('⚠️ 发布操作正在进行中，忽略重复调用');
       return;
     }
     isPublishing = true;
+    console.log('✅ [PUBLISH] Setting isPublishing to true');
     try {
       const { data: res } = await Axios.post("/chart/editChartContent", chart);
       if (res.code !== 0) {
@@ -453,10 +456,11 @@ export function useChartEditor(route, router) {
     } catch (err) {
       ElNotification({ title: "错误", message: "网络异常", type: "error" });
     } finally {
-      // 2秒后重置标志，允许下次发布
+      // 500ms后重置标志，允许下次发布
       setTimeout(() => {
         isPublishing = false;
-      }, 2000);
+        console.log('🔓 [PUBLISH] isPublishing reset to false');
+      }, 500);
     }
   };
 
