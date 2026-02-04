@@ -69,6 +69,9 @@ public interface SongService extends IService<Song> {
         // 从 JSON 重置数据库
         ReturnResponse<String> resetChartFromJSON(Integer songId);
 
+        // 获取谱面详情 (包含轨道和音符)
+        ReturnResponse<ChartContentDTO> getChart(Integer songId);
+
         // 强制同步所有 DB 到 JSON
         ReturnResponse<String> forceSyncAll();
 }

@@ -31,3 +31,12 @@ server:
       charset: UTF-8
       force: true
       enabled: true
+
+# Cloudflare R2 Config
+cloudflare:
+  r2:
+    endpoint: https://<account_id>.r2.cloudflarestorage.com
+    access-key: ${R2_ACCESS_KEY_ID:your-access-key}
+    secret-key: ${R2_SECRET_ACCESS_KEY:your-secret-key}
+    bucket-name: your-bucket-name
+    public-url: https://pub-xxx.r2.dev # or your custom domain

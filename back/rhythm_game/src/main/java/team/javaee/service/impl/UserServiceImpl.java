@@ -14,6 +14,7 @@ import team.javaee.entity.domain.*;
 import team.javaee.entity.dto.*;
 import team.javaee.entity.vo.*;
 import team.javaee.mapper.*;
+import team.javaee.service.FileStorageService;
 import team.javaee.service.UserService;
 
 import javax.servlet.http.Cookie;
@@ -69,6 +70,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Autowired
     private SongAssetMapper songAssetMapper;
+
+    @Autowired
+    private FileStorageService fileStorageService;
 
     @Value("${web.upload-path}")
     private String uploadPath;
@@ -211,27 +215,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         try {
             String userId = Objects.requireNonNull(Normal.getUserIdByCookie(req));
             ImageVO imageVO = new ImageVO();
-            String realPath = uploadPath + "image/user/";
-            // String realPath =
-            // "E:\\新建文件夹\\j2ee_springboot\\rhythm_game\\src\\main\\resources\\static\\files\\";
-            // String realPath = "D:\\资料\\3
-            // 大三下\\j2ee架构\\大作业\\j2ee_springboot\\rhythm_game\\src\\main\\resources\\static\\files\\";
-            File folder = new File(realPath);
-            if (!folder.exists()) {
-                folder.mkdirs();
-            }
-            String oldName = file.getOriginalFilename();
+
+            // 使用 R2 存储头像
+            String url = fileStorageService.uploadFile(file, "avatars");
+
             User user = userMapper.selectById(userId);
-            String newName = UUID.randomUUID().toString() + oldName.substring(oldName.lastIndexOf("."));
-            file.transferTo(new File(folder, newName));
-            String url = req.getScheme() + "://" + req.getServerName() + ":" + req.getServerPort() + "/image/user/"
-                    + newName;
-            System.out.println("用户名为" + userId);
-            user.setIcon(url);
-            System.out.println(url);
-            QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
-            userQueryWrapper.eq("user_id", user.getUserId());
-            userMapper.update(user, userQueryWrapper);
+            if (user != null) {
+                user.setIcon(url);
+                QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+                userQueryWrapper.eq("user_id", user.getUserId());
+                userMapper.update(user, userQueryWrapper);
+            }
+
             imageVO.setUrl(url);
             return ReturnResponse.OK(imageVO);
         } catch (Exception e) {
