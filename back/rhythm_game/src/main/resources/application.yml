@@ -24,11 +24,11 @@ mybatis-plus:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 cloudflare:
   r2:
-    endpoint: ${R2_ENDPOINT}
-    access-key: ${R2_ACCESS_KEY_ID}
-    secret-key: ${R2_SECRET_ACCESS_KEY}
-    bucket-name: ${R2_BUCKET_NAME}
-    public-url: ${R2_PUBLIC_URL}
+    endpoint: ${R2_ENDPOINT:https://your-account-id.r2.cloudflarestorage.com}
+    access-key: ${R2_ACCESS_KEY_ID:your-access-key}
+    secret-key: ${R2_SECRET_ACCESS_KEY:your-secret-key}
+    bucket-name: ${R2_BUCKET_NAME:your-bucket-name}
+    public-url: ${R2_PUBLIC_URL:https://your-public-url.com}
 server:
   port: 8090
   servlet:

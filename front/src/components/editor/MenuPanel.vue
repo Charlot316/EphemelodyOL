@@ -19,7 +19,7 @@
       </div>
     </div>
 
-    <div class="assets-grid" :style="{ height: Height - 60 + 'px' }">
+    <div class="assets-list">
       <div v-if="!chart.assets || chart.assets.length === 0" class="empty-state">
         <el-icon>
           <Files />
@@ -27,7 +27,7 @@
         <p>暂无资源</p>
         <p class="sub">点击上方按钮上传</p>
       </div>
-      <div v-for="asset in chart.assets" :key="asset.id" class="asset-item" draggable="true"
+      <div v-for="asset in filteredAssets" :key="asset.id" class="asset-item" draggable="true"
         @dragstart="onDragStart($event, asset)">
         <div class="asset-preview">
           <img :src="asset.url" alt="asset" />
@@ -56,7 +56,7 @@
 </template>
 
 <script setup>
-import { defineProps } from 'vue';
+import { defineProps, computed } from 'vue';
 import { Picture, Plus, Files, Delete, Link } from '@element-plus/icons-vue';
 import { ElMessageBox, ElNotification } from 'element-plus';
 import { Axios } from '@/plugins/axios';
@@ -65,6 +65,16 @@ const props = defineProps({
   chart: Object,
   global: Object,
   Height: Number
+});
+
+const filteredAssets = computed(() => {
+  if (!props.chart.assets) return [];
+  // 过滤掉封面和默认背景，避免重复存储和显示（用户要求 cover/bg 不纳入 asset 管理）
+  return props.chart.assets.filter(asset => {
+    const isCover = (asset.name === 'Cover' || asset.url === props.chart.songCover);
+    const isDefaultBg = (asset.name === 'DefaultBackground' || asset.url === props.chart.defaultBackground);
+    return !isCover && !isDefaultBg;
+  });
 });
 
 const handleUploadSuccess = (response) => {
@@ -123,6 +133,9 @@ const onDragStart = (event, asset) => {
   height: 100%;
   background: #1e1e1e;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .panel-header {
@@ -156,21 +169,25 @@ const onDragStart = (event, asset) => {
   color: #fff !important;
 }
 
-.assets-grid {
+.assets-list {
+  flex: 1;
+  min-height: 0;
+  /* 关键：允许 flex 子元素在内容超出时收缩，从而触发滚动 */
   margin-top: 12px;
   display: flex;
   flex-direction: column;
   gap: 16px;
   overflow-y: auto;
+  overflow-x: hidden;
   padding-bottom: 20px;
   padding-right: 4px;
 }
 
-.assets-grid::-webkit-scrollbar {
+.assets-list::-webkit-scrollbar {
   width: 4px;
 }
 
-.assets-grid::-webkit-scrollbar-thumb {
+.assets-list::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 2px;
 }
@@ -181,6 +198,9 @@ const onDragStart = (event, asset) => {
   overflow: hidden;
   transition: transform 0.2s;
   cursor: grab;
+  flex-shrink: 0;
+  /* 绝对不允许在纵向被挤压 */
+  width: 100%;
 }
 
 .asset-item:hover {
@@ -191,16 +211,19 @@ const onDragStart = (event, asset) => {
 .asset-preview {
   position: relative;
   overflow: hidden;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.4);
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100px;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  /* 给出一个默认比例，防止初始加载时高度坍塌 */
+  min-height: 120px;
 }
 
 .asset-preview img {
-  max-width: 100%;
-  max-height: 300px;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
   display: block;
 }

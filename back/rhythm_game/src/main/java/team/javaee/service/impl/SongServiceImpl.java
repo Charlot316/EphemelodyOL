@@ -130,6 +130,19 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
             song.setLoadedText(editChartDTO.getLoadedText());
             song.setChartConstant(editChartDTO.getChartConstant());
             songMapper.updateById(song);
+
+            // [逻辑优化] 确保 Cover 和 DefaultBackground 不在 song_asset 中重复存在
+            if (song.getSongCover() != null) {
+                songAssetMapper.delete(new QueryWrapper<SongAsset>()
+                        .eq("song_id", song.getId())
+                        .eq("url", song.getSongCover()));
+            }
+            if (song.getDefaultBackground() != null) {
+                songAssetMapper.delete(new QueryWrapper<SongAsset>()
+                        .eq("song_id", song.getId())
+                        .eq("url", song.getDefaultBackground()));
+            }
+
             return ReturnResponse.OK("更新成功！");
         } catch (Exception e) {
             log.error("更新谱面信息失败", e);
@@ -601,9 +614,17 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
         }
         dto.setChangeBackgroundOperations(bgDtos);
 
-        // Assets (仅包含未标记删除的)
-        List<SongAsset> assets = songAssetMapper.selectList(
-                new QueryWrapper<SongAsset>().eq("song_id", songId).eq("is_deleted", 0));
+        // Assets (仅包含未标记删除的，且排除已设为封面或背景的资源，确保“只存一份”)
+        QueryWrapper<SongAsset> assetWrapper = new QueryWrapper<SongAsset>()
+                .eq("song_id", songId)
+                .eq("is_deleted", 0);
+        if (song.getSongCover() != null) {
+            assetWrapper.ne("url", song.getSongCover());
+        }
+        if (song.getDefaultBackground() != null) {
+            assetWrapper.ne("url", song.getDefaultBackground());
+        }
+        List<SongAsset> assets = songAssetMapper.selectList(assetWrapper);
         dto.setAssets(assets);
 
         return dto;
