@@ -223,10 +223,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
             User user = userMapper.selectById(userId);
             if (user != null) {
+                // 如果旧头像在 R2 上，先尝试删除
+                if (user.getIcon() != null && !user.getIcon().isEmpty()) {
+                    fileStorageService.deleteFile(user.getIcon());
+                }
                 user.setIcon(url);
-                QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
-                userQueryWrapper.eq("user_id", user.getUserId());
-                userMapper.update(user, userQueryWrapper);
+                userMapper.updateById(user);
             }
 
             imageVO.setUrl(url);

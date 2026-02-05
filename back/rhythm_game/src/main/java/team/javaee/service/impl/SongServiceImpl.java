@@ -110,11 +110,22 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
             if (!editChartDTO.getUploaderId().equals(song.getUploaderId())) {
                 return ReturnResponse.packageObject("您没有权利修改当前谱面", ReturnStatus.FAILURE);
             }
+            if (editChartDTO.getSongUrl() != null && !editChartDTO.getSongUrl().equals(song.getSongUrl())) {
+                fileStorageService.deleteFile(song.getSongUrl());
+                song.setSongUrl(editChartDTO.getSongUrl());
+            }
+            if (editChartDTO.getDefaultBackground() != null
+                    && !editChartDTO.getDefaultBackground().equals(song.getDefaultBackground())) {
+                fileStorageService.deleteFile(song.getDefaultBackground());
+                song.setDefaultBackground(editChartDTO.getDefaultBackground());
+            }
+            if (editChartDTO.getSongCover() != null && !editChartDTO.getSongCover().equals(song.getSongCover())) {
+                fileStorageService.deleteFile(song.getSongCover());
+                song.setSongCover(editChartDTO.getSongCover());
+            }
+
             song.setSongName(editChartDTO.getSongName());
             song.setSongWriter(editChartDTO.getSongWriter());
-            song.setSongUrl(editChartDTO.getSongUrl());
-            song.setDefaultBackground(editChartDTO.getDefaultBackground());
-            song.setSongCover(editChartDTO.getSongCover());
             song.setLoadingText(editChartDTO.getLoadingText());
             song.setLoadedText(editChartDTO.getLoadedText());
             song.setChartConstant(editChartDTO.getChartConstant());
@@ -132,6 +143,9 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
             String url = fileStorageService.uploadFile(file, "covers");
             Song song = songMapper.selectById(songId);
             if (song != null) {
+                if (song.getSongCover() != null && !song.getSongCover().isEmpty()) {
+                    fileStorageService.deleteFile(song.getSongCover());
+                }
                 song.setSongCover(url);
                 songMapper.updateById(song);
             }
@@ -151,6 +165,9 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
             String url = fileStorageService.uploadFile(file, "backgrounds");
             Song song = songMapper.selectById(songId);
             if (song != null) {
+                if (song.getDefaultBackground() != null && !song.getDefaultBackground().isEmpty()) {
+                    fileStorageService.deleteFile(song.getDefaultBackground());
+                }
                 song.setDefaultBackground(url);
                 songMapper.updateById(song);
             }
@@ -169,6 +186,9 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
             String url = fileStorageService.uploadFile(file, "mp3");
             Song song = songMapper.selectById(songId);
             if (song != null) {
+                if (song.getSongUrl() != null && !song.getSongUrl().isEmpty()) {
+                    fileStorageService.deleteFile(song.getSongUrl());
+                }
                 song.setSongUrl(url);
                 songMapper.updateById(song);
             }
@@ -207,7 +227,17 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
                 song.setNotesCount(notesCount);
                 songMapper.updateById(song);
             }
-            return ReturnResponse.OK("发布谱面成功！云端文件已同步。");
+
+            // [逻辑完善] 物理删除所有标记为 isDeleted 的资源
+            List<SongAsset> deletedAssets = songAssetMapper.selectList(
+                    new QueryWrapper<SongAsset>().eq("song_id", songId).eq("is_deleted", 1));
+            for (SongAsset asset : deletedAssets) {
+                log.info("🚀 [Publish Clean] 正在物理删除资源: {}", asset.getName());
+                fileStorageService.deleteFile(asset.getUrl());
+                songAssetMapper.deleteById(asset.getId());
+            }
+
+            return ReturnResponse.OK("发布谱面成功！云端文件已同步，已清理过期资源。");
         } catch (Exception e) {
             log.error("同步谱面失败", e);
             return ReturnResponse.systemException(ReturnStatus.BUSINESS_EXCEPTION);
@@ -332,10 +362,13 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
         try {
             SongAsset asset = songAssetMapper.selectById(id);
             if (asset != null) {
-                fileStorageService.deleteFile(asset.getUrl());
-                songAssetMapper.deleteById(id);
+                // 不直接删除 R2 资源，仅在数据库标记为已删除
+                // 待到用户点击“保存发布（editChartContent）”时再统一清理
+                asset.setIsDeleted(1);
+                songAssetMapper.updateById(asset);
+                log.info("🗑️ [Soft Delete] 资源已标记删除: {}", asset.getName());
             }
-            return ReturnResponse.OK("删除成功");
+            return ReturnResponse.OK("已标记删除，发布后生效");
         } catch (Exception e) {
             return ReturnResponse.systemException(ReturnStatus.BUSINESS_EXCEPTION);
         }
@@ -530,8 +563,9 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
         }
         dto.setChangeBackgroundOperations(bgDtos);
 
-        // Assets
-        List<SongAsset> assets = songAssetMapper.selectList(new QueryWrapper<SongAsset>().eq("song_id", songId));
+        // Assets (仅包含未标记删除的)
+        List<SongAsset> assets = songAssetMapper.selectList(
+                new QueryWrapper<SongAsset>().eq("song_id", songId).eq("is_deleted", 0));
         dto.setAssets(assets);
 
         return dto;

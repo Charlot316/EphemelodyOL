@@ -30,4 +30,10 @@ public class SongAsset implements Serializable {
 
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
+
+    /**
+     * 是否已删除（0-未删除，1-已删除）
+     * 标记为删除的资源将在下一次发布谱面时从 R2 中物理删除
+     */
+    private Integer isDeleted = 0;
 }
