@@ -7,9 +7,7 @@
         <div class="profile-card glass">
           <div class="profile-header">
             <div class="avatar-section">
-              <el-upload class="avatar-uploader" :action="$http.defaults.baseURL + '/user/uploadIcon'" with-credentials
-                name="file" accept=".jpg,.png" :show-file-list="false" :on-success="handleAvatarSuccess"
-                :before-upload="beforeAvatarUpload">
+              <div class="avatar-uploader" @click="triggerUpload">
                 <img v-if="userIcon" :src="userIcon" class="avatar" />
                 <div v-else class="avatar-placeholder">
                   <i class="el-icon-plus"></i>
@@ -17,7 +15,9 @@
                 <div class="avatar-overlay">
                   <i class="el-icon-camera"></i>
                 </div>
-              </el-upload>
+              </div>
+              <!-- Hidden file input for cropper -->
+              <input type="file" ref="fileInput" style="display: none" accept="image/*" @change="onFileChange" />
             </div>
             <div class="user-info">
               <h1 class="username">{{ username }}</h1>
@@ -67,15 +67,32 @@
         </span>
       </template>
     </el-dialog>
+
+    <!-- Avatar Crop Dialog -->
+    <el-dialog title="裁剪头像" v-model="cropperVisible" width="600px" custom-class="glass-dialog"
+      :close-on-click-modal="false" destroy-on-close>
+      <div class="cropper-wrapper">
+        <vue-cropper ref="cropper" :src="imgSrc" :aspect-ratio="1" :view-mode="1" drag-mode="move" :auto-crop-area="1"
+          style="width: 100%; height: 400px;" />
+      </div>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="cropperVisible = false">{{ $t('common.cancel') }}</el-button>
+          <el-button type="primary" @click="cropAndUpload" :loading="uploading">确认上传</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import Header from "../components/Header";
 import BackgroundDisplay from "@/components/BackgroundDisplay";
+import VueCropper from 'vue-cropperjs';
+import 'cropperjs/dist/cropper.css';
 
 export default {
-  components: { Header, BackgroundDisplay },
+  components: { Header, BackgroundDisplay, VueCropper },
   data() {
     return {
       noteSpeed: 1000,
@@ -83,7 +100,10 @@ export default {
       passwordForm: {
         oldPassword: "",
         newPassword: ""
-      }
+      },
+      cropperVisible: false,
+      imgSrc: "",
+      uploading: false
     };
   },
   computed: {
@@ -112,21 +132,64 @@ export default {
     formatTooltip(val) {
       return `${val}ms`;
     },
-    handleAvatarSuccess(res) {
-      if (res.code === 0) {
-        this.$message.success(this.$t('profile.avatarSuccess'));
-        // 后端 ImageVO 返回的是 url
-        this.$store.commit("changeParam", { key: "icon", value: res.data.url });
-      } else {
-        this.$message.error(res.msg || this.$t('profile.uploadFailed'));
+    triggerUpload() {
+      this.$refs.fileInput.click();
+    },
+    onFileChange(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      if (!file.type.startsWith('image/')) {
+        return this.$message.error(this.$t('profile.formatError'));
       }
+      // 放宽到 10MB
+      if (file.size > 10 * 1024 * 1024) {
+        return this.$message.error(this.$t('profile.sizeError') + " (Max 10MB)");
+      }
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        this.imgSrc = event.target.result;
+        this.cropperVisible = true;
+        // 重置 input 以便下次选择同一文件
+        e.target.value = '';
+      };
+      reader.readAsDataURL(file);
+    },
+    async cropAndUpload() {
+      const canvas = this.$refs.cropper.getCroppedCanvas({
+        width: 400,
+        height: 400
+      });
+
+      this.uploading = true;
+      canvas.toBlob(async (blob) => {
+        const formData = new FormData();
+        formData.append('file', blob, 'avatar.png');
+
+        try {
+          const { data: res } = await this.$http.post('/user/uploadIcon', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+          });
+          if (res.code === 0) {
+            this.$message.success(this.$t('profile.avatarSuccess'));
+            this.$store.commit("changeParam", { key: "icon", value: res.data.url });
+            this.cropperVisible = false;
+          } else {
+            this.$message.error(res.msg || this.$t('profile.uploadFailed'));
+          }
+        } catch (err) {
+          this.$message.error(this.$t('common.error'));
+        } finally {
+          this.uploading = false;
+        }
+      }, 'image/png');
     },
     beforeAvatarUpload(file) {
       const isValid = file.type === "image/jpeg" || file.type === "image/png";
-      const isLt2M = file.size / 1024 / 1024 < 2;
+      const isLt10M = file.size / 1024 / 1024 < 10;
       if (!isValid) this.$message.error(this.$t('profile.formatError'));
-      if (!isLt2M) this.$message.error(this.$t('profile.sizeError'));
-      return isValid && isLt2M;
+      if (!isLt10M) this.$message.error(this.$t('profile.sizeError') + " (Max 10MB)");
+      return isValid && isLt10M;
     },
     async changePassword() {
       if (!this.passwordForm.oldPassword || !this.passwordForm.newPassword) {
