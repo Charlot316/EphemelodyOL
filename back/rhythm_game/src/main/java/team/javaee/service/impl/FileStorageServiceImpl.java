@@ -131,14 +131,14 @@ public class FileStorageServiceImpl implements FileStorageService {
 
     private void compressImageToWebP(Path input, Path output) throws IOException, InterruptedException {
         ProcessBuilder pb = new ProcessBuilder(
-                "cwebp", "-q", "75", input.toString(), "-o", output.toString());
+                "/opt/homebrew/bin/cwebp", "-q", "75", input.toString(), "-o", output.toString());
         runProcess(pb, "图片压缩 (cwebp)");
     }
 
     private void compressVideo(Path input, Path output) throws IOException, InterruptedException {
         // 使用 ffmpeg 进行视频压缩，限制为 1080p 并在速度和质量间取得平衡
         ProcessBuilder pb = new ProcessBuilder(
-                "ffmpeg", "-y", "-i", input.toString(),
+                "/opt/homebrew/bin/ffmpeg", "-y", "-i", input.toString(),
                 "-vcodec", "libx264", "-crf", "28", "-preset", "faster",
                 "-vf", "scale=-2:1080", // 限制高度 1080，宽度自动且为偶数
                 "-acodec", "aac", "-b:a", "128k",
