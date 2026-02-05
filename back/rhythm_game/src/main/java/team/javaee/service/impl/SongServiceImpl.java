@@ -131,17 +131,8 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
             song.setChartConstant(editChartDTO.getChartConstant());
             songMapper.updateById(song);
 
-            // [逻辑优化] 确保 Cover 和 DefaultBackground 不在 song_asset 中重复存在
-            if (song.getSongCover() != null) {
-                songAssetMapper.delete(new QueryWrapper<SongAsset>()
-                        .eq("song_id", song.getId())
-                        .eq("url", song.getSongCover()));
-            }
-            if (song.getDefaultBackground() != null) {
-                songAssetMapper.delete(new QueryWrapper<SongAsset>()
-                        .eq("song_id", song.getId())
-                        .eq("url", song.getDefaultBackground()));
-            }
+            // [逻辑优化] 直接通过 SQL 清洗 song_asset 表，删除与封面/背景重复的资产项
+            songAssetMapper.deleteDuplicateAssets(song.getId());
 
             return ReturnResponse.OK("更新成功！");
         } catch (Exception e) {
@@ -249,6 +240,9 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
                 fileStorageService.deleteFile(asset.getUrl());
                 songAssetMapper.deleteById(asset.getId());
             }
+
+            // [逻辑完善] 通过 SQL 直接清理重复的封面/背景资产项
+            songAssetMapper.deleteDuplicateAssets(songId);
 
             return ReturnResponse.OK("发布谱面成功！云端文件已同步，已清理过期资源。");
         } catch (Exception e) {
