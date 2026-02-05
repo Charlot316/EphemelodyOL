@@ -94,10 +94,11 @@ public class UserController {
 
     @ApiOperation("获取单个谱面")
     @GetMapping("/getChart")
-    public ReturnResponse<SingleSongVO> getChart(@RequestParam String songId) {
+    public ReturnResponse<SingleSongVO> getChart(@RequestParam String songId,
+            @RequestParam(required = false, defaultValue = "false") boolean fromDb) {
         SongDTO songDTO = new SongDTO();
         songDTO.setSongId(songId);
-        return userService.getChart(songDTO);
+        return userService.getChart(songDTO, fromDb);
     }
 
     @ApiOperation("删除谱面")

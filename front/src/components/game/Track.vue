@@ -375,13 +375,13 @@ const paintTrack = () => {
 
   if (width.value > 4 && height.value > 0) {
     const longerThanScreen = height.value > myglobal.screenHeight - Y.value;
-    // Fill main rect (Always naturally transparent dark background)
+    // Fill main rect (Base color from color operations)
     painter.beginPath();
     painter.rect(left.value + 2, top.value, width.value - 4, height.value);
-    painter.fillStyle = `rgba(22, 22, 14, ${opacity})`;
+    painter.fillStyle = `rgba(${myTrack.tempr ?? 255}, ${myTrack.tempg ?? 255}, ${myTrack.tempb ?? 255}, 0.3)`;
     painter.fill();
     if (isActive.value) {
-      painter.fillStyle = `rgba(${myTrack.tempr},${myTrack.tempg},${myTrack.tempb},0.4)`;
+      painter.fillStyle = `rgba(${myTrack.tempr ?? 255}, ${myTrack.tempg ?? 255}, ${myTrack.tempb ?? 255}, 0.3)`;
       painter.fill();
     }
 
@@ -392,17 +392,17 @@ const paintTrack = () => {
       width.value - 4,
       longerThanScreen ? myglobal.screenHeight - Y.value : height.value
     );
-    painter.fillStyle = `rgba(22, 22, 14, 0.15)`; // Mirror part background
+    painter.fillStyle = `rgba(${myTrack.tempr ?? 255}, ${myTrack.tempg ?? 255}, ${myTrack.tempb ?? 255}, 0.15)`; // Mirror part background
     painter.fill();
     if (isActive.value) {
-      painter.fillStyle = `rgba(${myTrack.tempr},${myTrack.tempg},${myTrack.tempb},0.2)`;
+      painter.fillStyle = `rgba(${myTrack.tempr ?? 255}, ${myTrack.tempg ?? 255}, ${myTrack.tempb ?? 255}, 0.15)`;
       painter.fill();
     }
     // Left line (Use custom Track Color)
     painter.beginPath();
     painter.moveTo(left.value, top.value);
     painter.lineTo(left.value, Y.value);
-    painter.strokeStyle = `rgba(${myTrack.tempr},${myTrack.tempg},${myTrack.tempb},0.8)`;
+    painter.strokeStyle = `rgba(${myTrack.tempr ?? 255}, ${myTrack.tempg ?? 255}, ${myTrack.tempb ?? 255}, 0.8)`;
     painter.lineWidth = 2;
     painter.stroke();
 
@@ -417,7 +417,7 @@ const paintTrack = () => {
     painter.beginPath();
     painter.moveTo(left.value + width.value, top.value);
     painter.lineTo(left.value + width.value, Y.value);
-    painter.strokeStyle = "rgba(255,255,255,0.8)";
+    painter.strokeStyle = `rgba(${Math.min((myTrack.tempr ?? 255) + 40, 255)}, ${Math.min((myTrack.tempg ?? 255) + 40, 255)}, ${Math.min((myTrack.tempb ?? 255) + 40, 255)}, 0.8)`;
     painter.lineWidth = 2;
     painter.stroke();
 

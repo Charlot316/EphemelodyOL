@@ -48,7 +48,7 @@ public interface UserService extends IService<User> {
     ReturnResponse<SelfSongsListVO> getAllMyCharts(String userId);
 
     // 获取单个谱面
-    ReturnResponse<SingleSongVO> getChart(SongDTO songDTO);
+    ReturnResponse<SingleSongVO> getChart(SongDTO songDTO, boolean fromDb);
 
     // 删除谱面
     ReturnResponse<String> deleteChart(String userId, SongDTO songDTO);

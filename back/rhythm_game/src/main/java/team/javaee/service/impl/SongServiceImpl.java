@@ -440,8 +440,34 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
                             moveOperationMapper.insert(mo);
                         }
                     }
-                    // Color/Width operations omitted for brevity here but can be added back if
-                    // needed
+                    if (tDto.getChangeColorOperations() != null) {
+                        for (ChangeColorOperationDTO cDto : tDto.getChangeColorOperations()) {
+                            ChangeColorOperation co = new ChangeColorOperation();
+                            co.setSongId(songId);
+                            co.setBasedTrack(t.getId());
+                            co.setStartTiming(cDto.getStartTiming());
+                            co.setEndTiming(cDto.getEndTiming());
+                            co.setStartR(cDto.getStartR());
+                            co.setStartG(cDto.getStartG());
+                            co.setStartB(cDto.getStartB());
+                            co.setEndR(cDto.getEndR());
+                            co.setEndG(cDto.getEndG());
+                            co.setEndB(cDto.getEndB());
+                            changeColorOperationMapper.insert(co);
+                        }
+                    }
+                    if (tDto.getChangeWidthOperations() != null) {
+                        for (ChangeWidthOperationDTO wDto : tDto.getChangeWidthOperations()) {
+                            ChangeWidthOperation wo = new ChangeWidthOperation();
+                            wo.setSongId(songId);
+                            wo.setBasedTrack(t.getId());
+                            wo.setStartTiming(wDto.getStartTiming());
+                            wo.setEndTiming(wDto.getEndTiming());
+                            wo.setStartWidth(wDto.getStartWidth());
+                            wo.setEndWidth(wDto.getEndWidth());
+                            changeWidthOperationMapper.insert(wo);
+                        }
+                    }
                 }
             }
 

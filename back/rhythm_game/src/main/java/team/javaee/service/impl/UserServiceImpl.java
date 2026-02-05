@@ -409,7 +409,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public ReturnResponse<SingleSongVO> getChart(SongDTO songDTO) {
+    public ReturnResponse<SingleSongVO> getChart(SongDTO songDTO, boolean fromDb) {
         try {
             String songId = songDTO.getSongId();
             QueryWrapper<Song> songWrapper = new QueryWrapper<>();
@@ -438,137 +438,139 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             assetWrapper.eq("song_id", songId);
             singleSongVO.setAssets(songAssetMapper.selectList(assetWrapper));
 
-            // 优先尝试从 JSON 文件加载
-            String jsonPath = uploadPath + "charts/" + songId + ".json";
-            File jsonFile = new File(jsonPath);
-            if (jsonFile.exists()) {
-                try {
-                    ChartContentDTO content = objectMapper.readValue(jsonFile, ChartContentDTO.class);
+            // 如果不是强制查库，优先尝试从 JSON 文件加载
+            if (!fromDb) {
+                String jsonPath = uploadPath + "charts/" + songId + ".json";
+                File jsonFile = new File(jsonPath);
+                if (jsonFile.exists()) {
+                    try {
+                        ChartContentDTO content = objectMapper.readValue(jsonFile, ChartContentDTO.class);
 
-                    // 映射 ChangeBackgroundOperations
-                    if (content.getChangeBackgroundOperations() != null) {
-                        // 从数据库查询所有背景操作以获取 ID
-                        QueryWrapper<ChangeBackgroundOperation> bgWrapper = new QueryWrapper<>();
-                        bgWrapper.eq("song_id", songId);
-                        List<ChangeBackgroundOperation> dbBackgroundOps = changeBackgroundOperationMapper
-                                .selectList(bgWrapper);
+                        // 映射 ChangeBackgroundOperations
+                        if (content.getChangeBackgroundOperations() != null) {
+                            // 从数据库查询所有背景操作以获取 ID
+                            QueryWrapper<ChangeBackgroundOperation> bgWrapper = new QueryWrapper<>();
+                            bgWrapper.eq("song_id", songId);
+                            List<ChangeBackgroundOperation> dbBackgroundOps = changeBackgroundOperationMapper
+                                    .selectList(bgWrapper);
 
-                        List<ChangeBackgroundOperationsVO> backgroundOps = content.getChangeBackgroundOperations()
-                                .stream()
-                                .map(dto -> {
-                                    ChangeBackgroundOperationsVO vo = new ChangeBackgroundOperationsVO();
-                                    vo.setStartTiming(dto.getStartTiming());
-                                    vo.setEndTiming(dto.getEndTiming());
-                                    vo.setAssetId(dto.getAssetId());
+                            List<ChangeBackgroundOperationsVO> backgroundOps = content.getChangeBackgroundOperations()
+                                    .stream()
+                                    .map(dto -> {
+                                        ChangeBackgroundOperationsVO vo = new ChangeBackgroundOperationsVO();
+                                        vo.setStartTiming(dto.getStartTiming());
+                                        vo.setEndTiming(dto.getEndTiming());
+                                        vo.setAssetId(dto.getAssetId());
 
-                                    // 尝试从数据库匹配对应的操作以获取 ID 和 assetId
-                                    // 只根据 timing 匹配，因为 JSON 中的 assetId 可能是 null
-                                    dbBackgroundOps.stream()
-                                            .filter(dbOp -> dbOp.getStartTiming().equals(dto.getStartTiming())
-                                                    && dbOp.getEndTiming() != null
-                                                    && dbOp.getEndTiming().equals(dto.getEndTiming()))
-                                            .findFirst()
-                                            .ifPresent(dbOp -> {
-                                                vo.setId(dbOp.getId());
-                                                // 如果 JSON 中的 assetId 是 null，从数据库补充
-                                                if (vo.getAssetId() == null && dbOp.getAssetId() != null) {
-                                                    vo.setAssetId(dbOp.getAssetId());
-                                                }
-                                            });
+                                        // 尝试从数据库匹配对应的操作以获取 ID 和 assetId
+                                        // 只根据 timing 匹配，因为 JSON 中的 assetId 可能是 null
+                                        dbBackgroundOps.stream()
+                                                .filter(dbOp -> dbOp.getStartTiming().equals(dto.getStartTiming())
+                                                        && dbOp.getEndTiming() != null
+                                                        && dbOp.getEndTiming().equals(dto.getEndTiming()))
+                                                .findFirst()
+                                                .ifPresent(dbOp -> {
+                                                    vo.setId(dbOp.getId());
+                                                    // 如果 JSON 中的 assetId 是 null，从数据库补充
+                                                    if (vo.getAssetId() == null && dbOp.getAssetId() != null) {
+                                                        vo.setAssetId(dbOp.getAssetId());
+                                                    }
+                                                });
 
-                                    return vo;
-                                }).collect(Collectors.toList());
-                        singleSongVO.setChangeBackgroundOperations(backgroundOps);
-                    } else {
-                        singleSongVO.setChangeBackgroundOperations(new ArrayList<>());
+                                        return vo;
+                                    }).collect(Collectors.toList());
+                            singleSongVO.setChangeBackgroundOperations(backgroundOps);
+                        } else {
+                            singleSongVO.setChangeBackgroundOperations(new ArrayList<>());
+                        }
+
+                        // 映射 Tracks
+                        if (content.getTracks() != null) {
+                            List<TracksVO> tracksVOList = content.getTracks().stream().map(trackDto -> {
+                                TracksVO tracksVO = new TracksVO();
+                                tracksVO.setType(trackDto.getType());
+                                tracksVO.setKey(trackDto.getKey());
+                                tracksVO.setStartTiming(trackDto.getStartTiming());
+                                tracksVO.setEndTiming(trackDto.getEndTiming());
+                                tracksVO.setPositionX(String.valueOf(trackDto.getPositionX()));
+                                tracksVO.setWidth(String.valueOf(trackDto.getWidth()));
+                                tracksVO.setR(trackDto.getR());
+                                tracksVO.setG(trackDto.getG());
+                                tracksVO.setB(trackDto.getB());
+
+                                // Notes
+                                if (trackDto.getNotes() != null) {
+                                    tracksVO.setNotes(trackDto.getNotes().stream().map(noteDto -> {
+                                        NotesVO notesVO = new NotesVO();
+                                        notesVO.setNoteType(noteDto.getNoteType());
+                                        notesVO.setKey(noteDto.getKey());
+                                        notesVO.setTiming(noteDto.getTiming());
+                                        notesVO.setEndTiming(noteDto.getEndTiming());
+                                        return notesVO;
+                                    }).collect(Collectors.toList()));
+                                } else {
+                                    tracksVO.setNotes(new ArrayList<>());
+                                }
+
+                                // MoveOperations
+                                if (trackDto.getMoveOperations() != null) {
+                                    tracksVO.setMoveOperations(trackDto.getMoveOperations().stream().map(moveDto -> {
+                                        MoveOperationsVO moveVO = new MoveOperationsVO();
+                                        moveVO.setStartTiming(moveDto.getStartTiming());
+                                        moveVO.setEndTiming(moveDto.getEndTiming());
+                                        moveVO.setStartX(String.valueOf(moveDto.getStartX()));
+                                        moveVO.setEndX(String.valueOf(moveDto.getEndX()));
+                                        return moveVO;
+                                    }).collect(Collectors.toList()));
+                                } else {
+                                    tracksVO.setMoveOperations(new ArrayList<>());
+                                }
+
+                                // WidthOperations
+                                if (trackDto.getChangeWidthOperations() != null) {
+                                    tracksVO.setChangeWidthOperations(
+                                            trackDto.getChangeWidthOperations().stream().map(widthDto -> {
+                                                ChangeWidthOperationsVO widthVO = new ChangeWidthOperationsVO();
+                                                widthVO.setStartTiming(widthDto.getStartTiming());
+                                                widthVO.setEndTiming(widthDto.getEndTiming());
+                                                widthVO.setStartWidth(String.valueOf(widthDto.getStartWidth()));
+                                                widthVO.setEndWidth(String.valueOf(widthDto.getEndWidth()));
+                                                return widthVO;
+                                            }).collect(Collectors.toList()));
+                                } else {
+                                    tracksVO.setChangeWidthOperations(new ArrayList<>());
+                                }
+
+                                // ColorOperations
+                                if (trackDto.getChangeColorOperations() != null) {
+                                    tracksVO.setChangeColorOperations(
+                                            trackDto.getChangeColorOperations().stream().map(colorDto -> {
+                                                ChangeColorOperationsVO colorVO = new ChangeColorOperationsVO();
+                                                colorVO.setStartTiming(colorDto.getStartTiming());
+                                                colorVO.setEndTiming(colorDto.getEndTiming());
+                                                colorVO.setStartR(colorDto.getStartR());
+                                                colorVO.setStartG(colorDto.getStartG());
+                                                colorVO.setStartB(colorDto.getStartB());
+                                                colorVO.setEndR(colorDto.getEndR());
+                                                colorVO.setEndG(colorDto.getEndG());
+                                                colorVO.setEndB(colorDto.getEndB());
+                                                return colorVO;
+                                            }).collect(Collectors.toList()));
+                                } else {
+                                    tracksVO.setChangeColorOperations(new ArrayList<>());
+                                }
+
+                                return tracksVO;
+                            }).collect(Collectors.toList());
+                            singleSongVO.setTracks(tracksVOList);
+                        } else {
+                            singleSongVO.setTracks(new ArrayList<>());
+                        }
+                        return ReturnResponse.OK(singleSongVO);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        // 如果 JSON 解析失败，回退到数据库逻辑
                     }
-
-                    // 映射 Tracks
-                    if (content.getTracks() != null) {
-                        List<TracksVO> tracksVOList = content.getTracks().stream().map(trackDto -> {
-                            TracksVO tracksVO = new TracksVO();
-                            tracksVO.setType(trackDto.getType());
-                            tracksVO.setKey(trackDto.getKey());
-                            tracksVO.setStartTiming(trackDto.getStartTiming());
-                            tracksVO.setEndTiming(trackDto.getEndTiming());
-                            tracksVO.setPositionX(String.valueOf(trackDto.getPositionX()));
-                            tracksVO.setWidth(String.valueOf(trackDto.getWidth()));
-                            tracksVO.setR(trackDto.getR());
-                            tracksVO.setG(trackDto.getG());
-                            tracksVO.setB(trackDto.getB());
-
-                            // Notes
-                            if (trackDto.getNotes() != null) {
-                                tracksVO.setNotes(trackDto.getNotes().stream().map(noteDto -> {
-                                    NotesVO notesVO = new NotesVO();
-                                    notesVO.setNoteType(noteDto.getNoteType());
-                                    notesVO.setKey(noteDto.getKey());
-                                    notesVO.setTiming(noteDto.getTiming());
-                                    notesVO.setEndTiming(noteDto.getEndTiming());
-                                    return notesVO;
-                                }).collect(Collectors.toList()));
-                            } else {
-                                tracksVO.setNotes(new ArrayList<>());
-                            }
-
-                            // MoveOperations
-                            if (trackDto.getMoveOperations() != null) {
-                                tracksVO.setMoveOperations(trackDto.getMoveOperations().stream().map(moveDto -> {
-                                    MoveOperationsVO moveVO = new MoveOperationsVO();
-                                    moveVO.setStartTiming(moveDto.getStartTiming());
-                                    moveVO.setEndTiming(moveDto.getEndTiming());
-                                    moveVO.setStartX(String.valueOf(moveDto.getStartX()));
-                                    moveVO.setEndX(String.valueOf(moveDto.getEndX()));
-                                    return moveVO;
-                                }).collect(Collectors.toList()));
-                            } else {
-                                tracksVO.setMoveOperations(new ArrayList<>());
-                            }
-
-                            // WidthOperations
-                            if (trackDto.getChangeWidthOperations() != null) {
-                                tracksVO.setChangeWidthOperations(
-                                        trackDto.getChangeWidthOperations().stream().map(widthDto -> {
-                                            ChangeWidthOperationsVO widthVO = new ChangeWidthOperationsVO();
-                                            widthVO.setStartTiming(widthDto.getStartTiming());
-                                            widthVO.setEndTiming(widthDto.getEndTiming());
-                                            widthVO.setStartWidth(String.valueOf(widthDto.getStartWidth()));
-                                            widthVO.setEndWidth(String.valueOf(widthDto.getEndWidth()));
-                                            return widthVO;
-                                        }).collect(Collectors.toList()));
-                            } else {
-                                tracksVO.setChangeWidthOperations(new ArrayList<>());
-                            }
-
-                            // ColorOperations
-                            if (trackDto.getChangeColorOperations() != null) {
-                                tracksVO.setChangeColorOperations(
-                                        trackDto.getChangeColorOperations().stream().map(colorDto -> {
-                                            ChangeColorOperationsVO colorVO = new ChangeColorOperationsVO();
-                                            colorVO.setStartTiming(colorDto.getStartTiming());
-                                            colorVO.setEndTiming(colorDto.getEndTiming());
-                                            colorVO.setStartR(colorDto.getStartR());
-                                            colorVO.setStartG(colorDto.getStartG());
-                                            colorVO.setStartB(colorDto.getStartB());
-                                            colorVO.setEndR(colorDto.getEndR());
-                                            colorVO.setEndG(colorDto.getEndG());
-                                            colorVO.setEndB(colorDto.getEndB());
-                                            return colorVO;
-                                        }).collect(Collectors.toList()));
-                            } else {
-                                tracksVO.setChangeColorOperations(new ArrayList<>());
-                            }
-
-                            return tracksVO;
-                        }).collect(Collectors.toList());
-                        singleSongVO.setTracks(tracksVOList);
-                    } else {
-                        singleSongVO.setTracks(new ArrayList<>());
-                    }
-                    return ReturnResponse.OK(singleSongVO);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    // 如果 JSON 解析失败，回退到数据库逻辑
                 }
             }
 
@@ -670,7 +672,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                     changeColorOperationsVO.setStartR(z.getStartR());
                     changeColorOperationsVO.setStartG(z.getStartG());
                     changeColorOperationsVO.setStartB(z.getStartB());
-                    ;
                     changeColorOperationsVOList.add(changeColorOperationsVO);
                 }
                 tracksVO.setChangeColorOperations(changeColorOperationsVOList);

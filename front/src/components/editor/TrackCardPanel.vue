@@ -54,21 +54,25 @@
         <!-- Previews for Operations when not editing -->
         <div v-if="!track.edit" class="op-previews-overlay">
           <!-- Move Operations: Blue Line -->
-          <div v-for="(op, idx) in track.moveOperations" :key="'m' + idx" class="op-preview move" :style="{
+          <div v-for="(op, idx) in (track.moveOperations || [])" :key="'m' + idx" class="op-preview move" :style="{
             left: (op.startTiming / displayAreaTime) * (global.documentWidth - siderWidth) + 'px',
             width: ((op.endTiming - op.startTiming) / displayAreaTime) * (global.documentWidth - siderWidth) + 'px'
           }"></div>
           <!-- Width Operations: Green Line -->
-          <div v-for="(op, idx) in track.changeWidthOperations" :key="'w' + idx" class="op-preview width" :style="{
-            left: (op.startTiming / displayAreaTime) * (global.documentWidth - siderWidth) + 'px',
-            width: ((op.endTiming - op.startTiming) / displayAreaTime) * (global.documentWidth - siderWidth) + 'px'
-          }"></div>
+          <div v-for="(op, idx) in (track.changeWidthOperations || [])" :key="'w' + idx" class="op-preview width"
+            :style="{
+              left: (op.startTiming / displayAreaTime) * (global.documentWidth - siderWidth) + 'px',
+              width: ((op.endTiming - op.startTiming) / displayAreaTime) * (global.documentWidth - siderWidth) + 'px'
+            }"></div>
           <!-- Color Operations: Actual Color Line -->
-          <div v-for="(op, idx) in track.changeColorOperations" :key="'c' + idx" class="op-preview color" :style="{
-            left: (op.startTiming / displayAreaTime) * (global.documentWidth - siderWidth) + 'px',
-            width: ((op.endTiming - op.startTiming) / displayAreaTime) * (global.documentWidth - siderWidth) + 'px',
-            background: `rgba(${op.startR}, ${op.startG}, ${op.startB}, 0.8)`
-          }"></div>
+          <div v-for="(op, idx) in (track.changeColorOperations || [])" :key="'c' + idx" class="op-preview color"
+            :style="{
+              left: (op.startTiming / displayAreaTime) * (global.documentWidth - siderWidth) + 'px',
+              width: ((op.endTiming - op.startTiming) / displayAreaTime) * (global.documentWidth - siderWidth) + 'px',
+              background: `linear-gradient(to right, rgb(${op.startR ?? 255},${op.startG ?? 165},${op.startB ?? 0}), rgb(${op.endR ?? 255},${op.endG ?? 68},${op.endB ?? 0}))`,
+              border: '1px solid rgba(255,255,255,0.6)',
+              boxShadow: `0 0 6px rgba(${op.startR ?? 255},${op.startG ?? 165},${op.startB ?? 0}, 0.8)`
+            }"></div>
         </div>
       </div>
       <transition name="fade" enter-active-class="animate__animated animate__fadeInDown"
@@ -105,18 +109,10 @@
       <transition name="fade" enter-active-class="animate__animated animate__fadeInDown"
         leave-active-class="animate__animated animate__fadeOutUp">
         <div v-show="track.edit">
-          <div class="note-track-label" :style="{ left: scrollLeft + 'px' }">
-            音符轨道
-          </div>
-          <div class="positionX-track-label" :style="{ left: scrollLeft + 'px' }">
-            坐标操作
-          </div>
-          <div class="width-track-label" :style="{ left: scrollLeft + 'px' }">
-            宽度操作
-          </div>
-          <div class="color-track-label" :style="{ left: scrollLeft + 'px' }">
-            色彩操作
-          </div>
+          <div class="note-track-label" :style="{ left: scrollLeft + 'px' }">音符轨道</div>
+          <div class="positionX-track-label" :style="{ left: scrollLeft + 'px' }">坐标操作</div>
+          <div class="width-track-label" :style="{ left: scrollLeft + 'px' }">宽度操作</div>
+          <div class="color-track-label" :style="{ left: scrollLeft + 'px' }">色彩操作</div>
         </div>
       </transition>
     </div>
@@ -132,26 +128,20 @@
         <div class="menu-item" @click="contextAction('note-2')">添加滑键</div>
       </div>
       <div v-else-if="contextMenuData.type === 'move'" class="menu-group">
-        <div class="menu-item" @click="contextAction('op-move')">添加移动操作</div>
-      </div>
-      <div v-else-if="contextMenuData.type === 'width'" class="menu-group">
-        <div class="menu-item" @click="contextAction('op-width')">添加宽度操作</div>
-      </div>
-      <div v-else-if="contextMenuData.type === 'move'" class="menu-group">
         <div class="menu-item" @click="contextAction('op-move')">添加坐标操作</div>
       </div>
       <div v-else-if="contextMenuData.type === 'width'" class="menu-group">
         <div class="menu-item" @click="contextAction('op-width')">添加宽度操作</div>
       </div>
       <div v-else-if="contextMenuData.type === 'color'" class="menu-group">
-        <div class="menu-item" @click="contextAction('op-color')">添加颜色操作</div>
+        <div class="menu-item" @click="contextAction('op-color')">添加色彩操作</div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, watch, defineProps, defineEmits, inject } from 'vue';
+import { ref, watch, defineProps, defineEmits, inject, onMounted } from 'vue';
 import { ElNotification } from 'element-plus';
 import Note from "./Note.vue";
 import MoveOperation from "./MoveOperation.vue";
@@ -182,6 +172,12 @@ const leftMove = ref(false);
 const rightMove = ref(false);
 const passedTime = ref(0);
 
+onMounted(() => {
+  if (props.track.changeColorOperations?.length > 0) {
+    console.log(`[TrackCardPanel] Track ${props.track.id} has ${props.track.changeColorOperations.length} color operations`, props.track.changeColorOperations[0]);
+  }
+});
+
 const roundTime = (timing) => {
   if (props.global.beatLine) {
     const bpm = props.chart.bpm / 16;
@@ -200,33 +196,13 @@ const updateTrack = () => {
 };
 
 const newNote = (e) => {
-  // Check if click is near start/end handles. We assume handles are near ends?
-  // The user says "Track has open/close animation area", which usually means start/end timing adjustment areas.
-  // In our template, we have visible handles for start/end adjustment.
-  // We can just rely on the click event not propagating if it hit those elements if they stop propagation.
-  // But here we are on the main track div.
-  // Let's assume the click event provides the timing. We need to calculate timing from mouse position.
-
   if (props.currentNoteType !== 3 && props.currentNoteType !== undefined && props.currentNoteType >= 0) {
-    if (props.global.currentTime < props.track.startTiming || props.global.currentTime > props.track.endTiming) {
-      return; // Outside active track area
-    }
-
-    // Calculate timing based on click X if we wanted exact position, 
-    // BUT current implementation uses global.currentTime which is the seeker position.
-    // The user said: "Create note at the CLICKED time point".
-    // So we need to calculate time from e.offsetX
-
     const rect = e.currentTarget.getBoundingClientRect();
     const clickX = e.clientX - rect.left;
     const timeMs = (clickX / (props.global.documentWidth - props.siderWidth)) * props.displayAreaTime;
     const quantizedTime = roundTime(timeMs);
 
-    if (quantizedTime < props.track.startTiming || quantizedTime > props.track.endTiming) {
-      // Clicked outside efficient range
-      return;
-    }
-
+    if (quantizedTime < props.track.startTiming || quantizedTime > props.track.endTiming) return;
     addNoteAt(props.currentNoteType, quantizedTime);
   }
 };
@@ -285,7 +261,6 @@ watch(() => props.global.mouseUp, () => {
 
     if (finalStart !== oldStart || finalEnd !== oldEnd) {
       if (syncAction) syncAction("UPDATE_TRACK", props.track);
-
       if (commandHistory) {
         commandHistory.pushCommand({
           description: 'Adjust Track Timing',
@@ -304,7 +279,6 @@ watch(() => props.global.mouseUp, () => {
         });
       }
     }
-
     leftMove.value = false;
     rightMove.value = false;
   }
@@ -312,9 +286,7 @@ watch(() => props.global.mouseUp, () => {
 });
 
 watch(() => props.global.mouseMove, () => {
-  if (canMove.value) {
-    // Logic for moving the whole track start/end - if implemented
-  } else if (leftMove.value) {
+  if (leftMove.value) {
     const val = roundTime(props.global.currentTime);
     if (val <= props.track.endTiming) {
       if (props.track.notes.length > 0) {
@@ -330,24 +302,11 @@ watch(() => props.global.mouseMove, () => {
     }
   }
 });
+
 const contextMenuVisible = ref(false);
 const contextMenuData = ref({ x: 0, y: 0, time: 0 });
 
 const showContextMenu = (e) => {
-  if (props.track.edit) {
-    // If editing, allow context menu for specific operations?
-    // User said: "On operation track, right click adds operation".
-    // "On default track (note track), selects 3 note types".
-    // We are in TrackCardPanel which handles both Note Track (top) and Op Tracks (bottom).
-    // We need to know WHICH track area was clicked.
-    // The Note Track is .note-track / .note-track-edit
-    // The Op Tracks are .positionX-track, .width-track, etc.
-    // However, the event bubbles to parent.
-    // e.target.closest('.positionX-track') etc can differentiate.
-  }
-  // This logic is getting complex for a simple click handler.
-  // Let's implement logic:
-
   const rect = e.currentTarget.getBoundingClientRect();
   const clickX = e.clientX - rect.left;
   const timeMs = (clickX / (props.global.documentWidth - props.siderWidth)) * props.displayAreaTime;
@@ -357,18 +316,13 @@ const showContextMenu = (e) => {
     x: e.clientX,
     y: e.clientY,
     time: quantizedTime,
-    type: 'note' // default
+    type: 'note'
   };
 
-  if (e.target.closest('.positionX-track')) {
-    contextMenuData.value.type = 'move';
-  } else if (e.target.closest('.width-track')) {
-    contextMenuData.value.type = 'width';
-  } else if (e.target.closest('.color-track')) {
-    contextMenuData.value.type = 'color';
-  } else {
-    contextMenuData.value.type = 'note';
-  }
+  if (e.target.closest('.positionX-track')) contextMenuData.value.type = 'move';
+  else if (e.target.closest('.width-track')) contextMenuData.value.type = 'width';
+  else if (e.target.closest('.color-track')) contextMenuData.value.type = 'color';
+  else contextMenuData.value.type = 'note';
 
   contextMenuVisible.value = true;
 };
@@ -376,7 +330,6 @@ const showContextMenu = (e) => {
 const closeContextMenu = () => { contextMenuVisible.value = false; };
 
 const contextAction = (action) => {
-  // Action logic
   const time = contextMenuData.value.time;
   if (action === 'note-0') addNoteAt(0, time);
   else if (action === 'note-1') addNoteAt(1, time);
@@ -429,13 +382,6 @@ const addOpAt = (type, time) => {
   }
   updateTrack();
 };
-
-// Close menu on click anywhere else
-watch(() => props.global.mouseUp, () => {
-  if (contextMenuVisible.value) closeContextMenu();
-});
-
-// Reuse existing logic from newNote/newMoveOperations etc but parameterized
 </script>
 
 <style scoped>
@@ -446,7 +392,6 @@ watch(() => props.global.mouseUp, () => {
   position: relative;
   background: rgba(255, 255, 255, 0.02);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  /* Match Left Side */
 }
 
 .panel-edit {
@@ -533,33 +478,33 @@ watch(() => props.global.mouseUp, () => {
 
 .op-previews-overlay {
   position: absolute;
-  bottom: 0;
+  bottom: 2px;
   left: 0;
   width: 100%;
-  height: 6px;
-  display: flex;
-  flex-direction: column;
+  height: 12px;
   pointer-events: none;
-  gap: 1px;
-  padding-bottom: 2px;
+  z-index: 10;
 }
 
 .op-preview {
-  height: 2px;
-  border-radius: 1px;
-  opacity: 0.6;
+  position: absolute;
+  height: 4px;
+  border-radius: 2px;
+  opacity: 1;
 }
 
 .op-preview.move {
+  top: 0px;
   background: #409eff;
 }
 
 .op-preview.width {
+  top: 4px;
   background: #67c23a;
 }
 
 .op-preview.color {
-  background: #e6a23c;
+  top: 8px;
 }
 
 .context-menu {
