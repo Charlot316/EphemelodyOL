@@ -197,8 +197,8 @@ const selectedTrackOverlayStyle = computed(() => {
   return {
     position: 'absolute',
     top: '0px',
-    left: (t.tempPositionX - t.tempWidth) * global.screenWidth + 'px',
-    width: 2 * t.tempWidth * global.screenWidth - 4 + 'px',
+    left: ((t.tempPositionX || 0) - (t.tempwidth || 0)) * global.screenWidth + 'px',
+    width: 2 * (t.tempwidth || 0) * global.screenWidth - 4 + 'px',
     height: global.finalY * global.screenHeight - 2 + 'px',
     border: '2px solid rgba(255,255,255,1)',
     background: 'rgba(255,255,255,0.2)',
@@ -531,8 +531,8 @@ onMounted(() => {
       );
 
       for (const track of visibleTracks) {
-        const left = (track.tempPositionX - track.tempWidth) * global.screenWidth;
-        const right = (track.tempPositionX + track.tempWidth) * global.screenWidth;
+        const left = ((track.tempPositionX || 0) - (track.tempwidth || 0)) * global.screenWidth;
+        const right = ((track.tempPositionX || 0) + (track.tempwidth || 0)) * global.screenWidth;
         if (offsetX > left && offsetX < right) {
           emit('track-click', track);
           break;

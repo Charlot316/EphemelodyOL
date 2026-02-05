@@ -4,9 +4,9 @@
       <!-- Spatial Indicator Bar (Spatial Preview) -->
       <div v-if="global.currentTime > track.startTiming && global.currentTime < track.endTiming"
         class="spatial-indicator" :style="{
-          left: (track.tempPositionX - track.tempWidth) * 160 + 75 + 'px',
-          width: 2 * track.tempWidth * 160 + 'px',
-          background: `rgba(${track.tempR}, ${track.tempG}, ${track.tempB}, 0.6)`
+          left: ((track.tempPositionX || 0) - (track.tempwidth || 0)) * 160 + 75 + 'px',
+          width: 2 * (track.tempwidth || 0) * 160 + 'px',
+          background: `rgba(${track.tempr}, ${track.tempg}, ${track.tempb}, 0.6)`
         }"></div>
 
       <div class="card-header">

@@ -144,6 +144,7 @@ const global = reactive({
   keyIsHold: {},
   keyUsed: {},
   reCalculateChartMaker: false,
+  reCalculateTrack: false,
   siderWidth: 300,
   remainingTime: 1000,
   finalY: 0.8,
@@ -151,6 +152,7 @@ const global = reactive({
   pureTime: 50,
   farTime: 100,
   timeSort: true,
+  isEdit: true,
 });
 
 const menuOpened = ref(true);

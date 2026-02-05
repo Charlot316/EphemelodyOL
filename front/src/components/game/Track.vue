@@ -73,22 +73,22 @@ const finalHeight = computed(() => {
 });
 
 const width = computed(() => {
-  return 2 * myTrack.tempWidth * myglobal.screenWidth;
+  return 2 * (myTrack.tempwidth || 0) * myglobal.screenWidth;
 });
 
 const halfWidth = computed(() => {
-  return myTrack.tempWidth * myglobal.screenWidth;
+  return (myTrack.tempwidth || 0) * myglobal.screenWidth;
 });
 
 const left = computed(() => {
   return (
-    (myTrack.tempPositionX - myTrack.tempWidth) *
+    ((myTrack.tempPositionX || 0) - (myTrack.tempwidth || 0)) *
     myglobal.screenWidth
   );
 });
 
 const middle = computed(() => {
-  return myTrack.tempPositionX * myglobal.screenWidth;
+  return (myTrack.tempPositionX || 0) * myglobal.screenWidth;
 });
 
 const Y = computed(() => {
@@ -122,7 +122,7 @@ const binaryGetCurrentIndex = (currentTime, path) => {
 const getPositionX = () => {
   const currentTime = myglobal.currentTime;
   if (positionXPath.value.length === 0) return myTrack.positionX || 0;
-  
+
   let currentX = positionXPath.value[positionXIndex.value];
   if (!currentX || !(currentTime <= currentX.endTiming && currentTime >= currentX.startTiming)) {
     positionXIndex.value = binaryGetCurrentIndex(currentTime, positionXPath.value);
@@ -190,14 +190,14 @@ const paintNote = (note) => {
   const currentTime = myglobal.currentTime;
   const remainingTime = myglobal.remainingTime || 1000;
   const finalY = myglobal.finalY || 0.8;
-  
+
   const yValue =
     ((finalY / remainingTime) * currentTime -
       (finalY / remainingTime) *
-        (note.timing - remainingTime)) *
+      (note.timing - remainingTime)) *
     myglobal.screenHeight;
-  
-  
+
+
   const canMirror =
     (note.noteType != 1 &&
       yValue / myglobal.screenHeight >= 0.6 &&
@@ -257,7 +257,7 @@ const paintNote = (note) => {
       kl = ((note.endTiming - currentTime) / myglobal.remainingTime) * myglobal.finalY * myglobal.screenHeight;
       currentY = myglobal.finalY * myglobal.screenHeight;
     }
-    
+
     if (canMirror) {
       const tempY = 2 * Y.value - currentY;
       painter.beginPath();
@@ -368,8 +368,8 @@ const paintNotes = () => {
   }
 };
 
-const paintTrack = async () => {
-  await paintNotes();
+const paintTrack = () => {
+  paintNotes();
   const painter = myglobal.trackPainter;
   if (!painter) return;
 
@@ -381,7 +381,7 @@ const paintTrack = async () => {
     painter.fillStyle = `rgba(22, 22, 14, ${opacity})`;
     painter.fill();
     if (isActive.value) {
-      painter.fillStyle = `rgba(${myTrack.tempR},${myTrack.tempG},${myTrack.tempB},0.4)`;
+      painter.fillStyle = `rgba(${myTrack.tempr},${myTrack.tempg},${myTrack.tempb},0.4)`;
       painter.fill();
     }
 
@@ -395,14 +395,14 @@ const paintTrack = async () => {
     painter.fillStyle = `rgba(22, 22, 14, 0.15)`; // Mirror part background
     painter.fill();
     if (isActive.value) {
-      painter.fillStyle = `rgba(${myTrack.tempR},${myTrack.tempG},${myTrack.tempB},0.2)`;
+      painter.fillStyle = `rgba(${myTrack.tempr},${myTrack.tempg},${myTrack.tempb},0.2)`;
       painter.fill();
     }
     // Left line (Use custom Track Color)
     painter.beginPath();
     painter.moveTo(left.value, top.value);
     painter.lineTo(left.value, Y.value);
-    painter.strokeStyle = `rgba(${myTrack.tempR},${myTrack.tempG},${myTrack.tempB},0.8)`;
+    painter.strokeStyle = `rgba(${myTrack.tempr},${myTrack.tempg},${myTrack.tempb},0.8)`;
     painter.lineWidth = 2;
     painter.stroke();
 
@@ -728,11 +728,11 @@ const generateRGBPath = () => {
     if (i != length - 1) {
       let nextOperation = myTrack.changeColorOperations[i + 1];
       if (end < nextOperation.startTiming) {
-        RGBPath.value.push({ type: 0, R: operation.endR, G: operation.endG, B: operation.endB, startTiming: end, endTiming: nextOperation.startTiming });
+        RGBPath.value.push({ type: 0, r: operation.endR, g: operation.endG, b: operation.endB, startTiming: end, endTiming: nextOperation.startTiming });
       }
     } else {
       if (end < myTrack.endTiming) {
-        RGBPath.value.push({ type: 0, R: operation.endR, G: operation.endG, B: operation.endB, startTiming: end, endTiming: myTrack.endTiming });
+        RGBPath.value.push({ type: 0, r: operation.endR, g: operation.endG, b: operation.endB, startTiming: end, endTiming: myTrack.endTiming });
       }
     }
   }
@@ -752,7 +752,7 @@ const initiate = () => {
   generateRGBPath();
   myTrack.notes.sort((a, b) => a.timing - b.timing);
   myTrack.notes.forEach((note, i) => (note.index = i));
-  
+
   let index = 0;
   let last = myTrack.notes.length;
   for (let j = myTrack.notes.length - 1; j >= 0; j--) {
@@ -764,22 +764,22 @@ const initiate = () => {
   myTrack.lastNote = last - 1;
   myTrack.judges = [];
   myTrack.tempPositionX = getPositionX();
-  myTrack.tempWidth = getWidth();
+  myTrack.tempwidth = getWidth();
   const rgb = getRGB();
-  myTrack.tempR = rgb[0];
-  myTrack.tempG = rgb[1];
-  myTrack.tempB = rgb[2];
+  myTrack.tempr = rgb[0];
+  myTrack.tempg = rgb[1];
+  myTrack.tempb = rgb[2];
   paintTrack();
 };
 
 watch(() => myglobal.currentTime, () => {
-  if (myglobal.currentTime > 0) {
+  if (myglobal.currentTime >= 0) {
     myTrack.tempPositionX = getPositionX();
-    myTrack.tempWidth = getWidth();
+    myTrack.tempwidth = getWidth();
     const rgb = getRGB();
-    myTrack.tempR = rgb[0];
-    myTrack.tempG = rgb[1];
-    myTrack.tempB = rgb[2];
+    myTrack.tempr = rgb[0];
+    myTrack.tempg = rgb[1];
+    myTrack.tempb = rgb[2];
     setHeightAndTop();
     while (
       myTrack.judges.length > 0 &&
@@ -802,7 +802,7 @@ watch(() => myglobal.currentTime, () => {
   ) {
     myTrack.lastNote--;
   }
-  judge();
+  if (!myglobal.isEdit) judge();
 });
 
 watch(() => myglobal.screenHeight, () => {
@@ -823,12 +823,12 @@ watch(() => myglobal.reCalculateTrack, () => {
   generatePositionXPath();
   myTrack.tempPositionX = getPositionX();
   generateWidthPath();
-  myTrack.tempWidth = getWidth();
+  myTrack.tempwidth = getWidth();
   generateRGBPath();
   const rgb = getRGB();
-  myTrack.tempR = rgb[0];
-  myTrack.tempG = rgb[1];
-  myTrack.tempB = rgb[2];
+  myTrack.tempr = rgb[0];
+  myTrack.tempg = rgb[1];
+  myTrack.tempb = rgb[2];
   myTrack.notes.sort((a, b) => a.timing - b.timing);
   myTrack.notes.forEach((n, i) => (n.index = i));
   paintTrack();

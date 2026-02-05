@@ -1,44 +1,57 @@
 <template>
   <div class="footer-container">
     <div class="footer-header">
-    <div class="footer-toolbar">
-      <!-- 分组 0: 轨道管理与视图对齐 (对齐 siderWidth) -->
-      <div 
-        class="toolbar-side-aligned" 
-        :style="{ 
+      <div class="footer-toolbar">
+        <!-- 分组 0: 轨道管理与视图对齐 (对齐 siderWidth) -->
+        <div class="toolbar-side-aligned" :style="{
           width: siderWidth + 'px',
           width: siderWidth + 'px'
-        }"
-      >
+        }">
           <div class="toolbar-group-minimal">
             <el-tooltip content="新建轨道" placement="top">
               <el-button link class="tool-btn-minimal" @click="newTrack">
-                <el-icon><CirclePlus /></el-icon>
+                <el-icon>
+                  <CirclePlus />
+                </el-icon>
               </el-button>
             </el-tooltip>
             <el-tooltip content="显示所有" placement="top">
               <el-button link class="tool-btn-minimal" @click="showAllTracks">
-                <el-icon><View /></el-icon>
+                <el-icon>
+                  <View />
+                </el-icon>
               </el-button>
             </el-tooltip>
             <el-tooltip :content="global.timeSort ? '当前模式: 时间排序' : '当前模式: 坐标排序'" placement="top">
               <el-button link class="tool-btn-minimal" @click="global.timeSort = !global.timeSort; updateTrack();">
-                <el-icon><Sort v-if="!global.timeSort"/><Timer v-else/></el-icon>
+                <el-icon>
+                  <Sort v-if="!global.timeSort" />
+                  <Timer v-else />
+                </el-icon>
               </el-button>
             </el-tooltip>
             <el-tooltip :content="showNoRemain ? '过滤空轨' : '显示空轨'" placement="top">
-              <el-button link :class="['tool-btn-minimal', { 'is-active': !showNoRemain }]" @click="showNoRemain = !showNoRemain">
-                <el-icon><Filter /></el-icon>
+              <el-button link :class="['tool-btn-minimal', { 'is-active': !showNoRemain }]"
+                @click="showNoRemain = !showNoRemain">
+                <el-icon>
+                  <Filter />
+                </el-icon>
               </el-button>
             </el-tooltip>
             <el-tooltip :content="showCurrent ? '显示全局' : '锁定当前'" placement="top">
-              <el-button link :class="['tool-btn-minimal', { 'is-active': showCurrent }]" @click="showCurrent = !showCurrent">
-                <el-icon><Aim /></el-icon>
+              <el-button link :class="['tool-btn-minimal', { 'is-active': showCurrent }]"
+                @click="showCurrent = !showCurrent">
+                <el-icon>
+                  <Aim />
+                </el-icon>
               </el-button>
             </el-tooltip>
             <el-tooltip :content="autoScroll ? '关闭跟随' : '自动跟随'" placement="top">
-              <el-button link :class="['tool-btn-minimal', { 'is-active': autoScroll }]" @click="autoScroll = !autoScroll">
-                <el-icon><VideoPlay /></el-icon>
+              <el-button link :class="['tool-btn-minimal', { 'is-active': autoScroll }]"
+                @click="autoScroll = !autoScroll">
+                <el-icon>
+                  <VideoPlay />
+                </el-icon>
               </el-button>
             </el-tooltip>
           </div>
@@ -47,43 +60,32 @@
 
         <!-- 分组 2: 轨道类型过滤 -->
         <div class="toolbar-group">
-          <el-button
-            size="small"
-            class="toggle-btn"
-            :class="{ 'is-active': showReal }"
-            @click="showReal = !showReal"
-          >
-            <el-icon><CircleCheck /></el-icon>实轨
+          <el-button size="small" class="toggle-btn" :class="{ 'is-active': showReal }" @click="showReal = !showReal">
+            <el-icon>
+              <CircleCheck />
+            </el-icon>实轨
           </el-button>
-          <el-button
-            size="small"
-            class="toggle-btn"
-            :class="{ 'is-active': showFake }"
-            @click="showFake = !showFake"
-          >
-            <el-icon><MagicStick /></el-icon>虚轨
+          <el-button size="small" class="toggle-btn" :class="{ 'is-active': showFake }" @click="showFake = !showFake">
+            <el-icon>
+              <MagicStick />
+            </el-icon>虚轨
           </el-button>
         </div>
 
 
         <!-- 分组 3: 点击行为设置 -->
         <div class="toolbar-group mode-selector">
-          <el-button
-            v-for="(label, idx) in ['短键', '长键', '滑键']"
-            :key="idx"
-            size="small"
+          <el-button v-for="(label, idx) in ['短键', '长键', '滑键']" :key="idx" size="small"
             :class="['mode-btn', { 'is-selected': currentNoteType == idx }]"
-            @click="currentNoteType = (currentNoteType === idx ? -1 : idx)"
-          >
+            @click="currentNoteType = (currentNoteType === idx ? -1 : idx)">
             <span class="mode-dot" :class="'mode-' + idx"></span>
             {{ label }}
           </el-button>
-          <el-button
-            size="small"
-            :class="['mode-btn', { 'is-selected': currentNoteType == 3 }]"
-            @click="switchToDeleteMode"
-          >
-            <el-icon><Delete /></el-icon>
+          <el-button size="small" :class="['mode-btn', { 'is-selected': currentNoteType == 3 }]"
+            @click="switchToDeleteMode">
+            <el-icon>
+              <Delete />
+            </el-icon>
             删除
           </el-button>
         </div>
@@ -111,12 +113,10 @@
         <!-- 分组 5: 杂项 -->
         <div class="toolbar-group">
           <el-tooltip content="重置到上次保存" placement="top">
-            <el-button
-              size="small"
-              class="tool-btn-rect is-warning"
-              @click="resetChart"
-            >
-              <el-icon><Refresh /></el-icon>
+            <el-button size="small" class="tool-btn-rect is-warning" @click="resetChart">
+              <el-icon>
+                <Refresh />
+              </el-icon>
               重置
             </el-button>
           </el-tooltip>
@@ -126,32 +126,26 @@
         <!-- 分组 6: 系统与视图 -->
         <div class="toolbar-group">
           <el-tooltip content="返回列表" placement="top">
-            <el-button
-              size="small"
-              class="tool-btn-rect"
-              @click="router.go(-1)"
-            >
-              <el-icon><Back /></el-icon>
+            <el-button size="small" class="tool-btn-rect" @click="router.go(-1)">
+              <el-icon>
+                <Back />
+              </el-icon>
               返回
             </el-button>
           </el-tooltip>
           <el-tooltip content="仅发布更改" placement="top">
-            <el-button
-              size="small"
-              class="tool-btn-rect"
-              @click="saveChart(false)"
-            >
-              <el-icon><Upload /></el-icon>
+            <el-button size="small" class="tool-btn-rect" @click="saveChart(false)">
+              <el-icon>
+                <Upload />
+              </el-icon>
               发布
             </el-button>
           </el-tooltip>
           <el-tooltip content="通过表决后生成游玩文件并返回" placement="top">
-            <el-button
-              size="small"
-              class="tool-btn-rect is-primary"
-              @click="saveChart(true)"
-            >
-              <el-icon><UploadFilled /></el-icon>
+            <el-button size="small" class="tool-btn-rect is-primary" @click="saveChart(true)">
+              <el-icon>
+                <UploadFilled />
+              </el-icon>
               发布并返回
             </el-button>
           </el-tooltip>
@@ -161,13 +155,10 @@
         <!-- 分组 7: 全局控制 (移除冗余播放按钮) -->
         <div class="toolbar-group">
           <el-tooltip content="全局设置" placement="top">
-            <el-button
-              circle
-              size="small"
-              class="tool-btn-glass"
-              @click="$emit('open-settings')"
-            >
-              <el-icon><Setting /></el-icon>
+            <el-button circle size="small" class="tool-btn-glass" @click="$emit('open-settings')">
+              <el-icon>
+                <Setting />
+              </el-icon>
             </el-button>
           </el-tooltip>
         </div>
@@ -181,137 +172,79 @@
           <span class="unit">ms</span>
         </div>
         <div class="custom-slider-container">
-          <el-icon><ZoomIn /></el-icon>
-          <input 
-            type="range" 
-            v-model.number="displayAreaTime" 
-            :min="1000" 
-            :max="chart.songLength > 1000 ? chart.songLength : 1001"
-            class="custom-range"
-          />
+          <el-icon>
+            <ZoomIn />
+          </el-icon>
+          <input type="range" v-model.number="displayAreaTime" :min="1000"
+            :max="chart.songLength > 1000 ? chart.songLength : 1001" class="custom-range" />
         </div>
       </div>
     </div>
 
     <!-- 主内容区 -->
     <div v-if="chart.tracks" class="footer-main-content" @wheel="handleWheel">
-      <div 
-        class="footer-track-area" 
-        :style="{ height: bgCollapsed ? 'calc(100% - 32px)' : 'calc(100% - 100px)' }"
-      >
+      <div class="footer-track-area" :style="{ height: bgCollapsed ? 'calc(100% - 32px)' : 'calc(100% - 100px)' }">
         <div class="footer-left">
-          <div
-            class="footer-track-container"
-            id="footer-left-scroll"
-            @scroll="leftScroll"
-          >
-            <transition-group
-              name="list"
-              enter-active-class="animate__animated animate__fadeInUp"
-              leave-active-class="animate__animated animate__fadeOutUp"
-            >
+          <div class="footer-track-container" id="footer-left-scroll" @scroll="leftScroll">
+            <transition-group name="list" enter-active-class="animate__animated animate__fadeInUp"
+              leave-active-class="animate__animated animate__fadeOutUp">
               <div v-for="track in displayTracks.filter(isVisible)" :key="track.index">
-                <TrackCard
-                  :chart="chart"
-                  :track="track"
-                  :global="global"
-                  @currentTrack="handleCurrentTrack"
-                  @editStatus="handleEditStatus"
-                />
+                <TrackCard :chart="chart" :track="track" :global="global" @currentTrack="handleCurrentTrack"
+                  @editStatus="handleEditStatus" />
               </div>
             </transition-group>
           </div>
         </div>
-        <div
-          class="footer-right"
-          id="footer-right-scroll"
-          @scroll="rightScroll"
-          @mousemove="rightMouseMove($event)"
-          @mousedown="rightClick($event)"
-          @contextmenu.prevent
-        >
-          <div
-            class="beat-line-wrapper-absolute"
-            :style="{ top: scrollTop + 'px' }"
-          >
-            <BeatLine
-              :chart="chart"
-              :global="global"
-              :displayAreaTime="displayAreaTime"
-              :siderWidth="siderWidth"
-            />
+        <div class="footer-right" id="footer-right-scroll" @scroll="rightScroll" @mousemove="rightMouseMove($event)"
+          @mousedown="rightClick($event)" @contextmenu.prevent>
+          <div class="beat-line-wrapper-absolute" :style="{ top: scrollTop + 'px' }">
+            <BeatLine :chart="chart" :global="global" :displayAreaTime="displayAreaTime" :siderWidth="siderWidth" />
           </div>
           <div style="position:absolute;left:0;top:0;">
-            <transition-group
-              name="list"
-              enter-active-class="animate__animated animate__fadeInUp"
-              leave-active-class="animate__animated animate__fadeOutUp"
-            >
+            <transition-group name="list" enter-active-class="animate__animated animate__fadeInUp"
+              leave-active-class="animate__animated animate__fadeOutUp">
               <div v-for="track in displayTracks.filter(isVisible)" :key="track.index">
-                <TrackCardPanel
-                  :siderWidth="siderWidth"
-                  :currentNoteType="currentNoteType"
-                  :id="'trackCardPanel' + track.index"
-                  :chart="chart"
-                  :track="track"
-                  :global="global"
-                  :scrollLeft="scrollLeft"
-                  :displayAreaTime="displayAreaTime"
-                  :enableEdit="enableEdit"
-                  @currentTrack="handleCurrentTrack"
-                />
+                <TrackCardPanel :siderWidth="siderWidth" :currentNoteType="currentNoteType"
+                  :id="'trackCardPanel' + track.index" :chart="chart" :track="track" :global="global"
+                  :scrollLeft="scrollLeft" :displayAreaTime="displayAreaTime" :enableEdit="enableEdit"
+                  @currentTrack="handleCurrentTrack" />
               </div>
             </transition-group>
           </div>
 
-          <div
-            class="time-indicater"
-            id="time-indicater"
-            :style="{
-              width: '1px',
-              background: 'rgb(255,255,0)',
-              height: '100%',
-              position: 'absolute',
-              pointerEvents: 'none',
-              top: scrollTop + 'px',
-              left: (global.currentTime / displayAreaTime) * (global.documentWidth - siderWidth) + 'px',
-            }"
-          ></div>
-          <div
-            class="time-indicater-false"
-            id="time-indicater-false"
-            :style="{
-              width: '1px',
-              background: 'rgb(255,255,255)',
-              height: '100%',
-              position: 'absolute',
-              pointerEvents: 'none',
-              top: scrollTop + 'px',
-              left: indicatorLeft + 'px',
-            }"
-          ></div>
+          <div class="time-indicater" id="time-indicater" :style="{
+            width: '1px',
+            background: 'rgb(255,255,0)',
+            height: '100%',
+            position: 'absolute',
+            pointerEvents: 'none',
+            top: scrollTop + 'px',
+            left: (global.currentTime / displayAreaTime) * (global.documentWidth - siderWidth) + 'px',
+          }"></div>
+          <div class="time-indicater-false" id="time-indicater-false" :style="{
+            width: '1px',
+            background: 'rgb(255,255,255)',
+            height: '100%',
+            position: 'absolute',
+            pointerEvents: 'none',
+            top: scrollTop + 'px',
+            left: indicatorLeft + 'px',
+          }"></div>
         </div>
       </div>
-      
+
       <!-- 背景时间轴 -->
-      <BackgroundTimeline 
-        :chart="chart"
-        :global="global"
-        :displayAreaTime="displayAreaTime"
-        v-model:scrollLeft="scrollLeft"
-        :indicatorLeft="indicatorLeft"
-        @toggle-collapse="bgCollapsed = $event"
-        @mousemove="rightMouseMove($event)"
-        @mousedown="rightClick($event)"
-      />
+      <BackgroundTimeline :chart="chart" :global="global" :displayAreaTime="displayAreaTime"
+        v-model:scrollLeft="scrollLeft" :indicatorLeft="indicatorLeft" @toggle-collapse="bgCollapsed = $event"
+        @mousemove="rightMouseMove($event)" @mousedown="rightClick($event)" />
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, watch, defineProps, defineEmits, onMounted, inject } from 'vue';
-import { 
-  Sort, Timer, Filter, Aim, Compass, CircleCheck, 
+import {
+  Sort, Timer, Filter, Aim, Compass, CircleCheck,
   MagicStick, Delete, EditPen, ZoomIn, CirclePlus, View, Refresh,
   Back, Upload, UploadFilled, Setting, FullScreen, RefreshLeft,
   ArrowLeft, ArrowRight
@@ -370,11 +303,11 @@ const newTrack = () => {
     props.chart.tracks.push(track);
     // Auto scroll to the new track which is at the bottom
     setTimeout(() => {
-       const newTrackIndex = props.chart.tracks.length - 1;
-       const leftScroll = document.getElementById("footer-left-scroll");
-       if (leftScroll) leftScroll.scrollTop = leftScroll.scrollHeight;
+      const newTrackIndex = props.chart.tracks.length - 1;
+      const leftScroll = document.getElementById("footer-left-scroll");
+      if (leftScroll) leftScroll.scrollTop = leftScroll.scrollHeight;
     }, 100);
-    
+
     updateTrack();
   } else {
     ElNotification({
@@ -385,7 +318,7 @@ const newTrack = () => {
     // Find editing track and scroll to it
     const editIndex = props.chart.tracks.findIndex(t => t.edit);
     if (editIndex !== -1) {
-       // logic to scroll to editIndex track
+      // logic to scroll to editIndex track
     }
   }
 };
@@ -403,15 +336,15 @@ const showAllTracks = () => {
 
 const switchToDeleteMode = () => {
   if (currentNoteType.value === 3) {
-      // 已经在删除模式，再次点击退出
-      currentNoteType.value = -1;
-      ElNotification({
-        title: '快捷删除模式关闭',
-        message: '已退出删除模式',
-        type: 'info',
-        duration: 2000
-      });
-      return; 
+    // 已经在删除模式，再次点击退出
+    currentNoteType.value = -1;
+    ElNotification({
+      title: '快捷删除模式关闭',
+      message: '已退出删除模式',
+      type: 'info',
+      duration: 2000
+    });
+    return;
   }
   ElMessageBox.confirm(
     '进入快捷删除模式后，点击音符或操作将直接删除（无确认）。确定要继续吗？',
@@ -488,7 +421,7 @@ const rightClick = (e) => {
   if (!rightElem) return;
   const rect = rightElem.getBoundingClientRect();
   if (e.clientX < rect.left) return;
-  
+
   rightClicked.value = true;
   const x = e.clientX - rect.left + scrollLeft.value;
   const currentTime = (x / (rect.width)) * displayAreaTime.value;
@@ -502,7 +435,7 @@ const rightMouseMove = (e) => {
   if (!rightElem) return;
   const rect = rightElem.getBoundingClientRect();
   if (e.clientX < rect.left) return;
-  
+
   const x = e.clientX - rect.left + scrollLeft.value;
   indicatorLeft.value = x;
   if (rightClicked.value) {
@@ -520,16 +453,16 @@ const handleWheel = (e) => {
     // deltaY positive = zoom out (increase time range)?
     // Chrome: pinch out -> deltaY negative (zoom in).
     // Let's assume negative deltaY means ZOOM IN (smaller displayAreaTime).
-    
+
     // Sensitivity increased from 0.001 to 0.005
     const zoomFactor = 1 + (e.deltaY * 0.005);
     let newTime = displayAreaTime.value * zoomFactor;
-    
+
     // Constraints
     if (newTime < 1000) newTime = 1000;
     if (newTime > props.chart.songLength) newTime = props.chart.songLength;
     if (newTime > 300000) newTime = 300000; // Hard max if songLength is weird
-    
+
     displayAreaTime.value = newTime;
   }
 };
@@ -541,7 +474,7 @@ window.addEventListener("mouseup", () => {
 const displayTracks = computed(() => {
   const tracks = props.chart.tracks;
   if (!tracks) return [];
-  
+
   const currentTime = props.global.currentTime;
 
   return [...tracks].sort((a, b) => {
@@ -549,7 +482,7 @@ const displayTracks = computed(() => {
       if (a.startTiming !== b.startTiming) return a.startTiming - b.startTiming;
     } else {
       // 模式2: 坐标排序 (状态权重四级排序)
-      
+
       // 获取轨道当前相对于播放进度的状态权重
       // 0: 进行中 (正在屏幕上) - 最高优先级
       // 1: 待出场 (还没到时间) - 次高优先级
@@ -588,8 +521,8 @@ const isVisible = (track) => {
   if (track.showInTimeline === false) return false;
   const showByNote = !showNoRemain.value ? (track.notes.length > 0) : true;
   const showByType = track.type === 1 ? showReal.value : showFake.value;
-  const showByTime = showCurrent.value 
-    ? (props.global.currentTime >= track.startTiming && props.global.currentTime <= track.endTiming) 
+  const showByTime = showCurrent.value
+    ? (props.global.currentTime >= track.startTiming && props.global.currentTime <= track.endTiming)
     : true;
   return showByType && showByNote && showByTime;
 };
@@ -601,22 +534,31 @@ watch(scrollLeft, (newVal) => {
   }
 });
 
+// 核心：保持黄线居中的滚动计算
+const scrollToCenter = (time) => {
+  const rightElem = document.getElementById("footer-right-scroll");
+  if (!rightElem) return;
+  const rect = rightElem.getBoundingClientRect();
+  const totalWidth = props.global.documentWidth - props.siderWidth;
+  const currentX = (time / displayAreaTime.value) * totalWidth;
+  const targetScroll = currentX - (rect.width / 2);
+  rightElem.scrollLeft = targetScroll;
+
+  const bgTimelineScroll = document.querySelector(".bg-timeline-right");
+  if (bgTimelineScroll) bgTimelineScroll.scrollLeft = targetScroll;
+};
+
 watch(() => props.global.currentTime, (newVal) => {
   if (autoScroll.value) {
-    const rightElem = document.getElementById("footer-right-scroll");
-    if (rightElem) {
-      const rect = rightElem.getBoundingClientRect();
-      const currentX = (newVal / displayAreaTime.value) * (props.global.documentWidth - props.siderWidth);
-      // Center the view on the playhead
-      const targetScroll = currentX - (rect.width / 2);
-      
-      rightElem.scrollLeft = targetScroll;
-      
-      // Also sync background timeline
-      const bgTimelineScroll = document.querySelector(".bg-timeline-right");
-      if (bgTimelineScroll) bgTimelineScroll.scrollLeft = targetScroll;
-    }
+    scrollToCenter(newVal);
   }
+});
+
+// 监听缩放变化，实现居中缩放
+watch(displayAreaTime, () => {
+  // 缩放时，我们希望黄线（currentTime）在屏幕上的相对位置保持不变，或者直接居中
+  // 为了用户体验，缩放时直接居中当前时间点是最直观的
+  scrollToCenter(props.global.currentTime);
 });
 
 onMounted(() => {
@@ -628,14 +570,15 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.footer-container { 
-  height: 100%; 
-  width: 100vw; 
-  position: relative; 
-  overflow: hidden; 
+.footer-container {
+  height: 100%;
+  width: 100vw;
+  position: relative;
+  overflow: hidden;
   --sider-width: v-bind(siderWidth + 'px');
   user-select: none;
 }
+
 .footer-header {
   height: 48px;
   width: 100vw;
@@ -667,54 +610,70 @@ onMounted(() => {
   transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.footer-left { 
-  width: var(--sider-width, 300px); 
-  height: 100%; 
-  flex-shrink: 0; 
-  position: relative; 
+.footer-left {
+  width: var(--sider-width, 300px);
+  height: 100%;
+  flex-shrink: 0;
+  position: relative;
 }
-.footer-track-container { 
-  width: 100%; 
-  height: 100%; 
-  border-right: 1px solid rgba(255, 255, 255, 0.05); 
-  background: rgb(32, 32, 32); 
-  overflow-y: auto; 
+
+.footer-track-container {
+  width: 100%;
+  height: 100%;
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgb(32, 32, 32);
+  overflow-y: auto;
   overflow-x: hidden;
 }
-.footer-track-container::-webkit-scrollbar { width: 0 !important; }
 
-.footer-right { 
+.footer-track-container::-webkit-scrollbar {
+  width: 0 !important;
+}
+
+.footer-right {
   flex-grow: 1;
-  background: rgb(25, 25, 25); 
+  background: rgb(25, 25, 25);
   height: 100%;
-  overflow: auto; 
+  overflow: auto;
   padding-top: 0px;
   position: relative;
 }
-.footer-right::-webkit-scrollbar { height: 6px; background: rgba(0,0,0,0.2); }
-.footer-right::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
 
-.footer-toolbar { 
-  display: flex; 
-  align-items: center; 
-  height: 44px; /* 增加高度以提升大气感 */
-  overflow-x: auto; 
+.footer-right::-webkit-scrollbar {
+  height: 6px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.footer-right::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.footer-toolbar {
+  display: flex;
+  align-items: center;
+  height: 44px;
+  /* 增加高度以提升大气感 */
+  overflow-x: auto;
   white-space: nowrap;
   background: rgba(10, 10, 10, 0.4);
 }
+
 .toolbar-side-aligned {
   display: flex;
   align-items: center;
   /* 这里的 22px 是轨道卡片内边距(10px) + 卡片内部边距(12px) 的物理起点，确保对齐预览图 */
-  padding-left: 22px; 
+  padding-left: 22px;
   flex-shrink: 0;
   box-sizing: border-box;
 }
+
 .toolbar-group-minimal {
   display: flex;
   align-items: center;
   gap: 16px;
 }
+
 .toolbar-group {
   display: flex;
   align-items: center;
@@ -739,48 +698,209 @@ onMounted(() => {
   transform: translateY(-1px);
 }
 
-:deep(.el-button.is-active), :deep(.el-button.is-selected) {
+:deep(.el-button.is-active),
+:deep(.el-button.is-selected) {
   color: #409eff !important;
   background: rgba(64, 158, 255, 0.08) !important;
 }
 
 .tool-btn-minimal {
-  font-size: 18px; /* 稍微加大图标 */
+  font-size: 18px;
+  /* 稍微加大图标 */
   color: #999;
 }
+
 .tool-btn-minimal.is-active {
   color: #409eff;
 }
-.toolbar-divider { width: 1px; height: 20px; background: rgba(255, 255, 255, 0.1); margin: 0 8px; }
-.tool-btn { background: transparent !important; border: none !important; color: #888 !important; transition: all 0.2s ease; }
-.tool-btn:hover { color: #fff !important; transform: scale(1.1); }
-.tool-btn.is-active { color: var(--accent-cyan, #00f3ff) !important; text-shadow: 0 0 8px rgba(0, 243, 255, 0.5); }
-.toggle-btn { background: transparent !important; border: 1px solid rgba(255, 255, 255, 0.1) !important; color: #999 !important; border-radius: 6px !important; padding: 4px 10px !important; }
-.toggle-btn.is-active { background: rgba(64, 158, 255, 0.2) !important; border-color: #409eff !important; color: #409eff !important; }
-.mode-btn { background: rgba(255, 255, 255, 0.05) !important; border: 1px solid transparent !important; color: #aaa !important; border-radius: 4px !important; padding: 4px 12px !important; display: flex; align-items: center; gap: 6px; }
-.mode-btn.is-selected { background: rgba(255, 255, 255, 0.1) !important; border-color: rgba(255, 255, 255, 0.2) !important; color: #fff !important; }
-.mode-dot { width: 6px; height: 6px; border-radius: 50%; }
-.mode-0 { background: #409eff; }
-.mode-1 { background: #e6a23c; }
-.mode-2 { background: #67c23a; }
-.delete-mode-btn { background: transparent !important; border: 1px solid transparent !important; color: #888 !important; }
-.delete-mode-btn.is-selected { color: #f56c6c !important; }
-.tool-btn-rect { background: rgba(255, 255, 255, 0.05) !important; border: 1px solid rgba(255, 255, 255, 0.1) !important; color: #aaa !important; border-radius: 4px !important; }
-.tool-btn-rect.is-warning { color: #f56c6c !important; border-color: rgba(245, 108, 108, 0.3) !important; }
-.tool-btn-rect.is-primary { background: linear-gradient(135deg, #409eff, #3a8ee6) !important; color: #fff !important; border: none !important; font-weight: 600 !important; }
-.tool-btn-rect.is-primary:hover { filter: brightness(1.1); box-shadow: 0 0 10px rgba(64, 158, 255, 0.4); }
-.footer-header-right { display: flex; align-items: center; }
-.time-display-wrapper { background: rgba(0, 0, 0, 0.3); padding: 4px 12px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.05); font-family: 'Inter', monospace; }
-.current-time { color: #fff; font-size: 14px; font-weight: 700; min-width: 50px; text-align: right; }
-.time-separator { color: rgba(255, 255, 255, 0.3); margin: 0 4px; }
-.total-time { color: rgba(255, 255, 255, 0.5); font-size: 13px; }
-.unit { font-size: 10px; color: rgba(255, 255, 255, 0.2); margin-left: 4px; text-transform: uppercase; }
-.custom-slider-container { color: #888; display: flex; align-items: center; gap: 12px; }
-.custom-range { appearance: none; background: rgba(255,255,255,0.1); height: 4px; border-radius: 2px; outline: none; width: 120px; }
-.custom-range::-webkit-slider-thumb { appearance: none; width: 12px; height: 12px; background: #67c23a; border-radius: 50%; cursor: pointer; }
-.beat-line-wrapper-absolute { position: absolute; top: 0; left: 0; height: 100%; width: 100%; z-index: 5; pointer-events: none; }
-.animate__animated { --animate-duration: 0.2s; }
-.list-move { transition: transform 0.2s ease; }
+
+.toolbar-divider {
+  width: 1px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 0 8px;
+}
+
+.tool-btn {
+  background: transparent !important;
+  border: none !important;
+  color: #888 !important;
+  transition: all 0.2s ease;
+}
+
+.tool-btn:hover {
+  color: #fff !important;
+  transform: scale(1.1);
+}
+
+.tool-btn.is-active {
+  color: var(--accent-cyan, #00f3ff) !important;
+  text-shadow: 0 0 8px rgba(0, 243, 255, 0.5);
+}
+
+.toggle-btn {
+  background: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #999 !important;
+  border-radius: 6px !important;
+  padding: 4px 10px !important;
+}
+
+.toggle-btn.is-active {
+  background: rgba(64, 158, 255, 0.2) !important;
+  border-color: #409eff !important;
+  color: #409eff !important;
+}
+
+.mode-btn {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid transparent !important;
+  color: #aaa !important;
+  border-radius: 4px !important;
+  padding: 4px 12px !important;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mode-btn.is-selected {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  color: #fff !important;
+}
+
+.mode-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.mode-0 {
+  background: #409eff;
+}
+
+.mode-1 {
+  background: #e6a23c;
+}
+
+.mode-2 {
+  background: #67c23a;
+}
+
+.delete-mode-btn {
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  color: #888 !important;
+}
+
+.delete-mode-btn.is-selected {
+  color: #f56c6c !important;
+}
+
+.tool-btn-rect {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #aaa !important;
+  border-radius: 4px !important;
+}
+
+.tool-btn-rect.is-warning {
+  color: #f56c6c !important;
+  border-color: rgba(245, 108, 108, 0.3) !important;
+}
+
+.tool-btn-rect.is-primary {
+  background: linear-gradient(135deg, #409eff, #3a8ee6) !important;
+  color: #fff !important;
+  border: none !important;
+  font-weight: 600 !important;
+}
+
+.tool-btn-rect.is-primary:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 0 10px rgba(64, 158, 255, 0.4);
+}
+
+.footer-header-right {
+  display: flex;
+  align-items: center;
+}
+
+.time-display-wrapper {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  font-family: 'Inter', monospace;
+}
+
+.current-time {
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  min-width: 50px;
+  text-align: right;
+}
+
+.time-separator {
+  color: rgba(255, 255, 255, 0.3);
+  margin: 0 4px;
+}
+
+.total-time {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 13px;
+}
+
+.unit {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.2);
+  margin-left: 4px;
+  text-transform: uppercase;
+}
+
+.custom-slider-container {
+  color: #888;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.custom-range {
+  appearance: none;
+  background: rgba(255, 255, 255, 0.1);
+  height: 4px;
+  border-radius: 2px;
+  outline: none;
+  width: 120px;
+}
+
+.custom-range::-webkit-slider-thumb {
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  background: #67c23a;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.beat-line-wrapper-absolute {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.animate__animated {
+  --animate-duration: 0.2s;
+}
+
+.list-move {
+  transition: transform 0.2s ease;
+}
 
 .online-indicator {
   display: flex;
@@ -812,32 +932,57 @@ onMounted(() => {
 }
 
 @keyframes pulse {
-  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(103, 194, 58, 0.7); }
-  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(103, 194, 58, 0); }
-  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(103, 194, 58, 0); }
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(103, 194, 58, 0.7);
+  }
+
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 6px rgba(103, 194, 58, 0);
+  }
+
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(103, 194, 58, 0);
+  }
 }
 
 @keyframes pulse-warn {
-  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(230, 162, 60, 0.7); }
-  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(230, 162, 60, 0); }
-  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(230, 162, 60, 0); }
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(230, 162, 60, 0.7);
+  }
+
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 6px rgba(230, 162, 60, 0);
+  }
+
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(230, 162, 60, 0);
+  }
 }
 
 .user-list-tooltip {
   padding: 4px;
 }
+
 .tooltip-title {
   font-size: 12px;
   color: #888;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   margin-bottom: 6px;
   padding-bottom: 4px;
 }
+
 .user-item {
   font-size: 13px;
   color: #fff;
   padding: 2px 0;
 }
+
 .tool-btn-glass {
   background: rgba(255, 255, 255, 0.05) !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
@@ -845,6 +990,7 @@ onMounted(() => {
   backdrop-filter: blur(5px);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
 .tool-btn-glass:hover {
   background: rgba(64, 158, 255, 0.2) !important;
   border-color: rgba(64, 158, 255, 0.5) !important;
