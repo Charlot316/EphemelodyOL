@@ -1,6 +1,5 @@
 <template>
-  <div class="workspace-root select" :class="{ 'is-fullscreen': isEditorFullscreen }" v-loading="isLoading"
-    element-loading-text="正在构建舞台..." element-loading-background="rgba(0, 0, 0, 0.8)">
+  <div class="workspace-root select" :class="{ 'is-fullscreen': isEditorFullscreen }">
     <!-- 顶部状态栏 (可选/隐藏) -->
 
     <div class="main-layout" :style="layoutStyle">
@@ -332,9 +331,7 @@ onMounted(() => {
 
   getChart(() => {
     // Loaded
-    setTimeout(() => {
-      isLoading.value = false;
-    }, 1500); // 给 DOM 渲染留出缓冲时间
+    isLoading.value = false;
   });
 });
 
