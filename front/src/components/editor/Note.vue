@@ -60,11 +60,11 @@
       <template #reference>
         <div>
           <div v-if="note.noteType == 0">
-            <el-image @dragstart.prevent @mousedown="longNoteCanMove"
+            <el-image @dragstart.prevent @mousedown="longNoteCanMove($event)"
               style="width:40px;height:40px;user-select:none;cursor: move;" :src="hitNoteImage" />
           </div>
           <div v-if="note.noteType == 1">
-            <div @mousedown="longNoteCanMove" :style="{
+            <div @mousedown="longNoteCanMove($event)" :style="{
               userSelect: 'none',
               height: '38px',
               position: 'absolute',
@@ -77,10 +77,10 @@
               left: '20px',
               top: '1px',
             }"></div>
-            <el-image @dragstart.prevent @mousedown="startLeftMove"
+            <el-image @dragstart.prevent @mousedown="startLeftMove($event)"
               style="width:40px;height:40px;position:absolute;left:0;top:0;user-select: none;cursor:w-resize;"
               :src="hitNoteLeftImage" />
-            <el-image @dragstart.prevent @mousedown="startRightMove" :style="{
+            <el-image @dragstart.prevent @mousedown="startRightMove($event)" :style="{
               userSelect: 'none',
               height: '40px',
               width: '40px',
@@ -94,8 +94,8 @@
             }" :src="hitNoteRightImage" />
           </div>
           <div v-if="note.noteType == 2">
-            <el-image @mousedown="longNoteCanMove" @dragstart.prevent style="width:40px;height:40px;cursor: move;"
-              :src="slideNoteImage" />
+            <el-image @mousedown="longNoteCanMove($event)" @dragstart.prevent
+              style="width:40px;height:40px;cursor: move;" :src="slideNoteImage" />
           </div>
         </div>
       </template>
@@ -285,8 +285,8 @@ const checkOverlap = (start, end, exclude) => {
   return false;
 };
 
-const longNoteCanMove = () => {
-  if (props.note.isPending || props.note.isDeleting) return;
+const longNoteCanMove = (e) => {
+  if (e.button !== 0 || edit.value || props.note.isPending || props.note.isDeleting) return;
   canMove.value = true;
   hasDragged.value = false;
   mouseDownX.value = props.global.clientX;
@@ -296,8 +296,8 @@ const longNoteCanMove = () => {
   snapPoints.value = collectSnapPoints(props.note);
 };
 
-const startLeftMove = () => {
-  if (props.note.isPending || props.note.isDeleting) return;
+const startLeftMove = (e) => {
+  if (e.button !== 0 || edit.value || props.note.isPending || props.note.isDeleting) return;
   leftMove.value = true;
   hasDragged.value = false;
   mouseDownX.value = props.global.clientX;
@@ -307,8 +307,8 @@ const startLeftMove = () => {
   snapPoints.value = collectSnapPoints(props.note);
 };
 
-const startRightMove = () => {
-  if (props.note.isPending || props.note.isDeleting) return;
+const startRightMove = (e) => {
+  if (e.button !== 0 || edit.value || props.note.isPending || props.note.isDeleting) return;
   rightMove.value = true;
   hasDragged.value = false;
   mouseDownX.value = props.global.clientX;

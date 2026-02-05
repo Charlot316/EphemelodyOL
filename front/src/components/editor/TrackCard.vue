@@ -34,10 +34,9 @@
                 <CircleClose class="svg-icon" />
               </button>
 
-              <button v-if="track.edit" class="icon-btn save" @click.stop="saveTrack" title="发布">
-                <CircleCheck class="svg-icon" />
+              <button class="icon-btn delete" @click.stop="deleteTrack" title="删除轨道">
+                <Delete class="svg-icon" />
               </button>
-
             </div>
           </div>
           <div class="timing-info">
@@ -212,6 +211,29 @@ const handleCurrentTrack = () => {
   if (props.track.isPending || props.track.isDeleting) return;
   emit("currentTrack", props.track);
   startEdit();
+};
+
+const deleteTrack = () => {
+  ElMessageBox.confirm(
+    "删除轨道将会连同该轨道下的音符、操作、色彩一并删除，您确定要删除吗？",
+    "严格确认",
+    {
+      confirmButtonText: "狠心删除",
+      cancelButtonText: "我再想想",
+      type: "error",
+      confirmButtonClass: 'el-button--danger'
+    }
+  ).then(() => {
+    if (props.track.isNew) {
+      const idx = props.chart.tracks.indexOf(props.track);
+      if (idx !== -1) props.chart.tracks.splice(idx, 1);
+      emit("editStatus", true);
+    } else {
+      props.track.isDeleting = true;
+      if (syncAction) syncAction("DELETE_TRACK", props.track.id);
+    }
+    updateTrack();
+  }).catch(() => { });
 };
 
 const saveTrack = () => {

@@ -44,7 +44,7 @@
               </div>
             </template>
             <div>
-              <div @mousedown="longOperationCanMove" :style="{
+              <div @mousedown="longOperationCanMove($event)" :style="{
                 userSelect: 'none',
                 height: '40px',
                 position: 'absolute',
@@ -68,9 +68,9 @@
                   {{ operation.startWidth }}→{{ operation.endWidth }}
                 </div>
               </div>
-              <div @mousedown="startLeftMove"
+              <div @mousedown="startLeftMove($event)"
                 style="width:1px;height:40px;position:absolute;left:0px;top:0;cursor:w-resize;background:transparent;" />
-              <div @mousedown="startRightMove" :style="{
+              <div @mousedown="startRightMove($event)" :style="{
                 userSelect: 'none',
                 height: '40px',
                 width: '1px',
@@ -258,8 +258,8 @@ const checkOverlap = (start, end, exclude) => {
   return false;
 };
 
-const longOperationCanMove = () => {
-  if (props.operation.isPending || props.operation.isDeleting) return;
+const longOperationCanMove = (e) => {
+  if (e.button !== 0 || edit.value || props.operation.isPending || props.operation.isDeleting) return;
   canMove.value = true;
   dragStartX.value = props.global.clientX;
   dragStartTiming.value = props.operation.startTiming;
@@ -267,8 +267,8 @@ const longOperationCanMove = () => {
   snapPoints.value = collectSnapPoints(props.operation);
 };
 
-const startLeftMove = () => {
-  if (props.operation.isPending || props.operation.isDeleting) return;
+const startLeftMove = (e) => {
+  if (e.button !== 0 || edit.value || props.operation.isPending || props.operation.isDeleting) return;
   leftMove.value = true;
   dragStartX.value = props.global.clientX;
   dragStartTiming.value = props.operation.startTiming;
@@ -276,8 +276,8 @@ const startLeftMove = () => {
   snapPoints.value = collectSnapPoints(props.operation);
 };
 
-const startRightMove = () => {
-  if (props.operation.isPending || props.operation.isDeleting) return;
+const startRightMove = (e) => {
+  if (e.button !== 0 || edit.value || props.operation.isPending || props.operation.isDeleting) return;
   rightMove.value = true;
   dragStartX.value = props.global.clientX;
   dragStartTiming.value = props.operation.startTiming;

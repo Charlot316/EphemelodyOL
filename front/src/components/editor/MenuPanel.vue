@@ -158,11 +158,12 @@ const onDragStart = (event, asset) => {
 
 .assets-grid {
   margin-top: 12px;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
   overflow-y: auto;
   padding-bottom: 20px;
+  padding-right: 4px;
 }
 
 .assets-grid::-webkit-scrollbar {
@@ -188,15 +189,20 @@ const onDragStart = (event, asset) => {
 }
 
 .asset-preview {
-  aspect-ratio: 16/9;
   position: relative;
   overflow: hidden;
+  background: rgba(0, 0, 0, 0.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100px;
 }
 
 .asset-preview img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  max-width: 100%;
+  max-height: 300px;
+  object-fit: contain;
+  display: block;
 }
 
 .asset-overlay {
@@ -243,7 +249,6 @@ const onDragStart = (event, asset) => {
 }
 
 .empty-state {
-  grid-column: span 2;
   display: flex;
   flex-direction: column;
   align-items: center;

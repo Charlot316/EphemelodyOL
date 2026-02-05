@@ -307,6 +307,14 @@ const contextMenuVisible = ref(false);
 const contextMenuData = ref({ x: 0, y: 0, time: 0 });
 
 const showContextMenu = (e) => {
+  if (!props.track.edit) {
+    props.track.edit = true;
+    setTimeout(() => {
+      document.querySelector("#trackCard" + props.track.index)?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 100);
+    return;
+  }
+
   const rect = e.currentTarget.getBoundingClientRect();
   const clickX = e.clientX - rect.left;
   const timeMs = (clickX / (props.global.documentWidth - props.siderWidth)) * props.displayAreaTime;

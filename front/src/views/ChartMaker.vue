@@ -1,5 +1,6 @@
 <template>
-  <div class="workspace-root select" :class="{ 'is-fullscreen': isEditorFullscreen }">
+  <div class="workspace-root select" :class="{ 'is-fullscreen': isEditorFullscreen }" v-loading="isLoading"
+    element-loading-text="正在构建舞台..." element-loading-background="rgba(0, 0, 0, 0.8)">
     <!-- 顶部状态栏 (可选/隐藏) -->
 
     <div class="main-layout" :style="layoutStyle">
@@ -80,9 +81,8 @@
 import { ref, reactive, computed, watch, onMounted, onBeforeUnmount, provide } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
-import { Axios } from '@/plugins/axios';
-import { ElNotification } from 'element-plus';
-import { VideoPause, VideoPlay, Setting } from '@element-plus/icons-vue';
+import { VideoPause, VideoPlay, Setting, Loading } from '@element-plus/icons-vue';
+import { ElNotification, ElLoading } from 'element-plus';
 import BeatPlayer from "@/components/game/BeatPlayer.vue";
 import MenuPanel from "@/components/editor/MenuPanel.vue";
 import Footer from "@/components/editor/Footer.vue";
@@ -100,6 +100,7 @@ const isResizingSider = ref(false);
 const isEditorFullscreen = ref(false);
 const timeStep = ref(1);
 const siderWidth = ref(300);
+const isLoading = ref(true);
 
 const history = useCommandHistory();
 provide('commandHistory', history);
@@ -331,6 +332,9 @@ onMounted(() => {
 
   getChart(() => {
     // Loaded
+    setTimeout(() => {
+      isLoading.value = false;
+    }, 1500); // 给 DOM 渲染留出缓冲时间
   });
 });
 

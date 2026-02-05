@@ -62,7 +62,7 @@
               </div>
             </template>
             <div>
-              <div @mousedown="longOperationCanMove" :style="{
+              <div @mousedown="longOperationCanMove($event)" :style="{
                 userSelect: 'none',
                 height: '40px',
                 position: 'absolute',
@@ -104,9 +104,9 @@
                   }">█</span>
                 </div>
               </div>
-              <div @mousedown="leftMove = true"
+              <div @mousedown="startLeftMove($event)"
                 style="width:1px;height:40px;position:absolute;left:0px;top:0;cursor:w-resize;background:transparent;" />
-              <div @mousedown="rightMove = true" :style="{
+              <div @mousedown="startRightMove($event)" :style="{
                 userSelect: 'none',
                 height: '40px',
                 width: '1px',
@@ -286,9 +286,27 @@ const getSnappedTime = (time, points) => {
   return bestTime;
 };
 
-const longOperationCanMove = () => {
-  if (props.operation.isPending || props.operation.isDeleting) return;
+const longOperationCanMove = (e) => {
+  if (e.button !== 0 || edit.value || props.operation.isPending || props.operation.isDeleting) return;
   canMove.value = true;
+  dragStartX.value = props.global.clientX;
+  dragStartTiming.value = props.operation.startTiming;
+  dragEndTiming.value = props.operation.endTiming;
+  snapPoints.value = collectSnapPoints(props.operation);
+};
+
+const startLeftMove = (e) => {
+  if (e.button !== 0 || edit.value || props.operation.isPending || props.operation.isDeleting) return;
+  leftMove.value = true;
+  dragStartX.value = props.global.clientX;
+  dragStartTiming.value = props.operation.startTiming;
+  dragEndTiming.value = props.operation.endTiming;
+  snapPoints.value = collectSnapPoints(props.operation);
+};
+
+const startRightMove = (e) => {
+  if (e.button !== 0 || edit.value || props.operation.isPending || props.operation.isDeleting) return;
+  rightMove.value = true;
   dragStartX.value = props.global.clientX;
   dragStartTiming.value = props.operation.startTiming;
   dragEndTiming.value = props.operation.endTiming;

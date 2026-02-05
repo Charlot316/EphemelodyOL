@@ -1,73 +1,36 @@
 <template>
-  <div
-    @click="selfClicked"
-    @contextmenu.prevent.stop="startEdit"
-    :style="opStyle"
-    @mousedown="setZIndex"
-  >
+  <div @click="selfClicked" @contextmenu.prevent.stop="startEdit" :style="opStyle" @mousedown="setZIndex">
 
-    <el-popover
-      v-model:visible="edit"
-      placement="top"
-      :width="300"
-      trigger="manual"
-    >
+    <el-popover v-model:visible="edit" placement="top" :width="300" trigger="manual">
       <div style="text-align:right;">
-        <el-button
-          type="text"
-          class="cancel-button"
-          @click="edit = false"
-        >
-          <el-icon><CircleClose /></el-icon>
+        <el-button type="text" class="cancel-button" @click="edit = false">
+          <el-icon>
+            <CircleClose />
+          </el-icon>
         </el-button>
-        <el-button
-          type="text"
-          class="ok-button"
-          @click="saveOperation"
-        >
-          <el-icon><CircleCheck /></el-icon>
+        <el-button type="text" class="ok-button" @click="saveOperation">
+          <el-icon>
+            <CircleCheck />
+          </el-icon>
         </el-button>
-        <el-button
-          type="text"
-          class="delete-button"
-          @click="deleteOperation"
-        >
-          <el-icon><Delete /></el-icon>
+        <el-button type="text" class="delete-button" @click="deleteOperation">
+          <el-icon>
+            <Delete />
+          </el-icon>
         </el-button>
       </div>
-      <el-form
-        :model="tempOperation"
-        :rules="rules"
-        ref="formRef"
-        @submit.prevent="saveOperation"
-      >
+      <el-form :model="tempOperation" :rules="rules" ref="formRef" @submit.prevent="saveOperation">
         <el-form-item label="开始时机" label-width="80px" prop="startTiming">
-          <el-input
-            @keydown.enter="saveOperation"
-            v-model="tempOperation.startTiming"
-            style="width:130px"
-          />
+          <el-input @keydown.enter="saveOperation" v-model="tempOperation.startTiming" style="width:130px" />
         </el-form-item>
         <el-form-item label="结束时机" label-width="80px" prop="endTiming">
-          <el-input
-            @keydown.enter="saveOperation"
-            v-model="tempOperation.endTiming"
-            style="width:130px"
-          />
+          <el-input @keydown.enter="saveOperation" v-model="tempOperation.endTiming" style="width:130px" />
         </el-form-item>
         <el-form-item label="开始坐标" label-width="80px" prop="startX">
-          <el-input
-            @keydown.enter="saveOperation"
-            v-model="tempOperation.startX"
-            style="width:130px"
-          />
+          <el-input @keydown.enter="saveOperation" v-model="tempOperation.startX" style="width:130px" />
         </el-form-item>
         <el-form-item label="结束坐标" label-width="80px" prop="endX">
-          <el-input
-            @keydown.enter="saveOperation"
-            v-model="tempOperation.endX"
-            style="width:130px"
-          />
+          <el-input @keydown.enter="saveOperation" v-model="tempOperation.endX" style="width:130px" />
         </el-form-item>
       </el-form>
       <template #reference>
@@ -81,55 +44,47 @@
               </div>
             </template>
             <div>
-              <div
-                @mousedown="longOperationCanMove"
-                :style="{
-                  userSelect: 'none',
-                  height: '40px',
-                  position: 'absolute',
-                  background: 'rgb(83, 195, 208)',
-                  cursor: 'move',
-                  width:
-                    ((operation.endTiming - operation.startTiming) /
-                      displayAreaTime) *
-                      (global.documentWidth - global.siderWidth) +
-                    'px',
-                  left: '0px',
-                  top: '1px',
-                  overflow: 'hidden',
-                  lineHeight: '40px',
-                  fontSize: '20px',
-                  border: '0px solid #fff',
-                  borderLeftWidth: '1px',
-                  borderRightWidth: '1px',
-                }"
-              >
+              <div @mousedown="longOperationCanMove($event)" :style="{
+                userSelect: 'none',
+                height: '40px',
+                position: 'absolute',
+                background: 'rgb(83, 195, 208)',
+                cursor: 'move',
+                width:
+                  ((operation.endTiming - operation.startTiming) /
+                    displayAreaTime) *
+                  (global.documentWidth - global.siderWidth) +
+                  'px',
+                left: '0px',
+                top: '1px',
+                overflow: 'hidden',
+                lineHeight: '40px',
+                fontSize: '20px',
+                border: '0px solid #fff',
+                borderLeftWidth: '1px',
+                borderRightWidth: '1px',
+              }">
                 <div style="text-align:center;color:rgb(255,255,255)">
                   {{ operation.startX }}→{{ operation.endX }}
                 </div>
               </div>
-              <div
-                @mousedown="startLeftMove"
-                style="width:1px;height:40px;position:absolute;left:0px;top:0;cursor:w-resize;background:transparent;"
-              />
-              <div
-                @mousedown="startRightMove"
-                :style="{
-                  userSelect: 'none',
-                  height: '40px',
-                  width: '1px',
-                  position: 'absolute',
-                  cursor: 'e-resize',
-                  left:
-                    ((operation.endTiming - operation.startTiming) /
-                      displayAreaTime) *
-                      (global.documentWidth - global.siderWidth) +
-                    1 +
-                    'px',
-                  top: '0px',
-                  background: 'transparent'
-                }"
-              />
+              <div @mousedown="startLeftMove($event)"
+                style="width:1px;height:40px;position:absolute;left:0px;top:0;cursor:w-resize;background:transparent;" />
+              <div @mousedown="startRightMove($event)" :style="{
+                userSelect: 'none',
+                height: '40px',
+                width: '1px',
+                position: 'absolute',
+                cursor: 'e-resize',
+                left:
+                  ((operation.endTiming - operation.startTiming) /
+                    displayAreaTime) *
+                  (global.documentWidth - global.siderWidth) +
+                  1 +
+                  'px',
+                top: '0px',
+                background: 'transparent'
+              }" />
             </div>
           </el-tooltip>
         </div>
@@ -304,8 +259,8 @@ const checkOverlap = (start, end, exclude) => {
   return false;
 };
 
-const longOperationCanMove = () => {
-  if (props.operation.isPending || props.operation.isDeleting) return;
+const longOperationCanMove = (e) => {
+  if (e.button !== 0 || edit.value || props.operation.isPending || props.operation.isDeleting) return;
   canMove.value = true;
   dragStartX.value = props.global.clientX;
   dragStartTiming.value = props.operation.startTiming;
@@ -313,8 +268,8 @@ const longOperationCanMove = () => {
   snapPoints.value = collectSnapPoints(props.operation);
 };
 
-const startLeftMove = () => {
-  if (props.operation.isPending || props.operation.isDeleting) return;
+const startLeftMove = (e) => {
+  if (e.button !== 0 || edit.value || props.operation.isPending || props.operation.isDeleting) return;
   leftMove.value = true;
   dragStartX.value = props.global.clientX;
   dragStartTiming.value = props.operation.startTiming;
@@ -322,8 +277,8 @@ const startLeftMove = () => {
   snapPoints.value = collectSnapPoints(props.operation);
 };
 
-const startRightMove = () => {
-  if (props.operation.isPending || props.operation.isDeleting) return;
+const startRightMove = (e) => {
+  if (e.button !== 0 || edit.value || props.operation.isPending || props.operation.isDeleting) return;
   rightMove.value = true;
   dragStartX.value = props.global.clientX;
   dragStartTiming.value = props.operation.startTiming;
@@ -342,13 +297,13 @@ const saveOperation = () => {
     if (valid) {
       const oldState = JSON.parse(JSON.stringify(props.operation));
       const newState = JSON.parse(JSON.stringify(tempOperation));
-      
+
       Object.assign(props.operation, newState);
       edit.value = false;
       updateTrack();
 
       if (syncAction) syncAction("UPDATE_MOVE_OP", props.operation);
-      
+
       if (commandHistory) {
         commandHistory.pushCommand({
           description: 'Edit Move Op',
@@ -372,7 +327,7 @@ const deleteSelf = () => {
   if (props.operation.isDeleting) return;
   props.operation.isDeleting = true;
   if (syncAction) syncAction("DELETE_MOVE_OP", props.operation.id);
-  
+
   if (props.global.currentOperation === props.operation) {
     props.global.currentOperation = null;
   }
@@ -385,7 +340,7 @@ const deleteOperation = () => {
     type: "warning",
   }).then(() => {
     deleteSelf();
-  }).catch(() => {});
+  }).catch(() => { });
 };
 
 const selfClicked = () => {
@@ -398,25 +353,25 @@ watch(() => props.global.mouseUp, () => {
     leftMove.value = false;
     rightMove.value = false;
     snapPoints.value = [];
-    props.track.moveOperations.sort((a,b) => a.startTiming - b.startTiming);
+    props.track.moveOperations.sort((a, b) => a.startTiming - b.startTiming);
     updateTrack();
-    
+
     const finalStart = props.operation.startTiming;
     const finalEnd = props.operation.endTiming;
-    
+
     if (finalStart !== dragStartTiming.value || finalEnd !== dragEndTiming.value) {
       const oldS = dragStartTiming.value;
       const oldE = dragEndTiming.value;
 
       if (syncAction) syncAction("UPDATE_MOVE_OP", props.operation);
-      
+
       if (commandHistory) {
         commandHistory.pushCommand({
           description: 'Move Move Op',
           undo: () => {
             props.operation.startTiming = oldS;
             props.operation.endTiming = oldE;
-            props.track.moveOperations.sort((a,b) => a.startTiming - b.startTiming);
+            props.track.moveOperations.sort((a, b) => a.startTiming - b.startTiming);
             if (syncAction) syncAction("UPDATE_MOVE_OP", props.operation);
             updateTrack();
             updateTemp();
@@ -424,7 +379,7 @@ watch(() => props.global.mouseUp, () => {
           redo: () => {
             props.operation.startTiming = finalStart;
             props.operation.endTiming = finalEnd;
-            props.track.moveOperations.sort((a,b) => a.startTiming - b.startTiming);
+            props.track.moveOperations.sort((a, b) => a.startTiming - b.startTiming);
             if (syncAction) syncAction("UPDATE_MOVE_OP", props.operation);
             updateTrack();
             updateTemp();
