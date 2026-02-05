@@ -213,9 +213,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public ReturnResponse<ImageVO> imgUpload(@Param("file") MultipartFile file, HttpServletRequest req) {
         try {
-            String userId = Objects.requireNonNull(Normal.getUserIdByCookie(req));
+            String userId = Normal.getUserIdByCookie(req);
+            if (userId == null) {
+                return ReturnResponse.systemException(ReturnStatus.NO_LOGIN);
+            }
             ImageVO imageVO = new ImageVO();
-
             // 使用 R2 存储头像
             String url = fileStorageService.uploadFile(file, "avatars");
 
