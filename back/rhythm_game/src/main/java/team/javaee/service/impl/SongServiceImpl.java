@@ -455,6 +455,18 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
                     changeBackgroundOperationMapper.insert(bo);
                 }
             }
+
+            // [资产保护] 恢复 JSON 中引用的所有资产状态，撤销可能的删除标记
+            if (content.getAssets() != null) {
+                for (SongAsset asset : content.getAssets()) {
+                    SongAsset dbAsset = songAssetMapper.selectById(asset.getId());
+                    if (dbAsset != null) {
+                        dbAsset.setIsDeleted(0);
+                        songAssetMapper.updateById(dbAsset);
+                        log.info("🛡️ [Rollback Protect] 已撤销资产删除标记: {}", asset.getName());
+                    }
+                }
+            }
             return ReturnResponse.OK("重置成功");
         } catch (Exception e) {
             log.error("重置谱面失败", e);
