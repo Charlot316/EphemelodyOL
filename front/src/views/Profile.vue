@@ -170,6 +170,7 @@ export default {
           const { data: res } = await this.$http.post('/user/uploadIcon', formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
           });
+          console.log('[Avatar Upload] Response:', res);
           if (res.code === 0) {
             this.$message.success(this.$t('profile.avatarSuccess'));
             this.$store.commit("changeParam", { key: "icon", value: res.data.url });

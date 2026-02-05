@@ -36,7 +36,7 @@ const updateDisplay = () => {
 const animateValue = (newValue) => {
     const target = Number(newValue);
     new TWEEN.Tween(internalValue.value)
-        .to({ val: target }, 500)
+        .to({ val: target }, 400)
         .easing(TWEEN.Easing.Quadratic.Out)
         .onUpdate(updateDisplay)
         .start();
@@ -50,10 +50,11 @@ onMounted(() => {
     internalValue.value.val = Number(props.value);
     updateDisplay();
 
-    // Ensure tween works
     const animate = (time) => {
+        if (TWEEN.getAll().length > 0) {
+            TWEEN.update(time);
+        }
         requestAnimationFrame(animate);
-        TWEEN.update(time);
     };
     requestAnimationFrame(animate);
 });

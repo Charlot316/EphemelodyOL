@@ -41,8 +41,8 @@
         <RollingNumber :value="global.score || 0" :format="{ minimumIntegerDigits: 8, useGrouping: false }" />
       </div>
       <div class="combo-counter-wrapper" v-if="global.combo > 1">
-        <div class="combo-number">
-          <RollingNumber :value="global.combo" />
+        <div class="combo-number" :key="global.combo">
+          {{ global.combo }}
         </div>
         <div class="combo-label">
           <span :style="{
@@ -170,6 +170,21 @@ defineExpose({
   color: #fff;
   line-height: 1;
   text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+  animation: combo-pop 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes combo-pop {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.15);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 .combo-label {
