@@ -66,6 +66,9 @@ public interface SongService extends IService<Song> {
         // 删除资源素材
         ReturnResponse<String> deleteAsset(Integer id);
 
+        // 重命名资源素材
+        ReturnResponse<String> renameAsset(Integer id, String newName);
+
         // 从 JSON 重置数据库
         ReturnResponse<String> resetChartFromJSON(String songId);
 

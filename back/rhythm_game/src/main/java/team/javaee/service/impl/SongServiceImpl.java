@@ -131,8 +131,18 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
             song.setChartConstant(editChartDTO.getChartConstant());
             songMapper.updateById(song);
 
-            // [逻辑优化] 直接通过 SQL 清洗 song_asset 表，删除与封面/背景重复的资产项
-            songAssetMapper.deleteDuplicateAssets(song.getId());
+            // [去重优化] 确保新设置的封面/背景不再出现在 assets 列表中 (使用标准 MP 接口)
+            List<String> urlsToClean = new ArrayList<>();
+            if (song.getSongCover() != null)
+                urlsToClean.add(song.getSongCover());
+            if (song.getDefaultBackground() != null)
+                urlsToClean.add(song.getDefaultBackground());
+
+            if (!urlsToClean.isEmpty()) {
+                songAssetMapper.delete(new QueryWrapper<SongAsset>()
+                        .eq("song_id", song.getId())
+                        .in("url", urlsToClean));
+            }
 
             return ReturnResponse.OK("更新成功！");
         } catch (Exception e) {
@@ -152,6 +162,11 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
                 }
                 song.setSongCover(url);
                 songMapper.updateById(song);
+
+                // 同步清理资产表中的同名 URL 项
+                songAssetMapper.delete(new QueryWrapper<SongAsset>()
+                        .eq("song_id", songId)
+                        .eq("url", url));
             }
             ImageVO vo = new ImageVO();
             vo.setUrl(url);
@@ -174,6 +189,11 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
                 }
                 song.setDefaultBackground(url);
                 songMapper.updateById(song);
+
+                // 同步清理资产表中的同名 URL 项
+                songAssetMapper.delete(new QueryWrapper<SongAsset>()
+                        .eq("song_id", songId)
+                        .eq("url", url));
             }
             ImageVO vo = new ImageVO();
             vo.setUrl(url);
@@ -240,9 +260,6 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
                 fileStorageService.deleteFile(asset.getUrl());
                 songAssetMapper.deleteById(asset.getId());
             }
-
-            // [逻辑完善] 通过 SQL 直接清理重复的封面/背景资产项
-            songAssetMapper.deleteDuplicateAssets(songId);
 
             return ReturnResponse.OK("发布谱面成功！云端文件已同步，已清理过期资源。");
         } catch (Exception e) {
@@ -377,6 +394,23 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
             }
             return ReturnResponse.OK("已标记删除，发布后生效");
         } catch (Exception e) {
+            return ReturnResponse.systemException(ReturnStatus.BUSINESS_EXCEPTION);
+        }
+    }
+
+    @Override
+    public ReturnResponse<String> renameAsset(Integer id, String newName) {
+        try {
+            SongAsset asset = songAssetMapper.selectById(id);
+            if (asset != null) {
+                asset.setName(newName);
+                songAssetMapper.updateById(asset);
+                log.info("✏️ [Asset Rename] 资源已重命名: id={}, newName={}", id, newName);
+                return ReturnResponse.OK("已重命名");
+            }
+            return ReturnResponse.packageObject("资源不存在", ReturnStatus.FAILURE);
+        } catch (Exception e) {
+            log.error("重命名资产失败", e);
             return ReturnResponse.systemException(ReturnStatus.BUSINESS_EXCEPTION);
         }
     }

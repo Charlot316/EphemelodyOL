@@ -300,6 +300,12 @@ export function useChartEditor(route, router) {
         if (bgSync && clientId !== msg.clientId) Object.assign(bgSync, payload);
         break;
 
+      case "UPDATE_ASSET_ACK":
+      case "UPDATE_ASSET":
+        const assetToSync = chart.assets.find(a => a.id === payload.id);
+        if (assetToSync && clientId !== msg.clientId) Object.assign(assetToSync, payload);
+        break;
+
       case "ERROR":
         ElNotification({ title: "同步错误", message: payload, type: "error" });
         break;

@@ -93,6 +93,12 @@ public class SongController {
         return songService.deleteAsset(asset.getId());
     }
 
+    @ApiOperation("重命名资源素材")
+    @PostMapping("renameAsset")
+    public ReturnResponse<String> renameAsset(@RequestBody SongAsset asset) {
+        return songService.renameAsset(asset.getId(), asset.getName());
+    }
+
     @ApiOperation("重置谱面到上次发布的JSON状态")
     @PostMapping("resetChart")
     public ReturnResponse<String> resetChart(@RequestParam("songId") String songId) {

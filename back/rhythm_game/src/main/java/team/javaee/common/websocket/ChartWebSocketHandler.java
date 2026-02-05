@@ -73,6 +73,9 @@ public class ChartWebSocketHandler extends TextWebSocketHandler {
     @Autowired
     private ChangeBackgroundOperationMapper changeBackgroundOperationMapper;
 
+    @Autowired
+    private SongAssetMapper songAssetMapper;
+
     // Room management: songId -> sessions
     private static final Map<String, Set<WebSocketSession>> rooms = new ConcurrentHashMap<>();
     private static final Map<WebSocketSession, String> sessionToRoom = new ConcurrentHashMap<>();
@@ -295,6 +298,11 @@ public class ChartWebSocketHandler extends TextWebSocketHandler {
                     int deletedRows = changeBackgroundOperationMapper.deleteById(bgOpId);
                     log.info("✅ [DELETE_BG_OP] 删除完成，影响行数: {}, ID: {}", deletedRows, bgOpId);
                     resultPayload = msg.getPayload();
+                    break;
+                case "UPDATE_ASSET":
+                    SongAsset sa = objectMapper.convertValue(msg.getPayload(), SongAsset.class);
+                    songAssetMapper.updateById(sa);
+                    resultPayload = sa;
                     break;
             }
         } catch (Exception e) {

@@ -45,9 +45,16 @@
           </div>
         </div>
         <div class="asset-info">
-          <span class="asset-name">
+          <div v-if="editingAssetId === asset.id" class="rename-container">
+            <el-input v-model="tempName" size="small" @blur="handleRename(asset)" @keyup.enter="handleRename(asset)"
+              auto-focus ref="renameInput" />
+          </div>
+          <span v-else class="asset-name" @dblclick="startRename(asset)">
             <el-tag v-if="asset.name === 'Cover'" size="small" type="info" class="cover-tag">封面</el-tag>
             {{ asset.name }}
+            <el-icon class="rename-icon" @click.stop="startRename(asset)">
+              <Edit />
+            </el-icon>
           </span>
         </div>
       </div>
@@ -56,8 +63,8 @@
 </template>
 
 <script setup>
-import { defineProps, computed } from 'vue';
-import { Picture, Plus, Files, Delete, Link } from '@element-plus/icons-vue';
+import { defineProps, computed, ref, inject } from 'vue';
+import { Picture, Plus, Files, Delete, Link, Edit } from '@element-plus/icons-vue';
 import { ElMessageBox, ElNotification } from 'element-plus';
 import { Axios } from '@/plugins/axios';
 
@@ -66,6 +73,41 @@ const props = defineProps({
   global: Object,
   Height: Number
 });
+
+const syncAction = inject('syncAction');
+const history = inject('commandHistory');
+
+const editingAssetId = ref(null);
+const tempName = ref('');
+
+const startRename = (asset) => {
+  editingAssetId.value = asset.id;
+  tempName.value = asset.name;
+};
+
+const handleRename = async (asset) => {
+  if (!tempName.value || tempName.value === asset.name) {
+    editingAssetId.value = null;
+    return;
+  }
+
+  const oldName = asset.name;
+  const newName = tempName.value;
+
+  const executeRename = (name) => {
+    asset.name = name;
+    if (syncAction) syncAction("UPDATE_ASSET", { id: asset.id, name: name });
+  };
+
+  history.pushCommand({
+    undo: () => executeRename(oldName),
+    redo: () => executeRename(newName),
+    description: `重命名资产: ${oldName} -> ${newName}`
+  });
+
+  executeRename(newName);
+  editingAssetId.value = null;
+};
 
 const filteredAssets = computed(() => {
   if (!props.chart.assets) return [];
@@ -259,6 +301,23 @@ const onDragStart = (event, asset) => {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.rename-icon {
+  font-size: 12px;
+  color: #666;
+  margin-left: auto;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.asset-name:hover .rename-icon {
+  opacity: 1;
+}
+
+.rename-container {
+  width: 100%;
 }
 
 .cover-tag {

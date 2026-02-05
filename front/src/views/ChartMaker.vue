@@ -305,6 +305,9 @@ onMounted(() => {
         history.undo();
       }
       e.preventDefault();
+    } else if ((e.ctrlKey || e.metaKey) && e.key === 'y') {
+      history.redo();
+      e.preventDefault();
     }
   };
 
