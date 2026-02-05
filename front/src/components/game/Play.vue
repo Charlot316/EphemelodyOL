@@ -6,8 +6,8 @@
 
     <!-- 记分板 -->
     <div :class="loadingStatus.beforeFinished
-        ? 'play-interface-scoreboard-container-upward'
-        : 'play-interface-scoreboard-container-downward'
+      ? 'play-interface-scoreboard-container-upward'
+      : 'play-interface-scoreboard-container-downward'
       " :style="{
         height: '200px',
         position: 'absolute',
@@ -30,29 +30,21 @@
       </div>
       <div class="score-counter" style="text-align:center;
           position:absolute;
-          right:0px;
-          width: 200px;
+          right:20px;
+          width: 300px;
           margin: 0 auto;
-          text-shadow: 1px 1px 0 rgba(0,0,0,0.25);
-          font-size:40px;
+          text-shadow: 0 4px 12px rgba(0,0,0,0.5);
+          font-size:48px;
+          font-weight: 800;
+          font-family: 'Outfit', sans-serif;
           color:rgb(255,255,255)">
-        {{ score }}
+        <RollingNumber :value="global.score || 0" :format="{ minimumIntegerDigits: 8, useGrouping: false }" />
       </div>
-      <div class="combo-counter" v-if="global.combo > 1">
-        <div style="text-align:center;
-          width: 200px;
-          margin: 0 auto;
-          text-shadow: 1px 1px 0 rgba(0,0,0,0.25);
-          font-size:70px;
-          color:rgb(255,255,255)">
-          {{ global.combo }}
+      <div class="combo-counter-wrapper" v-if="global.combo > 1">
+        <div class="combo-number">
+          <RollingNumber :value="global.combo" />
         </div>
-        <div style="text-align:center;
-          width: 200px;
-          margin: 0 auto;
-          text-shadow: 1px 1px 0 rgba(0,0,0,0.25);
-          font-size:20px;
-          color:rgb(255,255,255)">
+        <div class="combo-label">
           <span :style="{
             color: [
               global.combo == global.pureCount && global.lostCount == 0
@@ -81,6 +73,7 @@
 <script setup>
 import { ref, defineProps, defineEmits, defineExpose } from 'vue';
 import BeatPlayer from "@/components/game/BeatPlayer.vue";
+import RollingNumber from './RollingNumber.vue';
 
 const props = defineProps({
   loadingStatus: Object,
@@ -159,5 +152,32 @@ defineExpose({
   top: 0;
   left: 0;
   overflow: hidden;
+}
+
+.combo-counter-wrapper {
+  position: absolute;
+  left: 50%;
+  top: 50px;
+  transform: translateX(-50%);
+  text-align: center;
+  pointer-events: none;
+}
+
+.combo-number {
+  font-size: 80px;
+  font-weight: 900;
+  font-family: 'Outfit', sans-serif;
+  color: #fff;
+  line-height: 1;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+.combo-label {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: rgba(255, 255, 255, 0.8);
+  margin-top: -5px;
+  text-transform: uppercase;
 }
 </style>
